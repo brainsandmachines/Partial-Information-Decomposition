@@ -6,7 +6,6 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics import r2_score
 from itertools import chain, combinations
 from typing import List, Tuple, Union
-import rpy2
 
 class CommonalityAnalysis:
     def __init__(self,predictions,target):
@@ -81,10 +80,10 @@ class CommonalityAnalysis:
         
         i.e 
         For two random variables:
-        U(Y;X1) = R^2(Y;X1) - CA{1,2}
+        U(Y;X1) = R^2(Y;X1) - unique{1,2}
 
         For three random variables:
-        U(Y;X1) = R^2(Y;X1) - CA{1,2} - CA{1,3} - CA{1,2,3}
+        U(Y;X1) = R^2(Y;X1) - unique{1,2} - unique{1,3} - unique{1,2,3}
         
         etc...
 
@@ -93,7 +92,7 @@ class CommonalityAnalysis:
 
         In general form: 
         Lets R^2(Y;X1,,,Xm) where m < n.
-        U(Y;X1,,,Xm) = R^2(Y;X1,,,Xm) - CA{1,,,,m,m+1} - CA{1,,,,m,m+2} - ... - CA{1,,,,,,n}
+        U(Y;X1,,,Xm) = R^2(Y;X1,,,Xm) - unique{1,,,,m,m+1} - unique{1,,,,m,m+2} - ... - unique{1,,,,,,n}
         """
         self.unique_dict = {}
         for S in list(reversed(self.powerset_idx)):
@@ -137,16 +136,15 @@ class CommonalityAnalysis:
 
 def test_CA():
     rng = np.random.default_rng(0)
-    n = 1000
+    n = 1000000
 
-    X1 = rng.normal(0, 1, n)
-    X2 = 0.5 * X1 + rng.normal(0, 1, n)   # correlated with X1
-    X3 = 0.3 * X1 + 0.7 * X2 + rng.normal(0, 1, n)  # correlated with X1 and X2
-    X4 = X1 + X3
-    X5 = rng.normal(0, 1, n)  # independent
-    Y  = 2 * X1 + 0.5 * X2 + X3 + rng.normal(0, 1, n)
+    S1 = rng.normal(0, 1, n)
+    N1 = rng.normal(0, 1, n)
+    X1 = S1 + N1
+    X2 = N1
+    Y  = S1
 
-    X = np.column_stack([X1, X2,X3])
+    X = np.column_stack([X1, X2])
     CA = CommonalityAnalysis(X,Y)
     CA.r_squared()
     CA._find_intersetion_r2()

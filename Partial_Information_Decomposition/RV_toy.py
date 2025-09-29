@@ -18,6 +18,7 @@ def generate_random_variables(func: Optional[Callable], num_obsv: int, vec_size:
     
     the purpose of this function is just to generate random variables as many as
     the  wishes and to apply a function to them if needed. else returns the random variables
+    
     returns: 
     what func outputs
     """

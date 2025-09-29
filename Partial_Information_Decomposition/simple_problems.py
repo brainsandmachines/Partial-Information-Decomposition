@@ -1,51 +1,71 @@
+import admUI
+import numpy as np
+from admUI import admUI_numpy
+from dit.shannon import conditional_entropy as dit_conditional_entropy
 from dit import Distribution
-from dit.pid import PID_BROJA
+from itertools import product
 
-def bern_pair_probs(p1=0.5, p2=0.5):
-    """Return joint probs P(X1=a, X2=b) for independent Bernoulli(p1), Bernoulli(p2)."""
-    return {
+def bern_pair_as_channels(p1=0.5, p2=0.5):
+    """
+    Convert two independent Bernoulli(p1), Bernoulli(p2) into
+    PXgS, PYgS, PS format compatible with computeQUI_numpy.
+    """
+    # Define joint distribution P(X1, X2)
+    probs = {
         (0,0): (1-p1)*(1-p2),
         (0,1): (1-p1)*p2,
         (1,0): p1*(1-p2),
         (1,1): p1*p2,
     }
 
-def broja_xor(p1=0.5, p2=0.5):
-    """
-    Exact distribution for XOR:
-      M1 = X1, M2 = X2, T = X1 XOR X2
-    Outcomes are tuples (M1, M2, T).
-    """
-    pm = bern_pair_probs(p1, p2)
-    supp = []
-    pmf  = []
-    for (x1,x2), pr in pm.items():
-        t = (x1 ^ x2)  # XOR
-        supp.append((x1, x2, t))
-        pmf.append(pr)
-    dist = Distribution(supp, pmf)
-    pid  = PID_BROJA(dist, inputs=[[0],[1]], output=[2])
-    return dist, pid
+    # There are 4 possible states of S, each representing (x1, x2)
+    states = [(0,0), (0,1), (1,0), (1,1)]
 
-def broja_two_bit_copy(p1=0.5, p2=0.5):
-    """
-    Exact distribution for two-bit copy:
-      M1 = X1, M2 = X2, T = (X1, X2)   (literal pair)
-    Outcomes are (M1, M2, T_tuple).
-    """
-    pm = bern_pair_probs(p1, p2)
-    supp = []
-    pmf  = []
-    for (x1,x2), pr in pm.items():
-        t = (x1, x2)      # T is the pair
-        supp.append((x1, x2, t))
-        pmf.append(pr)
-    dist = Distribution(supp, pmf)
-    pid  = PID_BROJA(dist, inputs=[[0],[1]], output=[2])
-    return dist, pid
+    # Prior over S (column vector)
+    PS = np.array([[probs[s]] for s in states])
 
-# --- Examples (uncomment to run) ---
-d_xor, pid_xor = broja_xor(0.5, 0.5)
-print("XOR BROJA:", pid_xor)
-# d_copy, pid_copy = broja_two_bit_copy(0.5, 0.5)
-# print("Two-bit copy BROJA:", pid_copy.get_measures())
+    # Channel PX1|S : rows = S, cols = values of X1
+    PX1gS = np.zeros((4,2))
+    for i,(x1,x2) in enumerate(states):
+        PX1gS[i, x1] = 1.0
+
+    # Channel PX2|S : rows = S, cols = values of X2
+    PX2gS = np.zeros((4,2))
+    for i,(x1,x2) in enumerate(states):
+        PX2gS[i, x2] = 1.0
+
+    return PX1gS, PX2gS, PS
+
+
+PXgS = np.array([[ 2./3,  0.],
+                    [ 1./3,  1.]])
+PYgS = PXgS
+PS = np.array([[ 0.75], [ 0.25]])
+Q = admUI_numpy.computeQUI_numpy(PXgS, PYgS, PS)
+print(PXgS.shape)
+print(PYgS.shape)
+print(PS.shape)
+print(Q.shape)
+print(Q)
+
+PX1gS, PX2gS, PS = bern_pair_as_channels()
+print(PX1gS.shape)
+print(PX2gS.shape)
+print(PS)
+Q_min = admUI_numpy.computeQUI_numpy(PX1gS.T, PX2gS.T, PS)
+print("QUI for two independent Bernoulli(0.5) sources:", Q_min)
+
+print('Calculating U')
+def dist_from_tensor(Q, names=('S','X','Y')):
+    Q = np.asarray(Q, float)
+    assert np.isclose(Q.sum(), 1.0), "Q must sum to 1"
+    nS, nX1, nX2 = Q.shape
+    outcomes = list(product(range(nS), range(nX1), range(nX2)))  # (s,x1,x2)
+    pmf = Q.reshape(-1)
+    d = Distribution(outcomes, pmf)
+    d.set_rv_names(list(names))
+    return d
+
+Q = dist_from_tensor(Q)
+U_M1 = dit_conditional_entropy(Q, 'S', 'X') + dit_conditional_entropy(Q, 'X', 'Y') - dit_conditional_entropy(Q, 'SX', 'Y')
+print(U_M1)
