@@ -52,7 +52,7 @@ class broja_venkatesh():
         which is constant across P and Q Venkatesh et al 2019"""
 
         self.constant_auto_cov = (self.cov_dict['cross_cov_m12_t'] @ inv(self.cov_dict['cov_t']) @ self.cov_dict['cross_cov_m12_t'].T)
-        self.constant_diff = self.constant_auto_cov[self.m1_dim:self.m1_dim+self.m2_dim, 0:self.m1_dim] #Equals to   ΣM1,M2 - ΣM1,M2|T
+        self.constant_diff = self.constant_auto_cov[0:self.m1_dim,self.m1_dim:self.m1_dim+self.m2_dim] #Equals to   ΣM1,M2 - ΣM1,M2|T
         
 
     def create_cov_matrix(self):
@@ -102,7 +102,7 @@ class broja_venkatesh():
 
             conditional_cov = block([[cov_m1_cond_t, matrix],
                                     [matrix.T, cov_m2_cond_t]]) #TODO: Check if the identitiy needs to be there or somemthing eles
-            assert conditional_cov.shape == (2*self.m1_dim, 2*self.m2_dim)
+            assert conditional_cov.shape == (self.m1_dim + self.m2_dim, self.m1_dim + self.m2_dim)
 
             eig_decomp = eigh(conditional_cov)
             eig_values = eig_decomp[0]
@@ -121,7 +121,7 @@ class broja_venkatesh():
         output: projected solution"""
         conditional_cov = self.create_positive_semidefinite(sol) #ΣXY |M (Create positive semi definite matrix)
 
-        cov_m1_2_cond_t = conditional_cov[self.m1_dim:self.m1_dim+self.m2_dim, 0:self.m1_dim] ##ΣX,Y |M maybe I can just use sol (?)
+        cov_m1_2_cond_t = conditional_cov[0:self.m1_dim, self.m1_dim:self.m1_dim+self.m2_dim] ##ΣX,Y |M maybe I can just use sol (?)
 
         conditional_m1 = conditional_cov[0:self.m1_dim, 0:self.m1_dim]
         conditional_m2 = conditional_cov[self.m1_dim:self.m1_dim+self.m2_dim, self.m1_dim:self.m1_dim+self.m2_dim]
@@ -187,27 +187,33 @@ class broja_venkatesh():
         B = self.cov_m1_t - sol_0 @ self.cov_m2_t #B = H(M1) - Σ(M1,M2|T) @ H(M2)
 
         # Define S
-        I = np.eye(sol_0.shape[0])
-        S = I - sol_0 @ sol_0.T #Not sure if this is needed
-        inv_S = inv((1+epsilon)*I - sol_0 @ sol_0.T)
+        I_t = np.eye(self.t_dim)
+        S = I_t - sol_0 @ sol_0.T #Not sure if this is needed
+        inv_S = inv((1+epsilon)*np.eye(sol_0.shape[0]) - sol_0 @ sol_0.T)
 
 
 
         for i in range(num_iterations):
             """Preforming gradient descent to minimize the objective function
             using Rprop algorithm"""
-            # Compute gradients
+            # Compute gradients'
+
+            
+            
             if i == 0:
                 sol = sol_0
 
-            # Compute gradient
-            grad = inv_S@ B @ inv(I + self.cov_m2_t @ self.cov_m2_t.T + B.T @ inv_S @ B) @ (B.T @ inv_S @ sol - self.cov_m2_t.T)
+                # Compute gradient
+                grad = inv_S@ B @ inv(I_t + self.cov_m2_t.T @ self.cov_m2_t + B.T @ inv_S @ B) @ (B.T @ inv_S @ sol - self.cov_m2_t.T)
+                sign_grad_curr = sign(grad)
 
+            if i > 0:
+                mue *=  beta**(-(sign_grad_curr*sign_grad_prev))
+
+            
+            
             # Update solution
-            sign_sol = sign(grad)
-
-
-            sol -= ((alpha)**i) * mue * sign_sol # *  - Hadamard product
+            sol -= ((alpha)**i) * mue * sign_grad_curr # *  - Hadamard product
             if np.isnan(sol).any():
                 print("NaN detected in solution, stopping gradient descent.")
                 break
@@ -219,9 +225,10 @@ class broja_venkatesh():
             B = self.cov_m1_t - sol_new @ self.cov_m2_t
 
             S = I - sol_new @ sol_new.T #Not sure if this is needed
-            inv_S = inv((1+epsilon)*I - sol_new @ sol_new.T)
+            inv_S = inv((1+epsilon)*np.eye(sol_0.shape[0]) - sol_new @ sol_new.T)
 
-            mue *=  beta**(-(sign(sol_new)*sign_sol))
+            #Keep previous gradient sign
+            sign_grad_prev = sign_grad_curr
 
             #Update solution
             sol = sol_new

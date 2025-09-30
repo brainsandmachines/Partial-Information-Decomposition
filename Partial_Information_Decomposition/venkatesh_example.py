@@ -77,6 +77,6 @@ if __name__ == "__main__":
     
     #pure_redundant_ = PID_BROJA(pure_redundant,vec_size,num_obsv)
 
-    #pure_synargy_ = PID_BROJA(pure_synargy,vec_size,num_obsv)
+    pure_synargy_ = PID_BROJA(pure_synargy,vec_size,num_obsv)
 
-    run_exp(PID_BROJA,pure_redundant,50,vec_size,num_obsv)
+    #run_exp(PID_BROJA,pure_redundant,50,vec_size,num_obsv)
