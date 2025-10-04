@@ -4,7 +4,7 @@ import torch
 from RV_toy import generate_random_variables
 from torch.distributions import Distribution, Normal 
 from numpy.linalg import inv, det, slogdet, eigh, pinv
-from numpy import block, sign, ones, log
+from numpy import block, sign, ones, log , eye
 from scipy.linalg import sqrtm
 
 
@@ -49,7 +49,7 @@ class broja_venkatesh():
         #Define the constant difference that will be used to find the real solution after gradient descent
         """We can use ΣX,Y|M in place of ΣX,Y because they differ by a constant: ΣX,Y|M - ΣX,Y is an off-diagonal
         block in ΣXY - ΣXY |M, which is equal to ΣXY,M @ inv(ΣM) @ transpose(ΣXY,M)
-        which is constant across P and Q Venkatesh et al 2019"""
+        which is constant across P and Q Venkatesh et al 2023"""
 
         self.constant_auto_cov = (self.cov_dict['cross_cov_m12_t'] @ inv(self.cov_dict['cov_t']) @ self.cov_dict['cross_cov_m12_t'].T)
         self.constant_diff = self.constant_auto_cov[0:self.m1_dim,self.m1_dim:self.m1_dim+self.m2_dim] #Equals to   ΣM1,M2 - ΣM1,M2|T
@@ -83,7 +83,7 @@ class broja_venkatesh():
 
     def create_positive_semidefinite(self,matrix):
             """This function creates the component of the projection step
-            from Venkatesh et al 2019
+            from Venkatesh et al 2023
             ΣM1,M2|T := VΛ(bar)VT
             Let λi(bar) := max(0,λi)
             Λ(bar) := diag(λi(bar)).
@@ -94,43 +94,60 @@ class broja_venkatesh():
             input: ΣM1,M2|T which is the off digonal block of ΣXY|M
             """
             #Create ΣXY|M according to the paper appendix shape(2*vec_size,2*vec_size)
-            self.id_vec_size_m1 = np.eye(self.m1_dim)
-            self.id_vec_size_m2 = np.eye(self.m2_dim)
 
-            cov_m1_cond_t = self.cov_dict['cov_m1'] - self.cov_m1_t @ inv(self.cov_dict['cov_t']) @ self.cov_m1_t.T
-            cov_m2_cond_t = self.cov_dict['cov_m2'] - self.cov_m2_t @ inv(self.cov_dict['cov_t']) @ self.cov_m2_t.T
-
-            conditional_cov = block([[cov_m1_cond_t, matrix],
-                                    [matrix.T, cov_m2_cond_t]]) #TODO: Check if the identitiy needs to be there or somemthing eles
-            assert conditional_cov.shape == (self.m1_dim + self.m2_dim, self.m1_dim + self.m2_dim)
-
-            eig_decomp = eigh(conditional_cov)
+            eig_decomp = eigh(matrix)
             eig_values = eig_decomp[0]
             eig_vectors = eig_decomp[1]
             
-            self.id = np.eye(eig_values.shape[0])
+            self.id = eye(eig_values.shape[0])
             max_eig_diag = np.diag(np.maximum(eig_values, 0))
 
             conditional_cov = eig_vectors @ max_eig_diag @ eig_vectors.T
             return conditional_cov
 
     def projection_step(self, sol):
-        """This function is the projection operator from Venkatesh et al 2019
+        """This function is the projection operator from Venkatesh et al 2023
         It will project the solution to the space of valid covariance matrices
         input: sol is the current solution ΣM1,M2|T
         output: projected solution"""
-        conditional_cov = self.create_positive_semidefinite(sol) #ΣXY |M (Create positive semi definite matrix)
 
-        cov_m1_2_cond_t = conditional_cov[0:self.m1_dim, self.m1_dim:self.m1_dim+self.m2_dim] ##ΣX,Y |M maybe I can just use sol (?)
+        
+        conditional_m1 = self.cov_dict['cov_m1'] - self.cov_m1_t @ inv(self.cov_dict['cov_t']) @ self.cov_m1_t.T
+        conditional_m2 = self.cov_dict['cov_m2'] - self.cov_m2_t @ inv(self.cov_dict['cov_t']) @ self.cov_m2_t.T
 
-        conditional_m1 = conditional_cov[0:self.m1_dim, 0:self.m1_dim]
-        conditional_m2 = conditional_cov[self.m1_dim:self.m1_dim+self.m2_dim, self.m1_dim:self.m1_dim+self.m2_dim]
+        conditional_cov_m12_t = block([[conditional_m1, sol],
+                                    [sol.T, conditional_m2]]) #TODO: Check if the identitiy needs to be there or somemthing eles
 
-        conditional_m1_sqrt = sqrtm(conditional_m1)
-        conditional_m2_sqrt = sqrtm(conditional_m2)  
+        assert conditional_cov_m12_t.shape == (self.m1_dim + self.m2_dim, self.m1_dim + self.m2_dim)
 
-        projected_sol = inv((self.gamma*np.eye(conditional_m1.shape[0])) +  conditional_m1_sqrt) @ cov_m1_2_cond_t @ inv((self.gamma*np.eye(conditional_m2.shape[0]) + conditional_m2_sqrt))
-        self.gamma *= 10
+        positive_semidef = self.create_positive_semidefinite(conditional_cov_m12_t) #ΣM1M2|T
+
+        cov_m1_2_cond_t = positive_semidef[0:self.m1_dim, self.m1_dim:self.m1_dim+self.m2_dim] ##ΣX,Y |M maybe I can just use sol (?)
+
+
+        bar_conditional_m1 = positive_semidef[0:self.m1_dim, 0:self.m1_dim] #ΣM1|T
+        bar_conditional_m2 = positive_semidef[self.m1_dim:self.m1_dim+self.m2_dim, self.m1_dim:self.m1_dim+self.m2_dim] #ΣM2|T
+
+        bar_conditional_m1_sqrt = sqrtm(bar_conditional_m1)
+        bar_conditional_m2_sqrt = sqrtm(bar_conditional_m2)
+
+        semi_def = False
+        j = 0
+
+        while not semi_def:
+            """where γ is slowly increased from 10-12, by a factor of 10 in each step, until g(Σproj
+                X,Y |M) ≽ 0 (Venkatesh et al 2023)"""
+            j += 1
+            projected_sol = inv((self.gamma*eye(conditional_m1.shape[0])) +  bar_conditional_m1_sqrt) @ cov_m1_2_cond_t @ inv((self.gamma*eye(conditional_m2.shape[0]) + bar_conditional_m2_sqrt))
+
+            if all(eigh(projected_sol)[0] >= 0):
+                semi_def = True
+                self.gamma = 1e-12 #Reset gamma for next projection step
+                print(f"Projection step converged after {j} iterations with eigenvalue::={eigh(projected_sol)[0]}")
+                j = 0 #Reset j for next projection step
+
+            else:
+                self.gamma *= 10
 
         return projected_sol
     
@@ -187,9 +204,9 @@ class broja_venkatesh():
         B = self.cov_m1_t - sol_0 @ self.cov_m2_t #B = H(M1) - Σ(M1,M2|T) @ H(M2)
 
         # Define S
-        I_t = np.eye(self.t_dim)
-        S = I_t - sol_0 @ sol_0.T #Not sure if this is needed
-        inv_S = inv((1+epsilon)*np.eye(sol_0.shape[0]) - sol_0 @ sol_0.T)
+        I_t = eye(self.t_dim)
+        S = eye(sol_0.shape[0]) - sol_0 @ sol_0.T #Not sure if this is needed
+        inv_S = inv((1+epsilon)*eye(sol_0.shape[0]) - sol_0 @ sol_0.T)
 
 
 
@@ -204,8 +221,8 @@ class broja_venkatesh():
                 sol = sol_0
 
                 # Compute gradient
-                grad = inv_S@ B @ inv(I_t + self.cov_m2_t.T @ self.cov_m2_t + B.T @ inv_S @ B) @ (B.T @ inv_S @ sol - self.cov_m2_t.T)
-                sign_grad_curr = sign(grad)
+            grad = inv_S@ B @ inv(I_t + self.cov_m2_t.T @ self.cov_m2_t + B.T @ inv_S @ B) @ (B.T @ inv_S @ sol - self.cov_m2_t.T)
+            sign_grad_curr = sign(grad)
 
             if i > 0:
                 mue *=  beta**(-(sign_grad_curr*sign_grad_prev))
@@ -224,8 +241,8 @@ class broja_venkatesh():
             # Update B,S and mue for next iteration
             B = self.cov_m1_t - sol_new @ self.cov_m2_t
 
-            S = I - sol_new @ sol_new.T #Not sure if this is needed
-            inv_S = inv((1+epsilon)*np.eye(sol_0.shape[0]) - sol_new @ sol_new.T)
+            S = eye(sol_0.shape[0]) - sol_new @ sol_new.T #Not sure if this is needed
+            inv_S = inv((1+epsilon)*eye(sol_0.shape[0]) - sol_new @ sol_new.T)
 
             #Keep previous gradient sign
             sign_grad_prev = sign_grad_curr
@@ -268,25 +285,34 @@ class broja_venkatesh():
                                   [cov_m1_2_cond_t.T, cov_m2_cond_t]]) #ΣM1M2|T
         #Find I(T;M1,M2):
         no_name = inv(cov_t) @ cov_m12_t.T @ inv(cov_m12_cond_t) @ cov_m12_t #need to find this a name
-        identity = np.eye(no_name.shape[0])
-        self.info_t_m1_m2 = 0.5*log(det(identity + no_name))
+        identity = eye(no_name.shape[0])
+        
+        log_det_info_t_m1_m2 = slogdet(identity + no_name)
+
+        self.info_t_m1_m2 = 0.5*log_det_info_t_m1_m2[1] #More stable the log(det(.))
         
         print(f"\nI(T;M1,M2) = {self.info_t_m1_m2}")
 
 
 
         #Find I(T;M1)
-        entropy_m1 = 0.5*log(det(2*np.pi*np.e*self.cov_dict['cov_m1']))
-        entropy_m1_cond_t = 0.5*log(det(2*np.pi*np.e*cov_m1_cond_t))
+        _, m1_logdet = slogdet(2*np.pi*np.e*self.cov_dict['cov_m1']) #More stable the log(det(.))
+        entropy_m1 = 0.5*m1_logdet
+
+        _, m1_logdet_cond_t = slogdet(2*np.pi*np.e*cov_m1_cond_t)
+        entropy_m1_cond_t = 0.5*m1_logdet_cond_t
 
         self.info_t_m1 = entropy_m1 - entropy_m1_cond_t
         print(f"I(T;M1) = {self.info_t_m1}")
 
 
         #Find I(T;M2)
-        entropy_m2 = 0.5*log(det(2*np.pi*np.e*self.cov_dict['cov_m2']))
-        entropy_m2_cond_t = 0.5*log(det(2*np.pi*np.e*cov_m2_cond_t))
-       
+        _, m2_logdet = slogdet(2*np.pi*np.e*self.cov_dict['cov_m2']) #More stable the log(det(.))
+        entropy_m2 = 0.5*m2_logdet
+
+        _, m2_logdet_cond_t = slogdet(2*np.pi*np.e*cov_m2_cond_t)
+        entropy_m2_cond_t = 0.5*m2_logdet_cond_t
+
         self.info_t_m2 = entropy_m2 - entropy_m2_cond_t
         print(f"I(T;M2) = {self.info_t_m2}")
 
@@ -294,8 +320,8 @@ class broja_venkatesh():
      
         
         #Unique information for U(T;M1\M2)
-        unique_t_m1 = self.info_t_m1_m2 - self.info_t_m2
-        unique_t_m2 = self.info_t_m1_m2 - self.info_t_m1
+        unique_t_m1 = self.info_t_m1_m2 - self.info_t_m1
+        unique_t_m2 = self.info_t_m1_m2 - self.info_t_m2
 
         if self.bias:
             print(f"\nApplying bias correction...")
@@ -313,8 +339,8 @@ class broja_venkatesh():
             self.info_t_m2_corrected = self.info_t_m2 * (1 - (bias_m2_t/self.info_t_m2))
             print(f"I(T;M2)[corr] = {self.info_t_m2_corrected}")
 
-            unique_t_m1 = self.info_t_m1_m2_corrected - self.info_t_m2_corrected
-            unique_t_m2 = self.info_t_m1_m2_corrected - self.info_t_m1_corrected
+            unique_t_m1 = self.info_t_m1_m2_corrected - self.info_t_m2 #NOTE: For now no bias correction on I(T;M2) 
+            unique_t_m2 = self.info_t_m1_m2_corrected - self.info_t_m1 #NOTE: For now no bias correction on I(T;M1) 
 
 
         else:
@@ -327,7 +353,7 @@ class broja_venkatesh():
 
     def bias_correction(self,p,q,sample_size):  
         """This function will perform bias correction on the unique information
-        using the method described in Venkatesh et al 2019"""
+        using the method described in Venkatesh et al 2023"""
         p_array = np.arange(1,p+1)
         q_array = np.arange(1,q+1)
         p_q_array = np.arange(1,p+q+1)
@@ -342,7 +368,7 @@ class broja_venkatesh():
     def compute_decomposition(self):
         """This function will compute the partial information decomposition
         using the covariance matrix obtained from gradient descent."""
-        if self.unique_t_m1 or self.unique_t_m2 is None:
+        if (self.unique_t_m1) or (self.unique_t_m2 is None):
             print("Computing Partial Information Decomposition...")
             print("------------------------------------")
             pid = self.unique_pid()
@@ -354,8 +380,8 @@ class broja_venkatesh():
             #print(f"\nRedundant information from M1: R(T;M1) = {self.redundant_m1_}")
             #print(f"\nRedundant information from M2: R(T;M2) = {self.redundant_m2_}")
             assert np.isclose(self.redundant_m1_, self.redundant_m2_,atol=1e-1), "Redundant information from M1 and M2 are not equal"
-            self.redundant = self.info_t_m1 + self.info_t_m2 - self.info_t_m1_m2
-
+            self.redundant =self.redundant_m1_
+            
             self.synergy = self.info_t_m1_m2 - self.unique_t_m1 - self.unique_t_m2 - self.redundant
             print(f"\nRedundant information R(T;M1,M2) = {self.redundant.item()}")
             print(f"\nSynergy information S(T;M1,M2) = {self.synergy.item()}")

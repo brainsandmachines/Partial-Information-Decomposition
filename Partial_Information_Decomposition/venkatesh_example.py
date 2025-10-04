@@ -6,11 +6,11 @@ from torch import rand, randn
 from torch.distributions import Distribution, Normal 
 
 
-def PID_BROJA(func,vec_size,num_obsv):
+def PID_BROJA(func,vec_size,num_obsv,bias:Optional[bool]=False):
 
     M1, M2, T = func(vec_size,num_obsv)
     M1, M2, T = M1.numpy(), M2.numpy(), T.numpy()
-    broja = broja_venkatesh(M1, M2, T, vec_size,bias=True)
+    broja = broja_venkatesh(M1, M2, T, vec_size,bias=bias)
     decomposition_values = broja.compute_decomposition()
     return decomposition_values
 
@@ -33,9 +33,10 @@ def pure_redundant(vec_size,num_obsv):
     M2 = T + noise
     return M1, M2, T
 
-def pure_synargy(vec_size,num_obsv,sigma=1500):
+def pure_synargy(vec_size,num_obsv,sigma=15000):
     dist_T = Normal(loc=0.0, scale=1)
     dist_noise = Normal(loc=0.0, scale=sigma)
+
     T = dist_T.sample((num_obsv, vec_size))
     noise = dist_noise.sample((num_obsv, vec_size))
     M1 = T + noise
@@ -43,14 +44,14 @@ def pure_synargy(vec_size,num_obsv,sigma=1500):
     return M1, M2, T
 
 
-def run_exp(PID,goal_func,trial_num,vec_size,num_obsv):
+def run_exp(PID,goal_func,trial_num,vec_size,num_obsv,bias:Optional[bool]=False):
     Unique_M1_all = 0
     Unique_M2_all = 0
     Redundant_M1_M2_all = 0
     Synergy_M1_M2_all = 0
 
     for i in range(trial_num):
-        results = PID(goal_func,vec_size,num_obsv)
+        results = PID(goal_func,vec_size,num_obsv,bias=True)
         if i % 10 == 0:
             print(f"Trial {i+1}: {results}")
         Unique_M1_all += results['Unique_M1']
@@ -73,10 +74,10 @@ if __name__ == "__main__":
     num_obsv = 3000
     vec_size = 1
 
-    #pure_unique_ = PID_BROJA(pure_unique,vec_size,num_obsv)
+    #pure_unique_ = PID_BROJA(pure_unique,vec_size,num_obsv,bias=True)
     
-    #pure_redundant_ = PID_BROJA(pure_redundant,vec_size,num_obsv)
+    #pure_redundant_ = PID_BROJA(pure_redundant,vec_size,num_obsv,bias=True)
 
-    pure_synargy_ = PID_BROJA(pure_synargy,vec_size,num_obsv)
+    pure_synargy_ = PID_BROJA(pure_synargy,vec_size,num_obsv,bias=True)
 
-    #run_exp(PID_BROJA,pure_redundant,50,vec_size,num_obsv)
+    #run_exp(PID_BROJA,pure_redundant,500,vec_size,num_obsv,bias=True)
