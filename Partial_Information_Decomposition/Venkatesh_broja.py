@@ -77,6 +77,7 @@ class broja_venkatesh():
         self.cov_dict['cross_cov_m1_m2'] = self.Sigma[self.t_dim:self.dt_dm1, self.dt_dm1:self.d_all]#ΣM1,M2
         self.cov_dict['cross_cov_m12_t'] = self.Sigma[self.t_dim:self.d_all, 0:self.t_dim] #ΣM1M2,T #TODO: Not sure if its the correct shape chatGPT says its correct
         self.cov_dict['auto_cov_m12'] = self.Sigma[self.t_dim:self.d_all, self.t_dim:self.d_all]  #ΣM1M2 
+        self.cov_dict['full_cov'] = self.Sigma  #Full covariance matrix
 
         return 
 
@@ -380,9 +381,9 @@ class broja_venkatesh():
             #print(f"\nRedundant information from M1: R(T;M1) = {self.redundant_m1_}")
             #print(f"\nRedundant information from M2: R(T;M2) = {self.redundant_m2_}")
             assert np.isclose(self.redundant_m1_, self.redundant_m2_,atol=1e-1), "Redundant information from M1 and M2 are not equal"
-            self.redundant =self.redundant_m1_
-            
-            self.synergy = self.info_t_m1_m2 - self.unique_t_m1 - self.unique_t_m2 - self.redundant
+            self.redundant =self.redundant_m1_ #NOTE: Maybe I should change to definition of BROJA
+
+            self.synergy = self.info_t_m1_m2 - self.unique_t_m1 - self.unique_t_m2 - self.redundant #NOTE: Maybe I should change to definition of BROJA
             print(f"\nRedundant information R(T;M1,M2) = {self.redundant.item()}")
             print(f"\nSynergy information S(T;M1,M2) = {self.synergy.item()}")
             print(f"\nUnique(T;M1\M2) = {self.unique_t_m1.item()}")
