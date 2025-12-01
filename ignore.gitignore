@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 gpid/
+source_conwell_code/
+external/mayas_project/*
+!/external/mayas_project/.git
+figures_/
