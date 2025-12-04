@@ -49,8 +49,78 @@ class ImageDataset(Dataset):
         return img
 
 
+def load_data_algonauts(paths_dict,args=None, subj=1,plot_fmri=False):
+    """Load fMRI data and image file lists for a given subject.
+    Args:
+        args (argObj): Argument object containing data directories.
+        data_dir (str): Base data directory.
+        parent_submission_dir (str): Parent submission directory.
+        subj (int): Subject number.
+        plot_fmri (bool): Whether to plot fMRI data on brain surface.
+    Returns:
+        dict: Dictionary containing fMRI data and image file lists:
+        output_dict: The actual fMRI data and images sorted.
+        data_dict: Metadata: image directories."""
+    
+
+   
+    data_dir = paths_dict['data_dir'] if 'data_dir' in paths_dict else '/mnt/data4tb/data_algonauts/'
+    parent_submission_dir = paths_dict['parent_submission_dir'] if 'parent_submission_dir' in paths_dict else '/mnt/data4tb/data_algonauts/submissions'
+    fmri_fig_path = paths_dict['fmri_fig_path'] if 'fmri_fig_path' in paths_dict else '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_figs'
+
+    if args is None:
+        args = argObj(data_dir=data_dir,
+            parent_submission_dir=parent_submission_dir,
+            subj=subj)
+
+    print("Loading data for subject:", subj)
+    print("Data directory:", data_dir)
+    print("Parent submission directory:", parent_submission_dir)
+    fmri_dir = os.path.join(args.data_dir, 'training_split', 'training_fmri')
+    lh_fmri = np.load(os.path.join(fmri_dir, 'lh_training_fmri.npy'))
+    rh_fmri = np.load(os.path.join(fmri_dir, 'rh_training_fmri.npy'))
+
+    print('LH training fMRI data shape:')
+    print(lh_fmri.shape)
+    print('(Training stimulus images × LH vertices)')
+
+    print('\nRH training fMRI data shape:')
+    print(rh_fmri.shape)
+    print('(Training stimulus images × RH vertices)')
 
 
+    train_img_dir  = os.path.join(args.data_dir, 'training_split', 'training_images')
+    test_img_dir  = os.path.join(args.data_dir, 'test_split', 'test_images')
+
+    # Create lists will all training and test image file names, sorted
+    train_img_list = os.listdir(train_img_dir)
+    train_img_list.sort()
+    test_img_list = os.listdir(test_img_dir)
+    test_img_list.sort()
+    print('Training images: ' + str(len(train_img_list)))
+    print('Test images: ' + str(len(test_img_list)))
+
+    train_img_file = train_img_list[0]
+    print('Training image file name: ' + train_img_file)
+    print('73k NSD images ID: ' + train_img_file[-9:-4])
+
+    """================================================="""
+    # Visualize fMRI data on brain surface:
+    if plot_fmri:
+        hemisphere = 'l'  # 'l' or 'r'
+        print(f"visualizing fMRI data on brain surface at: {fmri_fig_path} for hemisphere {hemisphere}")
+        plot_fmri(path=fmri_fig_path,args=args,hemi=hemisphere)
+    """==================================================="""
+    output_dict = {
+        'train_img_list': train_img_list,
+        'test_img_list': test_img_list,
+        'lh_fmri': lh_fmri,
+        'rh_fmri': rh_fmri,}
+        
+    data_dict = {'train_img_dir': train_img_dir,
+        'test_img_dir': test_img_dir,}
+
+    return output_dict, data_dict
 
 if __name__ == "__main__":
   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

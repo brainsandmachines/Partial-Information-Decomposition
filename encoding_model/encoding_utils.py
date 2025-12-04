@@ -1,16 +1,18 @@
 from nilearn import plotting
 import os
 import numpy as np
+from numpy import ndarray
 from nilearn import datasets
 import matplotlib.pyplot as plt
 from PIL import Image
-
+from typing import Optional, List
+import joblib
 #Import utils
 from pathlib import Path
 import sys
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from utils import check_file_exists
+from utils import check_file_exists,check_folder_exists
 
 
 def plot_fmri(path,args, hemi, title=''):
@@ -148,8 +150,9 @@ def map_correlation_to_rois(args,lh_correlation,rh_correlation,hemisphere):
         title='Encoding accuracy, '+hemisphere+' hemisphere'
         ).figure
     
-def visualize_encdoing_accuaracy(args,lh_correlation,rh_correlation,fmri_fig_path):
-    """Visualize encoding accuracy with a bar graph
+def visualize_encdoing_accuaracy(args,lh_correlation,rh_correlation,correlation_path,plot=True):
+    """Visualize encoding accuracy with a bar graph and return ROI correlation values and 
+    ROI names for left and right hemispheres for a given subject.
 
     Args:
         args (argObj): Argument object containing data directories.
@@ -202,25 +205,84 @@ def visualize_encdoing_accuaracy(args,lh_correlation,rh_correlation,fmri_fig_pat
     roi_names.append('All vertices')
     lh_roi_correlation.append(lh_correlation)
     rh_roi_correlation.append(rh_correlation)
+    if plot:
+        # Create the plot
+        lh_mean_roi_correlation = [np.mean(lh_roi_correlation[r])
+            for r in range(len(lh_roi_correlation))]
+        rh_mean_roi_correlation = [np.mean(rh_roi_correlation[r])
+            for r in range(len(rh_roi_correlation))]
+        plt.figure(figsize=(18,6))
+        x = np.arange(len(roi_names))
+        width = 0.30
+        plt.bar(x - width/2, lh_mean_roi_correlation, width, label='Left Hemisphere')
+        plt.bar(x + width/2, rh_mean_roi_correlation, width,
+            label='Right Hemishpere')
+        plt.xlim(left=min(x)-.5, right=max(x)+.5)
+        plt.ylim(bottom=0, top=1)
+        plt.xlabel('ROIs')
+        plt.xticks(ticks=x, labels=roi_names, rotation=60)
+        plt.ylabel('Mean Pearson\'s $r$')
+        plt.legend(frameon=True, loc=1)
+        fig_dir = check_file_exists(os.path.join(correlation_path,
+            'mean_roi_correlation.png'))
+        plt.savefig(fig_dir,
+            dpi=300, bbox_inches="tight")
+    
+    return roi_names, lh_mean_roi_correlation, rh_mean_roi_correlation
+    
 
-    # Create the plot
-    lh_mean_roi_correlation = [np.mean(lh_roi_correlation[r])
-        for r in range(len(lh_roi_correlation))]
-    rh_mean_roi_correlation = [np.mean(rh_roi_correlation[r])
-        for r in range(len(rh_roi_correlation))]
-    plt.figure(figsize=(18,6))
-    x = np.arange(len(roi_names))
-    width = 0.30
-    plt.bar(x - width/2, lh_mean_roi_correlation, width, label='Left Hemisphere')
-    plt.bar(x + width/2, rh_mean_roi_correlation, width,
-        label='Right Hemishpere')
-    plt.xlim(left=min(x)-.5, right=max(x)+.5)
-    plt.ylim(bottom=0, top=1)
-    plt.xlabel('ROIs')
-    plt.xticks(ticks=x, labels=roi_names, rotation=60)
-    plt.ylabel('Mean Pearson\'s $r$')
-    plt.legend(frameon=True, loc=1)
-    fig_dir = check_file_exists(os.path.join(fmri_fig_path,
-        'mean_roi_correlation.png'))
-    plt.savefig(fig_dir,
-        dpi=300, bbox_inches="tight")
+def save_corellation(roi_names,lh_correlation,rh_correlation,correlation_path,experiment_name):
+    """Save correlation values to .npy files.
+
+    Args:
+        lh_correlation (np.array): Array of correlation values for left hemisphere vertices.
+        rh_correlation (np.array): Array of correlation values for right hemisphere vertices.
+        correlation_path (str): Path to save the correlation files.
+    """
+    #Define file name: 
+    lh_name = f'{experiment_name}_lh_correlation.npy' if experiment_name else 'lh_correlation.npy'
+    rh_name = f'{experiment_name}_rh_correlation.npy' if experiment_name else 'rh_correlation.npy'
+    roi_names_name = f'{experiment_name}_roi_names.npy' if experiment_name else 'roi_names.npy'
+
+
+    lh_corr_file = check_file_exists(os.path.join(correlation_path,
+        lh_name))
+    rh_corr_file = check_file_exists(os.path.join(correlation_path,
+        rh_name))
+    roi_names_file = check_file_exists(os.path.join(correlation_path,
+        roi_names_name))
+    
+    np.save(lh_corr_file, lh_correlation)
+    np.save(rh_corr_file, rh_correlation)
+    np.save(roi_names_file, roi_names)
+    print(f"Correlation files: {roi_names_file}, {lh_corr_file}, {rh_corr_file} saved to: {correlation_path}")
+
+
+def save_model(reg_lh, reg_rh, folder_path, model_name,
+               roi_names:Optional[List]=None,lh_correlation:Optional[ndarray]=None,rh_correlation:Optional[ndarray]=None):
+    """Save the trained encoding model. with its corellation values and roi names and figs
+
+    Args:
+        reg_lh (LinearRegression): Trained left hemisphere regression model.
+        reg_rh (LinearRegression): Trained right hemisphere regression model.
+        folder_path (str): Path to save the model's folder.
+        model_name (str): Name of the model.
+        roi_names (list, optional): List of ROI names. Defaults to None.
+        lh_correlation (np.array, optional): Array of correlation values for left hemisphere vertices. Defaults to None.
+        rh_correlation (np.array, optional): Array of correlation values for right
+        
+        Returns:
+            Saves the model and correlation values to specified folder with the specific rois.
+    """
+    model_name_joblib = f'{model_name}_encoding_model.joblib' if model_name else 'encoding_model.joblib'
+    
+    models_folder = check_folder_exists(f'{folder_path}/{model_name}')
+    model_save_path = os.path.join(models_folder, model_name_joblib)
+    joblib.dump({'reg_lh': reg_lh, 'reg_rh': reg_rh}, model_save_path)
+    
+    if roi_names is not None and lh_correlation is not None and rh_correlation is not None:
+        save_corellation(roi_names,lh_correlation,rh_correlation,models_folder,experiment_name=model_name)
+
+    print(f"Encoding model saved to: {model_save_path}")
+    
+    return models_folder

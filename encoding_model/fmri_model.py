@@ -127,4 +127,4 @@ class encoding_model():
    
 
     lh_correlation, rh_correlation = self.validate(reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, features_val)
-    return lh_correlation, rh_correlation
+    return reg_lh, reg_rh, lh_correlation, rh_correlation
