@@ -25,17 +25,18 @@ class encoding_model():
 
         # Load model (now that self is defined)
         print(f"No features provided, extracting features using {self.model} at layer {self.model_layer}...")
-        model = torch.hub.load(self.model_path, self.model)
-        model.to(self.device)
-        model.eval()
+        self.model = torch.hub.load(self.model_path, self.model)
+        self.model.to(self.device)
+        self.model.eval()
 
-        train_nodes, _ = get_graph_node_names(model) #Extract name of layers
+        train_nodes, _ = get_graph_node_names(self.model) #Extract name of layers
         print(f"Train nodes: {train_nodes}")
 
         # create feature extractor for the chosen layer
-        self.feature_extractor = create_feature_extractor(model, return_nodes=[self.model_layer])
+        self.feature_extractor = create_feature_extractor(self.model, return_nodes=[self.model_layer]) if features is None else features
+        print("Feature extractor created.")
 
-  def fit_pca(self,dataloader, batch_size=500,ncomponents=100):
+  def fit_pca(self,dataloader, batch_size=100,ncomponents=100):
       print("\nFitting PCA on the extracted features...")
       print(f"Number of PCA components: {ncomponents}")
       print(f"Batch size: {batch_size}")
@@ -57,7 +58,7 @@ class encoding_model():
 
   def train(self,train_data_loader,lh_fmri_train,rh_fmri_train,features_train:Optional[np.ndarray]=None):
 
-    self.features_train = self.features_train if self.features_train is not None else features_train
+    self.features_train = self.features_train if features_train is None else features_train
 
     print('\nTraining images features:')
     # Fit linear regressions on the training data
@@ -80,21 +81,21 @@ class encoding_model():
     reg_model_lh = self.reg_lh if self.reg_lh is not None else reg_lh
     reg_model_rh = self.reg_rh if self.reg_rh is not None else reg_rh
 
-    lh_fmri_val_pred = reg_model_lh.predict(features_val)
-    rh_fmri_val_pred = reg_model_rh.predict(features_val)
+    self.lh_fmri_val_pred = reg_model_lh.predict(features_val)
+    self.rh_fmri_val_pred = reg_model_rh.predict(features_val)
 
     print(f'\n Finding mean correlation for each hemisphere...')
         # Empty correlation array of shape: (LH vertices)
-    lh_correlation = np.zeros(lh_fmri_val_pred.shape[1])
+    lh_correlation = np.zeros(self.lh_fmri_val_pred.shape[1])
     # Correlate each predicted LH vertex with the corresponding ground truth vertex
-    for v in tqdm(range(lh_fmri_val_pred.shape[1])):
-        lh_correlation[v] = corr(lh_fmri_val_pred[:,v], lh_fmri_val[:,v])[0]
+    for v in tqdm(range(self.lh_fmri_val_pred.shape[1])):
+        lh_correlation[v] = corr(self.lh_fmri_val_pred[:,v], lh_fmri_val[:,v])[0]
 
     # Empty correlation array of shape: (RH vertices)
-    rh_correlation = np.zeros(rh_fmri_val_pred.shape[1])
+    rh_correlation = np.zeros(self.rh_fmri_val_pred.shape[1])
     # Correlate each predicted RH vertex with the corresponding ground truth vertex
-    for v in tqdm(range(rh_fmri_val_pred.shape[1])):
-        rh_correlation[v] = corr(rh_fmri_val_pred[:,v], rh_fmri_val[:,v])[0]
+    for v in tqdm(range(self.rh_fmri_val_pred.shape[1])):
+        rh_correlation[v] = corr(self.rh_fmri_val_pred[:,v], rh_fmri_val[:,v])[0]
 
     return lh_correlation, rh_correlation
 
@@ -108,9 +109,9 @@ class encoding_model():
     pass
 
 
-  def run_model(self,train_imgs_dataloader,val_imgs_dataloader,lh_fmri_train,rh_fmri_train,lh_fmri_val,rh_fmri_val):
+  def run_model(self,train_imgs_dataloader,val_imgs_dataloader,lh_fmri_train,rh_fmri_train,lh_fmri_val,rh_fmri_val,batch_size=100,ncomponents=100):
     """This function runs the entire encoding model pipeline: feature extraction, training, validation without testing."""
-    pca = self.fit_pca(train_imgs_dataloader)  #Fit PCA on the data loader used for training and validation
+    pca = self.fit_pca(train_imgs_dataloader,batch_size=batch_size,ncomponents=ncomponents)  #Fit PCA on the data loader used for training and validation
 
     #Training
     print("\nExtracting features for the training set...")
@@ -121,10 +122,10 @@ class encoding_model():
 
     #Validation
     print("\nExtracting features for the validation set...")
-    features_val = self.extract_features(val_imgs_dataloader, pca)
-    self.feature_dict['features_val'] = features_val
+    self.features_val = self.extract_features(val_imgs_dataloader, pca)
+    self.feature_dict['features_val'] = self.features_val
 
    
 
-    lh_correlation, rh_correlation = self.validate(reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, features_val)
+    lh_correlation, rh_correlation = self.validate(reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, self.features_val)
     return reg_lh, reg_rh, lh_correlation, rh_correlation

@@ -1,0 +1,48 @@
+
+======================================================================
+Experiment Settings:
+- Samples (N): 3000
+- Features per source (P): 100
+======================================================================
+
+======================================================================
+Experiment 1: LOW SNR + NO MIXING
+======================================================================
+
+--- STANDARD ---
+Warning: For method standard, combined R² is NOT greater than individual R² values. This may indicate overfitting or data issues.
+standard analysis of target (y_real):
+- R²_A: -0.0012
+- R²_B: -0.0379
+- R²_AB: -0.0012
+- unique_A: 0.0373
+- unique_B: 0.0000
+- common: -0.0385
+- unexplained: 1.0166
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: -131992437.1344
+- R²_B: -103262208.6082
+- R²_AB: -359673080.3946
+- unique_A: -260354196.3661
+- unique_B: -231182127.6966
+- common: 126331856.9188
+- unexplained: 365204468.1593
+
+--- RIDGE_CV ---
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_example_new.py", line 289, in <module>
+    main()
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_example_new.py", line 256, in main
+    run_all_methods(SEED, N, P, mixing_dimension=None, snr=1.0)
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_example_new.py", line 230, in run_all_methods
+    _, is_common_negative = run_experiment(rng, n=n, p=p, mixing_dimension=mixing_dimension, snr=snr, method=method)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_example_new.py", line 201, in run_experiment
+    decomp = commonality_analysis(X_M1, X_M2, y_real,X_m1_y,X_m2_y, method=method)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_example_new.py", line 124, in commonality_analysis
+    r2_A = compute_r2_fn(features_A,x_m1_y ,target)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: commonality_analysis.<locals>.<lambda>() takes 2 positional arguments but 3 were given

@@ -1,0 +1,240 @@
+
+======================================================================
+Experiment Settings:
+- Samples (N): 3000
+- Features per source (P): 100
+======================================================================
+
+======================================================================
+Experiment 1: LOW SNR + NO MIXING
+======================================================================
+
+--- STANDARD ---
+For method standard, combined R² is greater than individual R² values.
+standard analysis of target (y_real):
+- R²_A: 0.1796
+- R²_B: 0.0364
+- R²_AB: 0.2340
+- unique_A: 51.3318
+- unique_B: 14.1269
+- common: -4.6766
+- unexplained: 198.9721
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: 0.1217
+- R²_B: -0.0315
+- R²_AB: 0.1302
+- unique_A: 42.0019
+- unique_B: 2.1958
+- common: -10.3869
+- unexplained: 225.9434
+
+--- RIDGE_CV ---
+ridge_cv analysis of target (y_real):
+- R²_A: 0.1264
+- R²_B: -0.0162
+- R²_AB: 0.1374
+- unique_A: 39.9005
+- unique_B: 2.8438
+- common: -7.0631
+- unexplained: 224.0729
+
+All common variance estimates are negative ✅
+With mixing_dimension=None and snr=1.0,
+ We succesfully broke variance partitioning ❗❗❗.
+
+======================================================================
+Experiment 2: LOW SNR + INVERTIBLE MIXING (200→200)
+======================================================================
+
+--- STANDARD ---
+For method standard, combined R² is greater than individual R² values.
+standard analysis of target (y_real):
+- R²_A: 0.1796
+- R²_B: 0.0364
+- R²_AB: 0.2340
+- unique_A: 51.3318
+- unique_B: 14.1269
+- common: -4.6766
+- unexplained: 198.9721
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: 0.1217
+- R²_B: -0.0315
+- R²_AB: 0.1302
+- unique_A: 42.0019
+- unique_B: 2.1958
+- common: -10.3869
+- unexplained: 225.9434
+
+--- RIDGE_CV ---
+ridge_cv analysis of target (y_real):
+- R²_A: 0.1219
+- R²_B: -0.0313
+- R²_AB: 0.1307
+- unique_A: 42.0654
+- unique_B: 2.2686
+- common: -10.3966
+- unexplained: 225.8168
+
+All common variance estimates are negative ✅
+With mixing_dimension=200 and snr=1.0,
+ We succesfully broke variance partitioning ❗❗❗.
+
+======================================================================
+Experiment 3: LOW SNR + LOSSY MIXING (200→100)
+======================================================================
+
+--- STANDARD ---
+For method standard, combined R² is greater than individual R² values.
+standard analysis of target (y_real):
+- R²_A: 0.1796
+- R²_B: 0.0364
+- R²_AB: 0.2340
+- unique_A: 51.3318
+- unique_B: 14.1269
+- common: -4.6766
+- unexplained: 198.9721
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: 0.1217
+- R²_B: -0.0315
+- R²_AB: 0.1302
+- unique_A: 42.0019
+- unique_B: 2.1958
+- common: -10.3869
+- unexplained: 225.9434
+
+--- RIDGE_CV ---
+ridge_cv analysis of target (y_real):
+- R²_A: 0.1223
+- R²_B: -0.0275
+- R²_AB: 0.1303
+- unique_A: 40.9800
+- unique_B: 2.0758
+- common: -9.2131
+- unexplained: 225.9115
+
+All common variance estimates are negative ✅
+With mixing_dimension=100 and snr=1.0,
+ We succesfully broke variance partitioning ❗❗❗.
+
+======================================================================
+Experiment 4: HIGH SNR + NO MIXING
+======================================================================
+
+--- STANDARD ---
+For method standard, combined R² is greater than individual R² values.
+standard analysis of target (y_real):
+- R²_A: 0.3068
+- R²_B: 0.0292
+- R²_AB: 0.3845
+- unique_A: 45.7866
+- unique_B: 10.0155
+- common: -6.2591
+- unexplained: 79.3126
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: 0.2576
+- R²_B: -0.0396
+- R²_AB: 0.3140
+- unique_A: 45.5544
+- unique_B: 7.2577
+- common: -12.3551
+- unexplained: 88.3987
+
+--- RIDGE_CV ---
+ridge_cv analysis of target (y_real):
+- R²_A: 0.2597
+- R²_B: -0.0236
+- R²_AB: 0.3150
+- unique_A: 43.6323
+- unique_B: 7.1313
+- common: -10.1736
+- unexplained: 88.2657
+
+All common variance estimates are negative ✅
+With mixing_dimension=None and snr=10.0,
+ We succesfully broke variance partitioning ❗❗❗.
+
+======================================================================
+Experiment 5: HIGH SNR + INVERTIBLE MIXING (200→200)
+======================================================================
+
+--- STANDARD ---
+For method standard, combined R² is greater than individual R² values.
+standard analysis of target (y_real):
+- R²_A: 0.3068
+- R²_B: 0.0292
+- R²_AB: 0.3845
+- unique_A: 45.7866
+- unique_B: 10.0155
+- common: -6.2591
+- unexplained: 79.3126
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: 0.2576
+- R²_B: -0.0396
+- R²_AB: 0.3140
+- unique_A: 45.5544
+- unique_B: 7.2577
+- common: -12.3551
+- unexplained: 88.3987
+
+--- RIDGE_CV ---
+ridge_cv analysis of target (y_real):
+- R²_A: 0.2578
+- R²_B: -0.0393
+- R²_AB: 0.3142
+- unique_A: 45.5499
+- unique_B: 7.2627
+- common: -12.3284
+- unexplained: 88.3715
+
+All common variance estimates are negative ✅
+With mixing_dimension=200 and snr=10.0,
+ We succesfully broke variance partitioning ❗❗❗.
+
+======================================================================
+Experiment 6: HIGH SNR + LOSSY MIXING (200→100)
+======================================================================
+
+--- STANDARD ---
+For method standard, combined R² is greater than individual R² values.
+standard analysis of target (y_real):
+- R²_A: 0.3068
+- R²_B: 0.0292
+- R²_AB: 0.3845
+- unique_A: 45.7866
+- unique_B: 10.0155
+- common: -6.2591
+- unexplained: 79.3126
+
+--- OLS_CV ---
+ols_cv analysis of target (y_real):
+- R²_A: 0.2576
+- R²_B: -0.0396
+- R²_AB: 0.3140
+- unique_A: 45.5544
+- unique_B: 7.2577
+- common: -12.3551
+- unexplained: 88.3987
+
+--- RIDGE_CV ---
+ridge_cv analysis of target (y_real):
+- R²_A: 0.2580
+- R²_B: -0.0356
+- R²_AB: 0.3140
+- unique_A: 45.0569
+- unique_B: 7.2181
+- common: -11.8112
+- unexplained: 88.3919
+
+All common variance estimates are negative ✅
+With mixing_dimension=100 and snr=10.0,
+ We succesfully broke variance partitioning ❗❗❗.

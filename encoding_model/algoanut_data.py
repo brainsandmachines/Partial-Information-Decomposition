@@ -31,22 +31,6 @@ class argObj:
     if not os.path.isdir(self.subject_submission_dir):
         os.makedirs(self.subject_submission_dir)
 
-class ImageDataset(Dataset):
-    def __init__(self, imgs_paths, idxs, transform):
-        self.imgs_paths = np.array(imgs_paths)[idxs]
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.imgs_paths)
-
-    def __getitem__(self, idx):
-        # Load the image
-        img_path = self.imgs_paths[idx]
-        img = Image.open(img_path).convert('RGB')
-        # Preprocess the image and send it to the chosen device ('cpu' or 'cuda')
-        if self.transform:
-            img = self.transform(img).to(device)
-        return img
 
 
 def load_data_algonauts(paths_dict,args=None, subj=1,plot_fmri=False):

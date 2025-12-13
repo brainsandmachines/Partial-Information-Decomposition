@@ -7,3 +7,8 @@ external/mayas_project/*
 !/external/mayas_project/.git
 figures_/
 trained_models/
+**/fmri_dicts/
+**/fmri_figs/
+**/data_frames/
+**/between_models_cor/
+**/data_frames/

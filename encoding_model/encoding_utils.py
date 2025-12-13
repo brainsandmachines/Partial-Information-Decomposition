@@ -13,8 +13,27 @@ import sys
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from utils import check_file_exists,check_folder_exists
+from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
+import torch
 
+class ImageDataset(Dataset):
+    def __init__(self, imgs_paths, idxs, transform):
+        self.imgs_paths = np.array(imgs_paths)[idxs]
+        self.transform = transform
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+    def __len__(self):
+        return len(self.imgs_paths)
+
+    def __getitem__(self, idx):
+        # Load the image
+        img_path = self.imgs_paths[idx]
+        img = Image.open(img_path).convert('RGB')
+        # Preprocess the image and send it to the chosen device ('cpu' or 'cuda')
+        if self.transform:
+            img = self.transform(img).to(self.device)
+        return img
 def plot_fmri(path,args, hemi, title=''):
     """Plot fMRI data on a brain surface and save the figure.
 
@@ -94,12 +113,12 @@ def fmri_response_image(path,args,hemisphere,img_idx,train_img_dir,train_img_lis
     fig.savefig(f"{path}/{hemisphere}_fmri_response_{img_idx}.png", dpi=300, bbox_inches="tight")
 
 
-def split_dataset(train_img_list,test_img_list,rand_seed=5):
+def split_dataset(train_img_list,test_img_list,rand_seed=5,train_p=90):
      
     np.random.seed(rand_seed)
 
     # Calculate how many stimulus images correspond to 90% of the training data
-    num_train = int(np.round(len(train_img_list) / 100 * 90))
+    num_train = int(np.round(len(train_img_list) / 100 * train_p))
     # Shuffle all training stimulus images
     idxs = np.arange(len(train_img_list))
     np.random.shuffle(idxs)
@@ -114,6 +133,49 @@ def split_dataset(train_img_list,test_img_list,rand_seed=5):
     print('\nTest stimulus images: ' + format(len(idxs_test)))
     
     return idxs_train, idxs_val, idxs_test
+
+def fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,test_img_dir,batch_size=500,train_p=90):
+    
+    
+
+    idxs_train, idxs_val, idxs_test = split_dataset(train_img_list=train_img_list,test_img_list=test_img_list,train_p=train_p)
+    transform = transforms.Compose([
+        transforms.Resize((224,224)), # resize the images to 224x24 pixels
+        transforms.ToTensor(), # convert the images to a PyTorch tensor
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) # normalize the images color channels
+    ])
+
+    batch_size = 500 #@param
+    # Get the paths of all image files
+    train_imgs_paths = sorted(list(Path(train_img_dir).iterdir()))
+    test_imgs_paths = sorted(list(Path(test_img_dir).iterdir()))
+
+    # The DataLoaders contain the ImageDataset class
+    train_imgs_dataloader = DataLoader(
+        ImageDataset(train_imgs_paths, idxs_train, transform),
+        batch_size=batch_size
+    )
+    val_imgs_dataloader = DataLoader(
+        ImageDataset(train_imgs_paths, idxs_val, transform),
+        batch_size=batch_size
+    )
+    test_imgs_dataloader = DataLoader(
+        ImageDataset(test_imgs_paths, idxs_test, transform),
+        batch_size=batch_size
+    )
+
+    lh_fmri_train = lh_fmri[idxs_train]
+    lh_fmri_val = lh_fmri[idxs_val]
+    rh_fmri_train = rh_fmri[idxs_train]
+    rh_fmri_val = rh_fmri[idxs_val]
+    fmri_dict = {}
+    fmri_dict['lh_fmri_train'] = lh_fmri_train
+    fmri_dict['lh_fmri_val'] = lh_fmri_val
+    fmri_dict['rh_fmri_train'] = rh_fmri_train
+    fmri_dict['rh_fmri_val'] = rh_fmri_val
+
+    return fmri_dict,train_imgs_dataloader,val_imgs_dataloader
+
 
 
 def map_correlation_to_rois(args,lh_correlation,rh_correlation,hemisphere):
@@ -258,9 +320,9 @@ def save_corellation(roi_names,lh_correlation,rh_correlation,correlation_path,ex
     print(f"Correlation files: {roi_names_file}, {lh_corr_file}, {rh_corr_file} saved to: {correlation_path}")
 
 
-def save_model(reg_lh, reg_rh, folder_path, model_name,
+def save_model(folder_path, model_name,save_dict,reg_lh:Optional[ndarray]=None, reg_rh:Optional[ndarray]=None,features_val_pred_lh:Optional[List]=None,features_val_pred_rh:Optional[List]=None,features_train:Optional[ndarray]=None,features_val_trained:Optional[ndarray]=None,predict_array:Optional[ndarray]=None,
                roi_names:Optional[List]=None,lh_correlation:Optional[ndarray]=None,rh_correlation:Optional[ndarray]=None):
-    """Save the trained encoding model. with its corellation values and roi names and figs
+    """Save the trained encoding model. with its corellation values and roi names and figs`
 
     Args:
         reg_lh (LinearRegression): Trained left hemisphere regression model.
@@ -278,7 +340,9 @@ def save_model(reg_lh, reg_rh, folder_path, model_name,
     
     models_folder = check_folder_exists(f'{folder_path}/{model_name}')
     model_save_path = os.path.join(models_folder, model_name_joblib)
-    joblib.dump({'reg_lh': reg_lh, 'reg_rh': reg_rh}, model_save_path)
+    if save_dict is None:
+        save_dict = {'reg_lh': reg_lh, 'reg_rh': reg_rh, 'features_val_pred_lh': features_val_pred_lh, 'features_val_pred_rh': features_val_pred_rh, 'features_train': features_train,'features_val_trained': features_val_trained, 'predict_array': predict_array}
+    joblib.dump(save_dict, model_save_path)
     
     if roi_names is not None and lh_correlation is not None and rh_correlation is not None:
         save_corellation(roi_names,lh_correlation,rh_correlation,models_folder,experiment_name=model_name)
