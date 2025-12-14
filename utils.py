@@ -55,3 +55,18 @@ def create_permuation(list_to_permute):
     list_to_permute = list_to_permute[np.random.permutation(len(list_to_permute))]
 
     return permute_type(list_to_permute) 
+
+
+
+class Tee:
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, data):
+        for f in self.files:
+            f.write(data)
+            f.flush()
+
+    def flush(self):
+        for f in self.files:
+            f.flush()

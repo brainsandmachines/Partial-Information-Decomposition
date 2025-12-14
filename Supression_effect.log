@@ -1,0 +1,171 @@
+Loading data for subject: 1
+Data directory: /mnt/data4tb/data_algonauts/
+Parent submission directory: /mnt/data4tb/data_algonauts/submissions
+LH training fMRI data shape:
+(9841, 19004)
+(Training stimulus images × LH vertices)
+
+RH training fMRI data shape:
+(9841, 20544)
+(Training stimulus images × RH vertices)
+Training images: 9841
+Test images: 159
+Training image file name: train-0001_nsd-00013.png
+73k NSD images ID: 00013
+Training stimulus images: 9841
+
+Validation stimulus images: 0
+
+Test stimulus images: 159
+
+ Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/real_model_alexnet_features.2_subj1/real_model_alexnet_features.2_subj1_encoding_model.joblib
+
+======================================================================
+Experiment 1: LOW SNR + NO MIXING
+======================================================================
+Creating suppression model...
+
+--- STANDARD ---
+                value
+R²_A         0.199425
+R²_B         0.015750
+R²_AB        0.424253
+unique_A     0.408503
+unique_B     0.224828
+common      -0.209078
+unexplained  0.575747
+
+--- OLS_CV ---
+                value
+R²_A         0.180780
+R²_B        -0.007134
+R²_AB        0.397177
+unique_A     0.404312
+unique_B     0.216398
+common      -0.223532
+unexplained  0.602823
+
+======================================================================
+Experiment 2: LOW SNR + INVERTIBLE MIXING (70)
+======================================================================
+Creating suppression model...
+
+--- STANDARD ---
+                value
+R²_A         0.187202
+R²_B         0.010248
+R²_AB        0.269369
+unique_A     0.259122
+unique_B     0.082168
+common      -0.071920
+unexplained  0.730631
+
+--- OLS_CV ---
+                value
+R²_A         0.173941
+R²_B        -0.005843
+R²_AB        0.245363
+unique_A     0.251206
+unique_B     0.071422
+common      -0.077265
+unexplained  0.754637
+
+======================================================================
+Experiment 3: LOW SNR + LOSSY MIXING (100)
+======================================================================
+Creating suppression model...
+
+--- STANDARD ---
+                value
+R²_A         0.199358
+R²_B         0.015311
+R²_AB        0.424214
+unique_A     0.408903
+unique_B     0.224856
+common      -0.209545
+unexplained  0.575786
+
+--- OLS_CV ---
+                value
+R²_A         0.180718
+R²_B        -0.007555
+R²_AB        0.397135
+unique_A     0.404690
+unique_B     0.216417
+common      -0.223972
+unexplained  0.602865
+
+======================================================================
+Experiment 4: HIGH SNR + NO MIXING
+======================================================================
+Creating suppression model...
+
+--- STANDARD ---
+                value
+R²_A         0.443659
+R²_B         0.020539
+R²_AB        0.979645
+unique_A     0.959106
+unique_B     0.535986
+common      -0.515447
+unexplained  0.020355
+
+--- OLS_CV ---
+                value
+R²_A         0.430672
+R²_B        -0.002310
+R²_AB        0.978688
+unique_A     0.980998
+unique_B     0.548016
+common      -0.550326
+unexplained  0.021312
+
+======================================================================
+Experiment 5: HIGH SNR + INVERTIBLE MIXING (70)
+======================================================================
+Creating suppression model...
+
+--- STANDARD ---
+                value
+R²_A         0.425444
+R²_B         0.015069
+R²_AB        0.581701
+unique_A     0.566631
+unique_B     0.156256
+common      -0.141187
+unexplained  0.418299
+
+--- OLS_CV ---
+                value
+R²_A         0.416000
+R²_B        -0.000896
+R²_AB        0.567685
+unique_A     0.568581
+unique_B     0.151685
+common      -0.152581
+unexplained  0.432315
+
+======================================================================
+Experiment 6: HIGH SNR + LOSSY MIXING (100)
+======================================================================
+Creating suppression model...
+
+--- STANDARD ---
+                value
+R²_A         0.442839
+R²_B         0.020457
+R²_AB        0.979647
+unique_A     0.959190
+unique_B     0.536808
+common      -0.516351
+unexplained  0.020353
+
+--- OLS_CV ---
+                value
+R²_A         0.429761
+R²_B        -0.002353
+R²_AB        0.978690
+unique_A     0.981043
+unique_B     0.548929
+common      -0.551282
+unexplained  0.021310

@@ -10,7 +10,8 @@ import sys
 from algoanut_data import argObj, load_data_algonauts
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from utils import check_file_exists, create_permuation
+from toy_example_new import run_experiment
+from utils import check_file_exists, create_permuation,Tee
 from typing import Optional
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.decomposition import IncrementalPCA
@@ -18,8 +19,14 @@ from sklearn.linear_model import LinearRegression
 from fmri_model import encoding_model
 from pred_pipeline import pipeline
 from torchvision.models.feature_extraction import create_feature_extractor, get_graph_node_names
-from encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model
+from encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model,compute_r2,compute_ols_cv_r2,compute_ridge_cv_r2
 from scipy.stats import pearsonr as corr
+
+
+log = open("run.log", "w")
+
+sys.stdout = Tee(sys.stdout, log)
+sys.stderr = Tee(sys.stderr, log)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -48,7 +55,7 @@ test_img_dir = data_dict['test_img_dir']
 
 fmri_dict, train_data_loader,val_imgs_dataloader = fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,test_img_dir,batch_size=500,train_p=100)
 
-def real_model_func(model, layer_name,model_path,batch_size,ncomponents,train_data_loader,val_imgs_dataloader):
+def real_model_func(model, layer_name,model_path,batch_size,ncomponents,train_data_loader):
     """Create and train the real encoding model using fMRI data and image features.
     
     Args:
@@ -60,7 +67,13 @@ def real_model_func(model, layer_name,model_path,batch_size,ncomponents,train_da
         args: Argument object containing data directories.
         data_dir: Base data directory.
         parent_submission_dir: Parent submission directory.
-        subj: Subject number."""
+        subj: Subject number.
+    Returns:
+    model - The Instance from encoingding_model class after training.
+    real_reg_lh - Trained regression model for left hemisphere.
+    real_reg_rh - Trained regression model for right hemisphere.
+    pca - Fitted PCA object.
+    real_feature - Extracted features from training data."""
     model = encoding_model(device=device,model=model,model_layer=layer_name,model_path=model_path)
 
 
@@ -89,7 +102,19 @@ def create_predictions(reg_lh, reg_rh, features):
     return y_hat_lh, y_hat_rh
 
 def create_supression_model(rng,signal, features, suppression_strength=0.5,snr=1.0,mixing_dimension=None):
-
+    """Create suppression model features X_M1 and X_M2 based on the given parameters.
+    Args:
+        rng: Random number generator.
+        signal: The target signal (fMRI predictions).
+        features: The original feature matrix.
+        suppression_strength: Proportion of features to suppress (between 0 and 1).
+        snr: Signal-to-noise ratio for adding noise to the target.
+        mixing_dimension: Dimension to which features are mixed (if None, no mixing is applied).
+    Returns:
+        X_M1: Feature matrix for model 1.
+        X_M2: Feature matrix for model 2.
+        target: Noisy target signal.
+    """
     n,p = features.shape
     
     n_real_dim = 1-suppression_strength
@@ -111,9 +136,9 @@ def create_supression_model(rng,signal, features, suppression_strength=0.5,snr=1
     X_M1 = np.hstack([real_feature, shuffled_spurious])
     X_M2 = np.hstack([shuffled_real, shuffled_spurious])
 
-        # Remove any linear predictability of X_M2 from real_features
+    # Remove any linear predictability of X_M2 from real_features
     ortho_model = LinearRegression(fit_intercept=False)
-    ortho_model.fit(features, X_M2)
+    ortho_model.fit(X_M2, features)
     X_M2_pred = ortho_model.predict(features)
     X_M2 = X_M2 - X_M2_pred
 
@@ -126,66 +151,6 @@ def create_supression_model(rng,signal, features, suppression_strength=0.5,snr=1
 
     return X_M1, X_M2,target
 
-def compute_ols_cv_r2(X, y):
-    """
-    Compute cross-validated R² using leave-one-out cross-validation.
-    
-    Uses RidgeCV with near-zero regularization (alpha=1e-16) which is
-    effectively OLS but leverages the efficient GCV formula.
-    
-    Args:
-        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
-        y (np.ndarray): Target variable (shape: [n,]).
-        
-    Returns:
-        float: Cross-validated R² (can be negative if model overfits badly)
-    """
-    ridge_cv = RidgeCV(alphas=[1e-16], fit_intercept=True, scoring='r2', cv=None)
-    ridge_cv.fit(X, y)
-    return ridge_cv.best_score_
-
-
-def compute_ridge_cv_r2(X, y, alphas=None):
-    """
-    Compute cross-validated R² using RidgeCV with efficient LOO cross-validation.
-    
-    RidgeCV uses generalized cross-validation (GCV) which is an efficient 
-    approximation to leave-one-out CV for ridge regression.
-    
-    Args:
-        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
-        y (np.ndarray): Target variable (shape: [n,]).
-        alphas (array-like, optional): Array of alpha values to try.
-            Defaults to DEFAULT_RIDGE_ALPHAS.
-        
-    Returns:
-        float: Best cross-validated R² across all alpha values.
-    """
-    if alphas is None:
-        alphas = np.logspace(-3, 3, 50)
-    
-    # RidgeCV with leave-one-out CV (efficient GCV approximation)
-    # cv=None means use efficient LOO via GCV
-    ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
-    ridge_cv.fit(X, y)
-    
-    return ridge_cv.best_score_
-
-
-def compute_r2(X, y):
-    """
-    Compute in-sample R² for OLS regression.
-    
-    Args:
-        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
-        y (np.ndarray): Target variable (shape: [n,]).
-        
-    Returns:
-        float: In-sample R².
-    """
-    model = LinearRegression()
-    model.fit(X, y)
-    return model.score(X, y)
 
 def commonality_analysis(features_A, features_B, target, method='standard', alphas=None, snr=1.0):
     # Select R² computation function based on method
@@ -221,6 +186,19 @@ def commonality_analysis(features_A, features_B, target, method='standard', alph
         'unexplained': unexplained
     }
 
+def run_all_methods(rng_seed, mixing_dimension, snr,suppression_strength,models_and_features_dict=None):
+    """Run all three analysis methods with the same random seed."""
+    X_M1,X_M2,target,signal,real_feature = models_and_features_dict['X_M1'],models_and_features_dict['X_M2'],models_and_features_dict['target'],models_and_features_dict['signal'],models_and_features_dict['real_feature']
+    if X_M1 is None or X_M2 is None or target is None:
+        print("Creating suppression model...")
+        X_M1, X_M2,target = create_supression_model(rng=rng_seed,signal = signal,features=real_feature,suppression_strength=suppression_strength,mixing_dimension=mixing_dimension,snr=snr)
+    for method in ['standard', 'ols_cv']: #@['standard', 'ols_cv', 'ridge_cv']
+        print(f"\n--- {method.upper()} ---")
+        outputs = commonality_analysis(X_M1, X_M2, target, method=method)
+        df = pd.DataFrame.from_dict(outputs, orient='index', columns=['value']) 
+        print(df)
+    return outputs
+
 def train_save_or_load(folder_path, model_name,path_to_load=None):
     """Load a trained encoding model from disk."""
     if path_to_load is None:
@@ -238,6 +216,51 @@ def train_save_or_load(folder_path, model_name,path_to_load=None):
         print(f"\n Trained model loaded from: {path_to_load}")
 
     return trained_real_model
+
+
+def main(dict):
+    """Run the 2x3 factorial experiment design."""
+    # Common parameters
+    rng_seed = np.random.default_rng(0)
+    suppression_strength = 0.8
+    
+    # =============================================================================
+    # LOW SNR experiments (SNR = 1.0)
+    # =============================================================================
+
+    print("\n" + "="*70)
+    print("Experiment 1: LOW SNR + NO MIXING")
+    print("="*70)
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=None, snr=1.0,models_and_features_dict=dict)
+
+    print("\n" + "="*70)
+    print("Experiment 2: LOW SNR + INVERTIBLE MIXING (70)")
+    print("="*70)
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=70, snr=1.0,models_and_features_dict=dict)
+
+    print("\n" + "="*70)
+    print("Experiment 3: LOW SNR + LOSSY MIXING (100)")
+    print("="*70)
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=100, snr=1.0,models_and_features_dict=dict)
+
+    # =============================================================================
+    # HIGH SNR experiments (SNR = 10.0)
+    # =============================================================================
+
+    print("\n" + "="*70)
+    print("Experiment 4: HIGH SNR + NO MIXING")
+    print("="*70)
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=None, snr=10.0,models_and_features_dict=dict)
+
+    print("\n" + "="*70)
+    print("Experiment 5: HIGH SNR + INVERTIBLE MIXING (70)")
+    print("="*70)
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=70, snr=10.0,models_and_features_dict=dict)
+
+    print("\n" + "="*70)
+    print("Experiment 6: HIGH SNR + LOSSY MIXING (100)")
+    print("="*70)
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=100, snr=10.0,models_and_features_dict=dict)
 if __name__ == "__main__":
     folder_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models'
     model_name = 'real_model_' + model + '_' + layer_name + '_subj' + str(subj) + 'ncomponents' + str(ncomponents)
@@ -246,46 +269,17 @@ if __name__ == "__main__":
 
     loaded_model = train_save_or_load(folder_path, model_name,path_to_load=path_to_load)
     real_model, real_reg_lh, real_reg_rh, pca, real_feature = loaded_model['real_model'], loaded_model['reg_lh'], loaded_model['reg_rh'], loaded_model['pca'], loaded_model['real_feature']
-    #features_val = real_model.extract_features(val_imgs_dataloader, pca)
-    #lh_correlation,rh_correlation = real_model.validate(features_val, real_reg_lh, real_reg_rh)
-    n_preds = 500
+
     features = real_feature
     y_hat_lh, y_hat_rh = create_predictions(real_reg_lh, real_reg_rh, real_feature)
-    X_M1, X_M2,target = create_supression_model(rng=np.random.default_rng(0),signal = y_hat_lh,features=real_feature,suppression_strength=0.5,mixing_dimension=None,snr=10.0)
+    X_M1, X_M2,target = create_supression_model(rng=np.random.default_rng(0),signal = y_hat_lh,features=real_feature,suppression_strength=0.8,mixing_dimension=None,snr=1)
+    
+    models_and_features_dict = {'X_M1': None, 'X_M2': None, 'target': None,'signal': y_hat_lh,'real_feature': real_feature}
+    main(models_and_features_dict)
 
-    lh_results_dict = commonality_analysis(X_M1, X_M2, target, method='standard')
-    df = pd.DataFrame.from_dict(lh_results_dict, orient='index', columns=['value'])
-    print("\nLH Commonality Analysis Results:")
-    print(df)
 
-grid_search = False
-if grid_search:
-    def grid_search_ols(method,suppresions_strengths_list,snr_list,mixing_dimensions_list,signal):
-        results = []
-        for _,suppression_strength in tqdm(enumerate(suppresions_strengths_list), total=len(suppresions_strengths_list)):
-            for snr in snr_list:
-                for mixing_dimension in mixing_dimensions_list:
-                    X_M1, X_M2,target = create_supression_model(rng=np.random.default_rng(0),signal=signal, features=features, suppression_strength=suppression_strength,snr=snr,mixing_dimension=mixing_dimension)
-                    results_dict = commonality_analysis(X_M1, X_M2, target, method=method,snr=snr)
-                    results_dict.update({
-                        'suppression_strength': suppression_strength,
-                        'snr': snr,
-                        'mixing_dimension': mixing_dimension
-                    })
-                    results.append(results_dict)
-        df = pd.DataFrame(results)
-        data_frame_sorted = df = df.sort_values(by="common", ascending=True)
-        return data_frame_sorted
+    # lh_results_dict = commonality_analysis(X_M1, X_M2, target, method='standard')
+    # df = pd.DataFrame.from_dict(lh_results_dict, orient='index', columns=['value'])
+    # print("\nLH Commonality Analysis Results:")
+    # print(df)
 
-    suppresions_strengths_list = [0.5]
-    snr_list = [1.0, 5.0, 10.0, 20.0,50.0]
-    mixing_dimensions_list = [None,20, 50, 70,150,200,300,120,180,190,250]
-    df_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/data_frames'
-    exp_name = 'grid_seach_ols_commonality_analysis_real_model_' + model + '_' + layer_name + '_subj' + str(subj) + 'ncomponents' + str(ncomponents)+'.csv'
-    grid_search_result = grid_search_ols(method='standard',suppresions_strengths_list=suppresions_strengths_list,snr_list=snr_list,mixing_dimensions_list=mixing_dimensions_list,signal=y_hat_lh)
-    print("\nGrid Search Commonality Analysis finished:")
-    path = f"{df_path}/{exp_name}"
-    path = check_file_exists(path)
-    grid_search_result.to_csv(path)
-    print(f"Results saved to {path}")
-    print(grid_search_result)

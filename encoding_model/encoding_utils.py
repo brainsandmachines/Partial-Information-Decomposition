@@ -16,6 +16,9 @@ from utils import check_file_exists,check_folder_exists
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 import torch
+from sklearn.linear_model import RidgeCV, LinearRegression
+from sklearn.decomposition import IncrementalPCA
+from sklearn.linear_model import LinearRegression
 
 class ImageDataset(Dataset):
     def __init__(self, imgs_paths, idxs, transform):
@@ -350,3 +353,66 @@ def save_model(folder_path, model_name,save_dict,reg_lh:Optional[ndarray]=None, 
     print(f"Encoding model saved to: {model_save_path}")
     
     return models_folder
+
+
+
+def compute_ols_cv_r2(X, y):
+    """
+    Compute cross-validated R² using leave-one-out cross-validation.
+    
+    Uses RidgeCV with near-zero regularization (alpha=1e-16) which is
+    effectively OLS but leverages the efficient GCV formula.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        
+    Returns:
+        float: Cross-validated R² (can be negative if model overfits badly)
+    """
+    ridge_cv = RidgeCV(alphas=[1e-16], fit_intercept=True, scoring='r2', cv=None)
+    ridge_cv.fit(X, y)
+    return ridge_cv.best_score_
+
+
+def compute_ridge_cv_r2(X, y, alphas=None):
+    """
+    Compute cross-validated R² using RidgeCV with efficient LOO cross-validation.
+    
+    RidgeCV uses generalized cross-validation (GCV) which is an efficient 
+    approximation to leave-one-out CV for ridge regression.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        alphas (array-like, optional): Array of alpha values to try.
+            Defaults to DEFAULT_RIDGE_ALPHAS.
+        
+    Returns:
+        float: Best cross-validated R² across all alpha values.
+    """
+    if alphas is None:
+        alphas = np.logspace(-3, 3, 50)
+    
+    # RidgeCV with leave-one-out CV (efficient GCV approximation)
+    # cv=None means use efficient LOO via GCV
+    ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
+    ridge_cv.fit(X, y)
+    
+    return ridge_cv.best_score_
+
+
+def compute_r2(X, y):
+    """
+    Compute in-sample R² for OLS regression.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        
+    Returns:
+        float: In-sample R².
+    """
+    model = LinearRegression()
+    model.fit(X, y)
+    return model.score(X, y)
