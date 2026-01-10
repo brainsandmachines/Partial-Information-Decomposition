@@ -1,6 +1,6 @@
 
 import numpy as np
-from Commonality_Analysis import CommonalityAnalysis  # not used here; keep if you need it elsewhere
+from Partial_Information_Decomposition.NotNeedeRightNow.Commonality_Analysis import CommonalityAnalysis  # not used here; keep if you need it elsewhere
 from Partial_Information_Decomposition.RV_toy import generate_random_variables
 import admUI
 from admUI import admUI_numpy

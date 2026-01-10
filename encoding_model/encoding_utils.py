@@ -355,7 +355,6 @@ def save_model(folder_path, model_name,save_dict,reg_lh:Optional[ndarray]=None, 
     return models_folder
 
 
-
 def compute_ols_cv_r2(X, y):
     """
     Compute cross-validated R² using leave-one-out cross-validation.

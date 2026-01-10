@@ -1,0 +1,36 @@
+Loading data for subject: 1
+Data directory: /mnt/data4tb/data_algonauts/
+Parent submission directory: /mnt/data4tb/data_algonauts/submissions
+LH training fMRI data shape:
+(9841, 19004)
+(Training stimulus images × LH vertices)
+
+RH training fMRI data shape:
+(9841, 20544)
+(Training stimulus images × RH vertices)
+Training images: 9841
+Test images: 159
+Training image file name: train-0001_nsd-00013.png
+73k NSD images ID: 00013
+Training stimulus images: 9841
+
+Validation stimulus images: 0
+
+Test stimulus images: 159
+
+ Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/real_model_alexnet_features.2_subj1/real_model_alexnet_features.2_subj1_encoding_model.joblib
+Encoder 1 features shape:  (1000, 100)
+
+Creating predictions from encoder...
+Predictions created.
+Predicted fMRI shape (LH):  (1000, 19004)
+
+======================================================================
+Experiment 1: LOW SNR + NO MIXING
+======================================================================
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppresion_model.py", line 204, in <module>
+    main(models_and_features_dict)
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppresion_model.py", line 119, in main
+    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=None, snr=1,models_and_features_dict=dict)
+TypeError: run_all_methods() missing 1 required positional argument: 'suppresion_method'

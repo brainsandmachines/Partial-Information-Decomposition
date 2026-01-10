@@ -16,7 +16,7 @@ from typing import Optional
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.decomposition import IncrementalPCA
 from sklearn.linear_model import LinearRegression
-from fmri_model import encoding_model
+from encoding_model.fmri_model import encoding_model
 from pred_pipeline import pipeline
 from torchvision.models.feature_extraction import create_feature_extractor, get_graph_node_names
 from encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model

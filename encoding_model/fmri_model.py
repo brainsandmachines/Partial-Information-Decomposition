@@ -9,9 +9,10 @@ from tqdm import tqdm
 from scipy.stats import pearsonr as corr
 from encoding_utils import map_correlation_to_rois, plot_fmri,fmri_response_image, split_dataset,visualize_encdoing_accuaracy
 from typing import Optional
+from sklearn.linear_model import RidgeCV
 
 class encoding_model():
-  def __init__(self,device  ,model:str='alexnet',model_layer:str='features.2',model_path:str ='pytorch/vision:v0.10.0' ,features:Optional[np.ndarray]=None):
+  def __init__(self,device  ,model:str='alexnet',model_layer:str='features.2',model_path:str ='pytorch/vision:v0.10.0' ,features:Optional[np.ndarray]=None,n_features=None):
         self.device = device
 
         self.model = model
@@ -52,18 +53,24 @@ class encoding_model():
       for _, d in tqdm(enumerate(dataloader), total=len(dataloader)):
           ft = self.feature_extractor(d)
           ft = torch.hstack([torch.flatten(l, start_dim=1) for l in ft.values()])
-          ft = pca.transform(ft.cpu().detach().numpy())
-          features.append(ft)
+          if pca is not None:
+            ft = pca.transform(ft.cpu().detach().numpy())
+          features.append(ft.cpu().detach().numpy())
       return np.vstack(features)
 
-  def train(self,train_data_loader,lh_fmri_train,rh_fmri_train,features_train:Optional[np.ndarray]=None):
+  def train(self,train_data_loader,lh_fmri_train,rh_fmri_train,features_train:Optional[np.ndarray]=None,alphas:Optional[np.ndarray]=None):
 
     self.features_train = self.features_train if features_train is None else features_train
 
     print('\nTraining images features:')
     # Fit linear regressions on the training data
-    self.reg_lh = LinearRegression().fit(self.features_train, lh_fmri_train)
-    self.reg_rh = LinearRegression().fit(self.features_train, rh_fmri_train)
+    # self.reg_lh = LinearRegression().fit(self.features_train, lh_fmri_train)
+    # self.reg_rh = LinearRegression().fit(self.features_train, rh_fmri_train)
+
+    alphas = np.logspace(-3, 3, 50) if alphas is None else alphas
+
+    self.reg_lh = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None).fit(self.features_train, lh_fmri_train)
+    self.reg_rh = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None).fit(self.features_train, rh_fmri_train)
 
     print("\nTraining completed.")
 
@@ -109,10 +116,12 @@ class encoding_model():
     pass
 
 
-  def run_model(self,train_imgs_dataloader,val_imgs_dataloader,lh_fmri_train,rh_fmri_train,lh_fmri_val,rh_fmri_val,batch_size=100,ncomponents=100):
+  def run_model(self,train_imgs_dataloader,val_imgs_dataloader,lh_fmri_train,rh_fmri_train,lh_fmri_val,rh_fmri_val,batch_size=100,ncomponents=None):
     """This function runs the entire encoding model pipeline: feature extraction, training, validation without testing."""
-    pca = self.fit_pca(train_imgs_dataloader,batch_size=batch_size,ncomponents=ncomponents)  #Fit PCA on the data loader used for training and validation
-
+    if ncomponents is not None:
+      pca = self.fit_pca(train_imgs_dataloader,batch_size=batch_size,ncomponents=ncomponents)  #Fit PCA on the data loader used for training and validation
+    else:
+      pca = None
     #Training
     print("\nExtracting features for the training set...")
     self.features_train = self.extract_features(train_imgs_dataloader, pca)
@@ -121,11 +130,16 @@ class encoding_model():
     reg_lh,reg_rh = self.train(train_imgs_dataloader, lh_fmri_train, rh_fmri_train)
 
     #Validation
-    print("\nExtracting features for the validation set...")
-    self.features_val = self.extract_features(val_imgs_dataloader, pca)
-    self.feature_dict['features_val'] = self.features_val
+    if len(val_imgs_dataloader) != 0:
+      print("\nExtracting features for the validation set...")
+      self.features_val = self.extract_features(val_imgs_dataloader, pca)
+      self.feature_dict['features_val'] = self.features_val
 
+      lh_correlation, rh_correlation = self.validate(reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, self.features_val)
+    else: 
+       print("\nNo validation data loader provided, skipping feature extraction for validation set.")
+       lh_correlation, rh_correlation = None, None
    
 
-    lh_correlation, rh_correlation = self.validate(reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, self.features_val)
+      
     return reg_lh, reg_rh, lh_correlation, rh_correlation

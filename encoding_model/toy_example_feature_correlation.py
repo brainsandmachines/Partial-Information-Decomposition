@@ -115,11 +115,10 @@ def commonality_analysis(features_A, features_B, target, method='standard', alph
     r2_AB = compute_r2_fn(features_AB, target)
     
     # Commonality analysis decomposition
-    unique_A = (r2_AB - r2_B) * var_y
-    unique_B = (r2_AB - r2_A) * var_y
-    common_AB = (r2_A + r2_B - r2_AB) * var_y
-    unexplained = (1 - r2_AB) * var_y
-    
+    unique_A = (r2_AB - r2_B)
+    unique_B = (r2_AB - r2_A) 
+    common_AB = (r2_A + r2_B - r2_AB) 
+    unexplained = (1 - r2_AB) 
     return {
         'R²_A': r2_A,
         'R²_B': r2_B,
@@ -129,6 +128,19 @@ def commonality_analysis(features_A, features_B, target, method='standard', alph
         'common': common_AB,
         'unexplained': unexplained
     }
+
+def generate_correlated_features(n, p, rho, rng):
+    """
+    Generates n samples of p features with an AR(1) correlation structure.
+    """
+    # Create the AR(1) covariance matrix
+    # Sigma_ij = rho^|i-j|
+    ii, jj = np.indices((p, p))
+    cov_matrix = rho ** np.abs(ii - jj)
+    
+    # Generate multivariate normal samples
+    features = rng.multivariate_normal(mean=np.zeros(p), cov=cov_matrix, size=n)
+    return features
 
 def run_experiment(rng, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard'):
     """
@@ -146,8 +158,9 @@ def run_experiment(rng, n=1024, p=100, mixing_dimension=None, snr=10.0, method='
         dict: Commonality analysis results
     """
     # Generate the four feature tensors
-    real_features = rng.standard_normal((n, p))
-    spurious_features = rng.standard_normal((n, p))
+    features = generate_correlated_features(2*n, 2*p, rho=1, rng=rng)
+    real_features = features[:n, :p].copy()
+    spurious_features = features[n:, p:].copy()
     rand_perm = rng.permutation(n)
     
     shuffled_real = real_features[rand_perm]
@@ -182,11 +195,11 @@ def run_experiment(rng, n=1024, p=100, mixing_dimension=None, snr=10.0, method='
     
     # Verify sum (only variance components, not R² values)
     # Note: CV version may not sum exactly due to negative R² being possible
-    if method == 'standard':
-        total_variance = np.var(y_real, ddof=1)
-        sum_of_components = decomp['unique_A'] + decomp['unique_B'] + decomp['common'] + decomp['unexplained']
-        assert np.isclose(total_variance, sum_of_components), \
-            "Decomposed components do not sum to total variance!"
+    # if method == 'standard':
+    #     total_variance = np.var(y_real, ddof=1)
+    #     sum_of_components = decomp['unique_A'] + decomp['unique_B'] + decomp['common'] + decomp['unexplained']
+    #     assert np.isclose(total_variance, sum_of_components), \
+    #         "Decomposed components do not sum to total variance!"
     
     return decomp
 
@@ -207,7 +220,7 @@ def run_all_methods(rng_seed, n, p, mixing_dimension, snr):
 def main():
     """Run the 2x3 factorial experiment design."""
     # Common parameters
-    N, P, SEED = 2000, 100, 42
+    N, P, SEED = 1000, 100, 42
 
     # =============================================================================
     # LOW SNR experiments (SNR = 1.0)

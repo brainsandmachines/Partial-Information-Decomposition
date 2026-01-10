@@ -4,24 +4,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import joblib
+import json
 from pathlib import Path
 from tqdm import tqdm
 import sys
 from algoanut_data import argObj, load_data_algonauts
 root = Path(__file__).resolve().parents[1]
-sys.path.append(str(root))
+sys.path.append(str(root))  
 from toy_example_new import run_experiment
-from utils import check_file_exists, create_permuation,Tee
+from utils import check_file_exists, create_permuation,Tee,meta_exists
 from typing import Optional
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.decomposition import IncrementalPCA
 from sklearn.linear_model import LinearRegression
-from fmri_model import encoding_model
+from encoding_model.fmri_model import encoding_model
 from pred_pipeline import pipeline
 from torchvision.models.feature_extraction import create_feature_extractor, get_graph_node_names
 from encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model,compute_r2,compute_ols_cv_r2,compute_ridge_cv_r2
 from scipy.stats import pearsonr as corr
-
+from encoding_model.suppression_core import *
 
 log = open("run.log", "w")
 
@@ -84,122 +85,7 @@ def real_model_func(model, layer_name,model_path,batch_size,ncomponents,train_da
     real_reg_lh,real_reg_rh = model.train(train_data_loader,fmri_dict['lh_fmri_train'],fmri_dict['rh_fmri_train'],features_train=real_feature)
     return model, real_reg_lh, real_reg_rh, pca, real_feature
 
-
-def create_predictions(reg_lh, reg_rh, features):
-    """
-    Create fMRI predictions using trained regression models.
-    
-    Args:
-        reg_lh: Trained regression model for left hemisphere.
-        reg_rh: Trained regression model for right hemisphere.
-        features: Feature matrix (shape: [n_samples, n_features]).
-        
-    Returns:
-        Tuple[np.ndarray, np.ndarray]: Predicted fMRI responses for left and right hemispheres.
-    """
-    y_hat_lh = reg_lh.predict(features)
-    y_hat_rh = reg_rh.predict(features)
-    return y_hat_lh, y_hat_rh
-
-def create_supression_model(rng,signal, features, suppression_strength=0.5,snr=1.0,mixing_dimension=None):
-    """Create suppression model features X_M1 and X_M2 based on the given parameters.
-    Args:
-        rng: Random number generator.
-        signal: The target signal (fMRI predictions).
-        features: The original feature matrix.
-        suppression_strength: Proportion of features to suppress (between 0 and 1).
-        snr: Signal-to-noise ratio for adding noise to the target.
-        mixing_dimension: Dimension to which features are mixed (if None, no mixing is applied).
-    Returns:
-        X_M1: Feature matrix for model 1.
-        X_M2: Feature matrix for model 2.
-        target: Noisy target signal.
-    """
-    n,p = features.shape
-    
-    n_real_dim = 1-suppression_strength
-    real_dim = int(p*n_real_dim)
-
-    std = np.std(signal)
-    noise_std = std.item() / snr
-    signal_dim1 , signal_dim2 = signal.shape[0], signal.shape[1]
-    target = signal +  noise_std * rng.standard_normal((signal_dim1 , signal_dim2))
-
-    real_feature = features[:,:real_dim]
-    spurious_feature = features[:,real_dim:]
-
-    rand_perm = rng.permutation(n)
-
-    shuffled_real = real_feature[rand_perm]
-    shuffled_spurious = spurious_feature[rand_perm]
-
-    X_M1 = np.hstack([real_feature, shuffled_spurious])
-    X_M2 = np.hstack([shuffled_real, shuffled_spurious])
-
-    # Remove any linear predictability of X_M2 from real_features
-    ortho_model = LinearRegression(fit_intercept=False)
-    ortho_model.fit(X_M2, features)
-    X_M2_pred = ortho_model.predict(features)
-    X_M2 = X_M2 - X_M2_pred
-
-    if mixing_dimension is not None:
-        # Create mixed features: entangle real and spurious with a mixing matrix
-        mixing_matrix_M1 = rng.standard_normal((X_M1.shape[1], mixing_dimension))
-        X_M1 = X_M1 @ mixing_matrix_M1
-        mixing_matrix_M2 = rng.standard_normal((X_M2.shape[1], mixing_dimension))
-        X_M2 = X_M2 @ mixing_matrix_M2
-
-    return X_M1, X_M2,target
-
-
-def commonality_analysis(features_A, features_B, target, method='standard', alphas=None, snr=1.0):
-    # Select R² computation function based on method
-    if method == 'standard':
-        compute_r2_fn = compute_r2
-    elif method == 'ols_cv':
-        compute_r2_fn = compute_ols_cv_r2
-    elif method == 'ridge_cv':
-        compute_r2_fn = lambda X, y: compute_ridge_cv_r2(X, y, alphas)
-    else:
-        raise ValueError(f"Unknown method: {method}. Use 'standard', 'ols_cv', or 'ridge_cv'.")
-    
-    #Define joint model features
-    features_AB = np.hstack([features_A, features_B])
-    # Compute R² for each model
-    r2_A = compute_r2_fn(features_A, target)
-    r2_B = compute_r2_fn(features_B, target)
-    r2_AB = compute_r2_fn(features_AB, target)
-    
-    # Commonality analysis decomposition
-    unique_A = (r2_AB - r2_B)
-    unique_B = (r2_AB - r2_A)
-    common_AB = (r2_A + r2_B - r2_AB)
-    unexplained = (1 - r2_AB)
-    
-    return {
-        'R²_A': r2_A,
-        'R²_B': r2_B,
-        'R²_AB': r2_AB,
-        'unique_A': unique_A,
-        'unique_B': unique_B,
-        'common': common_AB,
-        'unexplained': unexplained
-    }
-
-def run_all_methods(rng_seed, mixing_dimension, snr,suppression_strength,models_and_features_dict=None):
-    """Run all three analysis methods with the same random seed."""
-    X_M1,X_M2,target,signal,real_feature = models_and_features_dict['X_M1'],models_and_features_dict['X_M2'],models_and_features_dict['target'],models_and_features_dict['signal'],models_and_features_dict['real_feature']
-    if X_M1 is None or X_M2 is None or target is None:
-        print("Creating suppression model...")
-        X_M1, X_M2,target = create_supression_model(rng=rng_seed,signal = signal,features=real_feature,suppression_strength=suppression_strength,mixing_dimension=mixing_dimension,snr=snr)
-    for method in ['standard', 'ols_cv']: #@['standard', 'ols_cv', 'ridge_cv']
-        print(f"\n--- {method.upper()} ---")
-        outputs = commonality_analysis(X_M1, X_M2, target, method=method)
-        df = pd.DataFrame.from_dict(outputs, orient='index', columns=['value']) 
-        print(df)
-    return outputs
-
-def train_save_or_load(folder_path, model_name,path_to_load=None):
+def train_save_or_load(folder_path=None, model_name=None,path_to_load=None):
     """Load a trained encoding model from disk."""
     if path_to_load is None:
         trained_real_model = real_model_func(model, layer_name,model_path,batch_size,ncomponents,train_data_loader,val_imgs_dataloader)
@@ -210,7 +96,6 @@ def train_save_or_load(folder_path, model_name,path_to_load=None):
         print(f"\n Trained model saved to folder: {folder_path}/{model_name}")
     else:
     #Load trained model:
-        path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/real_model_alexnet_features.2_subj1/real_model_alexnet_features.2_subj1_encoding_model.joblib'
         assert check_file_exists(path_to_load), f"File {path_to_load} does not exist."
         trained_real_model = joblib.load(path_to_load)
         print(f"\n Trained model loaded from: {path_to_load}")
@@ -218,11 +103,12 @@ def train_save_or_load(folder_path, model_name,path_to_load=None):
     return trained_real_model
 
 
-def main(dict):
+
+def main(dict,suppression_strength=0.5,rng_seed=0):
     """Run the 2x3 factorial experiment design."""
     # Common parameters
     rng_seed = np.random.default_rng(0)
-    suppression_strength = 0.8
+    suppression_strength = 0.7
     
     # =============================================================================
     # LOW SNR experiments (SNR = 1.0)
@@ -231,17 +117,17 @@ def main(dict):
     print("\n" + "="*70)
     print("Experiment 1: LOW SNR + NO MIXING")
     print("="*70)
-    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=None, snr=1.0,models_and_features_dict=dict)
+    run_all_methods(rng_seed,suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=None, snr=1,models_and_features_dict=dict)
 
     print("\n" + "="*70)
-    print("Experiment 2: LOW SNR + INVERTIBLE MIXING (70)")
+    print("Experiment 2: LOW SNR + INVERTIBLE MIXING (30)")
     print("="*70)
-    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=70, snr=1.0,models_and_features_dict=dict)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=30, snr=1,models_and_features_dict=dict)
 
     print("\n" + "="*70)
-    print("Experiment 3: LOW SNR + LOSSY MIXING (100)")
+    print("Experiment 3: LOW SNR + LOSSY MIXING (50)")
     print("="*70)
-    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=100, snr=1.0,models_and_features_dict=dict)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=50, snr=1,models_and_features_dict=dict)
 
     # =============================================================================
     # HIGH SNR experiments (SNR = 10.0)
@@ -250,36 +136,155 @@ def main(dict):
     print("\n" + "="*70)
     print("Experiment 4: HIGH SNR + NO MIXING")
     print("="*70)
-    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=None, snr=10.0,models_and_features_dict=dict)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=None, snr=10.0,models_and_features_dict=dict)
 
     print("\n" + "="*70)
     print("Experiment 5: HIGH SNR + INVERTIBLE MIXING (70)")
     print("="*70)
-    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=70, snr=10.0,models_and_features_dict=dict)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=30, snr=10.0,models_and_features_dict=dict)
 
     print("\n" + "="*70)
-    print("Experiment 6: HIGH SNR + LOSSY MIXING (100)")
+    print("Experiment 6: HIGH SNR + LOSSY MIXING (50)")
     print("="*70)
-    run_all_methods(rng_seed, suppression_strength=suppression_strength, mixing_dimension=100, snr=10.0,models_and_features_dict=dict)
-if __name__ == "__main__":
-    folder_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models'
-    model_name = 'real_model_' + model + '_' + layer_name + '_subj' + str(subj) + 'ncomponents' + str(ncomponents)
-    path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/real_model_alexnet_features.2_subj1ncomponents200'
-    #path_to_load = None
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=50, snr=10.0,models_and_features_dict=dict)
 
-    loaded_model = train_save_or_load(folder_path, model_name,path_to_load=path_to_load)
-    real_model, real_reg_lh, real_reg_rh, pca, real_feature = loaded_model['real_model'], loaded_model['reg_lh'], loaded_model['reg_rh'], loaded_model['pca'], loaded_model['real_feature']
-
-    features = real_feature
-    y_hat_lh, y_hat_rh = create_predictions(real_reg_lh, real_reg_rh, real_feature)
-    X_M1, X_M2,target = create_supression_model(rng=np.random.default_rng(0),signal = y_hat_lh,features=real_feature,suppression_strength=0.8,mixing_dimension=None,snr=1)
+    # =============================================================================
+    # HIGHER SNR experiments (SNR = 50.0)
+    # =============================================================================
     
-    models_and_features_dict = {'X_M1': None, 'X_M2': None, 'target': None,'signal': y_hat_lh,'real_feature': real_feature}
-    main(models_and_features_dict)
+    print("\n" + "="*70)
+    print("Experiment 7: HIGHER SNR + NO MIXING")
+    print("="*70)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=None, snr=50.0,models_and_features_dict=dict)
+
+    print("\n" + "="*70)
+    print("Experiment 8: HIGHER SNR + INVERTIBLE MIXING (30)")
+    print("="*70)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=30, snr=50.0,models_and_features_dict=dict)
+
+
+    print("\n" + "="*70)
+    print("Experiment 9: HIGHER SNR + LOSSY MIXING (50)")
+    print("="*70)
+    run_all_methods(rng_seed, suppresion_method='permutate' ,suppression_strength=suppression_strength, mixing_dimension=50, snr=50.0,models_and_features_dict=dict)
+
+def test_run(run_name,save_dir,features,fmri_dict,rng_seeds,suppression_method,suppression_strength=[0.5],n_samples=[1000],n_features=[100],snr=[1.0],mixing_dimension=[None]):
+    print("\n" + "="*70)
+    print('\nStarting test run...')
+    csv_path = save_dir / f"{run_name}.csv"
+    pkl_path = save_dir / f"{run_name}.pkl"
+    records = []
+    print(f"\nResults will be saved to: {csv_path} and {pkl_path}")
+    print(f'\n Starting test run with features shape: {features.shape} and fmri shape (LH): {fmri_dict["lh_fmri_train"].shape}')
+    for num in rng_seeds:
+        rng_seed = np.random.default_rng(num)
+        for n_s in n_samples:
+            for n_f in n_features:
+                for s in suppression_strength:
+                    for sn in snr:
+                        for md in mixing_dimension:
+                            # ----- meta_data (hyperparameters) -----
+                            meta_data = {
+                                "rng_seed": num,
+                                "suppression_method": suppression_method,
+                                "n_samples": n_s,
+                                "n_features": n_f,
+                                "suppression_strength": s,
+                                "snr": sn,
+                                "mixing_dimension": md
+                            }
+
+                            if meta_exists(meta_data, csv_path):
+                                print(f"\nSkipping already completed test with parameters: {meta_data}")
+                                continue
+
+                            print("\n" + "="*70)
+                            print(f"\nTest Run: n_samples={n_s}, n_features={n_f}, suppression_strength={s}, snr={sn}, mixing_dimension={md}")
+
+                            lh_fmri_train = fmri_dict['lh_fmri_train'][:n_s,:]
+                            real_features = features[:n_s,:]
+                            encoder,selected_features = create_encoder(rng_seed, real_features,lh_fmri_train,n_features=n_f)
+
+                            print("\nEncoder's features shape: ", selected_features.shape)
+                            print("\nCreating predictions from encoder...")
+                            y_hat_lh, y_hat_rh = create_predictions(encoder,reg_rh=None, features=selected_features) #From model1 
+                            print("Predictions created.\nPredicted fMRI shape (LH): ", y_hat_lh.shape) if y_hat_lh is not None else None
+                            print("\nPredicted fMRI shape (RH): ", y_hat_rh.shape) if y_hat_rh is not None else None
+                            
+
+                            models_and_features_dict = {'X_M1': None, 'X_M2': None, 'target': None,'signal': y_hat_lh,'real_feature': selected_features}
+                            outputs = run_all_methods(rng_seed,suppresion_method=suppression_method ,mixing_dimension=md, snr=sn, suppression_strength=s,models_and_features_dict=models_and_features_dict)
+                            
+                            record =  {**meta_data, **outputs}
+
+                            df_new = pd.DataFrame([record])
+
+                            if csv_path.exists():
+                                # append without overwriting
+                                df_new.to_csv(csv_path, mode="a", header=False, index=False)
+                            else:
+                                # first time: create file with header
+                                df_new.to_csv(csv_path, index=False)
+
+                            # keep pickle in sync (overwrite is fine)
+                            if pkl_path.exists():
+                                df_old = pd.read_pickle(pkl_path)
+                                df_all = pd.concat([df_old, df_new], ignore_index=True)
+                            else:
+                                df_all = df_new
+
+                            df_all.to_pickle(pkl_path)
+
+    return 
+    
+if __name__ == "__main__":
+    #path_to_load = None
+    # n_stimuli = 1000
+    # n_features = 100
+    # rng_seed = np.random.default_rng(0)
+    # folder_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models'
+    # model_name = 'real_model_' + model + '_' + layer_name + '_subj' + str(subj) + 'ncomponents' + str(ncomponents)
+    path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/RidgeCV_subj1_model_alexnet_features.2/RidgeCV_subj1_model_alexnet_features.2_encoding_model.joblib'
+
+    loaded_model = train_save_or_load(path_to_load=path_to_load)
+    real_reg_lh, real_reg_rh, real_features =loaded_model['reg_lh'], loaded_model['reg_rh'], loaded_model['features_train'] 
+    fmri_dict = joblib.load('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts/subj1_fmri_dicts.joblib')
+    
+    run_name = "test_run_RidgeCV_Encoder"
+    save_dir = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/test_runs')
+    features = real_features
+    suppression_method = 'permutate'
+    rngs_seed = [2,32,10,6]
+    supression_strength = [0.3,0.5,0.8]
+    n_samples = [1000,2000,3000]
+    n_features = [100,300,500] #WARNING: n_features should be less than n_samples
+    snr = [20.0,50.0,80.0]
+    mixing_dimension = [None,30,50,70,100]
+ 
+    df = test_run(run_name, save_dir, features, fmri_dict, rngs_seed, suppression_method, supression_strength, n_samples, n_features, snr, mixing_dimension)
+    print("\nTest run completed. Results saved.")
+    print(df)
+    print("\n" + "="*70)
+
+    # features_train = real_features[:n_stimuli,:] #In case I want to less data for faster testing: i.e: features_train[:1000,:]
+    # lh_fmri_train = fmri_dict['lh_fmri_train'][:n_stimuli,:] #In case I want to less data for faster testing: i.e: fmri_dict['lh_fmri_test'][:1000,:]
+    # rh_fmri_train = fmri_dict['rh_fmri_train'][:n_stimuli,:] #In case I want to less data for faster testing: i.e:
+
+    # #Create a model with less features: 
+    # encoder,selected_features = create_encoder(rng_seed, features_train,lh_fmri_train,n_features=n_features)
+    
+    # print("Encoder 1 features shape: ", features_train.shape)
+    # print("\nCreating predictions from encoder...")
+    # y_hat_lh, y_hat_rh = create_predictions(real_reg_lh,reg_rh=None, features=features_train) #From model1 
+    # print("Predictions created.\nPredicted fMRI shape (LH): ", y_hat_lh.shape) if y_hat_lh is not None else None
+    # print("\nPredicted fMRI shape (RH): ", y_hat_rh.shape) if y_hat_rh is not None else None
+    
+
+    # models_and_features_dict = {'X_M1': None, 'X_M2': None, 'target': None,'signal': y_hat_lh,'real_feature': features_train}
+    # main(models_and_features_dict)
 
 
     # lh_results_dict = commonality_analysis(X_M1, X_M2, target, method='standard')
     # df = pd.DataFrame.from_dict(lh_results_dict, orient='index', columns=['value'])
     # print("\nLH Commonality Analysis Results:")
     # print(df)
-
