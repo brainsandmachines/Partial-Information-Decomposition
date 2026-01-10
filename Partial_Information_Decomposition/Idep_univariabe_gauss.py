@@ -163,7 +163,9 @@ class Idep_univariate_gauss:
 
             unique_1 = torch.min(torch.stack([c,f,h,j]))
             self.I_dep_values['unique_1'] = unique_1.item()
-
+        #Check for nan values
+        assert self.I_dep_values['unique_0'] != torch.nan, f"unique_0 = {unique_0} was not calculated properly."
+        assert self.I_dep_values['unique_1'] != torch.nan, f"unique_1 = {unique_1} was not calculated properly."  
         return self.I_dep_values
     def pid_values(self,unique_0, unique_1):
         """This function will compute the PID values using the I_dep values
@@ -176,11 +178,14 @@ class Idep_univariate_gauss:
         # Redundant information
         red0 = i_m0_t - unique_0
         red1 = i_m1_t - unique_1
-        assert abs(red0 - red1) < 1e-10, "Redundant information from both sources not equal."
+        assert abs(red0 - red1) < 1e-10, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
         # Synergistic information
         syn = self.i_m0_m1_t - (red + unique_0 + unique_1)
 
+        #Check for nan values
+        assert red != torch.nan, f"Redundant={red} information not calculated properly."
+        assert syn != torch.nan, f"Synergistic={syn} information not calculated properly."
         self.PID_values = {
             'red': red.item(),
             'unq0': unique_0,
