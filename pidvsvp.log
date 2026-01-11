@@ -1,0 +1,38 @@
+
+Running Gaussian Univariate target and sources simple example...
+
+======================================================================
+Experiment 1: snr = 10.0
+
+======================================================================
+Simple Example with RNG seed 1 and Noise seed 1
+======================================================================
+standard analysis of target (y_real):
+- R²_A: 0.0766
+- R²_B: 0.0435
+- R²_AB: 0.1439
+- unique_A: 0.1004
+- unique_B: 0.0673
+- common: -0.0238
+- unexplained: 0.8561
+
+Full covariance matrix shape: torch.Size([101, 101])
+
+Covariance matrix shape: torch.Size([101, 101])
+dim_m1: 50, dim_m2: 50, dim_t: 1
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/gauss_multivariate.py", line 211, in <module>
+    main()
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/gauss_multivariate.py", line 180, in main
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=False, snr=snr, method=method, mixing_dimension=mixing_dimension)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/gauss_multivariate.py", line 80, in gauss_simple_example
+    pid = idep_class.idep()
+          ^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_multivariate_gauss.py", line 291, in idep
+    idep_values = self.compute_Idep(unique=[0,1])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_multivariate_gauss.py", line 243, in compute_Idep
+    assert not torch.isnan(unique_0), f"unique_0 = {unique_0} was not calculated properly."
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unique_0 = nan was not calculated properly.

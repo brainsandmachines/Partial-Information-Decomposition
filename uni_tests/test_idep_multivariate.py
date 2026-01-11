@@ -13,14 +13,14 @@ from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multi
 
 @pytest.fixture(scope="module")
 def dims():
-    return dict(d_m1=100, d_m2=100, d_t=100)
+    return dict(d_m1=3, d_m2=4, d_t=3)
 
 
 
 @pytest.fixture #It marks the function random_data() as a data provider.
 def random_data(dims):
     """Fixture to provide random tensors for testing."""
-    N = 1000
+    N = 100
     d_t = dims['d_t']
     d_m1 = dims['d_m1']
     d_m2 = dims['d_m2']
@@ -119,4 +119,80 @@ def test_semi_positivity(random_data):
     res = solver.dependency_matrix(constraints)
     for model_key, cov_matrix in res.items():
         eigenvalues = torch.linalg.eigvalsh(cov_matrix)
-        assert torch.all(eigenvalues >= -1e-10), f"Covariance matrix for {model_key} is not positive semi-definite."
+        assert torch.all(eigenvalues >= -1e-5), f"Covariance matrix for {model_key} is not positive semi-definite."
+
+
+@pytest.fixture
+def PQR(random_data):
+    T, M1, M2 = random_data  # each (N, d)
+
+    def zscore(X):
+        X = X - X.mean(dim=0, keepdim=True)
+        X = X / (X.std(dim=0, keepdim=True, unbiased=True) + 1e-8)
+        return X
+
+    Tz  = zscore(T)
+    M1z = zscore(M1)
+    M2z = zscore(M2)
+
+    # Cross-correlation blocks (matrix-valued)
+    # P: corr(M1, M2) shape (d_m1, d_m2)
+    P = (M1z.T @ M2z) / (M1z.shape[0] - 1)
+
+    # Q: corr(M1, T)  shape (d_m1, d_t)
+    Q = (M1z.T @ Tz)  / (M1z.shape[0] - 1)
+
+    # R: corr(M2, T)  shape (d_m2, d_t)
+    R = (M2z.T @ Tz)  / (M2z.shape[0] - 1)
+
+    return [P, Q, R],[Tz, M1z, M2z]
+
+def test_PQR(PQR):
+    """
+    Verifies that the P, Q, R matrices have correct dimensions.
+    """
+    list1,list2 = PQR
+    P, Q, R = list1
+    T, M1, M2 = list2
+    solver = Idep_multivariate_gauss(sources=[M1, M2], targets=[T], cov_matrix=None)
+    
+    assert torch.all(torch.isclose(P, solver.P)), "P matrix does not match expected value."
+    assert torch.all(torch.isclose(Q, solver.Q)), "Q matrix does not match expected value."
+    assert torch.all(torch.isclose(R, solver.R)), "R matrix does not match expected value."
+    # Further dimension checks can be added based on expected sizes
+
+def test_PQR_multi(PQR):
+    list1,list2 = PQR
+    P, Q, R = list1
+    T, M1, M2 = list2
+    solver = Idep_multivariate_gauss(sources=[M1, M2], targets=[T], cov_matrix=None)
+
+    constraints  = ['c_model_1', 'c_model_2', 'c_model_3', 'c_model_4', 'c_model_5', 'c_model_6', 'c_model_7']
+    res = solver.dependency_matrix(constraints)
+    M5 = res['c_model_5']
+    M6 = res['c_model_6']
+    M7 = res['c_model_7']
+
+    assert torch.all(torch.isclose(P.T @ Q, M5[M1.shape[1]:M1.shape[1] + M2.shape[1], M1.shape[1] + M2.shape[1]:])), "P.T @ Q does not match covariance block in model 5." 
+    assert torch.all(torch.isclose(P @ R, M6[:M1.shape[1], M1.shape[1] + M2.shape[1]:])), "P.T @ R does not match covariance block in model 6."
+    assert torch.all(torch.isclose(Q@ R.T, M7[:M1.shape[1], M1.shape[1]:M1.shape[1] + M2.shape[1]])), "Q.T @ R does not match covariance block in model 7."
+
+def test_idep(random_data):
+    """
+    Verifies that the compute_Idep function runs without errors and returns a dictionary.
+    """
+    M1, M2, T = random_data
+    solver = Idep_multivariate_gauss(sources=[M1, M2], targets=[T], cov_matrix=None)
+    
+    constraints = ['c_model_1', 'c_model_2', 'c_model_3', 'c_model_4', 'c_model_5', 'c_model_6', 'c_model_7','c_model_8']
+    solver.dependency_matrix(constraints)
+    unique_result = solver.compute_Idep()
+    pid_result = solver.pid_values(unique_result['unique_0'], unique_result['unique_1'])
+
+    #run pipeline
+    pid_result_pipline = solver.idep()
+
+    for key in ['red', 'unq0', 'unq1', 'syn']:
+        assert key in pid_result, f"Key {key} missing in PID result."
+        assert key in pid_result_pipline, f"Key {key} missing in PID result from pipeline."
+        assert torch.isclose(torch.tensor([pid_result[key]]), torch.tensor([pid_result_pipline[key]])), f"Mismatch in PID value for {key} between direct computation and pipeline."

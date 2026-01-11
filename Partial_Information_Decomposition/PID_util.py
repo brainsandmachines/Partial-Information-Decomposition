@@ -42,29 +42,37 @@ def create_cov_matrix(X0,X1,X2):
 
     Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
     cov_dict = {}
-
-    m1_dim = X1.shape[1]
-    m2_dim = X2.shape[1]
-    t_dim = X0.shape[1]
+    print(f"\nFull covariance matrix shape: {Sigma.shape}")
+    x1_dim = X1.shape[1]
+    x2_dim = X2.shape[1]
+    x0_dim = X0.shape[1]
     N = X1.shape[0] #number of observations
     
-    dt_dm1 = t_dim + m1_dim
-    d_all = t_dim + m1_dim + m2_dim
+    dt_dx1 = x0_dim + x1_dim
+    d_all = x0_dim + x1_dim + x2_dim
 
-    cov_dict['cov_t'] = Sigma[0:t_dim, 0:t_dim] #ΣX0
-    cov_dict['cov_m1'] = Sigma[t_dim:dt_dm1, t_dim:dt_dm1] #ΣX1
-    cov_dict['cov_m2'] = Sigma[dt_dm1:d_all, dt_dm1:d_all] #ΣX2
-    cov_dict['cov_t_m1'] = Sigma[0:t_dim, t_dim:dt_dm1] #ΣX0,X1
-    cov_dict['cov_t_m2'] = Sigma[0:t_dim, dt_dm1:d_all] #ΣX0,X2
-    cov_dict['cross_cov_m1_m2'] = Sigma[t_dim:dt_dm1, dt_dm1:d_all]#ΣX1,X2
-    cov_dict['cross_cov_m12_t'] = Sigma[t_dim:d_all, 0:t_dim] #ΣX1X2,X0 
-    cov_dict['auto_cov_m12'] = Sigma[t_dim:d_all, t_dim:d_all]  #ΣX1X2 
-    cov_dict['cov_tm1'] = Sigma[0:dt_dm1, 0:dt_dm1] #ΣX0,X1
-    ##ΣX0,X2:
-    a = torch.cat((cov_dict['cov_t'], cov_dict['cov_t_m2']),dim=1)
-    b = torch.cat((cov_dict['cov_t_m2'].T, cov_dict['cov_m2']),dim=1)
-    cov_dict['cov_tm2'] = torch.cat((a,b),dim=0)
-    
+    #Full covariance matrix
     cov_dict['full_cov'] = Sigma #Full covariance matrix ΣX0X1X2
+
+    #Cross-Covariances:
+    cov_dict['cross_x0_x1'] = Sigma[0:x0_dim, x0_dim:dt_dx1] #ΣX0,X1
+    cov_dict['cross_x0_x2'] = Sigma[0:x0_dim, dt_dx1:d_all] #ΣX0,X2
+    cov_dict['cross_x1_x2'] = Sigma[x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
+    cov_dict['cross_x12_x0'] = Sigma[x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
+
+    #Auto-Covariances
+    cov_dict['cov_x0'] = Sigma[0:x0_dim, 0:x0_dim] #ΣX0
+    cov_dict['cov_x1'] = Sigma[x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
+    cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
+    cov_dict['auto_x01'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
+    cov_dict['auto_x02'] = Sigma[0:x0_dim, dt_dx1:d_all]  #ΣX0X2   
+    cov_dict['auto_x12'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
+
+ 
+    ##ΣX0,X2:
+    a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=1)
+    b = torch.cat((cov_dict['cross_x0_x2'].T, cov_dict['cov_x2']),dim=1)
+    cov_dict['auto_x02'] = torch.cat((a,b),dim=0)
+
 
     return cov_dict

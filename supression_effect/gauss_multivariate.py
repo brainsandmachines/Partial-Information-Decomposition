@@ -8,7 +8,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
 from encoding_model.toy_example import run_all_methods,run_experiment,commonality_analysis
-from Partial_Information_Decomposition.Idep_univariabe_gauss import Idep_univariate_gauss
+from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from utils import Tee
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
@@ -17,6 +17,17 @@ log = open("pidvsvp.log", "w")
 
 sys.stdout = Tee(sys.stdout, log)
 sys.stderr = Tee(sys.stderr, log)
+
+
+def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
+    """
+    Standardize columns of X to zero mean and unit variance.
+
+    X shape: (N, P)
+    """
+    mean = X.mean(dim=0, keepdim=True)
+    std  = X.std(dim=0, unbiased=False, keepdim=True)
+    return (X - mean) / (std + eps)
 
 
 def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True, snr=1.0,method='ridge_cv',mixing_dimension=None):
@@ -55,16 +66,17 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     M1 = t_m_dict['X_M1']
     M2 = t_m_dict['X_M2']
     T = t_m_dict['y']
+    T = T.reshape(-1,1)
     # --- compute PID ---
 
     #Change to tensors: 
-    M1 = torch.tensor(M1, dtype=torch.float64)
-    M2 = torch.tensor(M2, dtype=torch.float64)
-    T = torch.tensor(T, dtype=torch.float64)
+    M1 = torch.tensor(M1)
+    M2 = torch.tensor(M2)
+    T = torch.tensor(T)
 
     sources = [M1,M2]
     targets = [T]
-    idep_class = Idep_univariate_gauss(sources,targets)
+    idep_class = Idep_multivariate_gauss(sources,targets)
     pid = idep_class.idep()
     print("\nIdep PID results:")
     for key, value in pid.items():
@@ -155,17 +167,17 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 500, 1
-    rng_seed, noise_seed = 42, 24
-    snr = 1000
-    method = 'ridge_cv'
-    mixing_dimension = None
+    N, P = 1000, 100
+    rng_seed, noise_seed = 1, 1
+    snr = 10.0
+    method = 'standard'
+    mixing_dimension = 50
 
     print("\nRunning Gaussian Univariate target and sources simple example...")
 
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=False, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
