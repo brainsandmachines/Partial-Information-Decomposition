@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 from torch.distributions import Normal
 from sklearn.linear_model import LinearRegression
 
+
 if __name__ != "__main__":
-    from .PID_util import create_cov_matrix, cond_cov
+    from .PID_util import create_cov_matrix, cond_cov,standardize
 else:
-    from PID_util import create_cov_matrix, cond_cov
+    from PID_util import create_cov_matrix, cond_cov,standardize
 from typing import Optional
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
@@ -32,7 +33,7 @@ class Idep_multivariate_gauss:
 
         self.dim_m1 = self.M1.shape[1] if self.M1 is not None else 0
         self.dim_m2 = self.M2.shape[1] if self.M2 is not None else 0
-        self.dim_t = 1
+        self.dim_t = self.T.shape[1] if self.T is not None else 0
 
         self.I0 = torch.eye(self.dim_m1)
         self.I1 = torch.eye(self.dim_m2)
@@ -64,34 +65,32 @@ class Idep_multivariate_gauss:
         self.I_dep_values = {}
         self.PID_values = {}
 
-    def whiten_block(self, Sigma_xx: torch.Tensor,
-                 Sigma_xy: torch.Tensor,
-                 Sigma_yy: torch.Tensor) -> torch.Tensor:
-        """
-        Return: Sigma_xx^{-1/2} Sigma_xy Sigma_yy^{-1/2}
-        using Cholesky factors and triangular solves (stable).
-
-        Assumes Sigma_xx and Sigma_yy are symmetric positive definite (SPD).
-        """
-        # Sigma_xx = Lx Lx^T, Sigma_yy = Ly Ly^T
-        Lx = torch.linalg.cholesky(Sigma_xx)
-        Ly = torch.linalg.cholesky(Sigma_yy)
-
-        dx = Lx.shape[0]
-        dy = Ly.shape[0]
-
-        Ix = torch.eye(dx, device=Sigma_xx.device, dtype=Sigma_xx.dtype)
-        Iy = torch.eye(dy, device=Sigma_yy.device, dtype=Sigma_yy.dtype)
-
-        # Compute inv(L) via triangular solve (more stable than inverse)
-        invLx = torch.linalg.solve_triangular(Lx, Ix, upper=False)  # Lx^{-1}
-        invLy = torch.linalg.solve_triangular(Ly, Iy, upper=False)  # Ly^{-1}
-
-        # Sigma_xx^{-1/2} = Lx^{-T}, Sigma_yy^{-1/2} = Ly^{-T}
-        # => Lx^{-T} Sigma_xy Ly^{-1}
-        return invLx.T @ Sigma_xy @ invLy
-    
-    
+    def whiten_block(self, Sigma_xx: torch.Tensor, 
+                    Sigma_xy: torch.Tensor, 
+                    Sigma_yy: torch.Tensor) -> torch.Tensor:
+            """
+            Return: L_x^{-1} Sigma_xy L_y^{-T}
+            Equivalent to whitening using Cholesky factors.
+            """
+            # 1. Compute Cholesky factors (Lower triangular)
+            Lx = torch.linalg.cholesky(Sigma_xx)
+            Ly = torch.linalg.cholesky(Sigma_yy)
+            
+            # 2. Apply whitening WITHOUT explicit inversion
+            # We want: K = Lx^{-1} @ Sigma_xy @ Ly^{-T}
+            
+            # Step A: Compute tmp = Sigma_xy @ Ly^{-T}
+            # This is equivalent to solving Ly @ tmp.T = Sigma_xy.T
+            # We solve for tmp.T then transpose back.
+            tmp = torch.linalg.solve_triangular(Ly, Sigma_xy.T, upper=False).T
+            
+            # Step B: Compute K = Lx^{-1} @ tmp
+            # This is equivalent to solving Lx @ K = tmp
+            K = torch.linalg.solve_triangular(Lx, tmp, upper=False)
+            
+            return K
+        
+        
 
     def log_base(self,x:Optional[torch.Tensor]) -> torch.Tensor:
         if self.base_e:
@@ -153,9 +152,7 @@ class Idep_multivariate_gauss:
 
 
 
-        if 'c_model_8' in constraints: 
-            self.constraint_cov_dict['c_model_8'] = cov_matrix #Full covariance, all dependent
-
+        
         if 'c_model_1' in constraints:
             self.constraint_cov_dict['c_model_1'] = I = torch.eye(cov_matrix.shape[0], device=cov_matrix.device, dtype=cov_matrix.dtype)
         #No constraints, all independent
@@ -187,6 +184,11 @@ class Idep_multivariate_gauss:
             M7 = self.create_model_M(block1=Q_R,block2=self.Q,block3=self.R)   
             self.constraint_cov_dict['c_model_7'] = M7 #M1 and T dependent, M2 and T dependent
 
+        if 'c_model_8' in constraints: 
+            M8 = self.create_model_M(self.P,self.Q,self.R) #Full covariance, all dependent
+            self.constraint_cov_dict['c_model_8'] = M8
+
+
         return self.constraint_cov_dict
     
     def compute_Idep(self,unique:list = [0,1])-> dict:
@@ -213,7 +215,7 @@ class Idep_multivariate_gauss:
 
             #calculate k with U8:
             mat = self.constraint_cov_dict['c_model_8']
-            nume8 = torch.exp(torch.logdet(self.I1 - (self.P.T @ self.P)))
+            nume8 = (self.I1 - (self.P.T @ self.P)).det()
             deno8 = torch.exp(torch.logdet(mat))
             k = 0.5*self.log_base(nume8/deno8) - self.i_m1_t
 

@@ -58,9 +58,9 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     # --- compute PID ---
 
     #Change to tensors: 
-    M1 = torch.tensor(M1, dtype=torch.float64)
-    M2 = torch.tensor(M2, dtype=torch.float64)
-    T = torch.tensor(T, dtype=torch.float64)
+    M1 = torch.tensor(M1, dtype=torch.float64).reshape(-1,1)
+    M2 = torch.tensor(M2, dtype=torch.float64).reshape(-1,1)
+    T = torch.tensor(T, dtype=torch.float64).reshape(-1,1)
 
     sources = [M1,M2]
     targets = [T]
@@ -157,7 +157,7 @@ def main():
     """Main function to run the Gaussian simple example and compare results."""
     N, P = 500, 1
     rng_seed, noise_seed = 42, 24
-    snr = 1000
+    snr = 1
     method = 'ridge_cv'
     mixing_dimension = None
 

@@ -76,3 +76,12 @@ def create_cov_matrix(X0,X1,X2):
 
 
     return cov_dict
+def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
+    """
+    Standardize columns of X to zero mean and unit variance.
+
+    X shape: (N, P)
+    """
+    mean = X.mean(dim=0, keepdim=True)
+    std  = X.std(dim=0, unbiased=False, keepdim=True)
+    return (X - mean) / (std + eps)
