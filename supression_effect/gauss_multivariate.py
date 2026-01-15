@@ -70,9 +70,9 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     # --- compute PID ---
 
     #Change to tensors: 
-    M1 = standardize(torch.tensor(M1))
-    M2 = standardize(torch.tensor(M2))
-    T = standardize(torch.tensor(T))
+    M1 = torch.tensor(M1)
+    M2 = torch.tensor(M2)
+    T = torch.tensor(T)
     sources = [M1,M2]
     targets = [T]
     idep_class = Idep_multivariate_gauss(sources,targets)
@@ -110,25 +110,25 @@ def check_supression_effect(vp_results,pid_results):
 
     if np.isclose(R_A,0) or R_A < 0 and unique_A > 0:
         print("\nSuppression effect detected: M1 is a suppressor variable.❗❗❗")
-        if not np.isclose(unq0,0,atol=1e-5):
-            print("PID fell to supression effect ❌")
-        else: 
-            if syn > 0:
-                print("PID did not fall to supression effect and detected synergy ✅✅✅")
-            else:
-                print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
+        # if not np.isclose(unq0,0,atol=1e-5):
+        #     print("PID fell to supression effect ❌")
+        # else: 
+        #     if syn > 0:
+        #         print("PID did not fall to supression effect and detected synergy ✅✅✅")
+        #     else:
+        #         print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
             
     elif np.isclose(R_B,0) or R_B < 0 and unique_B > 0:
         print("\nSuppression effect detected: M2 is a suppressor variable.❗❗❗")
-        if not np.isclose(unq1,0,atol=1e-5):
-            print("PID fell to supression effect ❌")
-        else: 
-            if syn > 0:
-                print("PID did not fall to supression effect and detected synergy ✅✅✅")
-            else:
-                print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
+        # if not np.isclose(unq1,0,atol=1e-5):
+        #     print("PID fell to supression effect ❌")
+        # else: 
+        #     if syn > 0:
+        #         print("PID did not fall to supression effect and detected synergy ✅✅✅")
+        #     else:
+        #         print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
     else:
-        print("\nNo suppression effect detected: One of the unique contributions is zero.")
+        print("\nNo suppression effect detected for VP: One of the unique contributions is zero.")
     return 
 
 
@@ -166,7 +166,7 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 1000, 2
+    N, P = 1000, 10
     rng_seed, noise_seed = 42, 24
     snr = 1
     method = 'ridge_cv'
@@ -176,7 +176,7 @@ def main():
 
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=False, snr=snr, method=method, mixing_dimension=None)
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=snr, method=method, mixing_dimension=None)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)

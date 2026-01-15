@@ -2,38 +2,327 @@
 Running Gaussian Univariate target and sources simple example...
 
 ======================================================================
-Experiment 1: snr = 1
-Failed to enable GUI event loop integration for 'qt'
-Traceback (most recent call last):
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/matplotlibtools.py", line 49, in do_enable_gui
-    enable_gui(guiname)
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 567, in enable_gui
-    return gui_hook(app)
-           ^^^^^^^^^^^^^
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 187, in enable_qt
-    self.enable_qt4(app)
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 213, in enable_qt4
-    app, inputhook_qt4 = create_inputhook_qt4(self, app)
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhookqt4.py", line 87, in create_inputhook_qt4
-    app = QtGui.QApplication([" "])
-          ^^^^^^^^^^^^^^^^^^
-AttributeError: module 'PySide6.QtGui' has no attribute 'QApplication'. Did you mean: 'QGuiApplication'?
-Backend qtagg is interactive backend. Turning interactive mode on.
+Experiment 1: snr = 10
 
 ======================================================================
 Simple Example with RNG seed 42 and Noise seed 24
 ======================================================================
 ridge_cv analysis of target (y_real):
-- R²_A: 1.0000
-- R²_B: -0.0047
+- R²_A: 0.9893
+- R²_B: -0.0019
 - R²_AB: 1.0000
-- unique_A: 1.0047
-- unique_B: -0.0000
-- common: -0.0047
+- unique_A: 1.0019
+- unique_B: 0.0107
+- common: -0.0127
 - unexplained: 0.0000
+Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
+New rank after adding jitter: 30
 
-Full covariance matrix shape: torch.Size([10, 10])
+Full covariance matrix shape: torch.Size([30, 30])
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
 
-Covariance matrix shape: torch.Size([10, 10])
-dim_m1: 4, dim_m2: 4, dim_t: 2
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+
+Idep PID results:
+- red: 0.0507
+- unq0: 18.9845
+- unq1: 0.0028
+- syn: 51.3182
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9893 | I(T;M1): 19.0352
+M2 R² (VP): -0.0019 | I(T;M2): 0.0535
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 70.3562
+
+Unique to M1 (VP): 1.0019 | Unique(T;M1\M2): 18.9845
+Unique to M2 (VP): 0.0107 | Unique(T;M2\M1): 0.0028
+Common (VP): -0.0127 | Redundant (PID): 0.0507
+Synergy (PID): 51.3182
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 2: snr = 10 univariate gaussian with different seeds
+
+======================================================================
+Simple Example with RNG seed 44 and Noise seed 26
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.9901
+- R²_B: -0.0014
+- R²_AB: 1.0000
+- unique_A: 1.0014
+- unique_B: 0.0099
+- common: -0.0114
+- unexplained: 0.0000
+Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
+New rank after adding jitter: 30
+
+Full covariance matrix shape: torch.Size([30, 30])
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+
+Idep PID results:
+- red: 0.0475
+- unq0: 18.8286
+- unq1: 0.0032
+- syn: 52.2924
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9901 | I(T;M1): 18.8761
+M2 R² (VP): -0.0014 | I(T;M2): 0.0507
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 71.1718
+
+Unique to M1 (VP): 1.0014 | Unique(T;M1\M2): 18.8286
+Unique to M2 (VP): 0.0099 | Unique(T;M2\M1): 0.0032
+Common (VP): -0.0114 | Redundant (PID): 0.0475
+Synergy (PID): 52.2924
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 3: snr = 10
+
+======================================================================
+Simple Example with RNG seed 42 and Noise seed 24
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.9617
+- R²_B: -0.0025
+- R²_AB: 1.0000
+- unique_A: 1.0025
+- unique_B: 0.0383
+- common: -0.0407
+- unexplained: 0.0000
+Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
+New rank after adding jitter: 30
+
+Full covariance matrix shape: torch.Size([30, 30])
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+
+Idep PID results:
+- red: 0.0454
+- unq0: 13.4719
+- unq1: 0.0061
+- syn: 57.8962
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9617 | I(T;M1): 13.5173
+M2 R² (VP): -0.0025 | I(T;M2): 0.0515
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 71.4195
+
+Unique to M1 (VP): 1.0025 | Unique(T;M1\M2): 13.4719
+Unique to M2 (VP): 0.0383 | Unique(T;M2\M1): 0.0061
+Common (VP): -0.0407 | Redundant (PID): 0.0454
+Synergy (PID): 57.8962
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 4: snr = 10 univariate gaussian with different seeds
+
+======================================================================
+Simple Example with RNG seed 44 and Noise seed 26
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.9637
+- R²_B: -0.0015
+- R²_AB: 1.0000
+- unique_A: 1.0015
+- unique_B: 0.0363
+- common: -0.0378
+- unexplained: 0.0000
+Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
+New rank after adding jitter: 30
+
+Full covariance matrix shape: torch.Size([30, 30])
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+
+Idep PID results:
+- red: 0.0451
+- unq0: 13.4876
+- unq1: 0.0046
+- syn: 58.9292
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9637 | I(T;M1): 13.5327
+M2 R² (VP): -0.0015 | I(T;M2): 0.0497
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 72.4665
+
+Unique to M1 (VP): 1.0015 | Unique(T;M1\M2): 13.4876
+Unique to M2 (VP): 0.0363 | Unique(T;M2\M1): 0.0046
+Common (VP): -0.0378 | Redundant (PID): 0.0451
+Synergy (PID): 58.9292
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 5: snr = 100
+
+======================================================================
+Simple Example with RNG seed 42 and Noise seed 24
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.9999
+- R²_B: -0.0019
+- R²_AB: 1.0000
+- unique_A: 1.0019
+- unique_B: 0.0001
+- common: -0.0020
+- unexplained: 0.0000
+Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
+New rank after adding jitter: 30
+
+Full covariance matrix shape: torch.Size([30, 30])
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+
+Idep PID results:
+- red: 0.0549
+- unq0: 40.4356
+- unq1: 0.0001
+- syn: 28.7380
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9999 | I(T;M1): 40.4905
+M2 R² (VP): -0.0019 | I(T;M2): 0.0551
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 69.2286
+
+Unique to M1 (VP): 1.0019 | Unique(T;M1\M2): 40.4356
+Unique to M2 (VP): 0.0001 | Unique(T;M2\M1): 0.0001
+Common (VP): -0.0020 | Redundant (PID): 0.0549
+Synergy (PID): 28.7380
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 6: snr = 100 univariate gaussian with different seeds
+
+======================================================================
+Simple Example with RNG seed 43 and Noise seed 25
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.9999
+- R²_B: -0.0020
+- R²_AB: 1.0000
+- unique_A: 1.0020
+- unique_B: 0.0001
+- common: -0.0021
+- unexplained: 0.0000
+Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
+New rank after adding jitter: 30
+
+Full covariance matrix shape: torch.Size([30, 30])
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+Matrix is full rank (rank=10).
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+Matrix is full rank (rank=30).
+
+Idep PID results:
+- red: 0.0416
+- unq0: 41.3872
+- unq1: 0.0000
+- syn: 30.0979
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9999 | I(T;M1): 41.4288
+M2 R² (VP): -0.0020 | I(T;M2): 0.0417
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 71.5267
+
+Unique to M1 (VP): 1.0020 | Unique(T;M1\M2): 41.3872
+Unique to M2 (VP): 0.0001 | Unique(T;M2\M1): 0.0000
+Common (VP): -0.0021 | Redundant (PID): 0.0416
+Synergy (PID): 30.0979
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+All experiments completed.

@@ -41,6 +41,7 @@ def create_cov_matrix(X0,X1,X2):
     Z = torch.hstack([X0, X1, X2])   # shape (N, d_T+d_M1+d_M2)
 
     Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
+    Sigma = assert_full_rank(Sigma,jitter=1e-6)
     cov_dict = {}
     print(f"\nFull covariance matrix shape: {Sigma.shape}")
     x1_dim = X1.shape[1]
@@ -85,3 +86,28 @@ def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
     mean = X.mean(dim=0, keepdim=True)
     std  = X.std(dim=0, unbiased=False, keepdim=True)
     return (X - mean) / (std + eps)
+
+
+
+def assert_full_rank(X: torch.Tensor,jitter=0) -> None:
+    """
+    Assert that the input matrix X is full rank.
+
+    X shape: (N, P)
+    """
+    n,m = X.shape
+    full_rank = min(n,m)
+
+    rank = torch.linalg.matrix_rank(X)
+    if rank < full_rank and jitter > 0:
+        # Try adding jitter to the diagonal and recompute rank
+        print(f"Matrix is rank-deficient (rank={rank}). Adding jitter to check for full rank.")
+        jitter_matrix = jitter * torch.eye(n, m)
+        rank = torch.linalg.matrix_rank(X + jitter_matrix)
+        X += jitter_matrix
+        print(f"New rank after adding jitter: {rank}")
+        return X
+    if rank < full_rank:
+        raise ValueError(f"Input matrix is rank-deficient (rank={rank}, expected full rank={full_rank}).")
+
+

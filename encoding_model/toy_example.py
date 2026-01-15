@@ -162,7 +162,7 @@ def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_di
     signal = real_features @ betas
     noise_std = np.std(signal) / snr
     signa_noise_rng = np.random.default_rng(seed=1000)
-    y_real  = signal #+ noise_std * signa_noise_rng.standard_normal((n,p))
+    y_real  = signal + noise_std * signa_noise_rng.standard_normal((n,p))
     
     if simple_example:
         noise = noise_std * noise_rng.standard_normal((n,p))

@@ -5,11 +5,10 @@ import matplotlib.pyplot as plt
 from torch.distributions import Normal
 from sklearn.linear_model import LinearRegression
 
-
 if __name__ != "__main__":
-    from .PID_util import create_cov_matrix, cond_cov,standardize
+    from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank
 else:
-    from PID_util import create_cov_matrix, cond_cov,standardize
+    from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank
 from typing import Optional
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
@@ -42,6 +41,7 @@ class Idep_multivariate_gauss:
         if self.M1 is not None and self.M2 is not None and self.T is not None:
             self.cov_dict = create_cov_matrix(self.M1,self.M2,self.T)
             self.cov_matrix = self.cov_dict['full_cov']
+            assert_full_rank(self.cov_matrix)
         elif cov_matrix is not None:
             self.cov_matrix = cov_matrix
 
@@ -87,6 +87,8 @@ class Idep_multivariate_gauss:
             # Step B: Compute K = Lx^{-1} @ tmp
             # This is equivalent to solving Lx @ K = tmp
             K = torch.linalg.solve_triangular(Lx, tmp, upper=False)
+
+            assert_full_rank(K)
             
             return K
         
@@ -120,6 +122,7 @@ class Idep_multivariate_gauss:
             M[self.dim_m1 + self.dim_m2:, self.dim_m1:self.dim_m1 + self.dim_m2] = block3.T
 
         assert M.shape == (self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t), f"Created matrix shape {M.shape} does not match expected shape {(self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t)}."
+        assert_full_rank(M)
         return M
 
 
