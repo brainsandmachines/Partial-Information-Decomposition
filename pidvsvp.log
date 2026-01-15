@@ -2,110 +2,88 @@
 Running Gaussian Univariate target and sources simple example...
 
 ======================================================================
-Experiment 1: snr = 10
+Experiment 1: snr = 1
 
 ======================================================================
 Simple Example with RNG seed 42 and Noise seed 24
 ======================================================================
 ridge_cv analysis of target (y_real):
-- R²_A: 0.9893
-- R²_B: -0.0019
+- R²_A: 0.6737
+- R²_B: -0.0116
 - R²_AB: 1.0000
-- unique_A: 1.0019
-- unique_B: 0.0107
-- common: -0.0127
+- unique_A: 1.0116
+- unique_B: 0.3263
+- common: -0.3379
 - unexplained: 0.0000
 Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
 New rank after adding jitter: 30
 
 Full covariance matrix shape: torch.Size([30, 30])
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
 
 Covariance matrix shape: torch.Size([30, 30])
 dim_m1: 10, dim_m2: 10, dim_t: 10
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
 
 Idep PID results:
-- red: 0.0507
-- unq0: 18.9845
-- unq1: 0.0028
-- syn: 51.3182
+- red: 0.0273
+- unq0: 5.2472
+- unq1: 0.0155
+- syn: 72.3871
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.9893 | I(T;M1): 19.0352
-M2 R² (VP): -0.0019 | I(T;M2): 0.0535
-Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 70.3562
+M1 R² (VP): 0.6737 | I(T;M1): 5.2744
+M2 R² (VP): -0.0116 | I(T;M2): 0.0428
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 77.6771
 
-Unique to M1 (VP): 1.0019 | Unique(T;M1\M2): 18.9845
-Unique to M2 (VP): 0.0107 | Unique(T;M2\M1): 0.0028
-Common (VP): -0.0127 | Redundant (PID): 0.0507
-Synergy (PID): 51.3182
+Unique to M1 (VP): 1.0116 | Unique(T;M1\M2): 5.2472
+Unique to M2 (VP): 0.3263 | Unique(T;M2\M1): 0.0155
+Common (VP): -0.3379 | Redundant (PID): 0.0273
+Synergy (PID): 72.3871
 
 Suppression effect detected: M2 is a suppressor variable.❗❗❗
 
 ======================================================================
-Experiment 2: snr = 10 univariate gaussian with different seeds
+Experiment 2: snr = 1 univariate gaussian with different seeds
 
 ======================================================================
 Simple Example with RNG seed 44 and Noise seed 26
 ======================================================================
 ridge_cv analysis of target (y_real):
-- R²_A: 0.9901
-- R²_B: -0.0014
+- R²_A: 0.6720
+- R²_B: -0.0078
 - R²_AB: 1.0000
-- unique_A: 1.0014
-- unique_B: 0.0099
-- common: -0.0114
+- unique_A: 1.0078
+- unique_B: 0.3280
+- common: -0.3358
 - unexplained: 0.0000
 Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
 New rank after adding jitter: 30
 
 Full covariance matrix shape: torch.Size([30, 30])
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
 
 Covariance matrix shape: torch.Size([30, 30])
 dim_m1: 10, dim_m2: 10, dim_t: 10
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
 
 Idep PID results:
-- red: 0.0475
-- unq0: 18.8286
-- unq1: 0.0032
-- syn: 52.2924
+- red: 0.0372
+- unq0: 5.2273
+- unq1: 0.0182
+- syn: 73.5271
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.9901 | I(T;M1): 18.8761
-M2 R² (VP): -0.0014 | I(T;M2): 0.0507
-Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 71.1718
+M1 R² (VP): 0.6720 | I(T;M1): 5.2645
+M2 R² (VP): -0.0078 | I(T;M2): 0.0553
+Both M1 and M2 R² (VP): 1.0000 | I(T;M1,M2): 78.8098
 
-Unique to M1 (VP): 1.0014 | Unique(T;M1\M2): 18.8286
-Unique to M2 (VP): 0.0099 | Unique(T;M2\M1): 0.0032
-Common (VP): -0.0114 | Redundant (PID): 0.0475
-Synergy (PID): 52.2924
+Unique to M1 (VP): 1.0078 | Unique(T;M1\M2): 5.2273
+Unique to M2 (VP): 0.3280 | Unique(T;M2\M1): 0.0182
+Common (VP): -0.3358 | Redundant (PID): 0.0372
+Synergy (PID): 73.5271
 
 Suppression effect detected: M2 is a suppressor variable.❗❗❗
 
@@ -127,20 +105,9 @@ Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
 New rank after adding jitter: 30
 
 Full covariance matrix shape: torch.Size([30, 30])
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
 
 Covariance matrix shape: torch.Size([30, 30])
 dim_m1: 10, dim_m2: 10, dim_t: 10
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
 
 Idep PID results:
 - red: 0.0454
@@ -181,20 +148,9 @@ Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
 New rank after adding jitter: 30
 
 Full covariance matrix shape: torch.Size([30, 30])
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
 
 Covariance matrix shape: torch.Size([30, 30])
 dim_m1: 10, dim_m2: 10, dim_t: 10
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
 
 Idep PID results:
 - red: 0.0451
@@ -235,20 +191,9 @@ Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
 New rank after adding jitter: 30
 
 Full covariance matrix shape: torch.Size([30, 30])
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
 
 Covariance matrix shape: torch.Size([30, 30])
 dim_m1: 10, dim_m2: 10, dim_t: 10
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
 
 Idep PID results:
 - red: 0.0549
@@ -289,20 +234,9 @@ Matrix is rank-deficient (rank=20). Adding jitter to check for full rank.
 New rank after adding jitter: 30
 
 Full covariance matrix shape: torch.Size([30, 30])
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
-Matrix is full rank (rank=10).
 
 Covariance matrix shape: torch.Size([30, 30])
 dim_m1: 10, dim_m2: 10, dim_t: 10
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
-Matrix is full rank (rank=30).
 
 Idep PID results:
 - red: 0.0416
