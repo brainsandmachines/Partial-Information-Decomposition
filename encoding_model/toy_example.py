@@ -2,6 +2,47 @@ import numpy as np
 from sklearn.linear_model import RidgeCV, LinearRegression
 import matplotlib.pyplot as plt
 
+def correlation_matrix(X):
+    """Compute the correlation matrix of the columns of X."""
+    X_centered = X - np.mean(X, axis=0)
+    cov_matrix = np.cov(X_centered, rowvar=False)
+    stddev = np.sqrt(np.diag(cov_matrix))
+    corr_matrix = cov_matrix / np.outer(stddev, stddev)
+    return corr_matrix
+
+def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
+    def cross_correlation(X, Y):
+        Xc, Yc = X - X.mean(0), Y - Y.mean(0)
+        n = Xc.shape[0] - 1
+        cov = (Xc.T @ Yc) / n
+        sx = np.sqrt(np.diag((Xc.T @ Xc) / n))
+        sy = np.sqrt(np.diag((Yc.T @ Yc) / n))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return cov / np.outer(sx, sy)
+
+    blocks, labels = [X_M1, X_M2, y_real], ["M1", "M2", "Y"]
+    counts = [b.shape[1] for b in blocks]
+    fig = plt.figure(figsize=(9, 9))
+    gs = plt.GridSpec(3, 3, width_ratios=counts, height_ratios=counts, wspace=0.05, hspace=0.05)
+    axes, im = [], None
+    for i in range(3):
+        for j in range(3):
+            ax = fig.add_subplot(gs[i, j])
+            corr = cross_correlation(blocks[i], blocks[j])
+            im = ax.imshow(corr, cmap='bwr', vmin=-1, vmax=1, aspect='auto')
+            max_text = "max: n/a" if np.all(np.isnan(corr)) else f"max: {np.nanmax(corr):.2f}"
+            ax.text(0.02, 0.98, max_text, transform=ax.transAxes, ha='left', va='top', fontsize=8,
+                    color='black', bbox={'boxstyle': 'round,pad=0.2', 'facecolor': 'white', 'alpha': 0.7, 'edgecolor': 'none'})
+            if i == 0:
+                ax.set_title(labels[j])
+            if j == 0:
+                ax.set_ylabel(labels[i])
+            ax.set_xticks([]); ax.set_yticks([])
+            axes.append(ax)
+    fig.colorbar(im, ax=axes, fraction=0.03, pad=0.02).set_label('Correlation Coefficient')
+    fig.suptitle(f'Correlation Matrix - Method: {method}, Mixing Dim: {mixing_dimension}')
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.show()
 
 def compute_ols_cv_r2(X, y):
     """
@@ -134,7 +175,7 @@ def commonality_analysis(features_A, features_B, target, method='standard', alph
         'betas_AB': modelAB.coef_ if hasattr(modelAB, 'coef_') else None
     }
 
-def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard'):
+def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False):
     """
     Run commonality analysis experiment.
     
@@ -181,7 +222,10 @@ def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_di
         X_M1 = X_M1 @ mixing_matrix_M1
         mixing_matrix_M2 = rng.standard_normal((X_M2.shape[1], mixing_dimension))
         X_M2 = X_M2 @ mixing_matrix_M2
-    
+    # plot correlation matrices
+    if show_diagnostic_plots:
+        diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension)
+
     # Commonality analysis
     decomp = commonality_analysis(X_M1, X_M2, y_real, method=method)
 
