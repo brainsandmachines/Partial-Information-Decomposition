@@ -233,7 +233,7 @@ def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_di
     
     if simple_example:
         noise = noise_std * noise_rng.standard_normal((n,p))
-        X_M1 = y_real + noise
+        X_M1 = signal + noise
         X_M2 = noise
     else:
         X_M1 = np.hstack([real_features, shuffled_spurious])
