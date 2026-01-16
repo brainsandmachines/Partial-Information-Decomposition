@@ -10,6 +10,32 @@ def correlation_matrix(X):
     corr_matrix = cov_matrix / np.outer(stddev, stddev)
     return corr_matrix
 
+def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
+    """Return min eigenvalue and singularity flag for blocks and combinations."""
+    blocks = {
+        "M1": X_M1,
+        "M2": X_M2,
+        "Y": y_real,
+        "M1+M2": np.hstack([X_M1, X_M2]),
+        "M1+Y": np.hstack([X_M1, y_real]),
+        "M2+Y": np.hstack([X_M2, y_real]),
+        "M1+M2+Y": np.hstack([X_M1, X_M2, y_real]),
+    }
+    report = {}
+    printing_required = False
+    for name, block in blocks.items():
+        eigvals = np.linalg.eigvalsh(correlation_matrix(block))
+        min_eig = float(eigvals.min())
+        report[name] = {"min_eigval": min_eig, "is_singular": min_eig <= tol}
+        if min_eig <= tol:
+            printing_required = True
+    # print report if any block is singular or ill-conditioned
+    if printing_required:
+        for name, info in report.items():
+            status = "SINGULAR" if info["is_singular"] else "OK"
+            print(f"Block {name}: min eigenvalue = {info['min_eigval']:.2e} -> {status}")
+    return report
+
 def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
     def cross_correlation(X, Y):
         Xc, Yc = X - X.mean(0), Y - Y.mean(0)
@@ -213,8 +239,10 @@ def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_di
         X_M1 = np.hstack([real_features, shuffled_spurious])
         X_M2 = np.hstack([shuffled_real, shuffled_spurious])
 
-
-
+    # make sure joint covariance matrix is not singular
+    sing_report = singularity_report(X_M1, X_M2, y_real)
+    assert not sing_report["M1+M2+Y"]["is_singular"], \
+        "Joint covariance matrix is singular or ill-conditioned!"
 
     if mixing_dimension is not None:
         # Create mixed features: entangle real and spurious with a mixing matrix
@@ -225,6 +253,11 @@ def run_experiment(rng,noise_rng,simple_example = True, n=1024, p=100, mixing_di
     # plot correlation matrices
     if show_diagnostic_plots:
         diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension)
+
+    # make sure joint covariance matrix is not singular
+    sing_report = singularity_report(X_M1, X_M2, y_real)
+    assert not sing_report["M1+M2+Y"]["is_singular"], \
+        "Joint covariance matrix is singular or ill-conditioned!"
 
     # Commonality analysis
     decomp = commonality_analysis(X_M1, X_M2, y_real, method=method)
