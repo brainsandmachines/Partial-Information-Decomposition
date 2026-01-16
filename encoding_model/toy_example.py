@@ -304,7 +304,7 @@ def run_all_methods(rng_seed,noise_seed,n, p, mixing_dimension, snr):
 def main():
     """Run the 2x3 factorial experiment design."""
     # Common parameters
-    N, P, SEED,NOISE_SEED = 1000, 100, 42, 24
+    N, P, SEED,NOISE_SEED = 1000, 200, 42, 24
 
     # =============================================================================
     # LOW SNR experiments (SNR = 1.0)
