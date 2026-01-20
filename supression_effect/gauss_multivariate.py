@@ -70,9 +70,9 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     # --- compute PID ---
 
     #Change to tensors: 
-    M1 = torch.tensor(M1)
-    M2 = torch.tensor(M2)
-    T = torch.tensor(T)
+    M1 = torch.tensor(M1).reshape(-1,P)
+    M2 = torch.tensor(M2).reshape(-1,P)
+    T = torch.tensor(T).reshape(-1,P)
     sources = [M1,M2]
     targets = [T]
     idep_class = Idep_multivariate_gauss(sources,targets)
@@ -166,42 +166,45 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 1000, 10
+    N, P = 1000000, 30
     rng_seed, noise_seed = 42, 24
     snr = 1
     method = 'ridge_cv'
     mixing_dimension = None
+    simple_example = False
 
     print("\nRunning Gaussian Univariate target and sources simple example...")
 
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=snr, method=method, mixing_dimension=None)
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=None)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
     print(f"Experiment 2: snr = {snr} univariate gaussian with different seeds")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=True, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
-    print("Experiment 3: snr = 10")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=5, method=method, mixing_dimension=mixing_dimension)
+    snr = 10
+    print(f"Experiment 3: snr = {snr}")
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
-    print("Experiment 4: snr = 10 univariate gaussian with different seeds")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=True, snr=5, method=method, mixing_dimension=mixing_dimension)
+    print(f"Experiment 4: snr = {snr} univariate gaussian with different seeds")
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
-    print("Experiment 5: snr = 100")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=100, method=method, mixing_dimension=mixing_dimension)
+    snr = 100
+    print(f"Experiment 5: snr = {snr}")
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
-    print("Experiment 6: snr = 100 univariate gaussian with different seeds")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=True, snr=100, method=method, mixing_dimension=mixing_dimension)
+    print(f"Experiment 6: snr = {snr} univariate gaussian with different seeds")
+    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
 
     print("\nAll experiments completed.")

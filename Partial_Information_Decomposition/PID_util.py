@@ -110,4 +110,4 @@ def assert_full_rank(X: torch.Tensor,jitter=0) -> None:
     if rank < full_rank:
         raise ValueError(f"Input matrix is rank-deficient (rank={rank}, expected full rank={full_rank}).")
 
-
+    return X

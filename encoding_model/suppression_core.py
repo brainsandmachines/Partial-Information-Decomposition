@@ -4,13 +4,11 @@ import pandas as pd
 import sys
 import joblib
 from pathlib import Path
+from encoding_model.encoding_utils import diagnostic_plots, singularity_report
+
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from toy_example_new import run_experiment
-from utils import check_file_exists
-from typing import Optional
 from sklearn.linear_model import RidgeCV, LinearRegression
-from sklearn.decomposition import IncrementalPCA
 from sklearn.linear_model import LinearRegression
 from encoding_model.encoding_utils import compute_r2,compute_ols_cv_r2,compute_ridge_cv_r2
 
@@ -179,6 +177,11 @@ def create_supression_model(rng,signal,suppresion_method, features, suppression_
         X_M1 = X_M1 @ mixing_matrix_M1
         mixing_matrix_M2 = rng.standard_normal((X_M2.shape[1], mixing_dimension))
         X_M2 = X_M2 @ mixing_matrix_M2
+
+        # make sure joint covariance matrix is not singular
+    # sing_report = singularity_report(X_M1, X_M2, target)
+    # assert not sing_report["M1+M2+Y"]["is_singular"], \
+    #     "Joint covariance matrix is singular or ill-conditioned!"
 
     return X_M1, X_M2,target
 

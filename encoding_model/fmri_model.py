@@ -7,7 +7,7 @@ from sklearn.decomposition import IncrementalPCA
 from sklearn.linear_model import LinearRegression
 from tqdm import tqdm
 from scipy.stats import pearsonr as corr
-from encoding_utils import map_correlation_to_rois, plot_fmri,fmri_response_image, split_dataset,visualize_encdoing_accuaracy
+from encoding_model.encoding_utils import map_correlation_to_rois, plot_fmri,fmri_response_image, split_dataset,visualize_encdoing_accuaracy
 from typing import Optional
 from sklearn.linear_model import RidgeCV
 

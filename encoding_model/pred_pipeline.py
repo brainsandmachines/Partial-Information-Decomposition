@@ -4,10 +4,10 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, Dataset
 import os
-from algoanut_data import argObj, load_data_algonauts
+from encoding_model.algoanut_data import argObj, load_data_algonauts
 from encoding_model.fmri_model import encoding_model
-from encoding_utils import check_folder_exists,plot_fmri, split_dataset, map_correlation_to_rois,ImageDataset
-from encoding_utils import visualize_encdoing_accuaracy,save_corellation,save_model,fmri_data_loader 
+from encoding_model.encoding_utils import check_folder_exists,plot_fmri, split_dataset, map_correlation_to_rois,ImageDataset
+from encoding_model.encoding_utils import visualize_encdoing_accuaracy,save_corellation,save_model,fmri_data_loader 
 import torchvision.transforms as transforms
 from pathlib import Path
 import joblib

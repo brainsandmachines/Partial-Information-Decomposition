@@ -19,6 +19,23 @@ Validation stimulus images: 0
 Test stimulus images: 159
 
  Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/RidgeCV_subj1_model_alexnet_features.2/RidgeCV_subj1_model_alexnet_features.2_encoding_model.joblib
+Failed to enable GUI event loop integration for 'qt'
+Traceback (most recent call last):
+  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/matplotlibtools.py", line 49, in do_enable_gui
+    enable_gui(guiname)
+  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 567, in enable_gui
+    return gui_hook(app)
+           ^^^^^^^^^^^^^
+  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 187, in enable_qt
+    self.enable_qt4(app)
+  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 213, in enable_qt4
+    app, inputhook_qt4 = create_inputhook_qt4(self, app)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhookqt4.py", line 87, in create_inputhook_qt4
+    app = QtGui.QApplication([" "])
+          ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'PySide6.QtGui' has no attribute 'QApplication'. Did you mean: 'QGuiApplication'?
+Backend qtagg is interactive backend. Turning interactive mode on.
 
 ======================================================================
 
@@ -434,292 +451,19 @@ Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_me
 
 Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 50}
 
-======================================================================
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 70}
 
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=50.0, mixing_dimension=70
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 100}
 
-Encoder's features shape:  (2000, 300)
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': None}
 
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 30}
 
---- STANDARD ---
-                value
-R²_A         0.241360
-R²_B         0.034009
-R²_AB        0.293913
-unique_A     0.259904
-unique_B     0.052553
-common      -0.018544
-unexplained  0.706087
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 50}
 
---- OLS_CV ---
-                value
-R²_A         0.181259
-R²_B        -0.038993
-R²_AB        0.178008
-unique_A     0.217001
-unique_B    -0.003252
-common      -0.035742
-unexplained  0.821992
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 70}
 
---- RIDGE_CV ---
-                value
-R²_A         0.182191
-R²_B        -0.037602
-R²_AB        0.180833
-unique_A     0.218434
-unique_B    -0.001359
-common      -0.036243
-unexplained  0.819167
-
-======================================================================
-
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=50.0, mixing_dimension=100
-
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
-                value
-R²_A         0.296879
-R²_B         0.052995
-R²_AB        0.368032
-unique_A     0.315037
-unique_B     0.071154
-common      -0.018158
-unexplained  0.631968
-
---- OLS_CV ---
-                value
-R²_A         0.215458
-R²_B        -0.050722
-R²_AB        0.212024
-unique_A     0.262745
-unique_B    -0.003435
-common      -0.047287
-unexplained  0.787976
-
---- RIDGE_CV ---
-                value
-R²_A         0.217033
-R²_B        -0.048209
-R²_AB        0.217239
-unique_A     0.265448
-unique_B     0.000206
-common      -0.048414
-unexplained  0.782761
-
-======================================================================
-
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=80.0, mixing_dimension=None
-
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
-                value
-R²_A         0.645281
-R²_B         0.152175
-R²_AB        0.676256
-unique_A     0.524081
-unique_B     0.030975
-common       0.121200
-unexplained  0.323744
-
---- OLS_CV ---
-                value
-R²_A         0.497191
-R²_B        -0.180045
-R²_AB        0.446934
-unique_A     0.626978
-unique_B    -0.050258
-common      -0.129787
-unexplained  0.553066
-
---- RIDGE_CV ---
-                value
-R²_A         0.508152
-R²_B        -0.009611
-R²_AB        0.472684
-unique_A     0.482295
-unique_B    -0.035468
-common       0.025857
-unexplained  0.527316
-
-======================================================================
-
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=80.0, mixing_dimension=30
-
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
-                value
-R²_A         0.134221
-R²_B         0.015356
-R²_AB        0.155226
-unique_A     0.139870
-unique_B     0.021005
-common      -0.005649
-unexplained  0.844774
-
---- OLS_CV ---
-                value
-R²_A         0.105544
-R²_B        -0.015658
-R²_AB        0.099893
-unique_A     0.115551
-unique_B    -0.005651
-common      -0.010006
-unexplained  0.900107
-
---- RIDGE_CV ---
-                value
-R²_A         0.105846
-R²_B        -0.015263
-R²_AB        0.100690
-unique_A     0.115953
-unique_B    -0.005155
-common      -0.010107
-unexplained  0.899310
-
-======================================================================
-
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=80.0, mixing_dimension=50
-
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
-                value
-R²_A         0.202213
-R²_B         0.026012
-R²_AB        0.240185
-unique_A     0.214173
-unique_B     0.037971
-common      -0.011960
-unexplained  0.759815
-
---- OLS_CV ---
-                value
-R²_A         0.157609
-R²_B        -0.025502
-R²_AB        0.154099
-unique_A     0.179602
-unique_B    -0.003510
-common      -0.021993
-unexplained  0.845901
-
---- RIDGE_CV ---
-                value
-R²_A         0.158178
-R²_B        -0.024698
-R²_AB        0.155678
-unique_A     0.180376
-unique_B    -0.002501
-common      -0.022197
-unexplained  0.844322
-
-======================================================================
-
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=80.0, mixing_dimension=70
-
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
-                value
-R²_A         0.238343
-R²_B         0.034979
-R²_AB        0.294645
-unique_A     0.259667
-unique_B     0.056303
-common      -0.021324
-unexplained  0.705355
-
---- OLS_CV ---
-                value
-R²_A         0.177816
-R²_B        -0.037687
-R²_AB        0.178661
-unique_A     0.216348
-unique_B     0.000845
-common      -0.038532
-unexplained  0.821339
-
---- RIDGE_CV ---
-                value
-R²_A         0.178748
-R²_B        -0.036295
-R²_AB        0.181439
-unique_A     0.217734
-unique_B     0.002692
-common      -0.038987
-unexplained  0.818561
-
-======================================================================
-
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.5, snr=80.0, mixing_dimension=100
-
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
-                value
-R²_A         0.303331
-R²_B         0.047684
-R²_AB        0.373200
-unique_A     0.325516
-unique_B     0.069869
-common      -0.022185
-unexplained  0.626800
-
---- OLS_CV ---
-                value
-R²_A         0.222201
-R²_B        -0.056497
-R²_AB        0.217876
-unique_A     0.274372
-unique_B    -0.004325
-common      -0.052172
-unexplained  0.782124
-
---- RIDGE_CV ---
-                value
-R²_A         0.223839
-R²_B        -0.053807
-R²_AB        0.223303
-unique_A     0.277110
-unique_B    -0.000536
-common      -0.053271
-unexplained  0.776697
+Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 100}
 
 ======================================================================
 
@@ -734,69 +478,12 @@ Creating suppression model...
 
 --- STANDARD ---
                 value
-R²_A         0.418665
-R²_B         0.147989
-R²_AB        0.439249
-unique_A     0.291260
-unique_B     0.020583
-common       0.127405
-unexplained  0.560751
+R²_A         0.391642
+R²_B         0.150885
+R²_AB        0.412697
+unique_A     0.261812
+unique_B     0.021055
+common       0.129830
+unexplained  0.587303
 
 --- OLS_CV ---
-                value
-R²_A         0.185613
-R²_B        -0.186242
-R²_AB        0.155912
-unique_A     0.342154
-unique_B    -0.029701
-common      -0.156541
-unexplained  0.844088
-
---- RIDGE_CV ---
-Traceback (most recent call last):
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppresion_model.py", line 264, in <module>
-    df = test_run(run_name, save_dir, features, fmri_dict, rngs_seed, suppression_method, supression_strength, n_samples, n_features, snr, mixing_dimension)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppresion_model.py", line 216, in test_run
-    outputs = run_all_methods(rng_seed,suppresion_method=suppression_method ,mixing_dimension=md, snr=sn, suppression_strength=s,models_and_features_dict=models_and_features_dict)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppression_core.py", line 229, in run_all_methods
-    outputs = commonality_analysis(X_M1, X_M2, target, method=method)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppression_core.py", line 201, in commonality_analysis
-    r2_B = compute_r2_fn(features_B, target)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppression_core.py", line 193, in <lambda>
-    compute_r2_fn = lambda X, y: compute_ridge_cv_r2(X, y, alphas)
-                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/encoding_utils.py", line 399, in compute_ridge_cv_r2
-    ridge_cv.fit(X, y)
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/base.py", line 1365, in wrapper
-    return fit_method(estimator, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2694, in fit
-    super().fit(X, y, sample_weight=sample_weight, **params)
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2425, in fit
-    estimator.fit(
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2201, in fit
-    alpha_score = self._score(
-                  ^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2288, in _score
-    _score = scorer(identity_estimator, predictions, y, **score_params)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/metrics/_scorer.py", line 308, in __call__
-    return self._score(partial(_cached_call, None), estimator, X, y_true, **_kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/metrics/_scorer.py", line 408, in _score
-    return self._sign * self._score_func(y_true, y_pred, **scoring_kwargs)
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 191, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/metrics/_regression.py", line 1292, in r2_score
-    numerator = xp.sum(weight * (y_true - y_pred) ** 2, axis=0)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/numpy/_core/fromnumeric.py", line 2333, in _sum_dispatcher
-    def _sum_dispatcher(a, axis=None, dtype=None, out=None, keepdims=None,
-    
-KeyboardInterrupt

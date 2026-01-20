@@ -7,9 +7,9 @@ import joblib
 from pathlib import Path
 from tqdm import tqdm
 import sys
-from algoanut_data import argObj, load_data_algonauts
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
+from encoding_model.algoanut_data import argObj, load_data_algonauts
 from toy_example_new import run_experiment
 from utils import check_file_exists, create_permuation
 from typing import Optional
@@ -19,7 +19,7 @@ from sklearn.linear_model import LinearRegression
 from encoding_model.fmri_model import encoding_model
 from pred_pipeline import pipeline
 from torchvision.models.feature_extraction import create_feature_extractor, get_graph_node_names
-from encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model
+from encoding_model.encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model
 from scipy.stats import pearsonr as corr
 from suppresion_model import create_supression_model,commonality_analysis
 

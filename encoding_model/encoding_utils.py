@@ -415,3 +415,72 @@ def compute_r2(X, y):
     model = LinearRegression()
     model.fit(X, y)
     return model.score(X, y)
+
+
+def correlation_matrix(X):
+    """Compute the correlation matrix of the columns of X."""
+    X_centered = X - np.mean(X, axis=0)
+    cov_matrix = np.cov(X_centered, rowvar=False)
+    stddev = np.sqrt(np.diag(cov_matrix))
+    corr_matrix = cov_matrix / np.outer(stddev, stddev)
+    return corr_matrix
+
+def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
+    """Return min eigenvalue and singularity flag for blocks and combinations."""
+    blocks = {
+        "M1": X_M1,
+        "M2": X_M2,
+        "Y": y_real,
+        "M1+M2": np.hstack([X_M1, X_M2]),
+        "M1+Y": np.hstack([X_M1, y_real]),
+        "M2+Y": np.hstack([X_M2, y_real]),
+        "M1+M2+Y": np.hstack([X_M1, X_M2, y_real]),
+    }
+    report = {}
+    printing_required = False
+    for name, block in blocks.items():
+        eigvals = np.linalg.eigvalsh(correlation_matrix(block))
+        min_eig = float(eigvals.min())
+        report[name] = {"min_eigval": min_eig, "is_singular": min_eig <= tol}
+        if min_eig <= tol:
+            printing_required = True
+    # print report if any block is singular or ill-conditioned
+    if printing_required:
+        for name, info in report.items():
+            status = "SINGULAR" if info["is_singular"] else "OK"
+            print(f"Block {name}: min eigenvalue = {info['min_eigval']:.2e} -> {status}")
+    return report
+
+def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
+    def cross_correlation(X, Y):
+        Xc, Yc = X - X.mean(0), Y - Y.mean(0)
+        n = Xc.shape[0] - 1
+        cov = (Xc.T @ Yc) / n
+        sx = np.sqrt(np.diag((Xc.T @ Xc) / n))
+        sy = np.sqrt(np.diag((Yc.T @ Yc) / n))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return cov / np.outer(sx, sy)
+
+    blocks, labels = [X_M1, X_M2, y_real], ["M1", "M2", "Y"]
+    counts = [b.shape[1] for b in blocks]
+    fig = plt.figure(figsize=(9, 9))
+    gs = plt.GridSpec(3, 3, width_ratios=counts, height_ratios=counts, wspace=0.05, hspace=0.05)
+    axes, im = [], None
+    for i in range(3):
+        for j in range(3):
+            ax = fig.add_subplot(gs[i, j])
+            corr = cross_correlation(blocks[i], blocks[j])
+            im = ax.imshow(corr, cmap='bwr', vmin=-1, vmax=1, aspect='auto')
+            max_text = "max: n/a" if np.all(np.isnan(corr)) else f"max: {np.nanmax(corr):.2f}"
+            ax.text(0.02, 0.98, max_text, transform=ax.transAxes, ha='left', va='top', fontsize=8,
+                    color='black', bbox={'boxstyle': 'round,pad=0.2', 'facecolor': 'white', 'alpha': 0.7, 'edgecolor': 'none'})
+            if i == 0:
+                ax.set_title(labels[j])
+            if j == 0:
+                ax.set_ylabel(labels[i])
+            ax.set_xticks([]); ax.set_yticks([])
+            axes.append(ax)
+    fig.colorbar(im, ax=axes, fraction=0.03, pad=0.02).set_label('Correlation Coefficient')
+    fig.suptitle(f'Correlation Matrix - Method: {method}, Mixing Dim: {mixing_dimension}')
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.show()

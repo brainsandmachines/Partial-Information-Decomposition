@@ -4,14 +4,19 @@ from pathlib import Path
 from PIL import Image
 from pyparsing import Optional
 from matplotlib import pyplot as plt
+from sympy import root
 import torch
 from torch.utils.data import DataLoader, Dataset
 from torchvision.models.feature_extraction import create_feature_extractor, get_graph_node_names
 from torchvision import transforms
 from sklearn.decomposition import IncrementalPCA
 from sklearn.linear_model import LinearRegression
+import sys
+import joblib
 from scipy.stats import pearsonr as corr
-from encoding_utils import map_correlation_to_rois, plot_fmri,fmri_response_image, split_dataset,visualize_encdoing_accuaracy
+root = Path(__file__).resolve().parents[1]
+sys.path.append(str(root))
+from encoding_model.encoding_utils import map_correlation_to_rois, plot_fmri,fmri_response_image, split_dataset,visualize_encdoing_accuaracy
 
 
 

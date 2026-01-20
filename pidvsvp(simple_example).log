@@ -1,0 +1,250 @@
+
+Running Gaussian Univariate target and sources simple example...
+
+======================================================================
+Experiment 1: snr = 0.95
+
+======================================================================
+Simple Example with RNG seed 42 and Noise seed 24
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.4262
+- R²_B: -0.0009
+- R²_AB: 0.4649
+- unique_A: 0.4658
+- unique_B: 0.0387
+- common: -0.0396
+- unexplained: 0.5351
+
+Full covariance matrix shape: torch.Size([30, 30])
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+
+Idep PID results:
+- red: 0.0020
+- unq0: 2.3755
+- unq1: 0.0032
+- syn: 0.3571
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.4262 | I(T;M1): 2.3775
+M2 R² (VP): -0.0009 | I(T;M2): 0.0052
+Both M1 and M2 R² (VP): 0.4649 | I(T;M1,M2): 2.7378
+
+Unique to M1 (VP): 0.4658 | Unique(T;M1\M2): 2.3755
+Unique to M2 (VP): 0.0387 | Unique(T;M2\M1): 0.0032
+Common (VP): -0.0396 | Redundant (PID): 0.0020
+Synergy (PID): 0.3571
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 2: snr = 0.95 univariate gaussian with different seeds
+
+======================================================================
+Simple Example with RNG seed 44 and Noise seed 26
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.4099
+- R²_B: -0.0010
+- R²_AB: 0.4559
+- unique_A: 0.4569
+- unique_B: 0.0459
+- common: -0.0469
+- unexplained: 0.5441
+
+Full covariance matrix shape: torch.Size([30, 30])
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+
+Idep PID results:
+- red: 0.0015
+- unq0: 2.3159
+- unq1: 0.0041
+- syn: 0.4153
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.4099 | I(T;M1): 2.3173
+M2 R² (VP): -0.0010 | I(T;M2): 0.0056
+Both M1 and M2 R² (VP): 0.4559 | I(T;M1,M2): 2.7368
+
+Unique to M1 (VP): 0.4569 | Unique(T;M1\M2): 2.3159
+Unique to M2 (VP): 0.0459 | Unique(T;M2\M1): 0.0041
+Common (VP): -0.0469 | Redundant (PID): 0.0015
+Synergy (PID): 0.4153
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 3: snr = 0.9
+
+======================================================================
+Simple Example with RNG seed 42 and Noise seed 24
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.4021
+- R²_B: -0.0009
+- R²_AB: 0.4385
+- unique_A: 0.4395
+- unique_B: 0.0364
+- common: -0.0373
+- unexplained: 0.5615
+
+Full covariance matrix shape: torch.Size([30, 30])
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+
+Idep PID results:
+- red: 0.0019
+- unq0: 2.2154
+- unq1: 0.0033
+- syn: 0.3220
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.4021 | I(T;M1): 2.2174
+M2 R² (VP): -0.0009 | I(T;M2): 0.0052
+Both M1 and M2 R² (VP): 0.4385 | I(T;M1,M2): 2.5427
+
+Unique to M1 (VP): 0.4395 | Unique(T;M1\M2): 2.2154
+Unique to M2 (VP): 0.0364 | Unique(T;M2\M1): 0.0033
+Common (VP): -0.0373 | Redundant (PID): 0.0019
+Synergy (PID): 0.3220
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 4: snr = 0.9 univariate gaussian with different seeds
+
+======================================================================
+Simple Example with RNG seed 44 and Noise seed 26
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.3870
+- R²_B: -0.0010
+- R²_AB: 0.4303
+- unique_A: 0.4312
+- unique_B: 0.0432
+- common: -0.0442
+- unexplained: 0.5697
+
+Full covariance matrix shape: torch.Size([30, 30])
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+
+Idep PID results:
+- red: 0.0014
+- unq0: 2.1631
+- unq1: 0.0042
+- syn: 0.3748
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.3870 | I(T;M1): 2.1645
+M2 R² (VP): -0.0010 | I(T;M2): 0.0056
+Both M1 and M2 R² (VP): 0.4303 | I(T;M1,M2): 2.5435
+
+Unique to M1 (VP): 0.4312 | Unique(T;M1\M2): 2.1631
+Unique to M2 (VP): 0.0432 | Unique(T;M2\M1): 0.0042
+Common (VP): -0.0442 | Redundant (PID): 0.0014
+Synergy (PID): 0.3748
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 5: snr = 0.8
+
+======================================================================
+Simple Example with RNG seed 42 and Noise seed 24
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.3508
+- R²_B: -0.0009
+- R²_AB: 0.3824
+- unique_A: 0.3833
+- unique_B: 0.0316
+- common: -0.0325
+- unexplained: 0.6176
+
+Full covariance matrix shape: torch.Size([30, 30])
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+
+Idep PID results:
+- red: 0.0017
+- unq0: 1.8911
+- unq1: 0.0035
+- syn: 0.2568
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.3508 | I(T;M1): 1.8928
+M2 R² (VP): -0.0009 | I(T;M2): 0.0053
+Both M1 and M2 R² (VP): 0.3824 | I(T;M1,M2): 2.1532
+
+Unique to M1 (VP): 0.3833 | Unique(T;M1\M2): 1.8911
+Unique to M2 (VP): 0.0316 | Unique(T;M2\M1): 0.0035
+Common (VP): -0.0325 | Redundant (PID): 0.0017
+Synergy (PID): 0.2568
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+======================================================================
+Experiment 6: snr = 0.8 univariate gaussian with different seeds
+
+======================================================================
+Simple Example with RNG seed 43 and Noise seed 25
+======================================================================
+ridge_cv analysis of target (y_real):
+- R²_A: 0.3244
+- R²_B: -0.0011
+- R²_AB: 0.3579
+- unique_A: 0.3590
+- unique_B: 0.0334
+- common: -0.0345
+- unexplained: 0.6421
+
+Full covariance matrix shape: torch.Size([30, 30])
+
+Covariance matrix shape: torch.Size([30, 30])
+dim_m1: 10, dim_m2: 10, dim_t: 10
+
+Idep PID results:
+- red: 0.0010
+- unq0: 1.7873
+- unq1: 0.0040
+- syn: 0.2643
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.3244 | I(T;M1): 1.7884
+M2 R² (VP): -0.0011 | I(T;M2): 0.0050
+Both M1 and M2 R² (VP): 0.3579 | I(T;M1,M2): 2.0566
+
+Unique to M1 (VP): 0.3590 | Unique(T;M1\M2): 1.7873
+Unique to M2 (VP): 0.0334 | Unique(T;M2\M1): 0.0040
+Common (VP): -0.0345 | Redundant (PID): 0.0010
+Synergy (PID): 0.2643
+
+Suppression effect detected: M2 is a suppressor variable.❗❗❗
+
+All experiments completed.
