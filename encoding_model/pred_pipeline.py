@@ -1,20 +1,11 @@
 import torch
-import numpy as np
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, Dataset
 import os
 from encoding_model.algoanut_data import argObj, load_data_algonauts
 from encoding_model.fmri_model import encoding_model
 from encoding_model.encoding_utils import check_folder_exists,plot_fmri, split_dataset, map_correlation_to_rois,ImageDataset
 from encoding_model.encoding_utils import visualize_encdoing_accuaracy,save_corellation,save_model,fmri_data_loader 
-import torchvision.transforms as transforms
-from pathlib import Path
-import joblib
 from pyparsing import Optional
 from scipy.stats import pearsonr as corr
-from sklearn.decomposition import IncrementalPCA
-from sklearn.linear_model import LinearRegression
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -26,7 +17,7 @@ correlation_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/cor
 subj = 1
 args = argObj(data_dir, parent_submission_dir, subj)
 
-def pipeline(data_dir, parent_submission_dir, subj,args,layer_name='features.2',model=None,features=None, only_validate=False,train_p=80):
+def pipeline(data_dir, parent_submission_dir, subj,args,layer_name='features.2',model=None,features=None, only_validate=False,train_p=80,data_fmri=None,data_imgs=None):
     """Main pipeline to run the encoding model on Algonauts data for a given subject.
     Args:
         data_dir (str): Base data directory.
@@ -41,93 +32,57 @@ def pipeline(data_dir, parent_submission_dir, subj,args,layer_name='features.2',
             trained left hemisphere regression model. (reg_lh)
             trained right hemisphere regression model. (reg_rh)
     """
-    output_dict, data_dict = load_data_algonauts(paths_dict={'data_dir': data_dir, 'parent_submission_dir': parent_submission_dir}, args=args, subj=subj)
-
-    train_img_list = output_dict['train_img_list']
-    test_img_list = output_dict['test_img_list']
-    lh_fmri = output_dict['lh_fmri']
-    rh_fmri = output_dict['rh_fmri']
-
-    train_img_dir = data_dict['train_img_dir']
-    test_img_dir = data_dict['test_img_dir']
-    
-        
-
-
-    idxs_train, idxs_val, idxs_test = split_dataset(train_img_list=train_img_list,test_img_list=test_img_list,train_p=train_p)
-
-    output_dict, data_dict = load_data_algonauts(paths_dict={'data_dir': data_dir, 'parent_submission_dir': parent_submission_dir}, args=args, subj=subj)
-
-    mri_dict, train_data_loader,val_imgs_dataloader = fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,test_img_dir,batch_size=500,train_p=100)
-    train_img_list = output_dict['train_img_list']
-    test_img_list = output_dict['test_img_list']
-    lh_fmri = output_dict['lh_fmri']
-    rh_fmri = output_dict['rh_fmri']
-
-    train_img_dir = data_dict['train_img_dir']
-    test_img_dir = data_dict['test_img_dir']
-    
-
-
-    lh_fmri_train = lh_fmri[idxs_train]
-    lh_fmri_val = lh_fmri[idxs_val]
-    rh_fmri_train = rh_fmri[idxs_train]
-    rh_fmri_val = rh_fmri[idxs_val]
-    fmri_dict = {}
-    fmri_dict['lh_fmri_train'] = lh_fmri_train
-    fmri_dict['lh_fmri_val'] = lh_fmri_val
-    fmri_dict['rh_fmri_train'] = rh_fmri_train
-    fmri_dict['rh_fmri_val'] = rh_fmri_val
-
-    if not only_validate:
-        encoding_model_instance = encoding_model(device=device,model_layer=layer_name,model=model,features=features)
-        reg_lh, reg_rh, lh_correlation, rh_correlation = encoding_model_instance.run_model(train_data_loader,val_imgs_dataloader,lh_fmri_train,
-                                                                                    rh_fmri_train,lh_fmri_val,rh_fmri_val,batch_size=500,ncomponents=None)
-        features_val_pred_lh = encoding_model_instance.lh_fmri_val_pred if hasattr(encoding_model_instance, 'lh_fmri_val_pred') else None
-        features_val_pred_rh = encoding_model_instance.rh_fmri_val_pred if hasattr(encoding_model_instance, 'rh_fmri_val_pred') else None
-        features_train = encoding_model_instance.features_train if hasattr(encoding_model_instance, 'features_train') else None
-        features_val_trained = encoding_model_instance.features_val if hasattr(encoding_model_instance, 'features_val') else None
-        #save_fmri
-        #fmri_dicts_paths = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts'
-        #fmri_save_path = os.path.join(fmri_dicts_paths, f'subj{subj}_fmri_dicts.joblib')
-        #joblib.dump(fmri_dict, fmri_save_path)
-    
+    if data_fmri is not None and data_imgs is not None:
+        lh_fmri = data_fmri['lh_fmri']
+        rh_fmri = data_fmri['rh_fmri']
+        train_img_list = data_imgs['train_img_list']
+        test_img_list = data_imgs['test_img_list'] if 'test_img_list' in data_imgs else None
     else:
-        encoding_model_instance = encoding_model(device=device,model_layer=layer_name,model=model,features=features)
-        zero_predict_list = []
-        for _, d in tqdm(enumerate(val_imgs_dataloader), total=len(val_imgs_dataloader)):
-            zero_predict = encoding_model_instance.feature_extractor(d)
-            zero_predict_list.append(zero_predict[layer_name].cpu().detach().numpy())
-        zero_predict_array = np.vstack(zero_predict_list)
-        features_val = zero_predict_array.reshape(zero_predict_array.shape[0], -1)
-        W_lh = np.random.randn(46656, 19004)
-        features_val_lh = features_val[:, :19004]
-        W_rh = np.random.randn(46656, 20544)
-        features_val_rh = features_val[:, :20544]
+        print(f"No data was provided, loading from {data_dir}...")
+        output_dict, data_dict = load_data_algonauts(paths_dict={'data_dir': data_dir, 'parent_submission_dir': parent_submission_dir}, args=args, subj=subj)
 
+        train_img_list = output_dict['train_img_list']
+        test_img_list = output_dict['test_img_list']
+        lh_fmri = output_dict['lh_fmri']
+        rh_fmri = output_dict['rh_fmri']
+
+        train_img_dir = data_dict['train_img_dir']
+        test_img_dir = data_dict['test_img_dir']
         
-        #pca = encoding_model_instance.fit_pca(train_imgs_dataloader)
-        #features_val = encoding_model_instance.extract_features(val_imgs_dataloader, pca)
-        print(f'\n Finding mean correlation for each hemisphere...')
-        # Empty correlation array of shape: (LH vertices)
-        lh_correlation = np.zeros(features_val_lh.shape[1])
-        # Correlate each predicted LH vertex with the corresponding ground truth vertex
-        for v in tqdm(range(features_val_lh.shape[1])):
-            lh_correlation[v] = corr(features_val_lh[:,v], lh_fmri_val[:,v])[0]
 
-        # Empty correlation array of shape: (RH vertices)
-        rh_correlation = np.zeros(features_val_rh.shape[1])
-        # Correlate each predicted RH vertex with the corresponding ground truth vertex
-        for v in tqdm(range(features_val_rh.shape[1])):
-            rh_correlation[v] = corr(features_val_rh[:,v], rh_fmri_val[:,v])[0]
-        reg_lh = None
-        reg_rh = None
-        features_val_pred_lh = features_val_lh
-        features_val_pred_rh = features_val_rh
-        predict_array = zero_predict_array
-        diction = {}
-        diction['predict_array'] = predict_array if predict_array is not None else None 
-        features_train = None
+        idxs_train, idxs_val, idxs_test = split_dataset(train_img_list=train_img_list,test_img_list=test_img_list,train_p=train_p)
+
+        fmri_dict, train_data_loader,val_imgs_dataloader = fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,test_img_dir,batch_size=500,train_p=100)
+        train_img_list = output_dict['train_img_list']
+        test_img_list = output_dict['test_img_list']
+        lh_fmri = output_dict['lh_fmri']
+        rh_fmri = output_dict['rh_fmri']
+
+        train_img_dir = data_dict['train_img_dir']
+        test_img_dir = data_dict['test_img_dir']
+        
+
+
+        lh_fmri_train = lh_fmri[idxs_train]
+        lh_fmri_val = lh_fmri[idxs_val]
+        rh_fmri_train = rh_fmri[idxs_train]
+        rh_fmri_val = rh_fmri[idxs_val]
+        fmri_dict = {}
+        fmri_dict['lh_fmri_train'] = lh_fmri_train
+        fmri_dict['lh_fmri_val'] = lh_fmri_val
+        fmri_dict['rh_fmri_train'] = rh_fmri_train
+        fmri_dict['rh_fmri_val'] = rh_fmri_val
+
+
+    encoding_model_instance = encoding_model(device=device,model_layer=layer_name,model=model,features=features)
+    reg_lh, reg_rh, lh_correlation, rh_correlation = encoding_model_instance.run_model(train_data_loader,val_imgs_dataloader,lh_fmri_train,
+                                                                                rh_fmri_train,lh_fmri_val,rh_fmri_val,batch_size=500,ncomponents=None)
+    features_val_pred_lh = encoding_model_instance.lh_fmri_val_pred if hasattr(encoding_model_instance, 'lh_fmri_val_pred') else None
+    features_val_pred_rh = encoding_model_instance.rh_fmri_val_pred if hasattr(encoding_model_instance, 'rh_fmri_val_pred') else None
+    features_train = encoding_model_instance.features_train if hasattr(encoding_model_instance, 'features_train') else None
+    features_val_trained = encoding_model_instance.features_val if hasattr(encoding_model_instance, 'features_val') else None
+    
+
     diction = {}
     diction['reg_lh'] = reg_lh if reg_lh is not None else None
     diction['reg_rh'] = reg_rh if reg_rh is not None else None
@@ -195,71 +150,7 @@ def just_validate(layer_name, model):
     print(f"\nTrained model and correlation values saved to: {models_folder}")
     return models_folder
 
-def check_corr_between_models(model_1_path,model_2_path):
-    """This function checks the correlation between two trained models' correlation values."""
-    model_1 = joblib.load(model_1_path)
-    model_2 = joblib.load(model_2_path)
-    
 
-    lh_corr_1 = model_1['features_val_pred_lh']
-    rh_corr_1 = model_1['features_val_pred_rh']
-
-    lh_corr_2 = model_2['features_val_pred_lh']
-    rh_corr_2 = model_2['features_val_pred_rh']
-    lh_correlation_between_models = corr(lh_corr_1, lh_corr_2)[0]
-    rh_correlation_between_models = corr(rh_corr_1, rh_corr_2)[0]
-    between_models_folder = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/between_models_cor'
-    roi_names, lh_mean_roi_correlation, rh_mean_roi_correlation = visualize_encdoing_accuaracy(args,lh_correlation_between_models,rh_correlation_between_models,correlation_path=between_models_folder,plot=True)
-    save_corellation(roi_names, lh_mean_roi_correlation, rh_mean_roi_correlation, correlation_path=between_models_folder, experiment_name='between_models_correlation')
-
-    print(f'Correlation between left hemisphere models: {lh_correlation_between_models}')
-    print(f'Correlation between right hemisphere models: {rh_correlation_between_models}')
-    return lh_correlation_between_models, rh_correlation_between_models
-
-def pred_two_models(trained_model_path,untrained_model_path,fmri_path):
-    trained_model = joblib.load(trained_model_path)
-    untrained_model = joblib.load(untrained_model_path)
-    fmri_dict = joblib.load(fmri_path)
-    train_fmri_data_lh = fmri_dict['lh_fmri_train']
-    train_fmri_data_rh = fmri_dict['rh_fmri_train']
-    lh_fmri_val = fmri_dict['lh_fmri_val']
-    rh_fmri_val = fmri_dict['rh_fmri_val']
-
-    reg_lh_trained = trained_model['reg_lh']
-    reg_rh_trained = trained_model['reg_rh']
-    features_train = trained_model['features_train']
-    features_val_trained = trained_model['features_val_trained']
-
-    reg_lh_untrained = untrained_model['predict_array']
-    reg_rh_untrained = untrained_model['predict_array']
-    features_val_untrained = untrained_model['features_val_pred_lh']
-
-
-    joint_model = np.concatenate(((reg_lh_trained.coef_).T, features_val_untrained))
-
-    model_lh = LinearRegression()
-    reg_lh = model_lh.fit(joint_model, train_fmri_data_lh)
-
-    model_rh = LinearRegression()
-    reg_rh = model_rh.fit(joint_model, train_fmri_data_rh)
-
-    predict_lh = reg_lh.predict(features_val_trained)
-    predict_rh = reg_rh.predict(features_val_trained)
-
-    print(f'\n Finding mean correlation for each hemisphere...')
-        # Empty correlation array of shape: (LH vertices)
-    lh_correlation = np.zeros(predict_lh.shape[1])
-    # Correlate each predicted LH vertex with the corresponding ground truth vertex
-    for v in tqdm(range(predict_lh.shape[1])):
-        lh_correlation[v] = corr(predict_lh[:,v], lh_fmri_val[:,v])[0]
-
-    # Empty correlation array of shape: (RH vertices)
-    rh_correlation = np.zeros(predict_rh.shape[1])
-    # Correlate each predicted RH vertex with the corresponding ground truth vertex
-    for v in tqdm(range(predict_rh.shape[1])):
-        rh_correlation[v] = corr(predict_rh[:,v], rh_fmri_val[:,v])[0]
-
-    return lh_correlation, rh_correlation
 
 
 if __name__ == "__main__":
@@ -270,15 +161,3 @@ if __name__ == "__main__":
     trained_model(layer_name, model,model_name=model_name,train_p=100)
 
     
-    # #models_folder = just_validate(layer_name, model)
-    # models_folder = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/subj1_model_features_1.2'
-    # model_1_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/subj1_model_features.2/subj1_model_features.2_encoding_model.joblib'
-    # model_2_path = f'{models_folder}/subj1_model_features.2_encoding_model.joblib'
-    # """ROI PPA is the desired ROI to compare between models
-    # model 1 which is the trained model has high correlation in PPA
-    # model 2 which is the validated model has low correlation in PPA
-    # but they have correlation between them in the given ROI PPA"""
-    # #check_corr_between_models(model_1_path,model_2_path)
-    # fmri_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts/subj1_fmri_dicts.joblib'
-    # lh_correlation_joint, rh_correlation_joint = pred_two_models(model_1_path,model_2_path,fmri_path=fmri_path)
-

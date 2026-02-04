@@ -49,8 +49,13 @@ def create_encoder(rng,features,target,n_features):
 
 
     model = LinearRegression()
-    features_idx = rng.permutation(features.shape[1])
-    features_idx = features_idx[:n_features]
+    if rng is not None: #If we need to create a permutated model
+        features_idx = rng.permutation(features.shape[1])
+        features_idx = features_idx[:n_features]
+        
+    else: #Just to lower number of features
+        features_idx = np.arange(n_features)
+
     selected_features = features[:,features_idx]
     model.fit(selected_features, target)
     return model, selected_features
@@ -76,49 +81,6 @@ def permutate_models(rng,features,suppression_strength):
 
     return X_M1, X_M2
 
-def partition_correlation(rng,features,target,permuation,suppression_strength,semi_partial=False):
-    """This function creates two predictors X_M1 and X_M2 and removes any linear predictability between them.
-    and remove linear predictability from the real features to X_M2.
-    where X_M2 is the the model that shouldn't be with correlation to the target.
-    WARNING: This function is useless right now!!!
-    
-    args:
-        features: Feature matrix (shape: [n_samples, n_features]).
-        target: Target matrix (shape: [n_samples, n_targets]).
-        permuation: Whether to permute the features or not.
-        suppression_strength: Proportion of features to suppress (between 0 and 1).
-        semi_partial: If True, only remove predictability from X_M2 to features.
-        
-        returns:
-        X_M1: Feature matrix for model 1.
-        X_M2: Feature matrix for model 2.
-            """
-    n,p = features.shape
-    
-    if permuation:
-        X_M1, X_M2 = permutate_models(rng,features,suppression_strength)
-
-    else:
-        noise_component = rng.standard_normal(features.shape) 
-        X_M1 = features.copy()
-        X_M2 = features.copy() + noise_component * suppression_strength
-
-    # Remove any linear predictability of X_M1 from X_M2
-    target_proj = LinearRegression(fit_intercept=True)
-    target_proj.fit(target, X_M2)            # X = target, y = X_M2
-    X_M2 = X_M2 - target_proj.predict(target)
-
-    
-    if semi_partial:
-        return X_M1, X_M2
-    
-    # Residualize X_M2 with respect to X_M1 (remove linear predictability of X_M2 from X_M1)
-    X_M2_proj = LinearRegression(fit_intercept=False)
-    X_M2_proj.fit(X_M1, X_M2)
-    X_M2_pred = X_M2_proj.predict(X_M1)
-    X_M2 = X_M2 - X_M2_pred
-
-    return X_M1, X_M2
 
 def noise_component(rng,features,suppression_strength,permutation):
     """Create suppresion model using only noise component.
@@ -234,3 +196,144 @@ def run_all_methods(rng_seed,suppresion_method ,mixing_dimension, snr,suppressio
         print(df)
         methods_outputs[method] = outputs
     return methods_outputs
+
+
+def suppression_analysis_pipeline(
+    features,
+    reg_lh=None,
+    reg_rh=None,
+    hemisphere='both',
+    suppression_strength=0.5,
+    snr=1.0,
+    mixing_dimension=None,
+    suppresion_method='permutate',
+    analysis_methods=['standard', 'ols_cv', 'ridge_cv'],
+    rng_seed=None,
+    alphas=None
+):
+    """
+    Complete pipeline that takes model features, creates predictions via regression,
+    generates suppression models, and performs commonality analysis.
+    
+    Args:
+        features: Feature matrix (shape: [n_samples, n_features]).
+        reg_lh: Trained regression model for left hemisphere (optional, creates predictions if provided).
+        reg_rh: Trained regression model for right hemisphere (optional, creates predictions if provided).
+        hemisphere: Which hemisphere to analyze ('left', 'right', or 'both').
+        suppression_strength: Proportion of features to suppress (between 0 and 1).
+        snr: Signal-to-noise ratio for adding noise to the target.
+        mixing_dimension: Dimension to which features are mixed (if None, no mixing is applied).
+        suppresion_method: Method to create suppression ('permutate' is default).
+        analysis_methods: List of methods to use for commonality analysis.
+        rng_seed: Random seed for reproducibility (if None, uses random).
+        alphas: Alpha values for ridge regression (if None, uses default range).
+        
+    Returns:
+        dict: Dictionary containing:
+            - predictions: Dictionary with 'lh' and/or 'rh' predictions
+            - suppression_models: Dictionary with X_M1, X_M2, target for each hemisphere
+            - commonality_results: Dictionary with analysis results for each hemisphere and method
+    """
+    # Initialize RNG
+    rng = np.random.default_rng(rng_seed) if rng_seed is not None else np.random.default_rng()
+    
+    # Initialize output dictionary
+    pipeline_results = {
+        'predictions': {},
+        'suppression_models': {},
+        'commonality_results': {}
+    }
+    
+    # Step 1: Create predictions if regression models are provided
+    print("=" * 70)
+    print("STEP 1: Creating predictions from regression models")
+    print("=" * 70)
+    
+    hemispheres_to_process = []
+    if hemisphere in ['left', 'both'] and reg_lh is not None:
+        hemispheres_to_process.append(('lh', reg_lh))
+    if hemisphere in ['right', 'both'] and reg_rh is not None:
+        hemispheres_to_process.append(('rh', reg_rh))
+    
+    if not hemispheres_to_process:
+        raise ValueError("No regression models provided. Need at least one of reg_lh or reg_rh.")
+    
+    for hemi_name, reg_model in hemispheres_to_process:
+        predictions = reg_model.predict(features)
+        pipeline_results['predictions'][hemi_name] = predictions
+        print(f"  {hemi_name.upper()} predictions shape: {predictions.shape}")
+    
+    # Step 2: Create suppression models for each hemisphere
+    print("\n" + "=" * 70)
+    print("STEP 2: Creating suppression models")
+    print("=" * 70)
+    print(f"  Suppression strength: {suppression_strength}")
+    print(f"  SNR: {snr}")
+    print(f"  Mixing dimension: {mixing_dimension}")
+    print(f"  Method: {suppresion_method}")
+    
+    for hemi_name in pipeline_results['predictions'].keys():
+        signal = pipeline_results['predictions'][hemi_name]
+        
+        print(f"\n  Creating suppression model for {hemi_name.upper()}...")
+        X_M1, X_M2, target = create_supression_model(
+            rng=rng,
+            signal=signal,
+            suppresion_method=suppresion_method,
+            features=features,
+            suppression_strength=suppression_strength,
+            snr=snr,
+            mixing_dimension=mixing_dimension
+        )
+        
+        pipeline_results['suppression_models'][hemi_name] = {
+            'X_M1': X_M1,
+            'X_M2': X_M2,
+            'target': target,
+            'signal': signal
+        }
+        
+        print(f"    X_M1 shape: {X_M1.shape}")
+        print(f"    X_M2 shape: {X_M2.shape}")
+        print(f"    Target shape: {target.shape}")
+    
+    # Step 3: Perform commonality analysis for each hemisphere
+    print("\n" + "=" * 70)
+    print("STEP 3: Performing commonality analysis")
+    print("=" * 70)
+    
+    for hemi_name in pipeline_results['suppression_models'].keys():
+        X_M1 = pipeline_results['suppression_models'][hemi_name]['X_M1']
+        X_M2 = pipeline_results['suppression_models'][hemi_name]['X_M2']
+        target = pipeline_results['suppression_models'][hemi_name]['target']
+        
+        pipeline_results['commonality_results'][hemi_name] = {}
+        
+        print(f"\n  Analyzing {hemi_name.upper()} hemisphere:")
+        print("-" * 70)
+        
+        for method in analysis_methods:
+            print(f"\n    Method: {method.upper()}")
+            
+            analysis_result = commonality_analysis(
+                X_M1, X_M2, target,
+                method=method,
+                alphas=alphas,
+                snr=snr
+            )
+            
+            pipeline_results['commonality_results'][hemi_name][method] = analysis_result
+            
+            # Print results as DataFrame
+            df = pd.DataFrame.from_dict(analysis_result, orient='index', columns=['value'])
+            print(df.to_string())
+    
+    # Summary
+    print("\n" + "=" * 70)
+    print("PIPELINE COMPLETED SUCCESSFULLY")
+    print("=" * 70)
+    print(f"Processed hemispheres: {list(pipeline_results['predictions'].keys())}")
+    print(f"Analysis methods used: {analysis_methods}")
+    
+    return pipeline_results
+

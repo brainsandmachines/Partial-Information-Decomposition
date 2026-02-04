@@ -231,12 +231,6 @@ def test_run(run_name,save_dir,features,fmri_dict,rng_seeds,suppression_method,s
     return 
     
 if __name__ == "__main__":
-    #path_to_load = None
-    # n_stimuli = 1000
-    # n_features = 100
-    # rng_seed = np.random.default_rng(0)
-    # folder_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models'
-    # model_name = 'real_model_' + model + '_' + layer_name + '_subj' + str(subj) + 'ncomponents' + str(ncomponents)
     path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/RidgeCV_subj1_model_alexnet_features.2/RidgeCV_subj1_model_alexnet_features.2_encoding_model.joblib'
 
     loaded_model = train_save_or_load(path_to_load=path_to_load)
@@ -259,25 +253,3 @@ if __name__ == "__main__":
     print(df)
     print("\n" + "="*70)
 
-    # features_train = real_features[:n_stimuli,:] #In case I want to less data for faster testing: i.e: features_train[:1000,:]
-    # lh_fmri_train = fmri_dict['lh_fmri_train'][:n_stimuli,:] #In case I want to less data for faster testing: i.e: fmri_dict['lh_fmri_test'][:1000,:]
-    # rh_fmri_train = fmri_dict['rh_fmri_train'][:n_stimuli,:] #In case I want to less data for faster testing: i.e:
-
-    # #Create a model with less features: 
-    # encoder,selected_features = create_encoder(rng_seed, features_train,lh_fmri_train,n_features=n_features)
-    
-    # print("Encoder 1 features shape: ", features_train.shape)
-    # print("\nCreating predictions from encoder...")
-    # y_hat_lh, y_hat_rh = create_predictions(real_reg_lh,reg_rh=None, features=features_train) #From model1 
-    # print("Predictions created.\nPredicted fMRI shape (LH): ", y_hat_lh.shape) if y_hat_lh is not None else None
-    # print("\nPredicted fMRI shape (RH): ", y_hat_rh.shape) if y_hat_rh is not None else None
-    
-
-    # models_and_features_dict = {'X_M1': None, 'X_M2': None, 'target': None,'signal': y_hat_lh,'real_feature': features_train}
-    # main(models_and_features_dict)
-
-
-    # lh_results_dict = commonality_analysis(X_M1, X_M2, target, method='standard')
-    # df = pd.DataFrame.from_dict(lh_results_dict, orient='index', columns=['value'])
-    # print("\nLH Commonality Analysis Results:")
-    # print(df)

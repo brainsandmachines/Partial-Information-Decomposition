@@ -7,7 +7,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
-from encoding_model.toy_example import run_all_methods,run_experiment,commonality_analysis
+from examples.toy_example import run_all_methods,run_experiment,commonality_analysis
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from utils import Tee
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
@@ -70,18 +70,18 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     # --- compute PID ---
 
     #Change to tensors: 
-    M1 = torch.tensor(M1).reshape(-1,P)
-    M2 = torch.tensor(M2).reshape(-1,P)
-    T = torch.tensor(T).reshape(-1,P)
+    M1 = torch.tensor(M1)
+    M2 = torch.tensor(M2)
+    T = torch.tensor(T)
     sources = [M1,M2]
     targets = [T]
     idep_class = Idep_multivariate_gauss(sources,targets)
-    pid = idep_class.idep()
+    pid , mi = idep_class.idep()
     print("\nIdep PID results:")
     for key, value in pid.items():
         print(f"- {key}: {value:.4f}")
-
-    return vp_results,pid
+    #plot_pid_results(pid, title="PID Components - example 1")
+    return vp_results,pid,mi
 
 def check_supression_effect(vp_results,pid_results):
     """Check for suppression effect in the results.
@@ -132,6 +132,55 @@ def check_supression_effect(vp_results,pid_results):
     return 
 
 
+def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
+    """Plot bar chart for PID results.
+    
+    Parameters
+    ----------
+    pid_results : dict
+        Dictionary containing PID components (unq0, unq1, red, syn).
+    title : str
+        Title for the plot.
+    """
+    if pid_results is not None:
+    # Extract the main PID components
+        components = {
+            'Unique(M1)': pid_results.get('unq0', 0),
+            'Unique(M2)': pid_results.get('unq1', 0),
+            'Redundant': pid_results.get('red', 0),
+            'Synergy': pid_results.get('syn', 0)
+            
+        }
+        title = "PID Components"
+    elif mi_results is not None:
+        components = {
+            'I(M1;T)': mi_results.get('I(M0;T)', 0),
+            'I(M2;T)': mi_results.get('I(M1;T)', 0),
+            'I(M1,M2;T)': mi_results.get('I(M0,M1;T)', 0)
+        }
+        title = "Mutual Information Components"
+    else:
+        raise ValueError("Either pid_results or mi_results must be provided.")
+    
+    
+    keys = list(components.keys())
+    values = list(components.values())
+    
+    # Create a colormap with different colors for each component
+    colors = plt.cm.Set2(np.linspace(0, 1, len(values)))
+    
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(keys)), values, color=colors)
+    plt.xticks(range(len(keys)), keys, rotation=0, ha='center', fontsize=18)
+    plt.yticks(fontsize=16)
+    plt.ylabel('Information (bits)', fontsize=18)
+    plt.title(title, fontsize=20)
+    plt.grid(True, alpha=0.3, linestyle='--', linewidth=0.5, axis='y')
+    plt.tight_layout()
+    #plt.show()
+    plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/figures_/{title}_{sub_title}.pdf", transparent=True)
+
+
 def compare_results(vp_results,pid_results):
     """Compare Variance Partitioning and Partial Information Decomposition results.
     Parameters
@@ -166,7 +215,7 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 1000000, 30
+    N, P = 1000000, 50
     rng_seed, noise_seed = 42, 24
     snr = 1
     method = 'ridge_cv'
@@ -177,35 +226,37 @@ def main():
 
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=None)
+    vp_results, pid_results, mi_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=0.9, method=method, mixing_dimension=30)
     compare_results(vp_results, pid_results)
+    plot_pid_results(pid_results=pid_results, sub_title="Experiment 2")
+    plot_pid_results(mi_results=mi_results, sub_title="Experiment 2")
 
-    print("\n" + "="*70)
-    print(f"Experiment 2: snr = {snr} univariate gaussian with different seeds")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    # print("\n" + "="*70)
+    # print(f"Experiment 2: snr = {snr} univariate gaussian with different seeds")
+    # vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    # compare_results(vp_results, pid_results)
 
-    print("\n" + "="*70)
-    snr = 10
-    print(f"Experiment 3: snr = {snr}")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    # print("\n" + "="*70)
+    # snr = 10
+    # print(f"Experiment 3: snr = {snr}")
+    # vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    # compare_results(vp_results, pid_results)
 
-    print("\n" + "="*70)
-    print(f"Experiment 4: snr = {snr} univariate gaussian with different seeds")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    # print("\n" + "="*70)
+    # print(f"Experiment 4: snr = {snr} univariate gaussian with different seeds")
+    # vp_results, pid_results = gauss_simple_example(N, P, rng_seed+2, noise_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    # compare_results(vp_results, pid_results)
 
-    print("\n" + "="*70)
-    snr = 100
-    print(f"Experiment 5: snr = {snr}")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    # print("\n" + "="*70)
+    # snr = 100
+    # print(f"Experiment 5: snr = {snr}")
+    # vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    # compare_results(vp_results, pid_results)
 
-    print("\n" + "="*70)
-    print(f"Experiment 6: snr = {snr} univariate gaussian with different seeds")
-    vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    # print("\n" + "="*70)
+    # print(f"Experiment 6: snr = {snr} univariate gaussian with different seeds")
+    # vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    # compare_results(vp_results, pid_results)
 
     print("\nAll experiments completed.")
 

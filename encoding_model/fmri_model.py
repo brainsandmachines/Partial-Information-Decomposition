@@ -106,15 +106,6 @@ class encoding_model():
 
     return lh_correlation, rh_correlation
 
-  def test(self,dataloader,lh_fmri_val,rh_fmri_val):
-    """This function is to test the model on the test set.
-    but for my case there isnt any test fmri data so I will skip this part."""
-    # # Use fitted linear regressions to predict the validation and test fMRI data
-    # features_test = self.extract_features(test_imgs_dataloader)
-    # lh_fmri_test_pred = reg_lh.predict(features_test)
-    # rh_fmri_test_pred = reg_rh.predict(features_test)
-    pass
-
 
   def run_model(self,train_imgs_dataloader,val_imgs_dataloader,lh_fmri_train,rh_fmri_train,lh_fmri_val,rh_fmri_val,batch_size=100,ncomponents=None):
     """This function runs the entire encoding model pipeline: feature extraction, training, validation without testing."""

@@ -10,7 +10,7 @@ import sys
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from encoding_model.algoanut_data import argObj, load_data_algonauts
-from toy_example_new import run_experiment
+from examples.toy_example_new import run_experiment
 from utils import check_file_exists, create_permuation
 from typing import Optional
 from sklearn.linear_model import RidgeCV, LinearRegression

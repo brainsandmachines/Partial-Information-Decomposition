@@ -295,7 +295,8 @@ class Idep_multivariate_gauss:
 
         idep_values = self.compute_Idep(unique=[0,1])
         pid = self.pid_values(idep_values['unique_0'], idep_values['unique_1'])
-        return pid
+        mi = {'I(M0;T)': self.i_m0_t.item(), 'I(M1;T)': self.i_m1_t.item(), 'I(M0,M1;T)': self.i_m0_m1_t.item()}
+        return pid , mi
     
     
 
@@ -382,6 +383,8 @@ def main():
         print(f"Example (n0,n1,n2)=({n0},{n1},{n2}), (p,q,r)=({p},{q},{r})")
         print("Got:      ", {k: round(v, 4) for k,v in got_fmt.items()})
         print("Expected: ", expected)
+
+
 
 if __name__ == "__main__":
     main()

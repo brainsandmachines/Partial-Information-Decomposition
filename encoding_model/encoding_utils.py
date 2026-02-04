@@ -129,19 +129,25 @@ def split_dataset(train_img_list,test_img_list,rand_seed=5,train_p=90):
     # and 10% to the test partition
     idxs_train, idxs_val = idxs[:num_train], idxs[num_train:]
     # No need to shuffle or split the test stimulus images
-    idxs_test = np.arange(len(test_img_list))
-
+    if test_img_list is not None:
+        idxs_test = np.arange(len(test_img_list))
+        print('\nTest stimulus images: ' + format(len(idxs_test)))
+    
     print('Training stimulus images: ' + format(len(idxs_train)))
     print('\nValidation stimulus images: ' + format(len(idxs_val)))
-    print('\nTest stimulus images: ' + format(len(idxs_test)))
     
-    return idxs_train, idxs_val, idxs_test
+    if test_img_list is not None:
+        return idxs_train, idxs_val, idxs_test
+    
+    return idxs_train, idxs_val
 
 def fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,test_img_dir,batch_size=500,train_p=90):
     
     
 
-    idxs_train, idxs_val, idxs_test = split_dataset(train_img_list=train_img_list,test_img_list=test_img_list,train_p=train_p)
+    dataset = split_dataset(train_img_list=train_img_list,test_img_list=test_img_list,train_p=train_p)
+    idxs_train, idxs_val = dataset if test_img_list is None else dataset[:2]
+    
     transform = transforms.Compose([
         transforms.Resize((224,224)), # resize the images to 224x24 pixels
         transforms.ToTensor(), # convert the images to a PyTorch tensor
@@ -151,7 +157,6 @@ def fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,
     batch_size = 500 #@param
     # Get the paths of all image files
     train_imgs_paths = sorted(list(Path(train_img_dir).iterdir()))
-    test_imgs_paths = sorted(list(Path(test_img_dir).iterdir()))
 
     # The DataLoaders contain the ImageDataset class
     train_imgs_dataloader = DataLoader(
@@ -162,10 +167,14 @@ def fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,
         ImageDataset(train_imgs_paths, idxs_val, transform),
         batch_size=batch_size
     )
-    test_imgs_dataloader = DataLoader(
-        ImageDataset(test_imgs_paths, idxs_test, transform),
-        batch_size=batch_size
-    )
+
+    if test_img_list is not None:
+        idxs_test = dataset[2]
+        test_imgs_paths = sorted(list(Path(test_img_dir).iterdir()))
+        test_imgs_dataloader = DataLoader(
+            ImageDataset(test_imgs_paths, idxs_test, transform),
+            batch_size=batch_size
+        )
 
     lh_fmri_train = lh_fmri[idxs_train]
     lh_fmri_val = lh_fmri[idxs_val]
@@ -215,6 +224,79 @@ def map_correlation_to_rois(args,lh_correlation,rh_correlation,hemisphere):
         title='Encoding accuracy, '+hemisphere+' hemisphere'
         ).figure
     
+
+def roi_fmri_data(args,lh_fmri,rh_fmri):
+    """Map fMRI data to ROIs.
+    args:
+    args (argObj): Argument object containing data directories.
+    lh_fmri (np.array): Left hemisphere fMRI data.
+    rh_fmri (np.array): Right hemisphere fMRI data.
+
+    
+    returns: fmri data for each ROI in left and right hemispheres.
+    """
+    roi_name_maps = []
+    roi_mapping_files = ['mapping_prf-visualrois.npy', 'mapping_floc-bodies.npy',
+        'mapping_floc-faces.npy', 'mapping_floc-places.npy',
+        'mapping_floc-words.npy', 'mapping_streams.npy']
+
+    # Load the ROI brain surface maps
+    lh_challenge_roi_files = ['lh.prf-visualrois_challenge_space.npy',
+        'lh.floc-bodies_challenge_space.npy', 'lh.floc-faces_challenge_space.npy',
+        'lh.floc-places_challenge_space.npy', 'lh.floc-words_challenge_space.npy',
+        'lh.streams_challenge_space.npy']
+    rh_challenge_roi_files = ['rh.prf-visualrois_challenge_space.npy',
+        'rh.floc-bodies_challenge_space.npy', 'rh.floc-faces_challenge_space.npy',
+        'rh.floc-places_challenge_space.npy', 'rh.floc-words_challenge_space.npy',
+        'rh.streams_challenge_space.npy']
+    for r in roi_mapping_files:
+        roi_name_maps.append(np.load(os.path.join(args.data_dir, 'roi_masks', r),
+            allow_pickle=True).item())
+
+        lh_challenge_rois = []
+        rh_challenge_rois = []
+
+        for r in range(len(lh_challenge_roi_files)):
+            lh_challenge_rois.append(np.load(os.path.join(args.data_dir, 'roi_masks',
+                lh_challenge_roi_files[r])))
+            rh_challenge_rois.append(np.load(os.path.join(args.data_dir, 'roi_masks',
+                rh_challenge_roi_files[r])))
+    roi_names = []
+    lh_roi_fmri = []
+    rh_roi_fmri = []       
+    for r1 in range(len(lh_challenge_rois)):
+        for r2 in roi_name_maps[r1].items():
+                if r2[0] != 0: # zeros indicate to vertices falling outside the ROI of interest
+                    roi_names.append(r2[1])
+
+
+                    lh_roi_idx = np.where(lh_challenge_rois[r1] == r2[0])[0]
+                    rh_roi_idx = np.where(rh_challenge_rois[r1] == r2[0])[0]
+
+                    lh_roi_fmri.append(lh_fmri[:,lh_roi_idx])
+                    rh_roi_fmri.append(rh_fmri[:,rh_roi_idx])
+
+
+    return roi_names, lh_roi_fmri, rh_roi_fmri
+
+def get_specific_roi_fmri(args,lh_fmri,rh_fmri,roi_name):
+    """Get fMRI data for a specific ROI.
+    args:
+    args (argObj): Argument object containing data directories.
+    lh_fmri (np.array): Left hemisphere fMRI data.
+    rh_fmri (np.array): Right hemisphere fMRI data.
+    roi_name (str): Name of the ROI.
+
+    
+    returns: fmri data for the specific ROI in left and right hemispheres.
+    """
+    roi_names, lh_roi_fmri, rh_roi_fmri = roi_fmri_data(args,lh_fmri,rh_fmri)
+    if roi_name in roi_names:
+        roi_index = roi_names.index(roi_name)
+        return lh_roi_fmri[roi_index], rh_roi_fmri[roi_index]
+    else:
+        raise ValueError(f"ROI name {roi_name} not found in the list of ROIs:{roi_names}.")
+
 def visualize_encdoing_accuaracy(args,lh_correlation,rh_correlation,correlation_path,plot=True):
     """Visualize encoding accuracy with a bar graph and return ROI correlation values and 
     ROI names for left and right hemispheres for a given subject.

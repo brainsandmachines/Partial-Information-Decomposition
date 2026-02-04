@@ -7,7 +7,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
-from encoding_model.toy_example import run_all_methods,run_experiment,commonality_analysis
+from examples.toy_example import run_all_methods,run_experiment,commonality_analysis
 from Partial_Information_Decomposition.Idep_univariabe_gauss import Idep_univariate_gauss
 from utils import Tee
 """"This module implements the supression effect for gaussian univariate sorces and targets. 

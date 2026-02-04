@@ -12,478 +12,64 @@ Training images: 9841
 Test images: 159
 Training image file name: train-0001_nsd-00013.png
 73k NSD images ID: 00013
+
+Test stimulus images: 159
 Training stimulus images: 9841
 
 Validation stimulus images: 0
 
-Test stimulus images: 159
+ Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/V1v_alexnet_features.2_subj01.pth/V1v_alexnet_features.2_subj01.pth_encoding_model.joblib
+Loaded model keys:  dict_keys(['reg_lh', 'reg_rh', 'lh_correlation', 'rh_correlation', 'features_val_pred_lh', 'features_val_pred_rh', 'features_train', 'features_val_trained'])
 
- Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/RidgeCV_subj1_model_alexnet_features.2/RidgeCV_subj1_model_alexnet_features.2_encoding_model.joblib
-Failed to enable GUI event loop integration for 'qt'
-Traceback (most recent call last):
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/matplotlibtools.py", line 49, in do_enable_gui
-    enable_gui(guiname)
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 567, in enable_gui
-    return gui_hook(app)
-           ^^^^^^^^^^^^^
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 187, in enable_qt
-    self.enable_qt4(app)
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 213, in enable_qt4
-    app, inputhook_qt4 = create_inputhook_qt4(self, app)
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhookqt4.py", line 87, in create_inputhook_qt4
-    app = QtGui.QApplication([" "])
-          ^^^^^^^^^^^^^^^^^^
-AttributeError: module 'PySide6.QtGui' has no attribute 'QApplication'. Did you mean: 'QGuiApplication'?
-Backend qtagg is interactive backend. Turning interactive mode on.
+Running suppression analysis pipeline with snr=0.1...
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 710)
 
 ======================================================================
-
-Starting test run...
-
-Results will be saved to: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/test_runs/test_run_RidgeCV_Encoder.csv and /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/test_runs/test_run_RidgeCV_Encoder.pkl
-
- Starting test run with features shape: (9841, 46656) and fmri shape (LH): (8857, 19004)
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 300, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 1000, 'n_features': 500, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 100, 'suppression_strength': 0.8, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.3, 'snr': 80.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 20.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 50.0, 'mixing_dimension': 100}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': None}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 30}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 50}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 70}
-
-Skipping already completed test with parameters: {'rng_seed': 2, 'suppression_method': 'permutate', 'n_samples': 2000, 'n_features': 300, 'suppression_strength': 0.5, 'snr': 80.0, 'mixing_dimension': 100}
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.2
+  SNR: 0.1
+  Mixing dimension: 710
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 710)
+    X_M2 shape: (7873, 710)
+    Target shape: (7873, 710)
 
 ======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
 
-Test Run: n_samples=2000, n_features=300, suppression_strength=0.8, snr=20.0, mixing_dimension=None
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
 
-Encoder's features shape:  (2000, 300)
-
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (2000, 19004)
-Creating suppression model...
-
---- STANDARD ---
+    Method: STANDARD
                 value
-R²_A         0.391642
-R²_B         0.150885
-R²_AB        0.412697
-unique_A     0.261812
-unique_B     0.021055
-common       0.129830
-unexplained  0.587303
+R²_A         0.095193
+R²_B         0.090097
+R²_AB        0.184995
+unique_A     0.094899
+unique_B     0.089802
+common       0.000295
+unexplained  0.815005
 
---- OLS_CV ---
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['standard']
+
+Pipeline completed for left hemisphere only.
+================================================================================
+                value
+R²_A         0.095193
+R²_B         0.090097
+R²_AB        0.184995
+unique_A     0.094899
+unique_B     0.089802
+common       0.000295
+unexplained  0.815005
