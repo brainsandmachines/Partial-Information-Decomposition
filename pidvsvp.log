@@ -20,23 +20,23 @@ Covariance matrix shape: torch.Size([110, 110])
 dim_m1: 30, dim_m2: 30, dim_t: 50
 
 Idep PID results:
-- red: 0.0096
-- unq0: 3.8632
-- unq1: 0.0718
-- syn: 3.1690
+- red: 0.0000
+- unq0: 3.7994
+- unq1: 0.0056
+- syn: 3.3095
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.1794 | I(T;M1): 3.8728
-M2 R² (VP): -0.0033 | I(T;M2): 0.0814
-Both M1 and M2 R² (VP): 0.2763 | I(T;M1,M2): 7.1136
+M1 R² (VP): 0.1794 | I(T;M1): 3.7994
+M2 R² (VP): -0.0033 | I(T;M2): 0.0056
+Both M1 and M2 R² (VP): 0.2763 | I(T;M1,M2): 7.1145
 
-Unique to M1 (VP): 0.2797 | Unique(T;M1\M2): 3.8632
-Unique to M2 (VP): 0.0970 | Unique(T;M2\M1): 0.0718
-Common (VP): -0.1003 | Redundant (PID): 0.0096
-Synergy (PID): 3.1690
+Unique to M1 (VP): 0.2797 | Unique(T;M1\M2): 3.7994
+Unique to M2 (VP): 0.0970 | Unique(T;M2\M1): 0.0056
+Common (VP): -0.1003 | Redundant (PID): 0.0000
+Synergy (PID): 3.3095
 
 Suppression effect detected: M2 is a suppressor variable.❗❗❗
 

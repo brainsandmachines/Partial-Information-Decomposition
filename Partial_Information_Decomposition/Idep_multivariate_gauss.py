@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from torch.distributions import Normal
 from sklearn.linear_model import LinearRegression
-
 if __name__ != "__main__":
     from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank
+    from .bias_corr import entropy_bias_term
 else:
     from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank
 from typing import Optional
@@ -25,11 +25,12 @@ class Idep_multivariate_gauss:
 
         """
         self.base_e = base_e  # Default to natural logarithm
+        
         self.M1 = sources[0] if sources is not None else None
         self.M2 = sources[1] if sources is not None else None
         self.T = targets[0] if targets is not None else None
         self.cov_dict = None
-
+        self.N = self.M1.shape[0] if self.M1 is not None else None
         self.dim_m1 = self.M1.shape[1] if self.M1 is not None else 0
         self.dim_m2 = self.M2.shape[1] if self.M2 is not None else 0
         self.dim_t = self.T.shape[1] if self.T is not None else 0
@@ -62,6 +63,13 @@ class Idep_multivariate_gauss:
             assert self.R.shape == (self.dim_m2,self.dim_t), f"Covariance matrix dimensions {self.R.shape} do not match the provided source and target dimensions: {self.dim_m2,self.dim_t}."
             assert self.dim_m1 + self.dim_m2 + self.dim_t == self.cov_matrix.shape[0], f"Covariance matrix dimensions {self.cov_matrix.shape} do not match the provided source and target dimensions: {self.dim_m1 + self.dim_m2 + self.dim_t}."
 
+            self.bm1 = entropy_bias_term(self.N, self.dim_m1) 
+            self.bm2 = entropy_bias_term(self.N, self.dim_m2)
+            self.bt = entropy_bias_term(self.N, self.dim_t)
+            
+            self.bq = entropy_bias_term(self.N, self.dim_t + self.dim_m1)
+            self.br = entropy_bias_term(self.N, self.dim_t + self.dim_m2)
+            self.bp = entropy_bias_term(self.N, self.dim_m1 + self.dim_m2)
         self.I_dep_values = {}
         self.PID_values = {}
 
@@ -199,28 +207,30 @@ class Idep_multivariate_gauss:
         assert hasattr(self, "constraint_cov_dict"), "Run dependency_matrix(...) before compute_Idep(...)."
         
         self.q_det = torch.exp(torch.logdet(self.I2 - (self.Q.T @ self.Q)))
-        self.i_m0_t = 0.5*self.log_base(1/(self.q_det))
-
+        self.q_correction = self.bm1 + self.bt - self.bq
+        self.i_m1_t = 0.5*self.log_base(1/(self.q_det)) + self.q_correction
+        
         self.r_det = torch.exp(torch.logdet(self.I2 - (self.R.T @ self.R)))
-        self.i_m1_t = 0.5*self.log_base(1/(self.r_det))
+        self.r_correction = self.bm2 + self.bt - self.br
+        self.i_m2_t = 0.5*self.log_base(1/(self.r_det)) + self.r_correction
         
         if 0 in unique:
             # calculate b and d both equal to I(M0;T)
-            b = self.i_m0_t 
-            d = self.i_m0_t 
+            b = self.i_m1_t 
+            d = self.i_m1_t 
 
             #calculate i with U7:
             mat = self.constraint_cov_dict['c_model_7']
             block7 = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
             nume7 = torch.exp(torch.logdet(self.I1-(block7.T@block7)))
             deno7 = torch.exp(torch.logdet(self.I2 - (self.Q.T @ self.Q))) * torch.exp(torch.logdet(self.I2 - (self.R.T @ self.R)))
-            i = 0.5*self.log_base(nume7/deno7) - self.i_m1_t 
+            i = 0.5*self.log_base(nume7/deno7) - self.i_m2_t 
 
             #calculate k with U8:
             mat = self.constraint_cov_dict['c_model_8']
             nume8 = (self.I1 - (self.P.T @ self.P)).det()
             deno8 = torch.exp(torch.logdet(mat))
-            k = 0.5*self.log_base(nume8/deno8) - self.i_m1_t
+            k = 0.5*self.log_base(nume8/deno8) - self.i_m2_t
 
 
             unique_0 = torch.min(torch.stack([b,d,i,k]))
@@ -230,16 +240,16 @@ class Idep_multivariate_gauss:
 
         if 1 in unique:
             # calculate c and f both equal to I(M1;T)
-            c = self.i_m1_t 
-            f = self.i_m1_t  
+            c = self.i_m2_t 
+            f = self.i_m2_t  
 
             #calculate h with U7:
             mat = self.constraint_cov_dict['c_model_7']
-            h = 0.5*self.log_base(nume7/(deno7)) - self.i_m0_t
+            h = 0.5*self.log_base(nume7/(deno7)) - self.i_m1_t
 
             #calculate j with U8:
             mat = self.constraint_cov_dict['c_model_8']
-            j = 0.5*self.log_base(nume8/deno8) - self.i_m0_t
+            j = 0.5*self.log_base(nume8/deno8) - self.i_m1_t
             unique_1 = torch.min(torch.stack([c,f,h,j]))
             self.I_dep_values['unique_1'] = unique_1.item()
 
@@ -254,8 +264,8 @@ class Idep_multivariate_gauss:
         input: unique_0, unique_1 are the unique informations for source 0 and source 1
         output: a dictionary with the PID values
         keys: 'red', 'unq0', 'unq1', 'syn'"""
-        i_m0_t = self.i_m0_t if self.i_m0_t is not None else 0.5*self.log_base(1/(self.q_det))
-        i_m1_t = self.i_m1_t if self.i_m1_t is not None else 0.5*self.log_base(1/(self.r_det))
+        i_m0_t = self.i_m1_t if self.i_m1_t is not None else 0.5*self.log_base(1/(self.q_det))
+        i_m1_t = self.i_m2_t if self.i_m2_t is not None else 0.5*self.log_base(1/(self.r_det))
         
         self.i_m0_m1_t = 0.5*self.log_base((self.I1 - self.P.T @ self.P).det()/(self.constraint_cov_dict['c_model_8']).det()) 
         # Redundant information
@@ -267,8 +277,8 @@ class Idep_multivariate_gauss:
         syn = self.i_m0_m1_t - (red + unique_0 + unique_1)
 
         #Check for nan values
-        assert red != torch.nan, f"Redundant={red} information not calculated properly."
-        assert syn != torch.nan, f"Synergistic={syn} information not calculated properly."
+        assert not torch.isnan(red), f"Redundant={red} information not calculated properly."
+        assert not torch.isnan(syn), f"Synergistic={syn} information not calculated properly."
         self.PID_values = {
             'red': red.item(),
             'unq0': unique_0,
@@ -295,7 +305,7 @@ class Idep_multivariate_gauss:
 
         idep_values = self.compute_Idep(unique=[0,1])
         pid = self.pid_values(idep_values['unique_0'], idep_values['unique_1'])
-        mi = {'I(M0;T)': self.i_m0_t.item(), 'I(M1;T)': self.i_m1_t.item(), 'I(M0,M1;T)': self.i_m0_m1_t.item()}
+        mi = {'I(M0;T)': self.i_m1_t.item(), 'I(M1;T)': self.i_m2_t.item(), 'I(M0,M1;T)': self.i_m0_m1_t.item()}
         return pid , mi
     
     
@@ -371,7 +381,7 @@ def main():
     ]
 
     for (n0,n1,n2), (p,q,r), expected in examples:
-        got = run_one(n0,n1,n2,p,q,r)
+        got,_ = run_one(n0,n1,n2,p,q,r)
         got_fmt = {
             "unq0": got["unq0"],
             "unq1": got["unq1"],
