@@ -73,6 +73,11 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     M1 = torch.tensor(M1)
     M2 = torch.tensor(M2)
     T = torch.tensor(T)
+
+    M1 = standardize(M1)
+    M2 = standardize(M2)
+    T = standardize(T)
+    
     sources = [M1,M2]
     targets = [T]
     idep_class = Idep_multivariate_gauss(sources,targets)
@@ -96,11 +101,11 @@ def check_supression_effect(vp_results,pid_results):
     -------
     None
     """
-    R_A = vp_results['R²_A']
-    R_B = vp_results['R²_B']
-    R_AB = vp_results['R²_AB']
-    unique_A = vp_results['unique_A']
-    unique_B = vp_results['unique_B']
+    R_A = vp_results['R²_X1']
+    R_B = vp_results['R²_X2']
+    R_AB = vp_results['R²_X12']
+    unique_A = vp_results['unique_X1']
+    unique_B = vp_results['unique_X2']
     common = vp_results['common']
 
     unq0 = pid_results['unq0']
@@ -198,11 +203,11 @@ def compare_results(vp_results,pid_results):
     print("Comparison of Variance Partitioning and PID Results")
     print("="*70)
     print("Results:")
-    print(f"M1 R² (VP): {vp_results['R²_A']:.4f} | I(T;M1): {pid_results['unq0'] + pid_results['red'] :.4f}")
-    print(f"M2 R² (VP): {vp_results['R²_B']:.4f} | I(T;M2): {pid_results['unq1'] + pid_results['red'] :.4f}")
-    print(f"Both M1 and M2 R² (VP): {vp_results['R²_AB']:.4f} | I(T;M1,M2): {pid_results['unq0'] + pid_results['unq1'] + pid_results['red'] + pid_results['syn']:.4f}")
-    print(f"\nUnique to M1 (VP): {vp_results['unique_A']:.4f} | Unique(T;M1\\M2): {pid_results['unq0']:.4f}")
-    print(f"Unique to M2 (VP): {vp_results['unique_B']:.4f} | Unique(T;M2\\M1): {pid_results['unq1']:.4f}")
+    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {pid_results['unq0'] + pid_results['red'] :.4f}")
+    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {pid_results['unq1'] + pid_results['red'] :.4f}")
+    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {pid_results['unq0'] + pid_results['unq1'] + pid_results['red'] + pid_results['syn']:.4f}")
+    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq0']:.4f}")
+    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq1']:.4f}")
     print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
     print(f"Synergy (PID): {pid_results['syn']:.4f}")
 
@@ -215,21 +220,21 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 1000000, 50
+    N, P = 10000, 50
     rng_seed, noise_seed = 42, 24
     snr = 1
     method = 'ridge_cv'
     mixing_dimension = None
-    simple_example = False
+    simple_example = True
 
-    print("\nRunning Gaussian Univariate target and sources simple example...")
+    print("\nRunning Gaussian Multivariate target and sources simple example...")
 
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
     vp_results, pid_results, mi_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=0.9, method=method, mixing_dimension=30)
     compare_results(vp_results, pid_results)
-    plot_pid_results(pid_results=pid_results, sub_title="Experiment 2")
-    plot_pid_results(mi_results=mi_results, sub_title="Experiment 2")
+    #plot_pid_results(pid_results=pid_results, sub_title="Experiment 2")
+    #plot_pid_results(mi_results=mi_results, sub_title="Experiment 2")
 
     # print("\n" + "="*70)
     # print(f"Experiment 2: snr = {snr} univariate gaussian with different seeds")

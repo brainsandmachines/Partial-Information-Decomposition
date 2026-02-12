@@ -14,7 +14,7 @@ from encoding_model.encoding_utils import map_correlation_to_rois, roi_fmri_data
 from encoding_model.pred_pipeline import pipeline
 from encoding_model.fmri_model import encoding_model
 from encoding_model.suppresion_model import train_save_or_load
-from encoding_model.suppression_core import create_encoder, create_predictions, suppression_analysis_pipeline
+from encoding_model.suppression_core import create_encoder, create_predictions, suppression_analysis_pipeline, grid_search_suppression_analysis
 
 
 def load_roi_data(args,roi_name='V1v'):
@@ -94,28 +94,32 @@ def main():
 
     v1_reg_lh = loaded_model_dict['reg_lh']
     features_train = loaded_model_dict['features_train']
-    table_dict = {}
-    snr_list = [0.1]  # Example list of random seeds for multiple runs
-    for snr in snr_list:
-        print(f"\nRunning suppression analysis pipeline with snr={snr}...")
-        results = suppression_analysis_pipeline(
-            features=features_train,
-            reg_lh=v1_reg_lh,
-            reg_rh=None,  
-            hemisphere='left',
-            suppression_strength=0.2,
-            snr=snr,
-            mixing_dimension=710,  
-            analysis_methods=['standard'],  
-            rng_seed=42
-        )
-        print("\nPipeline completed for left hemisphere only.")
-        print(f'=' * 80)
-        record = {f'snr_{snr}': results['commonality_results']['lh']['standard']}
-            
-        df = pd.DataFrame.from_dict(record[f'snr_{snr}'], orient='index', columns=['value'])
-    print(df)
-    return results
+
+    """results = suppression_analysis_pipeline(
+        features=features_train,
+        reg_lh=v1_reg_lh,
+        reg_rh=None,  
+        hemisphere='left',
+        suppression_strength=0.7,
+        snr=50,
+        mixing_dimension=100,  
+        analysis_methods=['ridge_cv'],  
+        rng_seed=1
+    )"""
+
+    grid_search_suppression_analysis(features=features_train,
+        reg_lh=v1_reg_lh,
+        reg_rh=None,
+        suppression_strength_list=[0.3, 0.5, 0.7],
+        snr_list=[0.5,1.0, 10.0, 20.0,700],
+        mixing_dimension_list=[None, 30, 50,100,250,500,1000],
+        rng_seed_list=list(np.arange(1, 100)),
+        hemisphere='left',
+        suppresion_method='permutate',
+        output_dir='./encoding_model/grid_search_results',
+        verbose=True    
+    )
 
 if __name__ == "__main__":
     main()
+

@@ -18,27 +18,41 @@ Training stimulus images: 9841
 
 Validation stimulus images: 0
 
- Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/V1v_alexnet_features.2_subj01.pth/V1v_alexnet_features.2_subj01.pth_encoding_model.joblib
+ Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib
 Loaded model keys:  dict_keys(['reg_lh', 'reg_rh', 'lh_correlation', 'rh_correlation', 'features_val_pred_lh', 'features_val_pred_rh', 'features_train', 'features_val_trained'])
+================================================================================
+GRID SEARCH SUPPRESSION ANALYSIS
+================================================================================
+Parameters to test:
+  Suppression strengths: [0.3, 0.5, 0.7]
+  SNR values: [0.5, 1.0, 10.0, 20.0, 100]
+  Mixing dimensions: [None, 30, 50, 100, 250]
+  Random seeds: [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(17), np.int64(18), np.int64(19), np.int64(20), np.int64(21), np.int64(22), np.int64(23), np.int64(24), np.int64(25), np.int64(26), np.int64(27), np.int64(28), np.int64(29), np.int64(30), np.int64(31), np.int64(32), np.int64(33), np.int64(34), np.int64(35), np.int64(36), np.int64(37), np.int64(38), np.int64(39), np.int64(40), np.int64(41), np.int64(42), np.int64(43), np.int64(44), np.int64(45), np.int64(46), np.int64(47), np.int64(48), np.int64(49), np.int64(50), np.int64(51), np.int64(52), np.int64(53), np.int64(54), np.int64(55), np.int64(56), np.int64(57), np.int64(58), np.int64(59), np.int64(60), np.int64(61), np.int64(62), np.int64(63), np.int64(64), np.int64(65), np.int64(66), np.int64(67), np.int64(68), np.int64(69), np.int64(70), np.int64(71), np.int64(72), np.int64(73), np.int64(74), np.int64(75), np.int64(76), np.int64(77), np.int64(78), np.int64(79), np.int64(80), np.int64(81), np.int64(82), np.int64(83), np.int64(84), np.int64(85), np.int64(86), np.int64(87), np.int64(88), np.int64(89), np.int64(90), np.int64(91), np.int64(92), np.int64(93), np.int64(94), np.int64(95), np.int64(96), np.int64(97), np.int64(98), np.int64(99)]
+  Total combinations: 7425
+================================================================================
 
-Running suppression analysis pipeline with snr=0.1...
+================================================================================
+Processing RNG Seed: 1
+================================================================================
+
+[1/7425] SS=0.3, SNR=0.5, MD=None, Seed=1
 ======================================================================
 STEP 1: Creating predictions from regression models
 ======================================================================
-  LH predictions shape: (7873, 710)
+  LH predictions shape: (7873, 574)
 
 ======================================================================
 STEP 2: Creating suppression models
 ======================================================================
-  Suppression strength: 0.2
-  SNR: 0.1
-  Mixing dimension: 710
+  Suppression strength: 0.3
+  SNR: 0.5
+  Mixing dimension: None
   Method: permutate
 
   Creating suppression model for LH...
-    X_M1 shape: (7873, 710)
-    X_M2 shape: (7873, 710)
-    Target shape: (7873, 710)
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
 
 ======================================================================
 STEP 3: Performing commonality analysis
@@ -47,29 +61,2402 @@ STEP 3: Performing commonality analysis
   Analyzing LH hemisphere:
 ----------------------------------------------------------------------
 
-    Method: STANDARD
+    Method: RIDGE_CV
                 value
-R²_A         0.095193
-R²_B         0.090097
-R²_AB        0.184995
-unique_A     0.094899
-unique_B     0.089802
-common       0.000295
-unexplained  0.815005
+R²_A         0.155298
+R²_B        -0.005338
+R²_AB        0.145861
+unique_A     0.151199
+unique_B    -0.009437
+common       0.004099
+unexplained  0.854139
 
 ======================================================================
 PIPELINE COMPLETED SUCCESSFULLY
 ======================================================================
 Processed hemispheres: ['lh']
-Analysis methods used: ['standard']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
 
-Pipeline completed for left hemisphere only.
-================================================================================
+[2/7425] SS=0.3, SNR=0.5, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 0.5
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
                 value
-R²_A         0.095193
-R²_B         0.090097
-R²_AB        0.184995
-unique_A     0.094899
-unique_B     0.089802
-common       0.000295
-unexplained  0.815005
+R²_A         0.054898
+R²_B        -0.003987
+R²_AB        0.053912
+unique_A     0.057899
+unique_B    -0.000986
+common      -0.003000
+unexplained  0.946088
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[3/7425] SS=0.3, SNR=0.5, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 0.5
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.068437
+R²_B        -0.006471
+R²_AB        0.066561
+unique_A     0.073032
+unique_B    -0.001877
+common      -0.004595
+unexplained  0.933439
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[4/7425] SS=0.3, SNR=0.5, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 0.5
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.092783
+R²_B        -0.012580
+R²_AB        0.085539
+unique_A     0.098119
+unique_B    -0.007244
+common      -0.005336
+unexplained  0.914461
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[5/7425] SS=0.3, SNR=0.5, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 0.5
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.100573
+R²_B        -0.032315
+R²_AB        0.073907
+unique_A     0.106222
+unique_B    -0.026667
+common      -0.005648
+unexplained  0.926093
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 5
+
+[6/7425] SS=0.3, SNR=1.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 1.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.415871
+R²_B        -0.005296
+R²_AB        0.400722
+unique_A     0.406017
+unique_B    -0.015149
+common       0.009854
+unexplained  0.599278
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[7/7425] SS=0.3, SNR=1.0, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 1.0
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.138492
+R²_B        -0.003933
+R²_AB        0.141510
+unique_A     0.145443
+unique_B     0.003018
+common      -0.006951
+unexplained  0.858490
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[8/7425] SS=0.3, SNR=1.0, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 1.0
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.174818
+R²_B        -0.006433
+R²_AB        0.179201
+unique_A     0.185633
+unique_B     0.004383
+common      -0.010815
+unexplained  0.820799
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[9/7425] SS=0.3, SNR=1.0, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 1.0
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.242689
+R²_B        -0.012314
+R²_AB        0.243282
+unique_A     0.255596
+unique_B     0.000593
+common      -0.012907
+unexplained  0.756718
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[10/7425] SS=0.3, SNR=1.0, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 1.0
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.289857
+R²_B        -0.032193
+R²_AB        0.274240
+unique_A     0.306433
+unique_B    -0.015617
+common      -0.016577
+unexplained  0.725760
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 10
+
+[11/7425] SS=0.3, SNR=10.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 10.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.964107
+R²_B        -0.005278
+R²_AB        0.952231
+unique_A     0.957508
+unique_B    -0.011876
+common       0.006599
+unexplained  0.047769
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[12/7425] SS=0.3, SNR=10.0, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 10.0
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.288707
+R²_B        -0.003790
+R²_AB        0.298960
+unique_A     0.302750
+unique_B     0.010254
+common      -0.014043
+unexplained  0.701040
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[13/7425] SS=0.3, SNR=10.0, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 10.0
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.365655
+R²_B        -0.006472
+R²_AB        0.381001
+unique_A     0.387474
+unique_B     0.015346
+common      -0.021819
+unexplained  0.618999
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[14/7425] SS=0.3, SNR=10.0, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 10.0
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.512105
+R²_B        -0.011940
+R²_AB        0.526719
+unique_A     0.538659
+unique_B     0.014614
+common      -0.026554
+unexplained  0.473281
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[15/7425] SS=0.3, SNR=10.0, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 10.0
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.632653
+R²_B        -0.032309
+R²_AB        0.637392
+unique_A     0.669701
+unique_B     0.004739
+common      -0.037048
+unexplained  0.362608
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 15
+
+[16/7425] SS=0.3, SNR=20.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 20.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.979871
+R²_B        -0.005281
+R²_AB        0.967723
+unique_A     0.973004
+unique_B    -0.012149
+common       0.006867
+unexplained  0.032277
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[17/7425] SS=0.3, SNR=20.0, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 20.0
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.291423
+R²_B        -0.003788
+R²_AB        0.301812
+unique_A     0.305600
+unique_B     0.010389
+common      -0.014176
+unexplained  0.698188
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[18/7425] SS=0.3, SNR=20.0, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 20.0
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.369078
+R²_B        -0.006480
+R²_AB        0.384611
+unique_A     0.391091
+unique_B     0.015533
+common      -0.022013
+unexplained  0.615389
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[19/7425] SS=0.3, SNR=20.0, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 20.0
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.516968
+R²_B        -0.011932
+R²_AB        0.531837
+unique_A     0.543769
+unique_B     0.014869
+common      -0.026801
+unexplained  0.468163
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[20/7425] SS=0.3, SNR=20.0, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 20.0
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.638905
+R²_B        -0.032325
+R²_AB        0.644019
+unique_A     0.676344
+unique_B     0.005114
+common      -0.037439
+unexplained  0.355981
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 20
+
+[21/7425] SS=0.3, SNR=100, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 100
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.985401
+R²_B        -0.005285
+R²_AB        0.972785
+unique_A     0.978070
+unique_B    -0.012615
+common       0.007330
+unexplained  0.027215
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[22/7425] SS=0.3, SNR=100, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 100
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.292311
+R²_B        -0.003788
+R²_AB        0.302745
+unique_A     0.306532
+unique_B     0.010434
+common      -0.014222
+unexplained  0.697255
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[23/7425] SS=0.3, SNR=100, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 100
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.370182
+R²_B        -0.006487
+R²_AB        0.385769
+unique_A     0.392256
+unique_B     0.015586
+common      -0.022073
+unexplained  0.614231
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[24/7425] SS=0.3, SNR=100, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 100
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.518541
+R²_B        -0.011927
+R²_AB        0.533493
+unique_A     0.545420
+unique_B     0.014951
+common      -0.026879
+unexplained  0.466507
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[25/7425] SS=0.3, SNR=100, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.3
+  SNR: 100
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.640930
+R²_B        -0.032337
+R²_AB        0.646164
+unique_A     0.678500
+unique_B     0.005233
+common      -0.037570
+unexplained  0.353836
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 25
+
+[26/7425] SS=0.5, SNR=0.5, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 0.5
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.150580
+R²_B        -0.005338
+R²_AB        0.140877
+unique_A     0.146215
+unique_B    -0.009702
+common       0.004365
+unexplained  0.859123
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[27/7425] SS=0.5, SNR=0.5, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 0.5
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.044700
+R²_B        -0.003987
+R²_AB        0.044454
+unique_A     0.048441
+unique_B    -0.000246
+common      -0.003741
+unexplained  0.955546
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[28/7425] SS=0.5, SNR=0.5, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 0.5
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.059660
+R²_B        -0.006471
+R²_AB        0.058202
+unique_A     0.064673
+unique_B    -0.001458
+common      -0.005013
+unexplained  0.941798
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[29/7425] SS=0.5, SNR=0.5, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 0.5
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.084764
+R²_B        -0.012580
+R²_AB        0.077875
+unique_A     0.090455
+unique_B    -0.006889
+common      -0.005691
+unexplained  0.922125
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[30/7425] SS=0.5, SNR=0.5, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 0.5
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.093728
+R²_B        -0.032315
+R²_AB        0.067395
+unique_A     0.099710
+unique_B    -0.026333
+common      -0.005982
+unexplained  0.932605
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 30
+
+[31/7425] SS=0.5, SNR=1.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 1.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.408026
+R²_B        -0.005296
+R²_AB        0.391856
+unique_A     0.397152
+unique_B    -0.016169
+common       0.010874
+unexplained  0.608144
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[32/7425] SS=0.5, SNR=1.0, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 1.0
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.114095
+R²_B        -0.003933
+R²_AB        0.118968
+unique_A     0.122902
+unique_B     0.004873
+common      -0.008807
+unexplained  0.881032
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[33/7425] SS=0.5, SNR=1.0, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 1.0
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.153661
+R²_B        -0.006433
+R²_AB        0.158979
+unique_A     0.165411
+unique_B     0.005317
+common      -0.011750
+unexplained  0.841021
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[34/7425] SS=0.5, SNR=1.0, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 1.0
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.222803
+R²_B        -0.012314
+R²_AB        0.224425
+unique_A     0.236739
+unique_B     0.001621
+common      -0.013935
+unexplained  0.775575
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[35/7425] SS=0.5, SNR=1.0, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 1.0
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.273096
+R²_B        -0.032193
+R²_AB        0.258417
+unique_A     0.290610
+unique_B    -0.014679
+common      -0.017514
+unexplained  0.741583
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 35
+
+[36/7425] SS=0.5, SNR=10.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 10.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.955833
+R²_B        -0.005278
+R²_AB        0.941714
+unique_A     0.946992
+unique_B    -0.014119
+common       0.008842
+unexplained  0.058286
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[37/7425] SS=0.5, SNR=10.0, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 10.0
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.238987
+R²_B        -0.003790
+R²_AB        0.252930
+unique_A     0.256720
+unique_B     0.013943
+common      -0.017733
+unexplained  0.747070
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[38/7425] SS=0.5, SNR=10.0, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 10.0
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.321593
+R²_B        -0.006472
+R²_AB        0.338772
+unique_A     0.345245
+unique_B     0.017179
+common      -0.023651
+unexplained  0.661228
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[39/7425] SS=0.5, SNR=10.0, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 10.0
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.469538
+R²_B        -0.011940
+R²_AB        0.486700
+unique_A     0.498640
+unique_B     0.017162
+common      -0.029102
+unexplained  0.513300
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[40/7425] SS=0.5, SNR=10.0, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 10.0
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.597107
+R²_B        -0.032309
+R²_AB        0.604027
+unique_A     0.636336
+unique_B     0.006921
+common      -0.039230
+unexplained  0.395973
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 40
+
+[41/7425] SS=0.5, SNR=20.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 20.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.971353
+R²_B        -0.005281
+R²_AB        0.957300
+unique_A     0.962581
+unique_B    -0.014053
+common       0.008772
+unexplained  0.042700
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[42/7425] SS=0.5, SNR=20.0, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 20.0
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.241241
+R²_B        -0.003788
+R²_AB        0.255355
+unique_A     0.259143
+unique_B     0.014114
+common      -0.017902
+unexplained  0.744645
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[43/7425] SS=0.5, SNR=20.0, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 20.0
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.324590
+R²_B        -0.006480
+R²_AB        0.341967
+unique_A     0.348448
+unique_B     0.017377
+common      -0.023858
+unexplained  0.658033
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[44/7425] SS=0.5, SNR=20.0, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 20.0
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.473987
+R²_B        -0.011932
+R²_AB        0.491437
+unique_A     0.503369
+unique_B     0.017450
+common      -0.029381
+unexplained  0.508563
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[45/7425] SS=0.5, SNR=20.0, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 20.0
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.603000
+R²_B        -0.032325
+R²_AB        0.610328
+unique_A     0.642653
+unique_B     0.007328
+common      -0.039653
+unexplained  0.389672
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 45
+
+[46/7425] SS=0.5, SNR=100, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 100
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.976746
+R²_B        -0.005285
+R²_AB        0.962451
+unique_A     0.967736
+unique_B    -0.014295
+common       0.009010
+unexplained  0.037549
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[47/7425] SS=0.5, SNR=100, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 100
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.241980
+R²_B        -0.003788
+R²_AB        0.256155
+unique_A     0.259943
+unique_B     0.014175
+common      -0.017963
+unexplained  0.743845
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[48/7425] SS=0.5, SNR=100, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 100
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.325558
+R²_B        -0.006487
+R²_AB        0.342990
+unique_A     0.349477
+unique_B     0.017433
+common      -0.023919
+unexplained  0.657010
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[49/7425] SS=0.5, SNR=100, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 100
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.475436
+R²_B        -0.011927
+R²_AB        0.492979
+unique_A     0.504907
+unique_B     0.017544
+common      -0.029471
+unexplained  0.507021
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[50/7425] SS=0.5, SNR=100, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.5
+  SNR: 100
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.604910
+R²_B        -0.032337
+R²_AB        0.612372
+unique_A     0.644709
+unique_B     0.007462
+common      -0.039799
+unexplained  0.387628
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 50
+
+[51/7425] SS=0.7, SNR=0.5, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.7
+  SNR: 0.5
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.143101
+R²_B        -0.005338
+R²_AB        0.132235
+unique_A     0.137573
+unique_B    -0.010866
+common       0.005528
+unexplained  0.867765
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[52/7425] SS=0.7, SNR=0.5, MD=30, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.7
+  SNR: 0.5
+  Mixing dimension: 30
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 30)
+    X_M2 shape: (7873, 30)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.033061
+R²_B        -0.003987
+R²_AB        0.032775
+unique_A     0.036762
+unique_B    -0.000286
+common      -0.003701
+unexplained  0.967225
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[53/7425] SS=0.7, SNR=0.5, MD=50, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.7
+  SNR: 0.5
+  Mixing dimension: 50
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 50)
+    X_M2 shape: (7873, 50)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.043909
+R²_B        -0.006471
+R²_AB        0.042343
+unique_A     0.048814
+unique_B    -0.001567
+common      -0.004905
+unexplained  0.957657
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[54/7425] SS=0.7, SNR=0.5, MD=100, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.7
+  SNR: 0.5
+  Mixing dimension: 100
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 100)
+    X_M2 shape: (7873, 100)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.065246
+R²_B        -0.012580
+R²_AB        0.058619
+unique_A     0.071199
+unique_B    -0.006627
+common      -0.005953
+unexplained  0.941381
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+[55/7425] SS=0.7, SNR=0.5, MD=250, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.7
+  SNR: 0.5
+  Mixing dimension: 250
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 250)
+    X_M2 shape: (7873, 250)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV
+                value
+R²_A         0.079903
+R²_B        -0.032315
+R²_AB        0.053721
+unique_A     0.086036
+unique_B    -0.026183
+common      -0.006133
+unexplained  0.946279
+
+======================================================================
+PIPELINE COMPLETED SUCCESSFULLY
+======================================================================
+Processed hemispheres: ['lh']
+Analysis methods used: ['ridge_cv']
+  ✓ Completed
+
+  ✓ Master CSV updated: encoding_model/grid_search_results/grid_search_lh-FBA-1_features.8_alexnet.csv
+    Total rows so far: 55
+
+[56/7425] SS=0.7, SNR=1.0, MD=None, Seed=1
+======================================================================
+STEP 1: Creating predictions from regression models
+======================================================================
+  LH predictions shape: (7873, 574)
+
+======================================================================
+STEP 2: Creating suppression models
+======================================================================
+  Suppression strength: 0.7
+  SNR: 1.0
+  Mixing dimension: None
+  Method: permutate
+
+  Creating suppression model for LH...
+    X_M1 shape: (7873, 43264)
+    X_M2 shape: (7873, 43264)
+    Target shape: (7873, 574)
+
+======================================================================
+STEP 3: Performing commonality analysis
+======================================================================
+
+  Analyzing LH hemisphere:
+----------------------------------------------------------------------
+
+    Method: RIDGE_CV

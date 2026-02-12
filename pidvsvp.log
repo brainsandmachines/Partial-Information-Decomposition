@@ -1,5 +1,5 @@
 
-Running Gaussian Univariate target and sources simple example...
+Running Gaussian Multivariate target and sources simple example...
 
 ======================================================================
 Experiment 1: snr = 1
@@ -8,13 +8,11 @@ Experiment 1: snr = 1
 Simple Example with RNG seed 42 and Noise seed 24
 ======================================================================
 ridge_cv analysis of target (y_real):
-- R²_A: 0.2234
-- R²_B: -0.0000
-- R²_AB: 0.2965
-- unique_A: 0.2965
-- unique_B: 0.0730
-- common: -0.0731
-- unexplained: 0.7035
+- R²_X1: 0.1794
+- R²_X2: -0.0033
+- R²_X12: 0.2763
+- common: -0.1003
+- unexplained: 0.7237
 
 Full covariance matrix shape: torch.Size([110, 110])
 
@@ -22,23 +20,23 @@ Covariance matrix shape: torch.Size([110, 110])
 dim_m1: 30, dim_m2: 30, dim_t: 50
 
 Idep PID results:
-- red: 0.0001
-- unq0: 5.2934
-- unq1: 0.0007
-- syn: 2.2224
+- red: 0.0096
+- unq0: 3.8632
+- unq1: 0.0718
+- syn: 3.1690
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.2234 | I(T;M1): 5.2935
-M2 R² (VP): -0.0000 | I(T;M2): 0.0008
-Both M1 and M2 R² (VP): 0.2965 | I(T;M1,M2): 7.5165
+M1 R² (VP): 0.1794 | I(T;M1): 3.8728
+M2 R² (VP): -0.0033 | I(T;M2): 0.0814
+Both M1 and M2 R² (VP): 0.2763 | I(T;M1,M2): 7.1136
 
-Unique to M1 (VP): 0.2965 | Unique(T;M1\M2): 5.2934
-Unique to M2 (VP): 0.0730 | Unique(T;M2\M1): 0.0007
-Common (VP): -0.0731 | Redundant (PID): 0.0001
-Synergy (PID): 2.2224
+Unique to M1 (VP): 0.2797 | Unique(T;M1\M2): 3.8632
+Unique to M2 (VP): 0.0970 | Unique(T;M2\M1): 0.0718
+Common (VP): -0.1003 | Redundant (PID): 0.0096
+Synergy (PID): 3.1690
 
 Suppression effect detected: M2 is a suppressor variable.❗❗❗
 

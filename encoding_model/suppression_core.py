@@ -139,7 +139,6 @@ def create_supression_model(rng,signal,suppresion_method, features, suppression_
         X_M1 = X_M1 @ mixing_matrix_M1
         mixing_matrix_M2 = rng.standard_normal((X_M2.shape[1], mixing_dimension))
         X_M2 = X_M2 @ mixing_matrix_M2
-
         # make sure joint covariance matrix is not singular
     # sing_report = singularity_report(X_M1, X_M2, target)
     # assert not sing_report["M1+M2+Y"]["is_singular"], \
@@ -336,4 +335,180 @@ def suppression_analysis_pipeline(
     print(f"Analysis methods used: {analysis_methods}")
     
     return pipeline_results
+
+
+def grid_search_suppression_analysis(
+    features,
+    reg_lh=None,
+    reg_rh=None,
+    suppression_strength_list=None,
+    snr_list=None,
+    mixing_dimension_list=None,
+    rng_seed_list=None,
+    hemisphere='both',
+    suppresion_method='permutate',
+    output_dir='./grid_search_results',
+    grid_name='NoName',
+    verbose=True
+):
+    """
+    Perform a grid search over suppression analysis parameters using ridge regression.
+    
+    Args:
+        features: Feature matrix (shape: [n_samples, n_features]).
+        reg_lh: Trained regression model for left hemisphere.
+        reg_rh: Trained regression model for right hemisphere.
+        suppression_strength_list: List of suppression strengths to test.
+        snr_list: List of SNR values to test.
+        mixing_dimension_list: List of mixing dimensions to test.
+        rng_seed_list: List of random seeds to test.
+        hemisphere: Which hemisphere(s) to analyze ('left', 'right', or 'both').
+        suppresion_method: Method to create suppression (default: 'permutate').
+        output_dir: Directory to save results.
+        grid_name: The name of the grid_search
+        verbose: Whether to print progress messages.
+        
+    Returns:
+        dict: Dictionary containing:
+            - results_df: Comprehensive dataframe with all results
+            - results_by_seed: Dictionary with results grouped by rng_seed
+            - file_paths: List of saved file paths
+    """
+    # Set defaults
+    suppression_strength_list = suppression_strength_list or [0.3, 0.5, 0.7]
+    snr_list = snr_list or [1.0, 5.0, 10.0]
+    mixing_dimension_list = mixing_dimension_list or [None, 50, 100]
+    rng_seed_list = rng_seed_list or [42, 123, 456]
+    
+    # Create output directory
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    if verbose:
+        print("=" * 80)
+        print("GRID SEARCH SUPPRESSION ANALYSIS")
+        print("=" * 80)
+        print(f"Parameters to test:")
+        print(f"  Suppression strengths: {suppression_strength_list}")
+        print(f"  SNR values: {snr_list}")
+        print(f"  Mixing dimensions: {mixing_dimension_list}")
+        print(f"  Random seeds: {rng_seed_list}")
+        print(f"  Total combinations: {len(suppression_strength_list) * len(snr_list) * len(mixing_dimension_list) * len(rng_seed_list)}")
+        print("=" * 80)
+    
+    # Initialize containers
+    all_results = []
+    results_by_seed = {}
+    file_paths = []
+    alphas = np.logspace(-3, 3, 50)
+    
+    # Master output file for all seeds
+    master_output_file = output_dir / f'grid_search_{grid_name}.csv'
+    
+    # Get total combinations for progress tracking
+    total_combos = (len(suppression_strength_list) * len(snr_list) * 
+                    len(mixing_dimension_list) * len(rng_seed_list))
+    current_combo = 0
+    
+    # Grid search loop
+    for rng_seed in rng_seed_list:
+        seed_results = []
+        
+        if verbose:
+            print(f"\n{'=' * 80}")
+            print(f"Processing RNG Seed: {rng_seed}")
+            print(f"{'=' * 80}")
+        
+        for suppression_strength in suppression_strength_list:
+            for snr in snr_list:
+                for mixing_dimension in mixing_dimension_list:
+                    current_combo += 1
+                    
+                    if verbose:
+                        print(f"\n[{current_combo}/{total_combos}] SS={suppression_strength}, SNR={snr}, MD={mixing_dimension}, Seed={rng_seed}")
+                    
+                    try:
+                        # Run pipeline with ridge regression only
+                        results = suppression_analysis_pipeline(
+                            features=features,
+                            reg_lh=reg_lh,
+                            reg_rh=reg_rh,
+                            hemisphere=hemisphere,
+                            suppression_strength=suppression_strength,
+                            snr=snr,
+                            mixing_dimension=mixing_dimension,
+                            suppresion_method=suppresion_method,
+                            analysis_methods=['ridge_cv'],  # Only ridge regression
+                            rng_seed=rng_seed,
+                            alphas=alphas
+                        )
+                        
+                        # Extract results from dict and convert to DataFrame
+                        result_dict = results['commonality_results']['lh']['ridge_cv'].copy() if 'lh' in results['commonality_results'] else results['commonality_results']['rh']['ridge_cv'].copy()
+                        
+                        # Add grid search parameters
+                        result_dict['suppression_strength'] = suppression_strength
+                        result_dict['snr'] = snr
+                        result_dict['mixing_dimension'] = mixing_dimension
+                        result_dict['rng_seed'] = rng_seed
+                        
+                        # Convert to DataFrame with single row
+                        results_df = pd.DataFrame([result_dict])
+                        
+                        # Append to lists
+                        all_results.append(results_df)
+                        seed_results.append(results_df)
+                        
+                        if verbose:
+                            print(f"  ✓ Completed")
+                        
+                    except Exception as e:
+                        if verbose:
+                            print(f"  ✗ Error: {str(e)}")
+                        continue
+                
+                # After each mixing_dimension loop, update the master CSV file with all results so far
+                if all_results:
+                    master_df = pd.concat(all_results, ignore_index=True)
+                    
+                    # Save/update master results file
+                    master_df.to_csv(master_output_file, index=False)
+                    
+                    if verbose:
+                        print(f"\n  ✓ Master CSV updated: {master_output_file}")
+                        print(f"    Total rows so far: {len(master_df)}")
+        
+        # Add to results_by_seed for reference
+        if seed_results:
+            results_by_seed[rng_seed] = seed_results
+    
+    # Final results
+    if all_results:
+        final_df = pd.concat(all_results, ignore_index=True)
+        file_paths.append(str(master_output_file))
+        
+        if verbose:
+            print(f"\n{'=' * 80}")
+            print("GRID SEARCH COMPLETED")
+            print(f"{'=' * 80}")
+            print(f"Results saved to: {master_output_file}")
+            print(f"Total parameter combinations tested: {len(final_df)}")
+            print(f"\nResults Summary:")
+            print(final_df.groupby('rng_seed').size())
+        
+        return {
+            'results_df': final_df,
+            'results_by_seed': results_by_seed,
+            'file_paths': file_paths,
+            'output_dir': str(output_dir)
+        }
+    else:
+        if verbose:
+            print("\n✗ No results generated!")
+        return {
+            'results_df': None,
+            'results_by_seed': {},
+            'file_paths': file_paths,
+            'output_dir': str(output_dir)
+        }
 

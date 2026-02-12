@@ -8,7 +8,7 @@ from itertools import chain, combinations
 from typing import List, Tuple, Union
 import torch
 from torch.linalg import inv, slogdet
-
+from sklearn.covariance import MinCovDet
 
 def LinearRegression_fit(X,y):
     model = LinearRegression()
@@ -40,7 +40,13 @@ def create_cov_matrix(X0,X1,X2):
     # Stack all variables side by side
     Z = torch.hstack([X0, X1, X2])   # shape (N, d_T+d_M1+d_M2)
 
-    Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
+    mcd = MinCovDet().fit(Z.numpy())
+    Sigma = torch.tensor(mcd.covariance_)
+    #Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
+    #logdet = slogdet(Sigma)[1]
+    #old_logdet = slogdet(Sigma_old)[1]
+    #print(f"Log determinant of MCD covariance: {logdet:.4f}")
+    #print(f"Log determinant of standard covariance: {old_logdet:.4f}")
     Sigma = assert_full_rank(Sigma,jitter=1e-6)
     cov_dict = {}
     print(f"\nFull covariance matrix shape: {Sigma.shape}")
