@@ -60,8 +60,9 @@ class Idep_multivariate_gauss:
             self.P = self.whiten_block(self.sigma00, self.sigma01, self.sigma11)
             self.Q = self.whiten_block(self.sigma00, self.sigma02, self.sigma22)
             self.R = self.whiten_block(self.sigma11, self.sigma12, self.sigma22)
-            singularity_report(self.P.numpy(),self.Q.numpy(),self.R.numpy())
-            
+            report, is_singularity = singularity_report(self.P.numpy(),self.Q.numpy(),self.R.numpy())
+            if is_singularity:
+                print("Warning: Singularity detected in the Q,P or R matrices.")
             assert self.P.shape == (self.dim_m1,self.dim_m2), f"Covariance matrix dimensions {self.P.shape} do not match the provided source dimensions: {self.dim_m1,self.dim_m2}."
             assert self.Q.shape == (self.dim_m1,self.dim_t), f"Covariance matrix dimensions {self.Q.shape} do not match the provided source and target dimensions: {self.dim_m1,self.dim_t}."
             assert self.R.shape == (self.dim_m2,self.dim_t), f"Covariance matrix dimensions {self.R.shape} do not match the provided source and target dimensions: {self.dim_m2,self.dim_t}."

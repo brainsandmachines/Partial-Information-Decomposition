@@ -151,7 +151,7 @@ def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
         for name, info in report.items():
             status = "SINGULAR" if info["is_singular"] else "OK"
             print(f"Block {name}: min eigenvalue = {info['min_eigval']:.2e} -> {status}")
-    return report
+    return report,printing_required
 
 def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
     def cross_correlation(X, Y):
