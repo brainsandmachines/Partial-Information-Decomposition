@@ -194,7 +194,7 @@ def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
 def vif_summary(X):
     if len(X.shape) == 2:
          X = X.reshape(-1, 1)
-
+    max_vif_list = []
     for block in X:
         block = StandardScaler().fit_transform(block)
         
@@ -203,7 +203,7 @@ def vif_summary(X):
         
         R = np.corrcoef(block, rowvar=False)
         eigvals = np.linalg.eigvalsh(R)
-        
+        max_vif_list.append(np.max(vifs))
         print("\n===== VIF Summary =====")
         print("Max VIF:", np.max(vifs))
         print("Mean VIF:", np.mean(vifs))
@@ -211,3 +211,7 @@ def vif_summary(X):
         print("Num > 10:", np.sum(vifs > 10))
         print("Min eigenvalue (corr):", np.min(eigvals))
         print("Condition number (corr):", eigvals.max()/eigvals.min())
+    
+    for max_vif in max_vif_list:
+        if max_vif > 10:
+            print("Warning: High multicollinearity detected (max VIF > 10). Consider removing or combining features.")

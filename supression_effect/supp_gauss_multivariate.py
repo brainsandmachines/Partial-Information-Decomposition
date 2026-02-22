@@ -67,7 +67,7 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     M1 = t_m_dict['X_M1']
     M2 = t_m_dict['X_M2']
     T = t_m_dict['y']
-    vif_summary(np.array([T,M1,M2]))
+    vif_summary(np.array([M1,M2]))
     # --- compute PID ---
 
     #Change to tensors: 
@@ -221,7 +221,7 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 8000, 10
+    N, P = 8000, 100
     rng_seed, noise_seed = 42, 24
     snr = 1
     method = 'ridge_cv'
@@ -243,7 +243,7 @@ def main():
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
-    snr = 10
+    snr = 5
     print(f"Experiment 3: snr = {snr}")
     vp_results, pid_results, mi_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
@@ -254,7 +254,7 @@ def main():
     compare_results(vp_results, pid_results)
 
     print("\n" + "="*70)
-    snr = 100
+    snr = 10
     print(f"Experiment 5: snr = {snr}")
     vp_results, pid_results, mi_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)

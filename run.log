@@ -27,11 +27,10 @@ Predictions created.
 Predicted fMRI shape (LH):  (5000, 574)
 Creating suppression model...
 
-Full covariance matrix shape: torch.Size([6, 6])
-Block M1: min eigenvalue = 0.00e+00 -> SINGULAR
-Block M2: min eigenvalue = 2.22e-16 -> SINGULAR
-Block Y: min eigenvalue = 1.11e-16 -> SINGULAR
-Block M1+M2: min eigenvalue = -4.20e-18 -> SINGULAR
-Block M1+Y: min eigenvalue = 3.49e-18 -> SINGULAR
-Block M2+Y: min eigenvalue = 7.36e-17 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -5.35e-16 -> SINGULAR
+===== VIF Summary =====
+Max VIF: 3.3335690106703404
+Mean VIF: 1.8457973352441193
+Median VIF: 1.6455366797638518
+Num > 10: 0
+Min eigenvalue (corr): 0.18113127486575087
+Condition number (corr): 41.766314737552115
