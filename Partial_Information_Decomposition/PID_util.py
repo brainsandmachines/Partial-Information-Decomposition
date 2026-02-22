@@ -45,9 +45,9 @@ def create_cov_matrix(X0,X1,X2):
     
     cov_dict = {}
     print(f"\nFull covariance matrix shape: {Sigma.shape}")
+    x0_dim = X0.shape[1]
     x1_dim = X1.shape[1]
     x2_dim = X2.shape[1]
-    x0_dim = X0.shape[1]
     N = X1.shape[0] #number of observations
     
     dt_dx1 = x0_dim + x1_dim

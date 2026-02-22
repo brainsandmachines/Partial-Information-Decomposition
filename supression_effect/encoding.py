@@ -23,7 +23,7 @@ n_s = 5000  #Number of samples
 n_f = 100    #Number of features to use in the encoder
 rng_seed = np.random.default_rng(seed=42)  #Random number generator seed
 snr = 0.9  #Signal to noise ratio
-mixing_dimension = 70  #Mixing dimension for suppression model
+mixing_dimension = 2  #Mixing dimension for suppression model
 suppression_strength = 0.5  #Suppression strength
 suppression_method = 'permutate'
 path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib'
@@ -59,7 +59,7 @@ X_M1, X_M2,target = create_supression_model(rng=rng_seed,signal = y_hat_lh,suppr
 
 M1 = torch.tensor(X_M1,dtype=torch.float64)
 M2 = torch.tensor(X_M2,dtype=torch.float64)
-T = torch.tensor(target,dtype=torch.float64)
+T = torch.tensor(target[:,:mixing_dimension],dtype=torch.float64)
 
 sources = [M1,M2]
 targets = [T]

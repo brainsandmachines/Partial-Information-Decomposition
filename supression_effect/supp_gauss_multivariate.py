@@ -220,7 +220,7 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 8000, 2
+    N, P = 8000, 10
     rng_seed, noise_seed = 42, 24
     snr = 1
     method = 'ridge_cv'
