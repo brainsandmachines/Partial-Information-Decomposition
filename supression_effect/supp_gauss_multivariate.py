@@ -10,6 +10,7 @@ sys.path.append(str(root))
 from examples.toy_example import run_all_methods,run_experiment,commonality_analysis
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from utils import Tee
+from Partial_Information_Decomposition.PID_util import standardize, singularity_report,vif_summary
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
 
@@ -66,7 +67,7 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
     M1 = t_m_dict['X_M1']
     M2 = t_m_dict['X_M2']
     T = t_m_dict['y']
-
+    vif_summary(np.array([T,M1,M2]))
     # --- compute PID ---
 
     #Change to tensors: 

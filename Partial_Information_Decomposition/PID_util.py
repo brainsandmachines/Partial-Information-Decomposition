@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.discriminant_analysis import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics import r2_score
@@ -9,6 +10,8 @@ from typing import List, Tuple, Union
 import torch
 from torch.linalg import inv, slogdet
 from sklearn.covariance import MinCovDet
+import statsmodels
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 def LinearRegression_fit(X,y):
     model = LinearRegression()
@@ -186,3 +189,25 @@ def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
     fig.suptitle(f'Correlation Matrix - Method: {method}, Mixing Dim: {mixing_dimension}')
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
+
+
+def vif_summary(X):
+    if len(X.shape) == 2:
+         X = X.reshape(-1, 1)
+
+    for block in X:
+        block = StandardScaler().fit_transform(block)
+        
+        vifs = np.array([variance_inflation_factor(block, i) 
+                        for i in range(block.shape[1])])
+        
+        R = np.corrcoef(block, rowvar=False)
+        eigvals = np.linalg.eigvalsh(R)
+        
+        print("\n===== VIF Summary =====")
+        print("Max VIF:", np.max(vifs))
+        print("Mean VIF:", np.mean(vifs))
+        print("Median VIF:", np.median(vifs))
+        print("Num > 10:", np.sum(vifs > 10))
+        print("Min eigenvalue (corr):", np.min(eigvals))
+        print("Condition number (corr):", eigvals.max()/eigvals.min())

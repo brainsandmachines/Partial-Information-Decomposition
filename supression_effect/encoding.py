@@ -12,7 +12,7 @@ from encoding_model.suppresion_model import train_save_or_load
 from encoding_model.suppression_core import *
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from encoding_model.encoding_utils import get_specific_roi_fmri
-from Partial_Information_Decomposition.PID_util import correlation_matrix, singularity_report,block_singularity_check
+from Partial_Information_Decomposition.PID_util import correlation_matrix, singularity_report,block_singularity_check, vif_summary
 
 data_dir  = '/mnt/data4tb/data_algonauts/'
 parent_submission_dir = '/mnt/data4tb/data_algonauts/submissions'
@@ -59,8 +59,8 @@ X_M1, X_M2,target = create_supression_model(rng=rng_seed,signal = y_hat_lh,suppr
 
 M1 = torch.tensor(X_M1,dtype=torch.float64)
 M2 = torch.tensor(X_M2,dtype=torch.float64)
-T = torch.tensor(target[:,:mixing_dimension],dtype=torch.float64)
-
+T = torch.tensor(target,dtype=torch.float64)
+vif_summary(np.array([T,M1,M2]))
 sources = [M1,M2]
 targets = [T]
 idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=True)
