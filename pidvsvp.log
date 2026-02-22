@@ -8,36 +8,12 @@ Experiment 1: snr = 1
 Simple Example with RNG seed 42 and Noise seed 24
 ======================================================================
 ridge_cv analysis of target (y_real):
-- R²_X1: 0.1794
-- R²_X2: -0.0033
-- R²_X12: 0.2763
-- common: -0.1003
-- unexplained: 0.7237
+- R²_X1: 0.2025
+- R²_X2: -0.0005
+- R²_X12: 0.3295
+- unique_X1: 0.3300
+- unique_X2: 0.1269
+- common: -0.1274
+- unexplained: 0.6705
 
-Full covariance matrix shape: torch.Size([110, 110])
-
-Covariance matrix shape: torch.Size([110, 110])
-dim_m1: 30, dim_m2: 30, dim_t: 50
-
-Idep PID results:
-- red: 0.0000
-- unq0: 3.7994
-- unq1: 0.0056
-- syn: 3.3095
-
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): 0.1794 | I(T;M1): 3.7994
-M2 R² (VP): -0.0033 | I(T;M2): 0.0056
-Both M1 and M2 R² (VP): 0.2763 | I(T;M1,M2): 7.1145
-
-Unique to M1 (VP): 0.2797 | Unique(T;M1\M2): 3.7994
-Unique to M2 (VP): 0.0970 | Unique(T;M2\M1): 0.0056
-Common (VP): -0.1003 | Redundant (PID): 0.0000
-Synergy (PID): 3.3095
-
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
-
-All experiments completed.
+Full covariance matrix shape: torch.Size([6, 6])

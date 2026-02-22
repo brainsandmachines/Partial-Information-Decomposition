@@ -7,20 +7,26 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 
+from encoding_model.algoanut_data import argObj
 from encoding_model.suppresion_model import train_save_or_load   
 from encoding_model.suppression_core import *
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from encoding_model.encoding_utils import get_specific_roi_fmri
+from Partial_Information_Decomposition.PID_util import correlation_matrix, singularity_report,block_singularity_check
 
-
+data_dir  = '/mnt/data4tb/data_algonauts/'
+parent_submission_dir = '/mnt/data4tb/data_algonauts/submissions'
+subj = 1
+args = argObj(data_dir, parent_submission_dir, subj)
 method = 'ridge_cv'  #Method for variance partitioning
-n_s = 200  #Number of samples
+n_s = 5000  #Number of samples
 n_f = 100    #Number of features to use in the encoder
 rng_seed = np.random.default_rng(seed=42)  #Random number generator seed
-snr = 20  #Signal to noise ratio
+snr = 0.9  #Signal to noise ratio
 mixing_dimension = 70  #Mixing dimension for suppression model
-suppression_strength = 0.2  #Suppression strength
+suppression_strength = 0.5  #Suppression strength
 suppression_method = 'permutate'
-path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/RidgeCV_subj1_model_alexnet_features.2/RidgeCV_subj1_model_alexnet_features.2_encoding_model.joblib'
+path_to_load = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib'
 
 loaded_model = train_save_or_load(path_to_load=path_to_load)
 real_reg_lh, real_reg_rh, real_features =loaded_model['reg_lh'], loaded_model['reg_rh'], loaded_model['features_train'] 
@@ -33,8 +39,10 @@ suppression_method = 'permutate'
 n_features = n_f
 
 lh_fmri_train = fmri_dict['lh_fmri_train'][:n_s,:]
+rh_fmri_train = fmri_dict['rh_fmri_train'][:n_s,:]
+lh_fmri,rh_fmri = get_specific_roi_fmri(args=args,lh_fmri=lh_fmri_train,rh_fmri=rh_fmri_train, roi_name='FBA-1')
 real_features = features[:n_s,:]
-encoder,selected_features = create_encoder(rng=None, features=real_features, target=lh_fmri_train, n_features=n_f)
+encoder,selected_features = create_encoder(rng=rng_seed, features=real_features, target=lh_fmri, n_features=n_f)
 
 print("\nEncoder's features shape: ", selected_features.shape)
 print("\nCreating predictions from encoder...")
@@ -55,7 +63,7 @@ T = torch.tensor(target,dtype=torch.float64)
 
 sources = [M1,M2]
 targets = [T]
-idep_class = Idep_multivariate_gauss(sources,targets)
+idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=True)
 pid = idep_class.idep()
 print("\nIdep PID results:")
 for key, value in pid.items():

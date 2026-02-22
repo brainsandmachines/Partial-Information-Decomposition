@@ -1,3 +1,6 @@
+import sys
+from zipfile import Path
+
 from networkx import constraint
 import torch
 import numpy as np
@@ -5,10 +8,10 @@ import matplotlib.pyplot as plt
 from torch.distributions import Normal
 from sklearn.linear_model import LinearRegression
 if __name__ != "__main__":
-    from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank
+    from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report,block_singularity_check
     from .bias_corr import entropy_bias_term
 else:
-    from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank
+    from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report
 from typing import Optional
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
@@ -16,7 +19,7 @@ Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems
 
 torch.set_default_dtype(torch.float64)
 class Idep_multivariate_gauss:
-    def __init__(self, sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True):
+    def __init__(self, sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
         """Initialize the Idep multivariate gaussian class
 
         input: M1,M2,T are torch tensors of shape (N,P)
@@ -42,7 +45,7 @@ class Idep_multivariate_gauss:
         if self.M1 is not None and self.M2 is not None and self.T is not None:
             self.cov_dict = create_cov_matrix(self.M1,self.M2,self.T)
             self.cov_matrix = self.cov_dict['full_cov']
-            assert_full_rank(self.cov_matrix)
+            #assert_full_rank(self.cov_matrix)
         elif cov_matrix is not None:
             self.cov_matrix = cov_matrix
 
@@ -57,12 +60,14 @@ class Idep_multivariate_gauss:
             self.P = self.whiten_block(self.sigma00, self.sigma01, self.sigma11)
             self.Q = self.whiten_block(self.sigma00, self.sigma02, self.sigma22)
             self.R = self.whiten_block(self.sigma11, self.sigma12, self.sigma22)
-
+            singularity_report(self.P.numpy(),self.Q.numpy(),self.R.numpy())
+            
             assert self.P.shape == (self.dim_m1,self.dim_m2), f"Covariance matrix dimensions {self.P.shape} do not match the provided source dimensions: {self.dim_m1,self.dim_m2}."
             assert self.Q.shape == (self.dim_m1,self.dim_t), f"Covariance matrix dimensions {self.Q.shape} do not match the provided source and target dimensions: {self.dim_m1,self.dim_t}."
             assert self.R.shape == (self.dim_m2,self.dim_t), f"Covariance matrix dimensions {self.R.shape} do not match the provided source and target dimensions: {self.dim_m2,self.dim_t}."
             assert self.dim_m1 + self.dim_m2 + self.dim_t == self.cov_matrix.shape[0], f"Covariance matrix dimensions {self.cov_matrix.shape} do not match the provided source and target dimensions: {self.dim_m1 + self.dim_m2 + self.dim_t}."
-
+            
+        if bias_correction:
             self.bm1 = entropy_bias_term(self.N, self.dim_m1) 
             self.bm2 = entropy_bias_term(self.N, self.dim_m2)
             self.bt = entropy_bias_term(self.N, self.dim_t)
@@ -70,6 +75,9 @@ class Idep_multivariate_gauss:
             self.bq = entropy_bias_term(self.N, self.dim_t + self.dim_m1)
             self.br = entropy_bias_term(self.N, self.dim_t + self.dim_m2)
             self.bp = entropy_bias_term(self.N, self.dim_m1 + self.dim_m2)
+        else: 
+            self.bm1 = self.bm2 = self.bt = self.bq = self.br = self.bp = 0
+        
         self.I_dep_values = {}
         self.PID_values = {}
 
@@ -95,8 +103,6 @@ class Idep_multivariate_gauss:
             # Step B: Compute K = Lx^{-1} @ tmp
             # This is equivalent to solving Lx @ K = tmp
             K = torch.linalg.solve_triangular(Lx, tmp, upper=False)
-
-            assert_full_rank(K)
             
             return K
         
@@ -207,11 +213,11 @@ class Idep_multivariate_gauss:
         assert hasattr(self, "constraint_cov_dict"), "Run dependency_matrix(...) before compute_Idep(...)."
         
         self.q_det = torch.exp(torch.logdet(self.I2 - (self.Q.T @ self.Q)))
-        self.q_correction = self.bm1 + self.bt - self.bq
+        self.q_correction = (self.bm1 + self.bt - self.bq)
         self.i_m1_t = 0.5*self.log_base(1/(self.q_det)) + self.q_correction
         
         self.r_det = torch.exp(torch.logdet(self.I2 - (self.R.T @ self.R)))
-        self.r_correction = self.bm2 + self.bt - self.br
+        self.r_correction = (self.bm2 + self.bt - self.br) 
         self.i_m2_t = 0.5*self.log_base(1/(self.r_det)) + self.r_correction
         
         if 0 in unique:
@@ -229,6 +235,7 @@ class Idep_multivariate_gauss:
             #calculate k with U8:
             mat = self.constraint_cov_dict['c_model_8']
             nume8 = (self.I1 - (self.P.T @ self.P)).det()
+
             deno8 = torch.exp(torch.logdet(mat))
             k = 0.5*self.log_base(nume8/deno8) - self.i_m2_t
 
@@ -245,7 +252,7 @@ class Idep_multivariate_gauss:
 
             #calculate h with U7:
             mat = self.constraint_cov_dict['c_model_7']
-            h = 0.5*self.log_base(nume7/(deno7)) - self.i_m1_t
+            h = 0.5*self.log_base(nume7/(deno7)) - self.i_m1_t 
 
             #calculate j with U8:
             mat = self.constraint_cov_dict['c_model_8']

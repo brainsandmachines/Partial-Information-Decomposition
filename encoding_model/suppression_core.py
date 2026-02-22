@@ -405,6 +405,15 @@ def grid_search_suppression_analysis(
     # Master output file for all seeds
     master_output_file = output_dir / f'grid_search_{grid_name}.csv'
     
+    # Load existing results if file exists
+    if master_output_file.exists():
+        if verbose:
+            print(f"\nFound existing results file: {master_output_file}")
+            print("Loading and continuing from previous results...")
+        all_results = [pd.read_csv(master_output_file)]
+        if verbose:
+            print(f"Loaded {len(all_results[0])} existing rows")
+    
     # Get total combinations for progress tracking
     total_combos = (len(suppression_strength_list) * len(snr_list) * 
                     len(mixing_dimension_list) * len(rng_seed_list))
