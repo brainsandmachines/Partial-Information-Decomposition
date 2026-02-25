@@ -19,8 +19,8 @@ parent_submission_dir = '/mnt/data4tb/data_algonauts/submissions'
 subj = 1
 args = argObj(data_dir, parent_submission_dir, subj)
 method = 'ridge_cv'  #Method for variance partitioning
-n_s = 5000  #Number of samples
-n_f = 100    #Number of features to use in the encoder
+n_s = 7000  #Number of samples
+n_f = 1    #Number of features to use in the encoder
 rng_seed = np.random.default_rng(seed=42)  #Random number generator seed
 snr = 1  #Signal to noise ratio
 mixing_dimension = None  #Mixing dimension for suppression model
@@ -55,17 +55,25 @@ print("Creating suppression model...")
 X_M1, X_M2,target = create_supression_model(rng=rng_seed,signal = y_hat_lh,suppresion_method=suppression_method,features=selected_features,suppression_strength=suppression_strength,mixing_dimension=mixing_dimension,snr=snr)
 
 
-#outputs = commonality_analysis(X_M1, X_M2, target, method=method)
+outputs = commonality_analysis(X_M1, X_M2, target, method=method)
 
 M1 = torch.tensor(X_M1,dtype=torch.float64)
 M2 = torch.tensor(X_M2,dtype=torch.float64)
 T = torch.tensor(target,dtype=torch.float64)
-vif_summary(np.array([M1]))
-vif_summary(np.array([M2]))
+#vif_summary(np.array([M1,M2]))
+
 sources = [M1,M2]
 targets = [T]
 idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=True)
-pid = idep_class.idep()
+pid,mi = idep_class.idep()
+print("\nPID Commonality Results:")
+for key, value in outputs.items():
+    print(f"- {key}: {value:.4f}")
+
+print("\n Mutual Information: ")
+for key, value in mi.items():
+    print(f"- {key}: {value:.4f}")
+
 print("\nIdep PID results:")
 for key, value in pid.items():
     print(f"- {key}: {value:.4f}")

@@ -20,17 +20,35 @@ Validation stimulus images: 0
 
  Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib
 
-Encoder's features shape:  (5000, 100)
+Encoder's features shape:  (7000, 1)
 
 Creating predictions from encoder...
 Predictions created.
-Predicted fMRI shape (LH):  (5000, 574)
+Predicted fMRI shape (LH):  (7000, 574)
 Creating suppression model...
 
-===== VIF Summary =====
-Max VIF: 3.3335690106703404
-Mean VIF: 1.8457973352441193
-Median VIF: 1.6455366797638518
-Num > 10: 0
-Min eigenvalue (corr): 0.18113127486575087
-Condition number (corr): 41.766314737552115
+===== Eigenvalue Summary =====
+Min eigenvalue: -2.0599841277224584e-18
+Max eigenvalue: 0.23945428337457472
+Eigenvalue ratio (max/min): -1.1624083902011326e+17
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.06e-18
+
+Full covariance matrix shape: torch.Size([576, 576])
+Block 0: min eigenvalue = 0.00e+00 -> SINGULAR
+Block 0: min eigenvalue = 0.00e+00 -> SINGULAR
+
+Covariance matrix shape: torch.Size([576, 576])
+dim_m1: 1, dim_m2: 1, dim_t: 574
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Examples/both_unique.py", line 9, in <module>
+    from supression_effect.encoding import X_M1
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/encoding.py", line 68, in <module>
+    pid,mi = idep_class.idep()
+             ^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_multivariate_gauss.py", line 313, in idep
+    idep_values = self.compute_Idep(unique=[0,1])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_multivariate_gauss.py", line 265, in compute_Idep
+    assert not torch.isnan(unique_0), f"unique_0 = {unique_0} was not calculated properly."
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unique_0 = nan was not calculated properly.

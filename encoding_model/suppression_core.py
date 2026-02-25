@@ -129,9 +129,12 @@ def create_supression_model(rng,signal,suppresion_method, features, suppression_
     noise_std = std.item() / snr
     signal_dim1 , signal_dim2 = signal.shape[0], signal.shape[1]
     target = signal +  noise_std * rng.standard_normal((signal_dim1 , signal_dim2))
-
+    noise_X1 = 0 #0.001 * rng.standard_normal(features.shape)
+    noise_X2 = 0 #0.001 * rng.standard_normal(features.shape)
 
     X_M1, X_M2 = permutate_models(rng,features,suppression_strength)
+    X_M1 = X_M1 + noise_X1
+    X_M2 = X_M2 + noise_X2
         
     if mixing_dimension is not None:
         # Create mixed features: entangle real and spurious with a mixing matrix
@@ -147,7 +150,7 @@ def create_supression_model(rng,signal,suppresion_method, features, suppression_
     return X_M1, X_M2,target
 
 
-def commonality_analysis(features_A, features_B, target, method='standard', alphas=None, snr=1.0):
+def commonality_analysis(features_A, features_B, target, method='standard', alphas=None):
     # Select R² computation function based on method
     if method == 'standard':
         compute_r2_fn = compute_r2

@@ -159,7 +159,7 @@ def permutate_models(rng,features,suppression_strength):
 
     epsilon = 1e-2
     spurious_M1 = shuffled_spurious
-    spurious_M2 = shuffled_spurious + (epsilon * rng.standard_normal(shuffled_spurious.shape))
+    spurious_M2 = shuffled_spurious #+ (epsilon * rng.standard_normal(shuffled_spurious.shape))
 
     X_M1 = np.hstack([real_feature, spurious_M1])
     X_M2 = np.hstack([shuffled_real, spurious_M2])
@@ -167,26 +167,7 @@ def permutate_models(rng,features,suppression_strength):
     return X_M1, X_M2
 
 
-def half_permute(rng,features,suppression_strength):
-    n,p = features.shape
-    
-    n_real_dim = 1-suppression_strength
-    real_dim = int(p*n_real_dim) 
-    idx = rng.permutation(p)
-    real_dim_indices = idx[:real_dim]
-    spurious_dim_indices = idx[real_dim:]
-    real_feature_1 = features[:,real_dim_indices]
-    real_feature_2 = features[:,spurious_dim_indices]
-    rand_perm = rng.permutation(n)
 
-    shuffled_real_1 = real_feature_1[rand_perm]
-    shuffled_real_2 = real_feature_2[rand_perm]
-
-
-    X_M1 = np.hstack([real_feature_1, shuffled_real_2])
-    X_M2 = np.hstack([shuffled_real_1, real_feature_2])
-
-    return X_M1, X_M2
 
 def rotate_in_random_plane(rng, X, angle_degrees):
     """
@@ -227,7 +208,7 @@ def rotate_in_random_plane(rng, X, angle_degrees):
     X_rot = X + np.outer(a_rot - a, u) + np.outer(b_rot - b, v)
     return X_rot, u, v
 
-def run_experiment(rng,noise_rng,simple_example = False, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False):
+def run_experiment(rng,suppresion_strength,simple_example = False, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False):
     """
     Run commonality analysis experiment.
     
@@ -254,19 +235,22 @@ def run_experiment(rng,noise_rng,simple_example = False, n=1024, p=100, mixing_d
     betas = rng.standard_normal((p, p))
     signal = real_features @ betas
     noise_std = np.std(signal) / snr
-    y_real  = signal + noise_std * noise_rng.standard_normal((n,p))
-    jitter=1e-6
-    if simple_example:
-        noise = noise_std * noise_rng.standard_normal((n,p))
-        X_M1 = signal + noise
-        X_M2 = noise
-    elif method == 'permutation':
-        #X_M1 = np.hstack([real_features, shuffled_spurious])
-        #X_M2 = np.hstack([shuffled_real, shuffled_spurious])
-        X_M1, X_M2 = permutate_models(rng, signal, suppression_strength=0.5)
+    noise_std_1 = noise_std  # Adjust noise level for X_M1
+    noise_std_2 = noise_std  # Adjust noise level for X_M2
+    y_real  = signal + noise_std * rng.standard_normal((n,p))
+    noise_Xm1 = noise_std_1 * rng.standard_normal((n, p))
+    noise_Xm2 = noise_std_2 * rng.standard_normal((n, p))
 
-    else: 
-        X_M1, X_M2 = half_permute(rng, signal, suppression_strength=0.3)
+    if simple_example:
+        common_noise = noise_std * rng.standard_normal((n,p))
+        X_M1 = signal + common_noise
+        X_M2 = common_noise
+    else:
+        X_M1, X_M2 = permutate_models(rng, real_features, suppression_strength=suppresion_strength)
+        X_M1 += noise_Xm1
+
+    # else: 
+    #     X_M1, X_M2 = half_permute(rng, signal, suppression_strength=0.3)
     # make sure joint covariance matrix is not singular
     #sing_report = singularity_report(X_M1, X_M2, y_real)
     #assert not sing_report["M1+M2+Y"]["is_singular"], \
@@ -291,10 +275,10 @@ def run_experiment(rng,noise_rng,simple_example = False, n=1024, p=100, mixing_d
     decomp = commonality_analysis(X_M1, X_M2, y_real, method=method)
 
 
-    print(f"{method} analysis of target (y_real):")
-    for key, value in decomp.items():
-        if key.startswith('R²') or key in ['unique_X1', 'unique_X2', 'common', 'unexplained']:
-            print(f"- {key}: {value:.4f}")
+    # print(f"{method} analysis of target (y_real):")
+    # for key, value in decomp.items():
+    #     if key.startswith('R²') or key in ['unique_X1', 'unique_X2', 'common', 'unexplained']:
+    #         print(f"- {key}: {value:.4f}")
     return decomp ,{'X_M1'  :X_M1,'X_M2':X_M2,'y':y_real}
     # Verify sum (only variance components, not R² values)
     # Note: CV version may not sum exactly due to negative R² being possible
@@ -312,15 +296,14 @@ def run_experiment(rng,noise_rng,simple_example = False, n=1024, p=100, mixing_d
 # 2x3 Factorial Design: SNR (low/high) x Mixing (none/invertible/lossy)
 # =============================================================================
 
-def run_all_methods(rng_seed,noise_seed,n, p, mixing_dimension, snr):
+def run_all_methods(rng_seed,n, p, mixing_dimension, snr):
     """Run all three analysis methods with the same random seed."""
     coef_dict = {}
     decomp_dict = {}
     for method in ['ridge_cv']: #,'ols_cv','standard']:
         print(f"\n--- {method.upper()} ---")
         rng = np.random.default_rng(seed=rng_seed)
-        noise_rng = np.random.default_rng(seed=noise_seed)
-        decomp,_ = run_experiment(rng,noise_rng=noise_rng, n=n, p=p, mixing_dimension=mixing_dimension, snr=snr, method=method)
+        decomp,_ = run_experiment(rng,suppresion_strength=0.5, n=n, p=p, mixing_dimension=mixing_dimension, snr=snr, method=method)
     
     for key, value in decomp.items():
         if key.startswith('betas'):
@@ -332,7 +315,7 @@ def run_all_methods(rng_seed,noise_seed,n, p, mixing_dimension, snr):
 def main():
     """Run the 2x3 factorial experiment design."""
     # Common parameters
-    N, P, SEED,NOISE_SEED = 1000, 200, 42, 24
+    N, P, SEED = 1000, 200, 42
 
     # =============================================================================
     # LOW SNR experiments (SNR = 1.0)
@@ -341,17 +324,17 @@ def main():
     print("\n" + "="*70)
     print("Experiment 1: LOW SNR + NO MIXING")
     print("="*70)
-    run_all_methods(SEED, NOISE_SEED, N, P, mixing_dimension=None, snr=0.9)
+    run_all_methods(SEED, N, P, mixing_dimension=None, snr=0.9)
 
     print("\n" + "="*70)
     print("Experiment 2: LOW SNR + INVERTIBLE MIXING (200→200)")
     print("="*70)
-    run_all_methods(SEED, NOISE_SEED, N, P, mixing_dimension=200, snr=1.0)
+    run_all_methods(SEED, N, P, mixing_dimension=200, snr=1.0)
 
     print("\n" + "="*70)
     print("Experiment 3: LOW SNR + LOSSY MIXING (200→100)")
     print("="*70)
-    run_all_methods(SEED, NOISE_SEED, N, P, mixing_dimension=100, snr=1.0)
+    run_all_methods(SEED, N, P, mixing_dimension=100, snr=1.0)
 
     # =============================================================================
     # HIGH SNR experiments (SNR = 10.0)
@@ -360,17 +343,17 @@ def main():
     print("\n" + "="*70)
     print("Experiment 4: HIGH SNR + NO MIXING")
     print("="*70)
-    run_all_methods(SEED, NOISE_SEED, N, P, mixing_dimension=None, snr=10.0)
+    run_all_methods(SEED, N, P, mixing_dimension=None, snr=10.0)
 
     print("\n" + "="*70)
     print("Experiment 5: HIGH SNR + INVERTIBLE MIXING (200→200)")
     print("="*70)
-    run_all_methods(SEED, NOISE_SEED, N, P, mixing_dimension=200, snr=10.0)
+    run_all_methods(SEED, N, P, mixing_dimension=200, snr=10.0)
 
     print("\n" + "="*70)
     print("Experiment 6: HIGH SNR + LOSSY MIXING (200→100)")
     print("="*70)
-    run_all_methods(SEED, NOISE_SEED, N, P, mixing_dimension=100, snr=10.0)
+    run_all_methods(SEED, N, P, mixing_dimension=100, snr=10.0)
 
 
 def plot_coefficients(coef_dict, title="Coefficient Comparison"):
@@ -438,7 +421,7 @@ def gauss_simple_example():
     print("="*70)
     rng = np.random.default_rng(seed=rng_seed)
     noise_rng = np.random.default_rng(seed=noise_seed)
-    coef_dict,comp_dict = run_all_methods(rng, noise_rng, n=N, p=P, mixing_dimension=30, snr=0.9)
+    coef_dict,comp_dict = run_all_methods(rng, n=N, p=P, mixing_dimension=30, snr=0.9)
 
     # Plot the results
     #plot_coefficients(coef_dict, f"Coefficients - Seed {rng_seed}")

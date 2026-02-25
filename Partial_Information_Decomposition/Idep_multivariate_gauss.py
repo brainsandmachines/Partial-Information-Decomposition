@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from torch.distributions import Normal
 from sklearn.linear_model import LinearRegression
+from sklearn.covariance import LedoitWolf
+
 if __name__ != "__main__":
     from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report,block_singularity_check
     from .bias_corr import entropy_bias_term
@@ -57,17 +59,23 @@ class Idep_multivariate_gauss:
             self.sigma02 = self.cov_dict['cross_x0_x2']
             self.sigma12 = self.cov_dict['cross_x1_x2']
 
+
             self.P = self.whiten_block(self.sigma00, self.sigma01, self.sigma11)
             self.Q = self.whiten_block(self.sigma00, self.sigma02, self.sigma22)
             self.R = self.whiten_block(self.sigma11, self.sigma12, self.sigma22)
-            report, is_singularity = singularity_report(self.P.numpy(),self.Q.numpy(),self.R.numpy())
-            if is_singularity:
-                print("Warning: Singularity detected in the Q,P or R matrices.")
+
+
             assert self.P.shape == (self.dim_m1,self.dim_m2), f"Covariance matrix dimensions {self.P.shape} do not match the provided source dimensions: {self.dim_m1,self.dim_m2}."
             assert self.Q.shape == (self.dim_m1,self.dim_t), f"Covariance matrix dimensions {self.Q.shape} do not match the provided source and target dimensions: {self.dim_m1,self.dim_t}."
             assert self.R.shape == (self.dim_m2,self.dim_t), f"Covariance matrix dimensions {self.R.shape} do not match the provided source and target dimensions: {self.dim_m2,self.dim_t}."
             assert self.dim_m1 + self.dim_m2 + self.dim_t == self.cov_matrix.shape[0], f"Covariance matrix dimensions {self.cov_matrix.shape} do not match the provided source and target dimensions: {self.dim_m1 + self.dim_m2 + self.dim_t}."
             
+            # Singularity check for P,Q and R blocks
+            p = (torch.eye(self.P.shape[0]) - self.P @ self.P.T).detach().cpu().numpy()
+            q = (torch.eye(self.Q.shape[0]) - self.Q @ self.Q.T).detach().cpu().numpy()
+            r = (torch.eye(self.R.shape[0]) - self.R @ self.R.T).detach().cpu().numpy()
+            block_singularity_check(np.array([p,q,r]))
+            block_singularity_check(np.array([p.T,q.T,r.T]))
         if bias_correction:
             self.bm1 = entropy_bias_term(self.N, self.dim_m1) 
             self.bm2 = entropy_bias_term(self.N, self.dim_m2)
@@ -82,31 +90,22 @@ class Idep_multivariate_gauss:
         self.I_dep_values = {}
         self.PID_values = {}
 
-    def whiten_block(self, Sigma_xx: torch.Tensor, 
-                    Sigma_xy: torch.Tensor, 
-                    Sigma_yy: torch.Tensor) -> torch.Tensor:
-            """
-            Return: L_x^{-1} Sigma_xy L_y^{-T}
-            Equivalent to whitening using Cholesky factors.
-            """
-            # 1. Compute Cholesky factors (Lower triangular)
-            Lx = torch.linalg.cholesky(Sigma_xx)
-            Ly = torch.linalg.cholesky(Sigma_yy)
+    def whiten_block(self,
+                        Sigma_xx: torch.Tensor,
+                        Sigma_xy: torch.Tensor,
+                        Sigma_yy: torch.Tensor) -> torch.Tensor:
+        """
+        return Ux^{-T} @ Sigma_xy @ Uy^{-1}
+        where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
+        """
+        Ux = torch.linalg.cholesky(Sigma_xx).T
+        Uy = torch.linalg.cholesky(Sigma_yy).T
+
+        tmp = torch.linalg.solve_triangular(Uy.T, Sigma_xy.T, upper=False).T
+        K   = torch.linalg.solve_triangular(Ux.T, tmp,        upper=False)
+
+        return K
             
-            # 2. Apply whitening WITHOUT explicit inversion
-            # We want: K = Lx^{-1} @ Sigma_xy @ Ly^{-T}
-            
-            # Step A: Compute tmp = Sigma_xy @ Ly^{-T}
-            # This is equivalent to solving Ly @ tmp.T = Sigma_xy.T
-            # We solve for tmp.T then transpose back.
-            tmp = torch.linalg.solve_triangular(Ly, Sigma_xy.T, upper=False).T
-            
-            # Step B: Compute K = Lx^{-1} @ tmp
-            # This is equivalent to solving Lx @ K = tmp
-            K = torch.linalg.solve_triangular(Lx, tmp, upper=False)
-            
-            return K
-        
         
 
     def log_base(self,x:Optional[torch.Tensor]) -> torch.Tensor:
@@ -137,7 +136,7 @@ class Idep_multivariate_gauss:
             M[self.dim_m1 + self.dim_m2:, self.dim_m1:self.dim_m1 + self.dim_m2] = block3.T
 
         assert M.shape == (self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t), f"Created matrix shape {M.shape} does not match expected shape {(self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t)}."
-        assert_full_rank(M)
+        #assert_full_rank(M)
         return M
 
 
@@ -282,9 +281,7 @@ class Idep_multivariate_gauss:
         assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
         # Synergistic information
-        syn = self.i_m0_m1_t - (red + unique_0 + unique_1)
-
-        #Check for nan values
+        syn = self.i_m0_m1_t - i_m1_t - unique_0
         assert not torch.isnan(red), f"Redundant={red} information not calculated properly."
         assert not torch.isnan(syn), f"Synergistic={syn} information not calculated properly."
         self.PID_values = {

@@ -12,6 +12,7 @@ from torch.linalg import inv, slogdet
 from sklearn.covariance import MinCovDet
 import statsmodels
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.covariance import LedoitWolf
 
 def LinearRegression_fit(X,y):
     model = LinearRegression()
@@ -33,19 +34,32 @@ def cond_cov(sigma_1,sigma_2,sigma12,sigma21):
     return cond_cov
 
 
+def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> torch.Tensor:
+    """
+    Fit Ledoit-Wolf on X (N,פ) and return covariance as torch.Tensor on same device/dtype.
+    """
+    X_np = X.detach().cpu().numpy()
+    lw = LedoitWolf(assume_centered=assume_centered).fit(X_np)
+    Sigma = torch.from_numpy(lw.covariance_).to(device=X.device, dtype=X.dtype)
+    return Sigma
+
+
 def create_cov_matrix(X0,X1,X2):
     """This function will create the covariance matrix for the three variables M1,M2,T
-    input: M1,M2,T are torch tensors of shape (N,d) 
+    input: M1,M2,T are torch tensors of shape (N,p) 
     N is the number of observations, 
-    d is the dimension of each observation.
+    p is the dimension of each observation.
 
-    output: a 3*dX3*d covariance matrix"""
-    # Stack all variables side by side
-    singularity_report(X0.numpy(),X1.numpy(),X2.numpy())
+    output: a 3*pX3*dp covariance matrix"""
+
     Z = torch.hstack([X0, X1, X2])   # shape (N, d_T+d_M1+d_M2)
 
     Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
-    
+    #eigvenvalue_summary(Sigma.detach().cpu().numpy())
+    min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
+    if is_singular:
+        print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")
+
     cov_dict = {}
     print(f"\nFull covariance matrix shape: {Sigma.shape}")
     x0_dim = X0.shape[1]
@@ -70,7 +84,6 @@ def create_cov_matrix(X0,X1,X2):
     cov_dict['cov_x1'] = Sigma[x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
     cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
     cov_dict['auto_x01'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
-    cov_dict['auto_x02'] = Sigma[0:x0_dim, dt_dx1:d_all]  #ΣX0X2   
     cov_dict['auto_x12'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
 
  
@@ -81,6 +94,48 @@ def create_cov_matrix(X0,X1,X2):
 
 
     return cov_dict
+
+def plot_cov_blocks(cov_dict, x0_dim, x1_dim, x2_dim,
+                    *, title="Covariance (block view)",
+                    cmap="Blues", vmin=None, vmax=None,
+                    fine_grid=False, show_colorbar=True):
+    Sigma = cov_dict["full_cov"]
+
+    # torch -> numpy
+    if hasattr(Sigma, "detach"):
+        M = Sigma.detach().cpu().numpy()
+    else:
+        M = np.asarray(Sigma)
+
+    n = M.shape[0]
+    assert n == x0_dim + x1_dim + x2_dim, "dims don't match full_cov"
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    im = ax.imshow(M, cmap=cmap, vmin=vmin, vmax=vmax,
+                   interpolation="nearest", aspect="equal")
+
+    # Thick block boundaries
+    cuts = [x0_dim, x0_dim + x1_dim]
+    for c in cuts:
+        ax.axvline(c - 0.5, linewidth=3)
+        ax.axhline(c - 0.5, linewidth=3)
+
+    # Optional fine grid for the “pixel lattice” look
+    if fine_grid:
+        ax.set_xticks(np.arange(-0.5, n, 1), minor=True)
+        ax.set_yticks(np.arange(-0.5, n, 1), minor=True)
+        ax.grid(which="minor", linewidth=0.25)
+        ax.tick_params(which="minor", bottom=False, left=False)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(title)
+
+    if show_colorbar:
+        plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    plt.tight_layout()
+    plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/random_plots/{title.replace(' ', '_')}.png", dpi=300)
 def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
     """
     Standardize columns of X to zero mean and unit variance.
@@ -127,7 +182,22 @@ def correlation_matrix(X):
 
 def block_singularity_check(X, tol=1e-10):
     """Check if a block is singular or ill-conditioned."""
-    eigvals = np.linalg.eigvalsh(correlation_matrix(X))
+
+    if len(X.shape) != 2:
+        singular_dict = {}
+        for i, block in enumerate(X):
+            min_eig, is_singular = block_singularity_check(block, tol)
+            singular_dict[i] = (min_eig,is_singular)
+        if any(is_singular for _, (_, is_singular) in singular_dict.items()):
+            for i, (min_eig, is_singular) in singular_dict.items():
+                status = "SINGULAR" if is_singular else "OK"
+                if is_singular:
+                    print(f"Block {i}: min eigenvalue = {min_eig:.2e} -> {status}")
+        return singular_dict
+    
+    if X.shape[0] != X.shape[1]:
+        raise ValueError("Input isn't a square matrix. it might no be a co-variance matrix")
+    eigvals = np.linalg.eigvalsh(X)
     min_eig = float(eigvals.min())
     return min_eig, min_eig <= tol
 
@@ -193,7 +263,7 @@ def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
 
 def vif_summary(X):
     if len(X.shape) == 2:
-         X = X.reshape(-1, 1)
+          X = np.expand_dims(X, axis=0)
     max_vif_list = []
     for block in X:
         block = StandardScaler().fit_transform(block)
@@ -211,7 +281,65 @@ def vif_summary(X):
         print("Num > 10:", np.sum(vifs > 10))
         print("Min eigenvalue (corr):", np.min(eigvals))
         print("Condition number (corr):", eigvals.max()/eigvals.min())
+        
     
     for max_vif in max_vif_list:
         if max_vif > 10:
             print("Warning: High multicollinearity detected (max VIF > 10). Consider removing or combining features.")
+
+
+import numpy as np
+
+def std_scaling_summary(X):
+    if len(X.shape) == 2:
+        X = np.expand_dims(X, axis=0)
+        
+    for block in X:
+        block = np.asarray(block)
+
+        # Standard deviations
+        stds = np.std(block, axis=0, ddof=1)
+        variances = stds**2
+        print("\n===== STD Scaling Summary =====")
+        print("Max std:", np.max(stds))
+        print("Min std:", np.min(stds))
+        print("Std ratio (max/min):", np.max(stds)/np.min(stds))
+        print("Max variance:", np.max(variances))
+        print("Min variance:", np.min(variances))
+        print("Variance ratio (max/min):", np.max(variances)/np.min(variances))
+
+
+def eigvenvalue_summary(X):
+    assert X.shape[0] == X.shape[1], "Input must be a square matrix to compute eigenvalues."
+    eigvals = np.linalg.eigvalsh(X)
+    print("\n===== Eigenvalue Summary =====")
+    print("Min eigenvalue:", np.min(eigvals))
+    print("Max eigenvalue:", np.max(eigvals))
+    print("Eigenvalue ratio (max/min):", np.max(eigvals)/np.min(eigvals))
+
+def compare_results(vp_results,pid_results,mi_results):
+    """Compare Variance Partitioning and Partial Information Decomposition results.
+    Parameters
+    ----------
+    vp_results : dict
+        Results from variance partitioning.
+    pid_results : dict
+        Results from Partial Information Decomposition.
+    mi_results : dict
+        Mutual information results from PID.
+
+    Returns
+    -------
+    None
+    """
+    print("\n" + "="*70)
+    print("Comparison of Variance Partitioning and PID Results")
+    print("="*70)
+    print("Results:")
+    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_results['I(M0;T)']:.4f}")
+    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_results['I(M1;T)']:.4f}")
+    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_results['I(M0,M1;T)']:.4f}")
+    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq0']:.4f}")
+    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq1']:.4f}")
+    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
+    print(f"Synergy (PID): {pid_results['syn']:.4f}")

@@ -1,446 +1,140 @@
 
-Running Gaussian Multivariate target and sources simple example...
-
 ======================================================================
-Experiment 1: snr = 1
+Experiment 1: snr = 2
 
-======================================================================
-Simple Example with RNG seed 42 and Noise seed 24
-======================================================================
-ridge_cv analysis of target (y_real):
-- R²_X1: 0.2453
-- R²_X2: -0.0130
-- R²_X12: 0.4326
-- unique_X1: 0.4456
-- unique_X2: 0.1873
-- common: -0.2003
-- unexplained: 0.5674
+Full covariance matrix shape: torch.Size([600, 600])
 
-===== VIF Summary =====
-Max VIF: 1.2616479754422154
-Mean VIF: 1.1954608296931826
-Median VIF: 1.1944281056323687
-Num > 10: 0
-Min eigenvalue (corr): 0.49465546144825484
-Condition number (corr): 4.530314307566372
-
-===== VIF Summary =====
-Max VIF: 1.274098357084146
-Mean VIF: 1.1933165972472568
-Median VIF: 1.190956430050464
-Num > 10: 0
-Min eigenvalue (corr): 0.4964068698087155
-Condition number (corr): 4.516279233223436
-
-===== VIF Summary =====
-Max VIF: 1.0164360240955443
-Mean VIF: 1.01213049111819
-Median VIF: 1.0120461614011877
-Num > 10: 0
-Min eigenvalue (corr): 0.805442816753591
-Condition number (corr): 1.5222924645150444
-
-Full covariance matrix shape: torch.Size([300, 300])
-Block M1: min eigenvalue = -4.44e-16 -> SINGULAR
-Block M2: min eigenvalue = -1.19e-16 -> SINGULAR
-Block Y: min eigenvalue = -1.15e-16 -> SINGULAR
-Block M1+M2: min eigenvalue = -1.40e-15 -> SINGULAR
-Block M1+Y: min eigenvalue = -1.52e-15 -> SINGULAR
-Block M2+Y: min eigenvalue = -2.00e-15 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -2.28e-15 -> SINGULAR
-Warning: Singularity detected in the Q,P or R matrices.
-
-Covariance matrix shape: torch.Size([300, 300])
-dim_m1: 100, dim_m2: 100, dim_t: 100
-
-Idep PID results:
-- red: 0.0000
-- unq0: 11.1558
-- unq1: -0.0054
-- syn: 15.3817
+Covariance matrix shape: torch.Size([600, 600])
+dim_m1: 200, dim_m2: 200, dim_t: 200
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.2453 | I(T;M1): 11.1558
-M2 R² (VP): -0.0130 | I(T;M2): -0.0054
-Both M1 and M2 R² (VP): 0.4326 | I(T;M1,M2): 26.5321
+M1 R² (VP): -0.0253 | I(T;M1): 0.0290
+M2 R² (VP): -0.0200 | I(T;M2): 0.0187
+Both M1 and M2 R² (VP): -0.0460 | I(T;M1,M2): 5.2455
 
-Unique to M1 (VP): 0.4456 | Unique(T;M1\M2): 11.1558
-Unique to M2 (VP): 0.1873 | Unique(T;M2\M1): -0.0054
-Common (VP): -0.2003 | Redundant (PID): 0.0000
-Synergy (PID): 15.3817
+Unique to M1 (VP): -0.0259 | Unique(T;M1\M2): 0.0290
+Unique to M2 (VP): -0.0207 | Unique(T;M2\M1): 0.0187
+Common (VP): 0.0006 | Redundant (PID): 0.0000
+Synergy (PID): 5.1977
 
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
-
-======================================================================
-Experiment 2: snr = 1 univariate gaussian with different seeds
+No suppression effect detected for VP: One of the unique contributions is zero.
 
 ======================================================================
-Simple Example with RNG seed 44 and Noise seed 26
-======================================================================
-ridge_cv analysis of target (y_real):
-- R²_X1: 0.2992
-- R²_X2: -0.0128
-- R²_X12: 0.4865
-- unique_X1: 0.4993
-- unique_X2: 0.1873
-- common: -0.2001
-- unexplained: 0.5135
+Experiment 2: snr = 2 multivariate gaussian with different seeds
 
-===== VIF Summary =====
-Max VIF: 1.3724156861591421
-Mean VIF: 1.249633708124848
-Median VIF: 1.2472468577997329
-Num > 10: 0
-Min eigenvalue (corr): 0.4491695965832983
-Condition number (corr): 5.368669264811646
+Full covariance matrix shape: torch.Size([600, 600])
 
-===== VIF Summary =====
-Max VIF: 1.3328825323547329
-Mean VIF: 1.2476312236522666
-Median VIF: 1.2461579542078458
-Num > 10: 0
-Min eigenvalue (corr): 0.45198183517706103
-Condition number (corr): 5.3233779642273245
-
-===== VIF Summary =====
-Max VIF: 1.0162954903470904
-Mean VIF: 1.0125599997849697
-Median VIF: 1.0124556365809538
-Num > 10: 0
-Min eigenvalue (corr): 0.7980647358164671
-Condition number (corr): 1.5389532154630916
-
-Full covariance matrix shape: torch.Size([300, 300])
-Block M1: min eigenvalue = 8.88e-16 -> SINGULAR
-Block M2: min eigenvalue = 1.14e-16 -> SINGULAR
-Block Y: min eigenvalue = -2.17e-17 -> SINGULAR
-Block M1+M2: min eigenvalue = -1.93e-15 -> SINGULAR
-Block M1+Y: min eigenvalue = -1.85e-15 -> SINGULAR
-Block M2+Y: min eigenvalue = -1.98e-15 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -2.55e-15 -> SINGULAR
-Warning: Singularity detected in the Q,P or R matrices.
-
-Covariance matrix shape: torch.Size([300, 300])
-dim_m1: 100, dim_m2: 100, dim_t: 100
-
-Idep PID results:
-- red: 0.0000
-- unq0: 13.7614
-- unq1: 0.0026
-- syn: 16.5888
+Covariance matrix shape: torch.Size([600, 600])
+dim_m1: 200, dim_m2: 200, dim_t: 200
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.2992 | I(T;M1): 13.7614
-M2 R² (VP): -0.0128 | I(T;M2): 0.0026
-Both M1 and M2 R² (VP): 0.4865 | I(T;M1,M2): 30.3529
+M1 R² (VP): -0.0223 | I(T;M1): 0.2317
+M2 R² (VP): -0.0199 | I(T;M2): 0.0339
+Both M1 and M2 R² (VP): -0.0428 | I(T;M1,M2): 5.4611
 
-Unique to M1 (VP): 0.4993 | Unique(T;M1\M2): 13.7614
-Unique to M2 (VP): 0.1873 | Unique(T;M2\M1): 0.0026
-Common (VP): -0.2001 | Redundant (PID): 0.0000
-Synergy (PID): 16.5888
+Unique to M1 (VP): -0.0229 | Unique(T;M1\M2): 0.2317
+Unique to M2 (VP): -0.0205 | Unique(T;M2\M1): 0.0339
+Common (VP): 0.0006 | Redundant (PID): 0.0000
+Synergy (PID): 5.1955
 
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
+No suppression effect detected for VP: One of the unique contributions is zero.
 
 ======================================================================
 Experiment 3: snr = 5
 
-======================================================================
-Simple Example with RNG seed 42 and Noise seed 24
-======================================================================
-ridge_cv analysis of target (y_real):
-- R²_X1: 0.9278
-- R²_X2: -0.0122
-- R²_X12: 0.9598
-- unique_X1: 0.9720
-- unique_X2: 0.0320
-- common: -0.0443
-- unexplained: 0.0402
+Full covariance matrix shape: torch.Size([600, 600])
 
-===== VIF Summary =====
-Max VIF: 6.839457349639938
-Mean VIF: 4.620432807141192
-Median VIF: 4.546766041607398
-Num > 10: 0
-Min eigenvalue (corr): 0.03799114236340669
-Condition number (corr): 96.74264654635786
-
-===== VIF Summary =====
-Max VIF: 6.767669145571124
-Mean VIF: 4.6172138705896035
-Median VIF: 4.58173066664886
-Num > 10: 0
-Min eigenvalue (corr): 0.03758595693578188
-Condition number (corr): 98.08018099392542
-
-===== VIF Summary =====
-Max VIF: 1.016436024095544
-Mean VIF: 1.01213049111819
-Median VIF: 1.0120461614011877
-Num > 10: 0
-Min eigenvalue (corr): 0.80544281675359
-Condition number (corr): 1.5222924645150462
-
-Full covariance matrix shape: torch.Size([300, 300])
-Block M1: min eigenvalue = 4.15e-16 -> SINGULAR
-Block M2: min eigenvalue = -3.07e-16 -> SINGULAR
-Block Y: min eigenvalue = 1.11e-16 -> SINGULAR
-Block M1+M2: min eigenvalue = -2.03e-15 -> SINGULAR
-Block M1+Y: min eigenvalue = -1.70e-15 -> SINGULAR
-Block M2+Y: min eigenvalue = -1.83e-15 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -2.63e-15 -> SINGULAR
-Warning: Singularity detected in the Q,P or R matrices.
-
-Covariance matrix shape: torch.Size([300, 300])
-dim_m1: 100, dim_m2: 100, dim_t: 100
-
-Idep PID results:
-- red: 0.0000
-- unq0: 100.6782
-- unq1: -0.0085
-- syn: 30.6694
+Covariance matrix shape: torch.Size([600, 600])
+dim_m1: 200, dim_m2: 200, dim_t: 200
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.9278 | I(T;M1): 100.6782
-M2 R² (VP): -0.0122 | I(T;M2): -0.0085
-Both M1 and M2 R² (VP): 0.9598 | I(T;M1,M2): 131.3391
+M1 R² (VP): -0.0034 | I(T;M1): 1.8951
+M2 R² (VP): -0.0201 | I(T;M2): 0.0117
+Both M1 and M2 R² (VP): -0.0231 | I(T;M1,M2): 7.0999
 
-Unique to M1 (VP): 0.9720 | Unique(T;M1\M2): 100.6782
-Unique to M2 (VP): 0.0320 | Unique(T;M2\M1): -0.0085
-Common (VP): -0.0443 | Redundant (PID): 0.0000
-Synergy (PID): 30.6694
+Unique to M1 (VP): -0.0031 | Unique(T;M1\M2): 1.8951
+Unique to M2 (VP): -0.0198 | Unique(T;M2\M1): 0.0117
+Common (VP): -0.0003 | Redundant (PID): 0.0000
+Synergy (PID): 5.1931
 
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
-
-======================================================================
-Experiment 4: snr = 5 univariate gaussian with different seeds
+No suppression effect detected for VP: One of the unique contributions is zero.
 
 ======================================================================
-Simple Example with RNG seed 44 and Noise seed 26
-======================================================================
-ridge_cv analysis of target (y_real):
-- R²_X1: 0.9283
-- R²_X2: -0.0122
-- R²_X12: 0.9601
-- unique_X1: 0.9722
-- unique_X2: 0.0317
-- common: -0.0439
-- unexplained: 0.0399
+Experiment 4: snr = 5 multivariate gaussian with different seeds
 
-===== VIF Summary =====
-Max VIF: 7.187839176982987
-Mean VIF: 4.726493260185198
-Median VIF: 4.629660043680001
-Num > 10: 0
-Min eigenvalue (corr): 0.03759928218567656
-Condition number (corr): 97.79667844958126
+Full covariance matrix shape: torch.Size([600, 600])
 
-===== VIF Summary =====
-Max VIF: 7.151292727468074
-Mean VIF: 4.710409091492349
-Median VIF: 4.648978092309255
-Num > 10: 0
-Min eigenvalue (corr): 0.03742771575172342
-Condition number (corr): 98.22751229173485
-
-===== VIF Summary =====
-Max VIF: 1.0162954903470909
-Mean VIF: 1.0125599997849697
-Median VIF: 1.0124556365809538
-Num > 10: 0
-Min eigenvalue (corr): 0.7980647358164679
-Condition number (corr): 1.5389532154630896
-
-Full covariance matrix shape: torch.Size([300, 300])
-Block M1: min eigenvalue = 6.25e-17 -> SINGULAR
-Block M2: min eigenvalue = -5.14e-16 -> SINGULAR
-Block Y: min eigenvalue = 1.94e-17 -> SINGULAR
-Block M1+M2: min eigenvalue = -2.01e-15 -> SINGULAR
-Block M1+Y: min eigenvalue = -1.88e-15 -> SINGULAR
-Block M2+Y: min eigenvalue = -1.80e-15 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -2.32e-15 -> SINGULAR
-Warning: Singularity detected in the Q,P or R matrices.
-
-Covariance matrix shape: torch.Size([300, 300])
-dim_m1: 100, dim_m2: 100, dim_t: 100
-
-Idep PID results:
-- red: 0.0000
-- unq0: 100.6165
-- unq1: -0.0025
-- syn: 30.5280
+Covariance matrix shape: torch.Size([600, 600])
+dim_m1: 200, dim_m2: 200, dim_t: 200
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.9283 | I(T;M1): 100.6165
-M2 R² (VP): -0.0122 | I(T;M2): -0.0025
-Both M1 and M2 R² (VP): 0.9601 | I(T;M1,M2): 131.1420
+M1 R² (VP): -0.0032 | I(T;M1): 1.8562
+M2 R² (VP): -0.0200 | I(T;M2): 0.0329
+Both M1 and M2 R² (VP): -0.0231 | I(T;M1,M2): 7.0754
 
-Unique to M1 (VP): 0.9722 | Unique(T;M1\M2): 100.6165
-Unique to M2 (VP): 0.0317 | Unique(T;M2\M1): -0.0025
-Common (VP): -0.0439 | Redundant (PID): 0.0000
-Synergy (PID): 30.5280
+Unique to M1 (VP): -0.0031 | Unique(T;M1\M2): 1.8562
+Unique to M2 (VP): -0.0199 | Unique(T;M2\M1): 0.0329
+Common (VP): -0.0001 | Redundant (PID): 0.0000
+Synergy (PID): 5.1863
 
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
+No suppression effect detected for VP: One of the unique contributions is zero.
 
 ======================================================================
 Experiment 5: snr = 10
 
-======================================================================
-Simple Example with RNG seed 42 and Noise seed 24
-======================================================================
-ridge_cv analysis of target (y_real):
-- R²_X1: 0.9805
-- R²_X2: -0.0103
-- R²_X12: 0.9896
-- unique_X1: 0.9999
-- unique_X2: 0.0091
-- common: -0.0194
-- unexplained: 0.0104
+Full covariance matrix shape: torch.Size([600, 600])
 
-===== VIF Summary =====
-Max VIF: 19.32671234408882
-Mean VIF: 9.213705924897006
-Median VIF: 8.877700260443799
-Num > 10: 30
-Min eigenvalue (corr): 0.010233294348107975
-Condition number (corr): 367.6152682892421
-
-===== VIF Summary =====
-Max VIF: 19.54525326990411
-Mean VIF: 9.22475709489462
-Median VIF: 8.89147878143643
-Num > 10: 30
-Min eigenvalue (corr): 0.009888006509041177
-Condition number (corr): 381.0670127652906
-
-===== VIF Summary =====
-Max VIF: 1.016436024095544
-Mean VIF: 1.01213049111819
-Median VIF: 1.0120461614011877
-Num > 10: 0
-Min eigenvalue (corr): 0.80544281675359
-Condition number (corr): 1.5222924645150462
-Warning: High multicollinearity detected (max VIF > 10). Consider removing or combining features.
-Warning: High multicollinearity detected (max VIF > 10). Consider removing or combining features.
-
-Full covariance matrix shape: torch.Size([300, 300])
-Block M1: min eigenvalue = 4.08e-16 -> SINGULAR
-Block M2: min eigenvalue = 6.54e-16 -> SINGULAR
-Block Y: min eigenvalue = 2.77e-16 -> SINGULAR
-Block M1+M2: min eigenvalue = -2.93e-15 -> SINGULAR
-Block M1+Y: min eigenvalue = -2.42e-15 -> SINGULAR
-Block M2+Y: min eigenvalue = -1.63e-15 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -2.86e-15 -> SINGULAR
-Warning: Singularity detected in the Q,P or R matrices.
-
-Covariance matrix shape: torch.Size([300, 300])
-dim_m1: 100, dim_m2: 100, dim_t: 100
-
-Idep PID results:
-- red: 0.0000
-- unq0: 158.3699
-- unq1: -0.0073
-- syn: 33.2143
+Covariance matrix shape: torch.Size([600, 600])
+dim_m1: 200, dim_m2: 200, dim_t: 200
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.9805 | I(T;M1): 158.3699
-M2 R² (VP): -0.0103 | I(T;M2): -0.0073
-Both M1 and M2 R² (VP): 0.9896 | I(T;M1,M2): 191.5769
+M1 R² (VP): 0.0428 | I(T;M1): 7.0975
+M2 R² (VP): -0.0201 | I(T;M2): 0.0112
+Both M1 and M2 R² (VP): 0.0255 | I(T;M1,M2): 12.2932
 
-Unique to M1 (VP): 0.9999 | Unique(T;M1\M2): 158.3699
-Unique to M2 (VP): 0.0091 | Unique(T;M2\M1): -0.0073
-Common (VP): -0.0194 | Redundant (PID): 0.0000
-Synergy (PID): 33.2143
+Unique to M1 (VP): 0.0456 | Unique(T;M1\M2): 7.0975
+Unique to M2 (VP): -0.0173 | Unique(T;M2\M1): 0.0112
+Common (VP): -0.0028 | Redundant (PID): 0.0000
+Synergy (PID): 5.1845
 
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
-
-======================================================================
-Experiment 6: snr = 10 univariate gaussian with different seeds
+No suppression effect detected for VP: One of the unique contributions is zero.
 
 ======================================================================
-Simple Example with RNG seed 43 and Noise seed 25
-======================================================================
-ridge_cv analysis of target (y_real):
-- R²_X1: 0.9805
-- R²_X2: -0.0105
-- R²_X12: 0.9896
-- unique_X1: 1.0001
-- unique_X2: 0.0091
-- common: -0.0196
-- unexplained: 0.0104
+Experiment 6: snr = 10 multivariate gaussian with different seeds
 
-===== VIF Summary =====
-Max VIF: 21.236227938888078
-Mean VIF: 9.7787089191007
-Median VIF: 9.497135357387801
-Num > 10: 43
-Min eigenvalue (corr): 0.009950090074748707
-Condition number (corr): 384.53881148169603
+Full covariance matrix shape: torch.Size([600, 600])
 
-===== VIF Summary =====
-Max VIF: 20.531531299933192
-Mean VIF: 9.805365482007048
-Median VIF: 9.544526714136996
-Num > 10: 44
-Min eigenvalue (corr): 0.009580198795977893
-Condition number (corr): 399.36181773290906
-
-===== VIF Summary =====
-Max VIF: 1.0179680285242199
-Mean VIF: 1.0123853535780973
-Median VIF: 1.012361336913728
-Num > 10: 0
-Min eigenvalue (corr): 0.7896520487796381
-Condition number (corr): 1.546638424267275
-Warning: High multicollinearity detected (max VIF > 10). Consider removing or combining features.
-Warning: High multicollinearity detected (max VIF > 10). Consider removing or combining features.
-
-Full covariance matrix shape: torch.Size([300, 300])
-Block M1: min eigenvalue = -1.11e-16 -> SINGULAR
-Block M2: min eigenvalue = 2.05e-16 -> SINGULAR
-Block Y: min eigenvalue = 1.85e-16 -> SINGULAR
-Block M1+M2: min eigenvalue = -2.26e-15 -> SINGULAR
-Block M1+Y: min eigenvalue = -2.88e-15 -> SINGULAR
-Block M2+Y: min eigenvalue = -1.63e-15 -> SINGULAR
-Block M1+M2+Y: min eigenvalue = -3.58e-15 -> SINGULAR
-Warning: Singularity detected in the Q,P or R matrices.
-
-Covariance matrix shape: torch.Size([300, 300])
-dim_m1: 100, dim_m2: 100, dim_t: 100
-
-Idep PID results:
-- red: 0.0000
-- unq0: 157.6965
-- unq1: -0.0124
-- syn: 32.9835
+Covariance matrix shape: torch.Size([600, 600])
+dim_m1: 200, dim_m2: 200, dim_t: 200
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.9805 | I(T;M1): 157.6965
-M2 R² (VP): -0.0105 | I(T;M2): -0.0124
-Both M1 and M2 R² (VP): 0.9896 | I(T;M1,M2): 190.6676
+M1 R² (VP): 0.0445 | I(T;M1): 6.9954
+M2 R² (VP): -0.0199 | I(T;M2): 0.0354
+Both M1 and M2 R² (VP): 0.0278 | I(T;M1,M2): 12.2474
 
-Unique to M1 (VP): 1.0001 | Unique(T;M1\M2): 157.6965
-Unique to M2 (VP): 0.0091 | Unique(T;M2\M1): -0.0124
-Common (VP): -0.0196 | Redundant (PID): 0.0000
-Synergy (PID): 32.9835
+Unique to M1 (VP): 0.0478 | Unique(T;M1\M2): 6.9954
+Unique to M2 (VP): -0.0166 | Unique(T;M2\M1): 0.0354
+Common (VP): -0.0033 | Redundant (PID): 0.0000
+Synergy (PID): 5.2166
 
-Suppression effect detected: M2 is a suppressor variable.❗❗❗
+No suppression effect detected for VP: One of the unique contributions is zero.
 
 All experiments completed.
