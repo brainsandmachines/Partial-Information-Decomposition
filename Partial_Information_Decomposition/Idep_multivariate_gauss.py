@@ -208,7 +208,7 @@ class Idep_multivariate_gauss:
 
         return self.constraint_cov_dict
     
-    def compute_Idep(self,unique:list = [0,1])-> dict:
+    def compute_Idep(self,unique:list = [1,2])-> dict:
         """This function calcualtes the mutual information for a given covariance matrix - U models in the lattice"""
         assert hasattr(self, "constraint_cov_dict"), "Run dependency_matrix(...) before compute_Idep(...)."
         
@@ -220,7 +220,7 @@ class Idep_multivariate_gauss:
         self.r_correction = (self.bm2 + self.bt - self.br) 
         self.i_m2_t = 0.5*self.log_base(1/(self.r_det)) + self.r_correction
         
-        if 0 in unique:
+        if 1 in unique:
             # calculate b and d both equal to I(M0;T)
             b = self.i_m1_t 
             d = self.i_m1_t 
@@ -241,11 +241,11 @@ class Idep_multivariate_gauss:
 
 
             unique_0 = torch.min(torch.stack([b,d,i,k]))
-            self.I_dep_values['unique_0'] = unique_0.item()
+            self.I_dep_values['unique_1'] = unique_0.item()
 
 
 
-        if 1 in unique:
+        if 2 in unique:
             # calculate c and f both equal to I(M1;T)
             c = self.i_m2_t 
             f = self.i_m2_t  
@@ -258,7 +258,7 @@ class Idep_multivariate_gauss:
             mat = self.constraint_cov_dict['c_model_8']
             j = 0.5*self.log_base(nume8/deno8) - self.i_m1_t
             unique_1 = torch.min(torch.stack([c,f,h,j]))
-            self.I_dep_values['unique_1'] = unique_1.item()
+            self.I_dep_values['unique_2'] = unique_1.item()
 
 
         #Check for nan values
@@ -266,28 +266,28 @@ class Idep_multivariate_gauss:
         assert not torch.isnan(unique_1), f"unique_1 = {unique_1} was not calculated properly."  
         return self.I_dep_values
     
-    def pid_values(self,unique_0, unique_1):
+    def pid_values(self,unique_1, unique_2):
         """This function will compute the PID values using the I_dep values
         input: unique_0, unique_1 are the unique informations for source 0 and source 1
         output: a dictionary with the PID values
-        keys: 'red', 'unq0', 'unq1', 'syn'"""
-        i_m0_t = self.i_m1_t if self.i_m1_t is not None else 0.5*self.log_base(1/(self.q_det))
-        i_m1_t = self.i_m2_t if self.i_m2_t is not None else 0.5*self.log_base(1/(self.r_det))
+        keys: 'red', 'unq1', 'unq2', 'syn'"""
+        i_m1_t = self.i_m1_t if self.i_m1_t is not None else 0.5*self.log_base(1/(self.q_det))
+        i_m2_t = self.i_m2_t if self.i_m2_t is not None else 0.5*self.log_base(1/(self.r_det))
         
-        self.i_m0_m1_t = 0.5*self.log_base((self.I1 - self.P.T @ self.P).det()/(self.constraint_cov_dict['c_model_8']).det()) 
+        self.i_m1_m2_t = 0.5*self.log_base((self.I1 - self.P.T @ self.P).det()/(self.constraint_cov_dict['c_model_8']).det()) 
         # Redundant information
-        red0 = i_m0_t - unique_0
-        red1 = i_m1_t - unique_1
+        red0 = i_m1_t - unique_1
+        red1 = i_m2_t - unique_2
         assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
         # Synergistic information
-        syn = self.i_m0_m1_t - i_m1_t - unique_0
+        syn = self.i_m1_m2_t - i_m1_t - unique_2
         assert not torch.isnan(red), f"Redundant={red} information not calculated properly."
         assert not torch.isnan(syn), f"Synergistic={syn} information not calculated properly."
         self.PID_values = {
             'red': red.item(),
-            'unq0': unique_0,
             'unq1': unique_1,
+            'unq2': unique_2,
             'syn': syn.item()
         }
         return self.PID_values
@@ -308,9 +308,9 @@ class Idep_multivariate_gauss:
             'c_model_5','c_model_6','c_model_7','c_model_8'
         ],cov_matrix=cov_matrix)
 
-        idep_values = self.compute_Idep(unique=[0,1])
-        pid = self.pid_values(idep_values['unique_0'], idep_values['unique_1'])
-        mi = {'I(M0;T)': self.i_m1_t.item(), 'I(M1;T)': self.i_m2_t.item(), 'I(M0,M1;T)': self.i_m0_m1_t.item()}
+        idep_values = self.compute_Idep(unique=[1,2])
+        pid = self.pid_values(idep_values['unique_1'], idep_values['unique_2'])
+        mi = {'I(M1;T)': self.i_m1_t.item(), 'I(M2;T)': self.i_m2_t.item(), 'I(M1,M2;T)': self.i_m1_m2_t.item()}
         return pid , mi
     
     
@@ -380,16 +380,16 @@ def main():
     # (rounded to 4 decimals in the paper table)
     examples = [
         # (n0,n1,n2, p,q,r, expected Idep row)
-        ((3,4,3), (-0.15, 0.15, 0.15), {"unq0":0.1227, "unq1":0.1865, "red":0.0406, "syn":2.4772}),
-        ((4,4,2), (-0.2, -0.2, 0.3),   {"unq0":0.0893, "unq1":0.7293, "red":0.1889, "syn":0.0087}),
-        ((4,2,4), (-0.1, 0.15, -0.2),  {"unq0":0.2336, "unq1":0.1899, "red":0.0883, "syn":0.0345}),
+        ((3,4,3), (-0.15, 0.15, 0.15), {"unq1":0.1227, "unq2":0.1865, "red":0.0406, "syn":2.4772}),
+        ((4,4,2), (-0.2, -0.2, 0.3),   {"unq1":0.0893, "unq2":0.7293, "red":0.1889, "syn":0.0087}),
+        ((4,2,4), (-0.1, 0.15, -0.2),  {"unq1":0.2336, "unq2":0.1899, "red":0.0883, "syn":0.0345}),
     ]
 
     for (n0,n1,n2), (p,q,r), expected in examples:
         got,_ = run_one(n0,n1,n2,p,q,r)
         got_fmt = {
-            "unq0": got["unq0"],
             "unq1": got["unq1"],
+            "unq2": got["unq2"],
             "red":  got["red"],
             "syn":  got["syn"],
         }

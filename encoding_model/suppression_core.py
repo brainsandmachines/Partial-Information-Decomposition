@@ -133,9 +133,8 @@ def create_supression_model(rng,signal,suppresion_method, features, suppression_
     noise_X2 = 0 #0.001 * rng.standard_normal(features.shape)
 
     X_M1, X_M2 = permutate_models(rng,features,suppression_strength)
-    X_M1 = X_M1 + noise_X1
-    X_M2 = X_M2 + noise_X2
-        
+    X_M1 = X_M1 
+    X_M2 = X_M2         
     if mixing_dimension is not None:
         # Create mixed features: entangle real and spurious with a mixing matrix
         mixing_matrix_M1 = rng.standard_normal((X_M1.shape[1], mixing_dimension))
@@ -175,11 +174,11 @@ def commonality_analysis(features_A, features_B, target, method='standard', alph
     unexplained = (1 - r2_AB)
     
     return {
-        'R²_A': r2_A,
-        'R²_B': r2_B,
-        'R²_AB': r2_AB,
-        'unique_A': unique_A,
-        'unique_B': unique_B,
+        'R²_X1': r2_A,
+        'R²_X2': r2_B,
+        'R²_X12': r2_AB,
+        'unique_X1': unique_A,
+        'unique_X2': unique_B,
         'common': common_AB,
         'unexplained': unexplained
     }

@@ -181,7 +181,6 @@ def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
     plt.title(title, fontsize=20)
     plt.grid(True, alpha=0.3, linestyle='--', linewidth=0.5, axis='y')
     plt.tight_layout()
-    #plt.show()
     plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/figures_/{title}_{sub_title}.pdf", transparent=True)
 
 

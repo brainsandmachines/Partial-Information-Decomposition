@@ -20,35 +20,40 @@ Validation stimulus images: 0
 
  Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib
 
-Encoder's features shape:  (7000, 1)
+Running seed 0 (1/2)...
 
-Creating predictions from encoder...
-Predictions created.
-Predicted fMRI shape (LH):  (7000, 574)
-Creating suppression model...
+Done calculating commonality analysis.
 
-===== Eigenvalue Summary =====
-Min eigenvalue: -2.0599841277224584e-18
-Max eigenvalue: 0.23945428337457472
-Eigenvalue ratio (max/min): -1.1624083902011326e+17
-Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.06e-18
+Full covariance matrix shape: torch.Size([774, 774])
 
-Full covariance matrix shape: torch.Size([576, 576])
-Block 0: min eigenvalue = 0.00e+00 -> SINGULAR
-Block 0: min eigenvalue = 0.00e+00 -> SINGULAR
+Covariance matrix shape: torch.Size([774, 774])
+dim_m1: 100, dim_m2: 100, dim_t: 574
 
-Covariance matrix shape: torch.Size([576, 576])
-dim_m1: 1, dim_m2: 1, dim_t: 574
-Traceback (most recent call last):
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Examples/both_unique.py", line 9, in <module>
-    from supression_effect.encoding import X_M1
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/encoding.py", line 68, in <module>
-    pid,mi = idep_class.idep()
-             ^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_multivariate_gauss.py", line 313, in idep
-    idep_values = self.compute_Idep(unique=[0,1])
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_multivariate_gauss.py", line 265, in compute_Idep
-    assert not torch.isnan(unique_0), f"unique_0 = {unique_0} was not calculated properly."
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: unique_0 = nan was not calculated properly.
+Running seed 1 (2/2)...
+
+Done calculating commonality analysis.
+
+Full covariance matrix shape: torch.Size([774, 774])
+
+Covariance matrix shape: torch.Size([774, 774])
+dim_m1: 100, dim_m2: 100, dim_t: 574
+
+======================================================================
+CA + PID component summary across 2 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.075123, std=0.001960
+CA_R²_X2: mean=-0.007326, std=0.000738
+CA_R²_X12: mean=0.080167, std=0.002155
+CA_unique_X1: mean=0.087493, std=0.002893
+CA_unique_X2: mean=0.005044, std=0.000196
+CA_common: mean=-0.012370, std=0.000933
+CA_unexplained: mean=0.919833, std=0.002155
+PID_red: mean=0.000000, std=0.000000
+PID_unq1: mean=2.338130, std=0.039310
+PID_unq2: mean=-0.005499, std=0.007152
+PID_syn: mean=9.249197, std=0.035496
+I(M1;T): mean=2.338130, std=0.039310
+I(M2;T): mean=-0.005499, std=0.007152
+I(M1,M2;T): mean=11.581828, std=0.010965
+
+Saved summary to: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/test_runs/seed_summary_20260225_230016.csv
