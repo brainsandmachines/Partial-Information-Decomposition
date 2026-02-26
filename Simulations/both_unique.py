@@ -31,16 +31,24 @@ def half_permute(rng,features,snr=10):
 
     return X_M1, X_M2
 
-def orthogonal_vectors(rng, n, p,features,noise=None,singal=None,unique_ratio=None):
+def orthogonal_vectors(rng, n, p,features,noise=None,singal=None,unique_ratio=None,function=None):
     d = int(p*unique_ratio)
 
     z1 = features[:,:d]
     z2 = features[:,d:]
 
+
+    if function is not None:
+        z1 = function(z1)
+        z2 = function(z2)
     q,_ = np.linalg.qr(rng.standard_normal((p, p)))
 
     A = q[:,:d]
     B = q[:,d:]
+    
+    X_M1 = z1 @ A.T
+    X_M2 = z2 @ B.T
+    
 
     #Make targets: 
     q_noise,_ = np.linalg.qr(rng.standard_normal((p, p)))
@@ -49,8 +57,6 @@ def orthogonal_vectors(rng, n, p,features,noise=None,singal=None,unique_ratio=No
     
     target = np.hstack([z1 @ W1.T, z2 @ W2.T])
 
-    X_M1 = z1 @ A.T
-    X_M2 = z2 @ B.T
 
     #Make orthogonal noise:
     if noise is  not None: 
@@ -121,7 +127,7 @@ def test_both_unique(rng, unique_ratio, n=1024, p=100, snr=10.0, method='standar
 
 def main():
     rng = np.random.default_rng(seed=42)
-    unique_ratio = 0.8
+    unique_ratio = 0.5
     ca_results, pid_results, mi_results = test_both_unique(rng, unique_ratio, n=10000, p=100, snr=1, method='ridge_cv')
     compare_results(ca_results, pid_results,mi_results)
 

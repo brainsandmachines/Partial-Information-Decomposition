@@ -32,17 +32,20 @@ def get_run_config() -> dict:
         "n_s": 7000,
         "n_f": 500,
         "rng_seed": np.random.default_rng(seed=30),
-        "n_seeds": 2,
+        "n_seeds": 10000,
         "seed_start": 0,
-        "snr": 1,
-        "mixing_dimension": 100,
-        "suppression_strength": 0.8,
+        "snr": 10,
+        "mixing_dimension": 50,
+        "suppression_strength": 0.5,
         "suppression_method": "permutate",
         "path_to_load": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib",
         "fmri_dict_path": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts/subj1_fmri_dicts.joblib",
         "roi_name": "FBA-1",
-        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/test_runs",
+        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding",
         "results_prefix": "seed_summary",
+        "all_runs_results_prefix": "seed_runs",
+        "progress_print_every": 100,
+        "test_name": 'FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 
@@ -156,15 +159,52 @@ def summarize_seed_results(results: list[dict]) -> dict:
     return summary
 
 
-def run_multi_seed_experiment(config: dict) -> dict:
+def save_all_seed_runs_results(seed_rows: list[dict], config: dict) -> Path:
+    results_dir = Path(config["results_dir"])
+    results_dir.mkdir(parents=True, exist_ok=True)
+
+    test_name = datetime.now().strftime("%Y%m%d_%H%M%S") if config.get("test_name") is None else config["test_name"]
+    prefix = config.get("all_runs_results_prefix", "seed_runs")
+    file_path = results_dir / f"{prefix}_{test_name}.csv"
+
+    config_to_save = dict(config)
+    config_to_save["rng_seed"] = str(config_to_save.get("rng_seed"))
+    config_json = json.dumps(config_to_save, sort_keys=True)
+
+    if not seed_rows:
+        metric_names = []
+    else:
+        metric_names = []
+        for row in seed_rows:
+            for key in row.keys():
+                if key != "seed" and key not in metric_names:
+                    metric_names.append(key)
+
+    header = ["seed", *metric_names]
+
+    with open(file_path, "w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["config_json", config_json])
+        writer.writerow([])
+        writer.writerow(header)
+        for row in seed_rows:
+            writer.writerow([row.get(column, "") for column in header])
+
+    return file_path
+
+
+def run_multi_seed_experiment(config: dict) -> tuple[dict, list[dict]]:
     real_features, fmri_dict = load_model_and_fmri(config)
     all_component_results = []
+    seed_rows = []
 
     seed_start = config["seed_start"]
     n_seeds = config["n_seeds"]
+    progress_print_every = config.get("progress_print_every", 100)
 
     for seed in range(seed_start, seed_start + n_seeds):
-        print(f"\nRunning seed {seed} ({seed - seed_start + 1}/{n_seeds})...")
+        completed_runs = seed - seed_start + 1
+        print(f"\nRunning seed {seed} ({completed_runs}/{n_seeds})...")
         run_config = dict(config)
         run_config["rng_seed"] = np.random.default_rng(seed=seed)
 
@@ -175,9 +215,18 @@ def run_multi_seed_experiment(config: dict) -> dict:
             encoder,
             verbose=False,
         )
-        all_component_results.append(extract_all_components(ca_results, pid_results, mi_results))
+        single_run_results = extract_all_components(ca_results, pid_results, mi_results)
+        all_component_results.append(single_run_results)
+        row = {"seed": seed}
+        row.update(single_run_results)
+        seed_rows.append(row)
 
-    return summarize_seed_results(all_component_results)
+        if progress_print_every > 0 and completed_runs % progress_print_every == 0:
+            running_summary = summarize_seed_results(all_component_results)
+            print(f"\nIntermediate summary after {completed_runs} runs:")
+            print_seed_summary(running_summary, completed_runs, seed_start)
+
+    return summarize_seed_results(all_component_results), seed_rows
 
 
 def print_seed_summary(summary: dict, n_seeds: int, seed_start: int) -> None:
@@ -192,8 +241,8 @@ def save_seed_summary(summary: dict, config: dict) -> Path:
     results_dir = Path(config["results_dir"])
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_path = results_dir / f"{config['results_prefix']}_{timestamp}.csv"
+    test_name = datetime.now().strftime("%Y%m%d_%H%M%S") if config.get("test_name") is None else config["test_name"]
+    file_path = results_dir / f"{config['results_prefix']}_{test_name}.csv"
 
     config_to_save = dict(config)
     config_to_save["rng_seed"] = str(config_to_save.get("rng_seed"))
@@ -230,9 +279,11 @@ def print_results(outputs: dict, mi: dict, pid: dict) -> None:
 
 def main() -> None:
     config = get_run_config()
-    summary = run_multi_seed_experiment(config)
+    summary, seed_rows = run_multi_seed_experiment(config)
     print_seed_summary(summary, config["n_seeds"], config["seed_start"])
+    all_runs_path = save_all_seed_runs_results(seed_rows, config)
     saved_path = save_seed_summary(summary, config)
+    print(f"\nSaved all seed run results to: {all_runs_path}")
     print(f"\nSaved summary to: {saved_path}")
 
 

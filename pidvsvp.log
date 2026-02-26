@@ -1,140 +1,128 @@
 
 ======================================================================
-Experiment 1: snr = 2
+Experiment 1: snr = 1
 
-Full covariance matrix shape: torch.Size([600, 600])
+Full covariance matrix shape: torch.Size([240, 240])
 
-Covariance matrix shape: torch.Size([600, 600])
-dim_m1: 200, dim_m2: 200, dim_t: 200
-
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): -0.0253 | I(T;M1): 0.0290
-M2 R² (VP): -0.0200 | I(T;M2): 0.0187
-Both M1 and M2 R² (VP): -0.0460 | I(T;M1,M2): 5.2455
-
-Unique to M1 (VP): -0.0259 | Unique(T;M1\M2): 0.0290
-Unique to M2 (VP): -0.0207 | Unique(T;M2\M1): 0.0187
-Common (VP): 0.0006 | Redundant (PID): 0.0000
-Synergy (PID): 5.1977
-
-No suppression effect detected for VP: One of the unique contributions is zero.
-
-======================================================================
-Experiment 2: snr = 2 multivariate gaussian with different seeds
-
-Full covariance matrix shape: torch.Size([600, 600])
-
-Covariance matrix shape: torch.Size([600, 600])
-dim_m1: 200, dim_m2: 200, dim_t: 200
+Covariance matrix shape: torch.Size([240, 240])
+dim_m1: 70, dim_m2: 70, dim_t: 100
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): -0.0223 | I(T;M1): 0.2317
-M2 R² (VP): -0.0199 | I(T;M2): 0.0339
-Both M1 and M2 R² (VP): -0.0428 | I(T;M1,M2): 5.4611
+M1 R² (VP): 0.1656 | I(T;M1): 8.5226
+M2 R² (VP): -0.0092 | I(T;M2): -0.0128
+Both M1 and M2 R² (VP): 0.2123 | I(T;M1,M2): 12.5938
 
-Unique to M1 (VP): -0.0229 | Unique(T;M1\M2): 0.2317
-Unique to M2 (VP): -0.0205 | Unique(T;M2\M1): 0.0339
-Common (VP): 0.0006 | Redundant (PID): 0.0000
-Synergy (PID): 5.1955
+Unique to M1 (VP): 0.2215 | Unique(T;M1\M2): 8.5226
+Unique to M2 (VP): 0.0467 | Unique(T;M2\M1): -0.0128
+Common (VP): -0.0559 | Redundant (PID): 0.0000
+Synergy (PID): 4.0839
 
-No suppression effect detected for VP: One of the unique contributions is zero.
+======================================================================
+Experiment 2: snr = 1 multivariate gaussian with different seeds
+
+Full covariance matrix shape: torch.Size([240, 240])
+
+Covariance matrix shape: torch.Size([240, 240])
+dim_m1: 70, dim_m2: 70, dim_t: 100
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.1678 | I(T;M1): 8.5747
+M2 R² (VP): -0.0089 | I(T;M2): 0.0066
+Both M1 and M2 R² (VP): 0.2143 | I(T;M1,M2): 12.6602
+
+Unique to M1 (VP): 0.2232 | Unique(T;M1\M2): 8.5747
+Unique to M2 (VP): 0.0465 | Unique(T;M2\M1): 0.0066
+Common (VP): -0.0554 | Redundant (PID): 0.0000
+Synergy (PID): 4.0789
 
 ======================================================================
 Experiment 3: snr = 5
 
-Full covariance matrix shape: torch.Size([600, 600])
+Full covariance matrix shape: torch.Size([240, 240])
 
-Covariance matrix shape: torch.Size([600, 600])
-dim_m1: 200, dim_m2: 200, dim_t: 200
+Covariance matrix shape: torch.Size([240, 240])
+dim_m1: 70, dim_m2: 70, dim_t: 100
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): -0.0034 | I(T;M1): 1.8951
-M2 R² (VP): -0.0201 | I(T;M2): 0.0117
-Both M1 and M2 R² (VP): -0.0231 | I(T;M1,M2): 7.0999
+M1 R² (VP): 0.3294 | I(T;M1): 29.8513
+M2 R² (VP): -0.0094 | I(T;M2): -0.0155
+Both M1 and M2 R² (VP): 0.4286 | I(T;M1,M2): 47.7109
 
-Unique to M1 (VP): -0.0031 | Unique(T;M1\M2): 1.8951
-Unique to M2 (VP): -0.0198 | Unique(T;M2\M1): 0.0117
-Common (VP): -0.0003 | Redundant (PID): 0.0000
-Synergy (PID): 5.1931
-
-No suppression effect detected for VP: One of the unique contributions is zero.
+Unique to M1 (VP): 0.4379 | Unique(T;M1\M2): 29.8513
+Unique to M2 (VP): 0.0992 | Unique(T;M2\M1): -0.0155
+Common (VP): -0.1085 | Redundant (PID): 0.0000
+Synergy (PID): 17.8751
 
 ======================================================================
 Experiment 4: snr = 5 multivariate gaussian with different seeds
 
-Full covariance matrix shape: torch.Size([600, 600])
+Full covariance matrix shape: torch.Size([240, 240])
 
-Covariance matrix shape: torch.Size([600, 600])
-dim_m1: 200, dim_m2: 200, dim_t: 200
+Covariance matrix shape: torch.Size([240, 240])
+dim_m1: 70, dim_m2: 70, dim_t: 100
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): -0.0032 | I(T;M1): 1.8562
-M2 R² (VP): -0.0200 | I(T;M2): 0.0329
-Both M1 and M2 R² (VP): -0.0231 | I(T;M1,M2): 7.0754
+M1 R² (VP): 0.3341 | I(T;M1): 29.3379
+M2 R² (VP): -0.0089 | I(T;M2): 0.0087
+Both M1 and M2 R² (VP): 0.4324 | I(T;M1,M2): 47.0982
 
-Unique to M1 (VP): -0.0031 | Unique(T;M1\M2): 1.8562
-Unique to M2 (VP): -0.0199 | Unique(T;M2\M1): 0.0329
-Common (VP): -0.0001 | Redundant (PID): 0.0000
-Synergy (PID): 5.1863
-
-No suppression effect detected for VP: One of the unique contributions is zero.
+Unique to M1 (VP): 0.4412 | Unique(T;M1\M2): 29.3379
+Unique to M2 (VP): 0.0983 | Unique(T;M2\M1): 0.0087
+Common (VP): -0.1071 | Redundant (PID): 0.0000
+Synergy (PID): 17.7517
 
 ======================================================================
 Experiment 5: snr = 10
 
-Full covariance matrix shape: torch.Size([600, 600])
+Full covariance matrix shape: torch.Size([240, 240])
 
-Covariance matrix shape: torch.Size([600, 600])
-dim_m1: 200, dim_m2: 200, dim_t: 200
+Covariance matrix shape: torch.Size([240, 240])
+dim_m1: 70, dim_m2: 70, dim_t: 100
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.0428 | I(T;M1): 7.0975
-M2 R² (VP): -0.0201 | I(T;M2): 0.0112
-Both M1 and M2 R² (VP): 0.0255 | I(T;M1,M2): 12.2932
+M1 R² (VP): 0.3398 | I(T;M1): 40.3496
+M2 R² (VP): -0.0094 | I(T;M2): -0.0132
+Both M1 and M2 R² (VP): 0.4423 | I(T;M1,M2): 68.6114
 
-Unique to M1 (VP): 0.0456 | Unique(T;M1\M2): 7.0975
-Unique to M2 (VP): -0.0173 | Unique(T;M2\M1): 0.0112
-Common (VP): -0.0028 | Redundant (PID): 0.0000
-Synergy (PID): 5.1845
-
-No suppression effect detected for VP: One of the unique contributions is zero.
+Unique to M1 (VP): 0.4517 | Unique(T;M1\M2): 40.3496
+Unique to M2 (VP): 0.1025 | Unique(T;M2\M1): -0.0132
+Common (VP): -0.1119 | Redundant (PID): 0.0000
+Synergy (PID): 28.2750
 
 ======================================================================
 Experiment 6: snr = 10 multivariate gaussian with different seeds
 
-Full covariance matrix shape: torch.Size([600, 600])
+Full covariance matrix shape: torch.Size([240, 240])
 
-Covariance matrix shape: torch.Size([600, 600])
-dim_m1: 200, dim_m2: 200, dim_t: 200
+Covariance matrix shape: torch.Size([240, 240])
+dim_m1: 70, dim_m2: 70, dim_t: 100
 
 ======================================================================
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.0445 | I(T;M1): 6.9954
-M2 R² (VP): -0.0199 | I(T;M2): 0.0354
-Both M1 and M2 R² (VP): 0.0278 | I(T;M1,M2): 12.2474
+M1 R² (VP): 0.3475 | I(T;M1): 41.6602
+M2 R² (VP): -0.0093 | I(T;M2): -0.0069
+Both M1 and M2 R² (VP): 0.4477 | I(T;M1,M2): 69.5944
 
-Unique to M1 (VP): 0.0478 | Unique(T;M1\M2): 6.9954
-Unique to M2 (VP): -0.0166 | Unique(T;M2\M1): 0.0354
-Common (VP): -0.0033 | Redundant (PID): 0.0000
-Synergy (PID): 5.2166
-
-No suppression effect detected for VP: One of the unique contributions is zero.
+Unique to M1 (VP): 0.4570 | Unique(T;M1\M2): 41.6602
+Unique to M2 (VP): 0.1002 | Unique(T;M2\M1): -0.0069
+Common (VP): -0.1095 | Redundant (PID): 0.0000
+Synergy (PID): 27.9411
 
 All experiments completed.

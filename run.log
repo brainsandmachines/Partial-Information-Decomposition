@@ -1,59 +1,12 @@
-Loading data for subject: 1
-Data directory: /mnt/data4tb/data_algonauts/
-Parent submission directory: /mnt/data4tb/data_algonauts/submissions
-LH training fMRI data shape:
-(9841, 19004)
-(Training stimulus images × LH vertices)
-
-RH training fMRI data shape:
-(9841, 20544)
-(Training stimulus images × RH vertices)
-Training images: 9841
-Test images: 159
-Training image file name: train-0001_nsd-00013.png
-73k NSD images ID: 00013
-
-Test stimulus images: 159
-Training stimulus images: 9841
-
-Validation stimulus images: 0
-
- Trained model loaded from: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib
-
-Running seed 0 (1/2)...
-
-Done calculating commonality analysis.
-
-Full covariance matrix shape: torch.Size([774, 774])
-
-Covariance matrix shape: torch.Size([774, 774])
-dim_m1: 100, dim_m2: 100, dim_t: 574
-
-Running seed 1 (2/2)...
-
-Done calculating commonality analysis.
-
-Full covariance matrix shape: torch.Size([774, 774])
-
-Covariance matrix shape: torch.Size([774, 774])
-dim_m1: 100, dim_m2: 100, dim_t: 574
-
-======================================================================
-CA + PID component summary across 2 seeds (start=0)
-======================================================================
-CA_R²_X1: mean=0.075123, std=0.001960
-CA_R²_X2: mean=-0.007326, std=0.000738
-CA_R²_X12: mean=0.080167, std=0.002155
-CA_unique_X1: mean=0.087493, std=0.002893
-CA_unique_X2: mean=0.005044, std=0.000196
-CA_common: mean=-0.012370, std=0.000933
-CA_unexplained: mean=0.919833, std=0.002155
-PID_red: mean=0.000000, std=0.000000
-PID_unq1: mean=2.338130, std=0.039310
-PID_unq2: mean=-0.005499, std=0.007152
-PID_syn: mean=9.249197, std=0.035496
-I(M1;T): mean=2.338130, std=0.039310
-I(M2;T): mean=-0.005499, std=0.007152
-I(M1,M2;T): mean=11.581828, std=0.010965
-
-Saved summary to: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/test_runs/seed_summary_20260225_230016.csv
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/encoding.py", line 19, in <module>
+    from encoding_model.suppresion_model import train_save_or_load   
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/suppresion_model.py", line 39, in <module>
+    output_dict, data_dict = load_data_algonauts(paths_dict={'data_dir': data_dir, 'parent_submission_dir': parent_submission_dir}, args=args, subj=subj)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/algoanut_data.py", line 65, in load_data_algonauts
+    print("Loading data for subject:", subj)
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/utils.py", line 68, in write
+    f.flush()
+KeyboardInterrupt

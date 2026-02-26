@@ -247,7 +247,7 @@ def run_experiment(rng,suppresion_strength,simple_example = False, n=1024, p=100
         X_M2 = common_noise
     else:
         X_M1, X_M2 = permutate_models(rng, real_features, suppression_strength=suppresion_strength)
-        X_M1 += noise_Xm1
+        #X_M1 += noise_Xm1
 
     # else: 
     #     X_M1, X_M2 = half_permute(rng, signal, suppression_strength=0.3)

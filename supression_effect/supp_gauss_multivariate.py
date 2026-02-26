@@ -184,7 +184,7 @@ def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
     plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/figures_/{title}_{sub_title}.pdf", transparent=True)
 
 
-def compare_results(vp_results,pid_results):
+def compare_results(vp_results,pid_results,mi_results):
     """Compare Variance Partitioning and Partial Information Decomposition results.
     Parameters
     ----------
@@ -192,6 +192,8 @@ def compare_results(vp_results,pid_results):
         Results from variance partitioning.
     pid_results : dict
         Results from Partial Information Decomposition.
+    mi_results : dict
+        Mutual information results from PID.
 
     Returns
     -------
@@ -201,16 +203,16 @@ def compare_results(vp_results,pid_results):
     print("Comparison of Variance Partitioning and PID Results")
     print("="*70)
     print("Results:")
-    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {pid_results['unq0'] + pid_results['red'] :.4f}")
-    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {pid_results['unq1'] + pid_results['red'] :.4f}")
-    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {pid_results['unq0'] + pid_results['unq1'] + pid_results['red'] + pid_results['syn']:.4f}")
-    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq0']:.4f}")
-    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq1']:.4f}")
+    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_results['I(M1;T)']:.4f}")
+    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_results['I(M2;T)']:.4f}")
+    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_results['I(M1,M2;T)']:.4f}")
+    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq1']:.4f}")
+    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq2']:.4f}")
     print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
     print(f"Synergy (PID): {pid_results['syn']:.4f}")
 
     
-    check_supression_effect(vp_results,pid_results)
+    #check_supression_effect(vp_results,pid_results)
         
 
 
@@ -218,46 +220,46 @@ def compare_results(vp_results,pid_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 8000, 200
+    N, P = 8000, 100
     rng_seed = 10
-    snr = 2
+    snr = 1
     method = 'ridge_cv'
-    mixing_dimension = None
+    mixing_dimension = 70
     simple_example = False
-    suppresion_strength = 0.8
+    suppresion_strength = 0.5
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
     vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed, simple_example=simple_example, snr=1, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    compare_results(vp_results, pid_results, mi_results)
     #plot_pid_results(pid_results=pid_results, sub_title="Experiment 2")
     #plot_pid_results(mi_results=mi_results, sub_title="Experiment 2")
 
     print("\n" + "="*70)
     print(f"Experiment 2: snr = {snr} multivariate gaussian with different seeds")
     vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 5
     print(f"Experiment 3: snr = {snr}")
     vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     print(f"Experiment 4: snr = {snr} multivariate gaussian with different seeds")
     vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 10
     print(f"Experiment 5: snr = {snr}")
     vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     print(f"Experiment 6: snr = {snr} multivariate gaussian with different seeds")
     vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+1, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
-    compare_results(vp_results, pid_results)
+    compare_results(vp_results, pid_results, mi_results)
 
     print("\nAll experiments completed.")
 
