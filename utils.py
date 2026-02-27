@@ -6,6 +6,13 @@ from nilearn import datasets, plotting
 from PIL import Image
 from pathlib import Path
 import pandas as pd
+import csv
+import json
+import hashlib
+from typing import Callable
+
+
+RUN_SIGNATURE_COLUMN = "__run_signature__"
 
 
 def check_file_exists(file_path):
@@ -125,5 +132,256 @@ def meta_exists(meta_data: dict, csv_path) -> bool:
             return True
     else:
         return False
+
+
+def _to_float_or_none(value):
+    if isinstance(value, (int, float, np.number)):
+        return float(value)
+    if isinstance(value, torch.Tensor) and value.numel() == 1:
+        return float(value.item())
+    return None
+
+
+def extract_all_components(ca_results: dict, pid_results: dict, mi_results: dict) -> dict:
+    combined = {}
+
+    for key, value in ca_results.items():
+        numeric_value = _to_float_or_none(value)
+        if numeric_value is not None:
+            combined[f"CA_{key}"] = numeric_value
+
+    for key, value in pid_results.items():
+        numeric_value = _to_float_or_none(value)
+        if numeric_value is not None:
+            combined[f"PID_{key}"] = numeric_value
+
+    for key, value in mi_results.items():
+        numeric_value = _to_float_or_none(value)
+        if numeric_value is not None:
+            combined[f"{key}"] = numeric_value
+
+    return combined
+
+
+def summarize_seed_results(results: list[dict]) -> dict:
+    if not results:
+        return {}
+
+    metric_names = results[0].keys()
+    summary = {}
+    for metric in metric_names:
+        values = np.array([row[metric] for row in results], dtype=float)
+        summary[metric] = {
+            "mean": float(np.mean(values)),
+            "std": float(np.std(values, ddof=1)) if len(values) > 1 else 0.0,
+        }
+    return summary
+
+
+def print_seed_summary(summary: dict, n_seeds: int, seed_start: int) -> None:
+    print("\n" + "=" * 70)
+    print(f"CA + PID component summary across {n_seeds} seeds (start={seed_start})")
+    print("=" * 70)
+    for metric, stats in summary.items():
+        print(f"{metric}: mean={stats['mean']:.6f}, std={stats['std']:.6f}")
+
+
+def _normalize_config_value(value):
+    if isinstance(value, np.random.Generator):
+        return "np.random.Generator"
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (np.integer, np.floating)):
+        return float(value)
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    return value
+
+
+def get_experiment_name(config: dict) -> str:
+    explicit_name = config.get("test_name")
+    if explicit_name is not None:
+        return explicit_name
+
+    normalized = {
+        key: _normalize_config_value(value)
+        for key, value in sorted(config.items(), key=lambda item: item[0])
+    }
+    config_blob = json.dumps(normalized, sort_keys=True, default=str)
+    digest = hashlib.sha1(config_blob.encode("utf-8")).hexdigest()[:12]
+    return f"exp_{digest}"
+
+
+def _parse_csv_numeric(value: str):
+    if value is None:
+        return ""
+    stripped = value.strip()
+    if stripped == "":
+        return ""
+    try:
+        return float(stripped)
+    except ValueError:
+        return stripped
+
+
+def get_seed_runs_csv_path(config: dict) -> Path:
+    results_dir = Path(config["results_dir"])
+    results_dir.mkdir(parents=True, exist_ok=True)
+    prefix = config.get("all_runs_results_prefix", "seed_runs")
+    experiment_name = get_experiment_name(config)
+    return results_dir / f"{prefix}_{experiment_name}.csv"
+
+
+def get_seed_summary_csv_path(config: dict) -> Path:
+    results_dir = Path(config["results_dir"])
+    results_dir.mkdir(parents=True, exist_ok=True)
+    prefix = config.get("results_prefix", "seed_summary")
+    experiment_name = get_experiment_name(config)
+    return results_dir / f"{prefix}_{experiment_name}.csv"
+
+
+def load_seed_run_checkpoint(config: dict) -> tuple[Path, list[dict], list[str]]:
+    file_path = get_seed_runs_csv_path(config)
+    if not file_path.exists() or file_path.stat().st_size == 0:
+        return file_path, [], []
+
+    with open(file_path, "r", newline="", encoding="utf-8") as csv_file:
+        rows = list(csv.reader(csv_file))
+
+    header = []
+    data_start_index = None
+    for index, row in enumerate(rows):
+        if row and row[0] == "seed":
+            header = row
+            data_start_index = index + 1
+            break
+
+    if not header or data_start_index is None:
+        return file_path, [], []
+
+    seed_rows = []
+    for row in rows[data_start_index:]:
+        if not row:
+            continue
+        if len(row) < len(header):
+            row = row + [""] * (len(header) - len(row))
+        parsed = {column: _parse_csv_numeric(value) for column, value in zip(header, row)}
+        seed_value = parsed.get("seed")
+        if seed_value == "":
+            continue
+        parsed["seed"] = int(float(seed_value))
+        for key, value in list(parsed.items()):
+            if key == "seed":
+                continue
+            if isinstance(value, str) and value == "":
+                parsed.pop(key)
+        seed_rows.append(parsed)
+
+    metric_names = [
+        column
+        for column in header
+        if column not in {"seed", RUN_SIGNATURE_COLUMN}
+    ]
+    return file_path, seed_rows, metric_names
+
+
+def _ensure_seed_runs_header(file_path: Path, config: dict, metric_names: list[str]) -> None:
+    if file_path.exists() and file_path.stat().st_size > 0:
+        return
+
+    config_to_save = {
+        key: _normalize_config_value(value)
+        for key, value in dict(config).items()
+    }
+    config_json = json.dumps(config_to_save, sort_keys=True, default=str)
+    header = ["seed", *metric_names]
+
+    with open(file_path, "w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["config_json", config_json])
+        writer.writerow([])
+        writer.writerow(header)
+
+
+def append_seed_run_checkpoint(config: dict, row: dict, metric_names: list[str]) -> Path:
+    file_path = get_seed_runs_csv_path(config)
+    _ensure_seed_runs_header(file_path, config, metric_names)
+
+    header = ["seed", *metric_names]
+    with open(file_path, "a", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow([row.get(column, "") for column in header])
+
+    return file_path
+
+
+def save_seed_summary_csv(summary: dict, config: dict) -> Path:
+    file_path = get_seed_summary_csv_path(config)
+    config_to_save = {
+        key: _normalize_config_value(value)
+        for key, value in dict(config).items()
+    }
+    config_json = json.dumps(config_to_save, sort_keys=True, default=str)
+
+    with open(file_path, "w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["config_json", config_json])
+        writer.writerow([])
+        writer.writerow(["metric", "mean", "std"])
+        for metric, stats in summary.items():
+            writer.writerow([metric, stats["mean"], stats["std"]])
+
+    return file_path
+
+
+def run_multi_seed_experiment(
+    config: dict,
+    per_seed_runner: Callable[[int, dict], dict],
+) -> tuple[dict, list[dict]]:
+    all_seed_runs_path, seed_rows, metric_names = load_seed_run_checkpoint(config)
+    completed_seeds = {int(row["seed"]) for row in seed_rows}
+    all_component_results = [
+        {
+            key: value
+            for key, value in row.items()
+            if key not in {"seed", RUN_SIGNATURE_COLUMN}
+        }
+        for row in seed_rows
+    ]
+
+    seed_start = config["seed_start"]
+    n_seeds = config["n_seeds"]
+    progress_print_every = config.get("progress_print_every", 100)
+    target_seeds = set(range(seed_start, seed_start + n_seeds))
+    completed_target_runs = len(completed_seeds.intersection(target_seeds))
+
+    if seed_rows:
+        print(f"Loaded {len(completed_seeds)} completed seeds from: {all_seed_runs_path}")
+
+    for seed in range(seed_start, seed_start + n_seeds):
+        if seed in completed_seeds:
+            print(f"Skipping seed {seed} (already completed).")
+            continue
+
+        print(f"\nRunning seed {seed} ({completed_target_runs + 1}/{n_seeds})...")
+        single_run_results = per_seed_runner(seed, config)
+        all_component_results.append(single_run_results)
+
+        row = {"seed": seed}
+        row.update(single_run_results)
+        seed_rows.append(row)
+        completed_seeds.add(seed)
+        completed_target_runs += 1
+
+        if not metric_names:
+            metric_names = list(single_run_results.keys())
+        append_seed_run_checkpoint(config, row=row, metric_names=metric_names)
+
+        if progress_print_every > 0 and completed_target_runs % progress_print_every == 0:
+            running_summary = summarize_seed_results(all_component_results)
+            print(f"\nIntermediate summary after {completed_target_runs} runs:")
+            print_seed_summary(running_summary, completed_target_runs, seed_start)
+
+    return summarize_seed_results(all_component_results), seed_rows
             
 

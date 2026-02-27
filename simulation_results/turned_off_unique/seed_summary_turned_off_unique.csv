@@ -1,0 +1,17 @@
+config_json,"{""all_runs_results_prefix"": ""seed_runs"", ""method"": ""lasso_cv"", ""n_seeds"": 10000, ""progress_print_every"": 100, ""r_str"": 0.5, ""results_dir"": ""/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique"", ""results_prefix"": ""seed_summary"", ""run_mode"": ""single"", ""seed_start"": 0, ""single_seed"": 4, ""snr"": 10, ""test_name"": ""turned_off_unique"", ""u1_str"": 1, ""u2_str"": 0.07}"
+
+metric,mean,std
+CA_R²_X1,0.9862355170278481,0.0
+CA_R²_X2,0.20118469411326484,0.0
+CA_R²_X12,0.9863229827943505,0.0
+CA_unique_X1,0.7851382886810856,0.0
+CA_unique_X2,8.746576650242588e-05,0.0
+CA_common,0.20109722834676247,0.0
+CA_unexplained,0.013677017205649511,0.0
+PID_red,0.221164993996271,0.0
+PID_unq1,4.064570145783871,0.0
+PID_unq2,0.0034606003768251625,0.0
+PID_syn,0.003196513169159587,0.0
+I(M1;T),4.285735139780142,0.0
+I(M2;T),0.22462559437309587,0.0
+"I(M1,M2;T)",4.292392253326127,0.0

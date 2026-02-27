@@ -3,10 +3,11 @@ from sklearn.linear_model import RidgeCV, LinearRegression
 import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
-
+from sklearn.linear_model import MultiTaskLassoCV,LassoCV
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-
+from sklearn.linear_model import LassoCV
+from sklearn.multioutput import MultiOutputRegressor
 from encoding_model.encoding_utils import diagnostic_plots, singularity_report
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 
@@ -71,6 +72,23 @@ def compute_r2(X, y):
     model.fit(X, y)
     return model,model.score(X, y)
 
+def compute_lasso_cv_r2(X, y):
+
+    base_lasso = LassoCV(
+        n_alphas=100,
+        fit_intercept=True,
+        cv=5,
+        max_iter=5000
+    )
+
+    mo_lasso = MultiOutputRegressor(base_lasso)
+
+    mo_lasso.fit(X, y)
+
+    r2 = mo_lasso.score(X, y)
+
+    return mo_lasso, r2
+
 
 def commonality_analysis(features_A, features_B, target, method='standard', alphas=None):
     """
@@ -114,6 +132,8 @@ def commonality_analysis(features_A, features_B, target, method='standard', alph
         compute_r2_fn = compute_ols_cv_r2
     elif method == 'ridge_cv':
         compute_r2_fn = lambda X, y: compute_ridge_cv_r2(X, y, alphas)
+    elif method == 'lasso_cv':
+        compute_r2_fn = compute_lasso_cv_r2
     else:
         raise ValueError(f"Unknown method: {method}. Use 'standard', 'ols_cv', or 'ridge_cv'.")
     
