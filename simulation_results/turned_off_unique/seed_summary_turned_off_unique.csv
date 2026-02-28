@@ -1,17 +1,17 @@
-config_json,"{""all_runs_results_prefix"": ""seed_runs"", ""method"": ""lasso_cv"", ""n_seeds"": 10000, ""progress_print_every"": 100, ""r_str"": 0.5, ""results_dir"": ""/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique"", ""results_prefix"": ""seed_summary"", ""run_mode"": ""single"", ""seed_start"": 0, ""single_seed"": 4, ""snr"": 10, ""test_name"": ""turned_off_unique"", ""u1_str"": 1, ""u2_str"": 0.07}"
+config_json,"{""all_runs_results_prefix"": ""seed_runs"", ""method"": ""ridge_cv"", ""n"": 10000, ""n_seeds"": 1000, ""p"": 100, ""progress_print_every"": 100, ""r_str"": 30, ""results_dir"": ""/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique"", ""results_prefix"": ""seed_summary"", ""seed_start"": 0, ""snr"": 10, ""test_name"": ""turned_off_unique"", ""u1_str"": 15, ""u2_str"": 2}"
 
 metric,mean,std
-CA_R²_X1,0.9862355170278481,0.0
-CA_R²_X2,0.20118469411326484,0.0
-CA_R²_X12,0.9863229827943505,0.0
-CA_unique_X1,0.7851382886810856,0.0
-CA_unique_X2,8.746576650242588e-05,0.0
-CA_common,0.20109722834676247,0.0
-CA_unexplained,0.013677017205649511,0.0
-PID_red,0.221164993996271,0.0
-PID_unq1,4.064570145783871,0.0
-PID_unq2,0.0034606003768251625,0.0
-PID_syn,0.003196513169159587,0.0
-I(M1;T),4.285735139780142,0.0
-I(M2;T),0.22462559437309587,0.0
-"I(M1,M2;T)",4.292392253326127,0.0
+CA_R²_X1,0.98645106220227,2.053910903952253e-05
+CA_R²_X2,0.7906074218711316,0.00037121994186791054
+CA_R²_X12,0.9863908959726961,2.0721915041058438e-05
+CA_unique_X1,0.19578347410156433,0.00036814650292031777
+CA_unique_X2,-6.0166229573926255e-05,2.7147329622287548e-06
+CA_common,0.7906675881007057,0.00037075224297890877
+CA_unexplained,0.013609104027303934,2.072191504105844e-05
+PID_red,77.39652364233059,0.08770054741774555
+PID_unq1,138.19809086092638,0.1061497947377071
+PID_unq2,1.3008717226006292,0.009988357995144333
+PID_syn,1.1652900866465644e-15,2.918417427597528e-14
+I(M1;T),215.59461450325696,0.07605798898045031
+I(M2;T),78.69739536493123,0.08885728008465504
+"I(M1,M2;T)",216.89548622585758,0.07636605971753838

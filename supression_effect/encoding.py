@@ -25,6 +25,7 @@ from utils import (
     save_seed_summary_csv,
     extract_all_components,
     print_seed_summary,
+    create_test_histograms_with_kde,
 )
 
 
@@ -50,7 +51,7 @@ def get_run_config() -> dict:
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
         "progress_print_every": 100,
-        "test_name": 'FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
+        "test_name": 'NoBiasCorrection-FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 
@@ -115,7 +116,7 @@ def run_suppression_pipeline(config: dict, selected_features: np.ndarray, encode
 
     sources = [m1, m2]
     targets = [t]
-    idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=True)
+    idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=False)
     pid, mi = idep_class.idep()
     return ca, pid,mi
 
@@ -201,4 +202,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_runs_FBA-Encoding-suppresion_exp1.csv"
+    output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding"
+    create_test_histograms_with_kde(csv_path, output_path)

@@ -10,6 +10,7 @@ import csv
 import json
 import hashlib
 from typing import Callable
+import seaborn as sns
 
 
 RUN_SIGNATURE_COLUMN = "__run_signature__"
@@ -384,4 +385,95 @@ def run_multi_seed_experiment(
 
     return summarize_seed_results(all_component_results), seed_rows
             
+def create_distribution_plot(
+    data: list[float],
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    save_path: Path,
+    bins: int = 30,
+    kde: bool = True,
+) -> None:
+    save_path = Path(save_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
 
+    plt.figure(figsize=(10, 6))
+    sns.histplot(data=data, bins=bins, kde=kde)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.grid(axis="y", alpha=0.75)
+    plt.tight_layout()
+    plt.savefig(save_path)
+    plt.close()
+
+
+def create_test_histograms_with_kde(
+    csv_path: Path | str,
+    output_dir: Path | str,
+    columns: list[str] | None = None,
+    bins: int = 30,
+) -> list[Path]:
+    def _load_results_dataframe(path: Path) -> pd.DataFrame:
+        with open(path, "r", newline="", encoding="utf-8") as csv_file:
+            rows = list(csv.reader(csv_file))
+
+        header = None
+        start_idx = None
+        for index, row in enumerate(rows):
+            if row and row[0] == "seed":
+                header = row
+                start_idx = index + 1
+                break
+
+        if header is None or start_idx is None:
+            return pd.read_csv(path)
+
+        parsed_rows = []
+        for row in rows[start_idx:]:
+            if not row:
+                continue
+            if len(row) < len(header):
+                row = row + [""] * (len(header) - len(row))
+            parsed_rows.append({column: value for column, value in zip(header, row)})
+
+        return pd.DataFrame(parsed_rows)
+
+    csv_path = Path(csv_path)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    df = _load_results_dataframe(csv_path)
+    if columns is None:
+        ignored_columns = {"seed", "config_json", RUN_SIGNATURE_COLUMN}
+        numeric_columns = []
+        for col in df.columns:
+            if col in ignored_columns:
+                continue
+            col_as_numeric = pd.to_numeric(df[col], errors="coerce")
+            if col_as_numeric.notna().any():
+                numeric_columns.append(col)
+        columns = [col for col in numeric_columns if col not in ignored_columns]
+
+    saved_paths = []
+    for col in columns:
+        if col not in df.columns:
+            continue
+
+        series = pd.to_numeric(df[col], errors="coerce").dropna()
+        if series.empty:
+            continue
+
+        plot_path = output_dir / f"hist_kde_{col}.png"
+        create_distribution_plot(
+            data=series.tolist(),
+            title=f"{col} distribution",
+            xlabel=col,
+            ylabel="Count",
+            save_path=plot_path,
+            bins=bins,
+            kde=True,
+        )
+        saved_paths.append(plot_path)
+
+    return saved_paths

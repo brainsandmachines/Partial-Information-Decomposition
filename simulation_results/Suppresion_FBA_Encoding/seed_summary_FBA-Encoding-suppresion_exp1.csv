@@ -1,0 +1,17 @@
+config_json,"{""all_runs_results_prefix"": ""seed_runs"", ""data_dir"": ""/mnt/data4tb/data_algonauts/"", ""fmri_dict_path"": ""/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts/subj1_fmri_dicts.joblib"", ""method"": ""ridge_cv"", ""mixing_dimension"": 50, ""n_f"": 500, ""n_s"": 7000, ""n_seeds"": 10000, ""parent_submission_dir"": ""/mnt/data4tb/data_algonauts/submissions"", ""path_to_load"": ""/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib"", ""progress_print_every"": 100, ""results_dir"": ""/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding"", ""results_prefix"": ""seed_summary"", ""rng_seed"": ""np.random.Generator"", ""roi_name"": ""FBA-1"", ""seed_start"": 0, ""snr"": 10, ""subj"": 1, ""suppression_method"": ""permutate"", ""suppression_strength"": 0.5, ""test_name"": ""FBA-Encoding-suppresion_exp1""}"
+
+metric,mean,std
+CA_R²_X1,0.1738499191224952,0.011780991119722245
+CA_R²_X2,-0.004254439918319406,0.0005518912363801186
+CA_R²_X12,0.18458055658728323,0.011793192432673833
+CA_unique_X1,0.18883499650560265,0.0117893892311379
+CA_unique_X2,0.01073063746478804,0.002735274710204451
+CA_common,-0.014985077383107446,0.00273604915605395
+CA_unexplained,0.8154194434127169,0.011793192432673833
+PID_red,0.0,0.0
+PID_unq1,10.172443782996282,0.21021628550991028
+PID_unq2,-8.858273737566424e-07,0.01786854862745848
+PID_syn,6.07033600560069,0.061696451613885525
+I(M1;T),10.172443782996282,0.21021628550991028
+I(M2;T),-8.858273737566424e-07,0.01786854862745848
+"I(M1,M2;T)",16.242778902769594,0.21964854006059287

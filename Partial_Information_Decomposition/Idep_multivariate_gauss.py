@@ -299,7 +299,7 @@ class Idep_multivariate_gauss:
 
         output: a dictionary with the PID values
 
-        keys: 'red', 'unq0', 'unq1', 'syn'"""
+        keys: 'red', 'unq1', 'unq2', 'syn'"""
 
         self.cov_matrix = self.cov_matrix if cov_matrix is None else cov_matrix
 
