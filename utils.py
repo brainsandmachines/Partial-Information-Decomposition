@@ -11,9 +11,89 @@ import json
 import hashlib
 from typing import Callable
 import seaborn as sns
-
+from sklearn.linear_model import RidgeCV, LinearRegression
+from sklearn.linear_model import MultiTaskLassoCV,LassoCV
 
 RUN_SIGNATURE_COLUMN = "__run_signature__"
+
+def compute_ols_cv_r2(X, y):
+    """
+    Compute cross-validated R² using leave-one-out cross-validation.
+    
+    Uses RidgeCV with near-zero regularization (alpha=1e-16) which is
+    effectively OLS but leverages the efficient GCV formula.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        
+    Returns:
+        float: Cross-validated R² (can be negative if model overfits badly)
+    """
+    ridge_cv = RidgeCV(alphas=[1e-16], fit_intercept=True, scoring='r2', cv=None)
+    ridge_cv.fit(X, y)
+    return ridge_cv,ridge_cv.best_score_
+
+
+def compute_ridge_cv_r2(X, y, alphas=None):
+    """
+    Compute cross-validated R² using RidgeCV with efficient LOO cross-validation.
+    
+    RidgeCV uses generalized cross-validation (GCV) which is an efficient 
+    approximation to leave-one-out CV for ridge regression.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        alphas (array-like, optional): Array of alpha values to try.
+            Defaults to DEFAULT_RIDGE_ALPHAS.
+        
+    Returns:
+        float: Best cross-validated R² across all alpha values.
+    """
+    if alphas is None:
+        alphas = np.logspace(-3, 3, 50)
+    
+    # RidgeCV with leave-one-out CV (efficient GCV approximation)
+    # cv=None means use efficient LOO via GCV
+    ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
+    ridge_cv.fit(X, y)
+    
+    return ridge_cv,ridge_cv.best_score_
+
+
+def compute_r2(X, y):
+    """
+    Compute in-sample R² for OLS regression.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        
+    Returns:
+        float: In-sample R².
+    """
+    model = LinearRegression()
+    model.fit(X, y)
+    return model,model.score(X, y)
+
+def compute_lasso_cv_r2(X, y):
+
+    base_lasso = LassoCV(
+        n_alphas=100,
+        fit_intercept=True,
+        cv=5,
+        max_iter=5000
+    )
+
+    mo_lasso = MultiOutputRegressor(base_lasso)
+
+    mo_lasso.fit(X, y)
+
+    r2 = mo_lasso.score(X, y)
+
+    return mo_lasso, r2
+
 
 
 def check_file_exists(file_path):
@@ -143,13 +223,19 @@ def _to_float_or_none(value):
     return None
 
 
-def extract_all_components(ca_results: dict, pid_results: dict, mi_results: dict) -> dict:
+def extract_all_components(ca_results: dict, pid_results: dict, mi_results: dict, betas_dict: dict = None) -> dict:
     combined = {}
 
     for key, value in ca_results.items():
         numeric_value = _to_float_or_none(value)
         if numeric_value is not None:
             combined[f"CA_{key}"] = numeric_value
+        
+    if betas_dict is not None:
+        for key, value in betas_dict.items():
+            numeric_value = _to_float_or_none(value)
+            if numeric_value is not None:
+                combined[f"{key}"] = numeric_value
 
     for key, value in pid_results.items():
         numeric_value = _to_float_or_none(value)
@@ -185,6 +271,65 @@ def print_seed_summary(summary: dict, n_seeds: int, seed_start: int) -> None:
     print("=" * 70)
     for metric, stats in summary.items():
         print(f"{metric}: mean={stats['mean']:.6f}, std={stats['std']:.6f}")
+
+
+def seed_summary_to_table(
+    csv_path: Path | str,
+    decimals: int = 5,
+    save_path: Path | str | None = None,
+) -> pd.DataFrame:
+    csv_path = Path(csv_path)
+    if not csv_path.exists() or csv_path.stat().st_size == 0:
+        return pd.DataFrame(columns=["metric", "mean", "std"])
+
+    df = pd.read_csv(csv_path, skiprows=2)
+    if not {"metric", "mean", "std"}.issubset(df.columns):
+        return pd.DataFrame(columns=["metric", "mean", "std"])
+
+    table = df[["metric", "mean", "std"]].copy()
+    table["mean"] = pd.to_numeric(table["mean"], errors="coerce").round(decimals)
+    table["std"] = pd.to_numeric(table["std"], errors="coerce").round(decimals)
+
+    if save_path is not None:
+        save_path = Path(save_path)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        table.to_csv(save_path, index=False)
+
+    return table
+
+
+def save_seed_summary_table_image(
+    csv_path: Path | str,
+    image_path: Path | str,
+    decimals: int = 5,
+    dpi: int = 300,
+) -> Path | None:
+    table = seed_summary_to_table(csv_path, decimals=decimals)
+    if table.empty:
+        return None
+
+    image_path = Path(image_path)
+    image_path.parent.mkdir(parents=True, exist_ok=True)
+
+    n_rows = len(table)
+    fig_height = max(2.0, 0.42 * (n_rows + 1))
+    fig, ax = plt.subplots(figsize=(12, fig_height))
+    ax.axis("off")
+
+    mpl_table = ax.table(
+        cellText=table.values,
+        colLabels=table.columns,
+        loc="center",
+        cellLoc="center",
+    )
+    mpl_table.auto_set_font_size(False)
+    mpl_table.set_fontsize(10)
+    mpl_table.scale(1, 1.2)
+
+    plt.tight_layout()
+    fig.savefig(image_path, dpi=dpi, bbox_inches="tight",transparent=True)
+    plt.close(fig)
+    return image_path
 
 
 def _normalize_config_value(value):
@@ -396,9 +541,19 @@ def create_distribution_plot(
 ) -> None:
     save_path = Path(save_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
+    numeric_data = np.asarray(data, dtype=float)
+    numeric_data = numeric_data[np.isfinite(numeric_data)]
+    if numeric_data.size == 0:
+        return
+
+    mean_value = float(np.mean(numeric_data))
+    std_value = float(np.std(numeric_data, ddof=1)) if numeric_data.size > 1 else 0.0
 
     plt.figure(figsize=(10, 6))
-    sns.histplot(data=data, bins=bins, kde=kde)
+    ax = sns.histplot(data=numeric_data, bins=bins, kde=kde)
+    legend_text = f"mean={mean_value:.6f}, std={std_value:.6f}"
+    ax.plot([], [], " ", label=legend_text)
+    ax.legend(loc="best", frameon=True)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -408,37 +563,133 @@ def create_distribution_plot(
     plt.close()
 
 
+def create_distribution_plot_with_colors(
+    data: list[float],
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    save_path: Path,
+    bins: int = 30,
+    kde: bool = True,
+    bar_color: str = "#4C72B0",
+    kde_color: str = "#DD8452",
+    bar_alpha: float = 0.65,
+    xlim: tuple[float, float] | None = None,
+) -> None:
+    save_path = Path(save_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    numeric_data = np.asarray(data, dtype=float)
+    numeric_data = numeric_data[np.isfinite(numeric_data)]
+    if numeric_data.size == 0:
+        return
+
+    mean_value = float(np.mean(numeric_data))
+    std_value = float(np.std(numeric_data, ddof=1)) if numeric_data.size > 1 else 0.0
+
+    plt.figure(figsize=(10, 6))
+    ax = sns.histplot(
+        data=numeric_data,
+        bins=bins,
+        kde=kde,
+        color=bar_color,
+        alpha=bar_alpha,
+        line_kws={"color": kde_color, "linewidth": 2.0},
+    )
+
+    if kde and ax.lines:
+        ax.lines[-1].set_color(kde_color)
+        ax.lines[-1].set_linewidth(2.0)
+
+    legend_text = f"mean={mean_value:.6f}, std={std_value:.6f}"
+    ax.plot([], [], " ", label=legend_text)
+    ax.legend(loc="best", frameon=True)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.grid(axis="y", alpha=0.75)
+    plt.tight_layout()
+    plt.savefig(save_path)
+    plt.close()
+
+
+def _load_results_dataframe(path: Path) -> pd.DataFrame:
+    with open(path, "r", newline="", encoding="utf-8") as csv_file:
+        rows = list(csv.reader(csv_file))
+
+    header = None
+    start_idx = None
+    for index, row in enumerate(rows):
+        if row and row[0] == "seed":
+            header = row
+            start_idx = index + 1
+            break
+
+    if header is None or start_idx is None:
+        return pd.read_csv(path)
+
+    parsed_rows = []
+    for row in rows[start_idx:]:
+        if not row:
+            continue
+        if len(row) < len(header):
+            row = row + [""] * (len(header) - len(row))
+        parsed_rows.append({column: value for column, value in zip(header, row)})
+
+    return pd.DataFrame(parsed_rows)
+
+
+def load_hist_kde_and_change_colors(
+    csv_path: Path | str,
+    column: str,
+    output_path: Path | str,
+    bins: int = 30,
+    bar_color: str = "#4C72B0",
+    kde_color: str = "#DD8452",
+    bar_alpha: float = 0.65,
+) -> Path | None:
+    csv_path = Path(csv_path)
+    output_path = Path(output_path)
+    if not csv_path.exists():
+        return None
+
+    df = _load_results_dataframe(csv_path)
+    if column not in df.columns:
+        return None
+
+    series = pd.to_numeric(df[column], errors="coerce").dropna()
+    if series.empty:
+        return None
+
+    create_distribution_plot_with_colors(
+        data=series.tolist(),
+        title=f"{column} distribution",
+        xlabel=column,
+        ylabel="Count",
+        save_path=output_path,
+        bins=bins,
+        kde=True,
+        bar_color=bar_color,
+        kde_color=kde_color,
+        bar_alpha=bar_alpha,
+    )
+    return output_path
+
+
 def create_test_histograms_with_kde(
     csv_path: Path | str,
     output_dir: Path | str,
     columns: list[str] | None = None,
     bins: int = 30,
+    bar_color: str = "#4C72B0",
+    kde_color: str = "#DD8452",
+    bar_alpha: float = 0.6,
+    shared_x_axis: bool = True,
+    shared_x_axis_groups: list[list[str]] = [['CA_R²_X1','CA_R²_X2','CA_R²_X12'],
+                                             ['CA_unique_X1','CA_unique_X2','CA_common'],
+                                             ['PID_red'],['PID_unq1','PID_unq2'],['PID_syn'],['I(M1;T)','I(M2;T)','"I(M1,M2;T)"'] ],
 ) -> list[Path]:
-    def _load_results_dataframe(path: Path) -> pd.DataFrame:
-        with open(path, "r", newline="", encoding="utf-8") as csv_file:
-            rows = list(csv.reader(csv_file))
-
-        header = None
-        start_idx = None
-        for index, row in enumerate(rows):
-            if row and row[0] == "seed":
-                header = row
-                start_idx = index + 1
-                break
-
-        if header is None or start_idx is None:
-            return pd.read_csv(path)
-
-        parsed_rows = []
-        for row in rows[start_idx:]:
-            if not row:
-                continue
-            if len(row) < len(header):
-                row = row + [""] * (len(header) - len(row))
-            parsed_rows.append({column: value for column, value in zip(header, row)})
-
-        return pd.DataFrame(parsed_rows)
-
     csv_path = Path(csv_path)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -455,17 +706,60 @@ def create_test_histograms_with_kde(
                 numeric_columns.append(col)
         columns = [col for col in numeric_columns if col not in ignored_columns]
 
-    saved_paths = []
+    numeric_series_by_col: dict[str, np.ndarray] = {}
     for col in columns:
         if col not in df.columns:
             continue
+        series_values = pd.to_numeric(df[col], errors="coerce").dropna().to_numpy(dtype=float)
+        series_values = series_values[np.isfinite(series_values)]
+        if series_values.size > 0:
+            numeric_series_by_col[col] = series_values
 
-        series = pd.to_numeric(df[col], errors="coerce").dropna()
-        if series.empty:
+    def _compute_xlim(arrays: list[np.ndarray]) -> tuple[float, float] | None:
+        if not arrays:
+            return None
+        concatenated = np.concatenate(arrays)
+        x_min = float(np.min(concatenated))
+        x_max = float(np.max(concatenated))
+        if x_min == x_max:
+            delta = 1e-9 if x_min == 0.0 else abs(x_min) * 0.01
+            x_min -= delta
+            x_max += delta
+        return (x_min, x_max)
+
+    xlim_by_col: dict[str, tuple[float, float] | None] = {col: None for col in numeric_series_by_col}
+    grouped_columns: set[str] = set()
+
+    if shared_x_axis_groups:
+        for group in shared_x_axis_groups:
+            valid_group_cols = [col for col in group if col in numeric_series_by_col]
+            if not valid_group_cols:
+                continue
+            group_xlim = _compute_xlim([numeric_series_by_col[col] for col in valid_group_cols])
+            for col in valid_group_cols:
+                xlim_by_col[col] = group_xlim
+                grouped_columns.add(col)
+
+    if shared_x_axis:
+        ungrouped_cols = [col for col in numeric_series_by_col if col not in grouped_columns]
+        if shared_x_axis_groups:
+            ungrouped_xlim = _compute_xlim([numeric_series_by_col[col] for col in ungrouped_cols])
+            for col in ungrouped_cols:
+                xlim_by_col[col] = ungrouped_xlim
+        else:
+            global_xlim = _compute_xlim(list(numeric_series_by_col.values()))
+            for col in numeric_series_by_col:
+                xlim_by_col[col] = global_xlim
+
+    saved_paths = []
+    for col in columns:
+        if col not in numeric_series_by_col:
             continue
 
+        series = numeric_series_by_col[col]
+
         plot_path = output_dir / f"hist_kde_{col}.png"
-        create_distribution_plot(
+        create_distribution_plot_with_colors(
             data=series.tolist(),
             title=f"{col} distribution",
             xlabel=col,
@@ -473,6 +767,10 @@ def create_test_histograms_with_kde(
             save_path=plot_path,
             bins=bins,
             kde=True,
+            bar_color=bar_color,
+            kde_color=kde_color,
+            bar_alpha=bar_alpha,
+            xlim=xlim_by_col.get(col),
         )
         saved_paths.append(plot_path)
 

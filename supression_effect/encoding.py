@@ -26,6 +26,9 @@ from utils import (
     extract_all_components,
     print_seed_summary,
     create_test_histograms_with_kde,
+    load_hist_kde_and_change_colors,
+    seed_summary_to_table,
+    save_seed_summary_table_image,
 )
 
 
@@ -203,6 +206,10 @@ def main() -> None:
 
 if __name__ == "__main__":
     #main()
-    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_runs_FBA-Encoding-suppresion_exp1.csv"
-    output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding"
-    create_test_histograms_with_kde(csv_path, output_path)
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_runs_NoBiasCorrection-FBA-Encoding-suppresion_exp1.csv"
+    output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Simulation_figs/Exp1_FBA_No_Bias_Correction"
+    create_test_histograms_with_kde(csv_path, output_path,bar_color="#55A868", kde_color="#000000")
+
+    summary_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_summary_NoBiasCorrection-FBA-Encoding-suppresion_exp1.csv"
+    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/NoBias_seed_summary_FBA-Encoding-suppresion_exp1_table.png"
+    save_seed_summary_table_image(summary_path,image_path=save_path) 

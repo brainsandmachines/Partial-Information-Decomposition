@@ -19,7 +19,8 @@ import torch
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.decomposition import IncrementalPCA
 from sklearn.linear_model import LinearRegression
-
+from sklearn.linear_model import LassoCV
+from sklearn.multioutput import MultiOutputRegressor
 class ImageDataset(Dataset):
     def __init__(self, imgs_paths, idxs, transform):
         self.imgs_paths = np.array(imgs_paths)[idxs]
@@ -497,6 +498,24 @@ def compute_r2(X, y):
     model = LinearRegression()
     model.fit(X, y)
     return model.score(X, y)
+
+def compute_lasso_cv_r2(X, y):
+
+    base_lasso = LassoCV(
+        n_alphas=100,
+        fit_intercept=True,
+        cv=5,
+        max_iter=5000
+    )
+
+    mo_lasso = MultiOutputRegressor(base_lasso)
+
+    mo_lasso.fit(X, y)
+
+    r2 = mo_lasso.score(X, y)
+
+    return mo_lasso, r2
+
 
 
 def correlation_matrix(X):

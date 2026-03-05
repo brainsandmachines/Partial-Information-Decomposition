@@ -9,6 +9,32 @@ sys.path.append(str(root))
 from toy_examples.toy_example import commonality_analysis
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
+from utils import (
+    extract_all_components,
+    print_seed_summary,
+    run_multi_seed_experiment,
+    get_seed_runs_csv_path,
+    save_seed_summary_csv,
+    create_test_histograms_with_kde,
+    save_seed_summary_table_image,
+)
+
+
+def get_run_config() -> dict:
+    return {
+        "method": "ridge_cv",
+        "n_seeds": 10000,
+        "seed_start": 0,
+        "snr": 10,
+        "n": 10000,
+        "p": 100,
+        "unique_ratio": 0.5,
+        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Equal_Unique_10snr",
+        "results_prefix": "seed_summary",
+        "all_runs_results_prefix": "seed_runs",
+        "progress_print_every": 100,
+        "test_name": "10snrboth_unique",
+    }
 
 def half_permute(rng,features,snr=10):
     n,p = features.shape
@@ -124,12 +150,38 @@ def test_both_unique(rng, unique_ratio, n=1024, p=100, snr=10.0, method='standar
     return ca_results, pid_results, mi_results
 
 
+def run_single_seed(seed: int, config: dict) -> dict:
+    rng = np.random.default_rng(seed=seed)
+    ca_results, pid_results, mi_results = test_both_unique(
+        rng,
+        config["unique_ratio"],
+        n=config["n"],
+        p=config["p"],
+        snr=config["snr"],
+        method=config["method"],
+    )
+    return extract_all_components(ca_results, pid_results, mi_results)
+
+
 
 def main():
-    rng = np.random.default_rng(seed=42)
-    unique_ratio = 0.5
-    ca_results, pid_results, mi_results = test_both_unique(rng, unique_ratio, n=10000, p=100, snr=1, method='ridge_cv')
-    compare_results(ca_results, pid_results,mi_results)
+    config = get_run_config()
+    summary, seed_rows = run_multi_seed_experiment(
+        config,
+        per_seed_runner=run_single_seed,
+    )
+    print_seed_summary(summary, n_seeds=config["n_seeds"], seed_start=config["seed_start"])
+    all_runs_path = get_seed_runs_csv_path(config)
+    summary_path = save_seed_summary_csv(summary, config)
+    print(f"\nSaved all seed run results to: {all_runs_path}")
+    print(f"Saved summary to: {summary_path}")
 
 if __name__ == "__main__":
-    main()
+    #main()
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Equal_Unique_10snr/seed_runs_10snrboth_unique.csv"
+    output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Simulation_figs/Equal_Unique10snr"
+    create_test_histograms_with_kde(csv_path, output_path,bar_color="#FA8100", kde_color="#000000")
+
+    summary_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Equal_Unique_10snr/seed_summary_10snrboth_unique.csv"
+    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Equal_Unique_10snr/10snrboth_unique_seed_summary_table.png"
+    save_seed_summary_table_image(summary_path,image_path=save_path) 
