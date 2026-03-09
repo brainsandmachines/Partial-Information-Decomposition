@@ -160,7 +160,7 @@ def test_regularization_term(seed: int, config: dict):
     #Commonality analysis with RidgeCV regularization
     CA = commonality_analysis(M1, M2, y_real, method=config["method"])
     best_alpha = CA.find_best_alpha(alphas=None)
-    alphas =  np.linspace(0.001, best_alpha, 5000)
+    alphas = np.logspace(-3, 3, 50)  #np.linspace(0.001, best_alpha, 5000)
     alpha_results = {}
     for i,alpha in enumerate(alphas):
         if i % 100 == 0:
@@ -330,7 +330,8 @@ if __name__ == "__main__":
     #Regularization term testing str are all consant
     csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2/alpha_results.csv"
     save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2/alpha_function.png"
-    test_regularization_term(seed=0, config=get_run_config())
+    reg_results = test_regularization_term(seed=0, config=get_run_config())
+    save_term_results_csv(x_axis="alpha", term_results=reg_results, output_csv_path=csv_path)
     plot_keys_vs_alpha(x_col="alpha", csv_path=csv_path, keys=['CA_unique_X2'], logx=False,save_path=save_path, sort_alpha=False)
 
 

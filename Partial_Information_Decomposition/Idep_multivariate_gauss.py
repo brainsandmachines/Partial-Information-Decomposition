@@ -240,8 +240,9 @@ class Idep_multivariate_gauss:
             k = 0.5*self.log_base(nume8/deno8) - self.i_m2_t
 
 
-            unique_0 = torch.min(torch.stack([b,d,i,k]))
-            self.I_dep_values['unique_1'] = unique_0.item()
+            unique_1 = torch.min(torch.stack([b,d,i,k]))
+            #assert unique_1 == i or unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={self.unique_1}, i={i}, k={k}."
+            self.I_dep_values['unique_1'] = unique_1.item()
 
 
 
@@ -257,13 +258,13 @@ class Idep_multivariate_gauss:
             #calculate j with U8:
             mat = self.constraint_cov_dict['c_model_8']
             j = 0.5*self.log_base(nume8/deno8) - self.i_m1_t
-            unique_1 = torch.min(torch.stack([c,f,h,j]))
-            self.I_dep_values['unique_2'] = unique_1.item()
-
+            unique_2 = torch.min(torch.stack([c,f,h,j]))
+            self.I_dep_values['unique_2'] = unique_2.item()
+            assert unique_2 == h or unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={unique_2}, h={h}, j={j}."
 
         #Check for nan values
-        assert not torch.isnan(unique_0), f"unique_0 = {unique_0} was not calculated properly."
-        assert not torch.isnan(unique_1), f"unique_1 = {unique_1} was not calculated properly."  
+        assert not torch.isnan(unique_1), f"unique_0 = {unique_1} was not calculated properly."
+        assert not torch.isnan(unique_2), f"unique_2 = {unique_2} was not calculated properly."  
         return self.I_dep_values
     
     def pid_values(self,unique_1, unique_2):

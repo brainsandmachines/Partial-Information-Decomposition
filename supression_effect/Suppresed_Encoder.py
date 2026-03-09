@@ -41,7 +41,7 @@ def get_run_config() -> dict:
         "n_s": 7000,
         "n_f": 500,
         "rng_seed": np.random.default_rng(seed=30),
-        "n_seeds": 10000,
+        "n_seeds": 20000,
         "seed_start": 0,
         "snr": 10,
         "mixing_dimension": 50,
@@ -54,7 +54,7 @@ def get_run_config() -> dict:
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
         "progress_print_every": 100,
-        "test_name": 'NoBiasCorrection-FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
+        "test_name": 'FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 
@@ -68,7 +68,7 @@ def load_model_and_fmri(config: dict):
 def prepare_inputs(config: dict, real_features: np.ndarray, fmri_dict: dict):
     args = argObj(config["data_dir"], config["parent_submission_dir"], config["subj"])
     n_s = config["n_s"]
-    n_f = config["n_f"]
+    n_f = config["n_f"] if config["n_f"] is not None else real_features.shape[1]
 
     lh_fmri_train = fmri_dict["lh_fmri_train"][:n_s, :]
     rh_fmri_train = fmri_dict["rh_fmri_train"][:n_s, :]
@@ -119,7 +119,7 @@ def run_suppression_pipeline(config: dict, selected_features: np.ndarray, encode
 
     sources = [m1, m2]
     targets = [t]
-    idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=False)
+    idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=True)
     pid, mi = idep_class.idep()
     return ca, pid,mi
 
@@ -205,7 +205,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    #main()
+    print("Running suppression experiment with FBA encoding...")
+    main()
     csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_runs_NoBiasCorrection-FBA-Encoding-suppresion_exp1.csv"
     output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Simulation_figs/Exp1_FBA_No_Bias_Correction"
     create_test_histograms_with_kde(csv_path, output_path,bar_color="#55A868", kde_color="#000000")
