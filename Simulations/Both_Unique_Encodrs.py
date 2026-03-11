@@ -26,7 +26,7 @@ def get_run_config() -> dict:
         "n_s": 7000,
         "n_f": 500,
         "rng_seed": np.random.default_rng(seed=30),
-        "n_seeds": 5000,
+        "n_seeds": 10000,
         "seed_start": 0,
         "snr": 5,
         "unique_ratio": 0.5,
@@ -38,8 +38,8 @@ def get_run_config() -> dict:
         "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Both_Unique_Encoder",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
-        "progress_print_every": 100,
-        "test_name": 'Both_Unique_Encoder_No_Orthogonal',  # Optional: specify a custom name for the summary file; if None, uses timestampW
+        "progress_print_every": 1,
+        "test_name": 'TMI_BC_Both_Unique_Encoder_No_Orthogonal',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 

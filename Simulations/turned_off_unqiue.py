@@ -41,8 +41,8 @@ def get_run_config() -> dict:
         "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Turned_off_unique_exp2",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
-        "progress_print_every": 100,
-        "test_name": "turned_off_unique_Exp2",
+        "progress_print_every": 5,
+        "test_name": "TMIBC_turned_off_unique_Exp2",
     }
 
 
@@ -337,11 +337,11 @@ if __name__ == "__main__":
 
     #Testing different u2_str ratios to u1_str:
 
-    # u2str_results = test_u2str(seed=0, config=get_run_config(), final_ratio=0.000001)
-    # save_term_results_csv(x_axis="unique_ratio", term_results=u2str_results, output_csv_path="/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2/u2_str_results.csv")
-    # csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2/u2_str_results.csv"
-    # save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2"
-    # keys = ['CA_unique_X2']
-    # plot_keys_vs_alpha(x_col="unique_ratio", csv_path=csv_path, keys=keys, save_path=f"{save_path}/ca_unique.png",sort_alpha=False)
-    # keys = ['PID_unq2']
-    # plot_keys_vs_alpha(x_col="unique_ratio", csv_path=csv_path, keys=keys, save_path=f"{save_path}/pid_unique.png",sort_alpha=False)
+    u2str_results = test_u2str(seed=0, config=get_run_config(), final_ratio=0.000001)
+    save_term_results_csv(x_axis="unique_ratio", term_results=u2str_results, output_csv_path="/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2/u2_str_results.csv")
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2/u2_str_results.csv"
+    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/turned_off_unique_exp2"
+    keys = ['CA_unique_X2']
+    plot_keys_vs_alpha(x_col="unique_ratio", csv_path=csv_path, keys=keys, save_path=f"{save_path}/ca_unique.png",sort_alpha=False)
+    keys = ['PID_unq2']
+    plot_keys_vs_alpha(x_col="unique_ratio", csv_path=csv_path, keys=keys, save_path=f"{save_path}/pid_unique.png",sort_alpha=False)

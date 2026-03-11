@@ -11,14 +11,14 @@ dim_m1: 70, dim_m2: 70, dim_t: 100
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.1656 | I(T;M1): 8.5226
-M2 R² (VP): -0.0092 | I(T;M2): -0.0128
-Both M1 and M2 R² (VP): 0.2123 | I(T;M1,M2): 12.5938
+M1 R² (VP): 0.1722 | I(T;M1): 8.4182
+M2 R² (VP): -0.0001 | I(T;M2): -0.0000
+Both M1 and M2 R² (VP): 0.2280 | I(T;M1,M2): 11.7513
 
-Unique to M1 (VP): 0.2215 | Unique(T;M1\M2): 8.5226
-Unique to M2 (VP): 0.0467 | Unique(T;M2\M1): -0.0128
-Common (VP): -0.0559 | Redundant (PID): 0.0000
-Synergy (PID): 4.0839
+Unique to M1 (VP): 0.2281 | Unique(T;M1\M2): 8.4178
+Unique to M2 (VP): 0.0559 | Unique(T;M2\M1): -0.0005
+Common (VP): -0.0559 | Redundant (PID): 0.0004
+Synergy (PID): 3.3336
 
 ======================================================================
 Experiment 2: snr = 1 multivariate gaussian with different seeds
@@ -32,14 +32,14 @@ dim_m1: 70, dim_m2: 70, dim_t: 100
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.1678 | I(T;M1): 8.5747
-M2 R² (VP): -0.0089 | I(T;M2): 0.0066
-Both M1 and M2 R² (VP): 0.2143 | I(T;M1,M2): 12.6602
+M1 R² (VP): 0.1708 | I(T;M1): 8.4397
+M2 R² (VP): -0.0001 | I(T;M2): -0.0001
+Both M1 and M2 R² (VP): 0.2271 | I(T;M1,M2): 11.8440
 
-Unique to M1 (VP): 0.2232 | Unique(T;M1\M2): 8.5747
-Unique to M2 (VP): 0.0465 | Unique(T;M2\M1): 0.0066
-Common (VP): -0.0554 | Redundant (PID): 0.0000
-Synergy (PID): 4.0789
+Unique to M1 (VP): 0.2271 | Unique(T;M1\M2): 8.4393
+Unique to M2 (VP): 0.0563 | Unique(T;M2\M1): -0.0005
+Common (VP): -0.0564 | Redundant (PID): 0.0004
+Synergy (PID): 3.4047
 
 ======================================================================
 Experiment 3: snr = 5
@@ -53,14 +53,14 @@ dim_m1: 70, dim_m2: 70, dim_t: 100
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.3294 | I(T;M1): 29.8513
-M2 R² (VP): -0.0094 | I(T;M2): -0.0155
-Both M1 and M2 R² (VP): 0.4286 | I(T;M1,M2): 47.7109
+M1 R² (VP): 0.3328 | I(T;M1): 29.5779
+M2 R² (VP): -0.0001 | I(T;M2): -0.0001
+Both M1 and M2 R² (VP): 0.4410 | I(T;M1,M2): 46.9686
 
-Unique to M1 (VP): 0.4379 | Unique(T;M1\M2): 29.8513
-Unique to M2 (VP): 0.0992 | Unique(T;M2\M1): -0.0155
-Common (VP): -0.1085 | Redundant (PID): 0.0000
-Synergy (PID): 17.8751
+Unique to M1 (VP): 0.4411 | Unique(T;M1\M2): 29.5770
+Unique to M2 (VP): 0.1082 | Unique(T;M2\M1): -0.0011
+Common (VP): -0.1083 | Redundant (PID): 0.0010
+Synergy (PID): 17.3917
 
 ======================================================================
 Experiment 4: snr = 5 multivariate gaussian with different seeds
@@ -74,14 +74,14 @@ dim_m1: 70, dim_m2: 70, dim_t: 100
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.3341 | I(T;M1): 29.3379
-M2 R² (VP): -0.0089 | I(T;M2): 0.0087
-Both M1 and M2 R² (VP): 0.4324 | I(T;M1,M2): 47.0982
+M1 R² (VP): 0.3301 | I(T;M1): 29.3560
+M2 R² (VP): -0.0001 | I(T;M2): -0.0000
+Both M1 and M2 R² (VP): 0.4386 | I(T;M1,M2): 47.2188
 
-Unique to M1 (VP): 0.4412 | Unique(T;M1\M2): 29.3379
-Unique to M2 (VP): 0.0983 | Unique(T;M2\M1): 0.0087
-Common (VP): -0.1071 | Redundant (PID): 0.0000
-Synergy (PID): 17.7517
+Unique to M1 (VP): 0.4386 | Unique(T;M1\M2): 29.3550
+Unique to M2 (VP): 0.1085 | Unique(T;M2\M1): -0.0010
+Common (VP): -0.1086 | Redundant (PID): 0.0010
+Synergy (PID): 17.8639
 
 ======================================================================
 Experiment 5: snr = 10
@@ -95,14 +95,14 @@ dim_m1: 70, dim_m2: 70, dim_t: 100
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.3398 | I(T;M1): 40.3496
-M2 R² (VP): -0.0094 | I(T;M2): -0.0132
-Both M1 and M2 R² (VP): 0.4423 | I(T;M1,M2): 68.6114
+M1 R² (VP): 0.3428 | I(T;M1): 40.5430
+M2 R² (VP): -0.0001 | I(T;M2): -0.0001
+Both M1 and M2 R² (VP): 0.4544 | I(T;M1,M2): 68.3566
 
-Unique to M1 (VP): 0.4517 | Unique(T;M1\M2): 40.3496
-Unique to M2 (VP): 0.1025 | Unique(T;M2\M1): -0.0132
-Common (VP): -0.1119 | Redundant (PID): 0.0000
-Synergy (PID): 28.2750
+Unique to M1 (VP): 0.4544 | Unique(T;M1\M2): 40.5419
+Unique to M2 (VP): 0.1115 | Unique(T;M2\M1): -0.0012
+Common (VP): -0.1116 | Redundant (PID): 0.0011
+Synergy (PID): 27.8149
 
 ======================================================================
 Experiment 6: snr = 10 multivariate gaussian with different seeds
@@ -116,13 +116,13 @@ dim_m1: 70, dim_m2: 70, dim_t: 100
 Comparison of Variance Partitioning and PID Results
 ======================================================================
 Results:
-M1 R² (VP): 0.3475 | I(T;M1): 41.6602
-M2 R² (VP): -0.0093 | I(T;M2): -0.0069
-Both M1 and M2 R² (VP): 0.4477 | I(T;M1,M2): 69.5944
+M1 R² (VP): 0.3498 | I(T;M1): 40.0985
+M2 R² (VP): -0.0001 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.4651 | I(T;M1,M2): 67.5805
 
-Unique to M1 (VP): 0.4570 | Unique(T;M1\M2): 41.6602
-Unique to M2 (VP): 0.1002 | Unique(T;M2\M1): -0.0069
-Common (VP): -0.1095 | Redundant (PID): 0.0000
-Synergy (PID): 27.9411
+Unique to M1 (VP): 0.4652 | Unique(T;M1\M2): 40.0973
+Unique to M2 (VP): 0.1153 | Unique(T;M2\M1): -0.0011
+Common (VP): -0.1154 | Redundant (PID): 0.0011
+Synergy (PID): 27.4832
 
 All experiments completed.

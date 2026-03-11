@@ -36,7 +36,7 @@ def get_run_config() -> dict:
     return {
         "data_dir": "/mnt/data4tb/data_algonauts/",
         "parent_submission_dir": "/mnt/data4tb/data_algonauts/submissions",
-        "subj": 1,
+        "subj": 1, 
         "method": "ridge_cv",
         "n_s": 7000,
         "n_f": 500,
@@ -44,7 +44,7 @@ def get_run_config() -> dict:
         "n_seeds": 20000,
         "seed_start": 0,
         "snr": 10,
-        "mixing_dimension": 50,
+        "mixing_dimension": 100,
         "suppression_strength": 0.5,
         "suppression_method": "permutate",
         "path_to_load": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib",
@@ -53,8 +53,8 @@ def get_run_config() -> dict:
         "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
-        "progress_print_every": 100,
-        "test_name": 'FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
+        "progress_print_every": 2,
+        "test_name": 'Bias_corr_for_TMI_FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 
