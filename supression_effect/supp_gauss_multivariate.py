@@ -238,7 +238,7 @@ def get_seed_sweep_config() -> dict:
         "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
-        "progress_print_every": 10,
+        "progress_print_every": 2,
         "test_name": "toyexample_supp_gauss_multivariate",
     }
 

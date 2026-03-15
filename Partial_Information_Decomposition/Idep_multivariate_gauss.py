@@ -77,19 +77,6 @@ class Idep_multivariate_gauss:
             block_singularity_check(np.array([p]))
             block_singularity_check(np.array([q]))
             block_singularity_check(np.array([r]))
-        if bias_correction:
-            self.bm1 = entropy_bias_term(df, self.dim_m1) 
-            self.bm2 = entropy_bias_term(df, self.dim_m2)
-            self.bt = entropy_bias_term(df, self.dim_t)
-            
-            self.bq = entropy_bias_term(df, self.dim_t + self.dim_m1)
-            self.br = entropy_bias_term(df, self.dim_t + self.dim_m2)
-            self.bp = entropy_bias_term(df, self.dim_m1 + self.dim_m2)
-            self.ball = entropy_bias_term(df, self.dim_m1 + self.dim_m2 + self.dim_t)
-            
-        else: 
-            self.ball = self.b_tmi = self.bm1 = self.bm2 = self.bt = self.bq = self.br = self.bp = 0
-            
         self.I_dep_values = {}
         self.PID_values = {}
 
@@ -262,50 +249,33 @@ class Idep_multivariate_gauss:
 
         return self.constraint_cov_dict
     
-    def compute_Idep(self, jackknife=False)-> dict:
+    def compute_Idep(self)-> dict:
         """This function calcualtes the mutual information for a given covariance matrix - U models in the lattice"""
         assert hasattr(self, "constraint_cov_dict"), "Run dependency_matrix(...) before compute_Idep(...)."
         
-        if jackknife:
-            jackknife_value = self.jackknife_bias_term(self.M1.detach().cpu(), self.M2.detach().cpu(), self.T.detach().cpu()) if self.M1 is not None else self.jackknife_bias_term(None,None,None)
-        self.df = 0 if self.N is None else self.N - 1
-        self.raw_q_logdet = torch.logdet(self.I2 - (self.Q.T @ self.Q))
-        #self.q_correction = (self.bm1 + self.bt - self.bq)
+        self.q_logdet = torch.logdet(self.I2 - (self.Q.T @ self.Q))
         
-        self.raw_r_logdet = torch.logdet(self.I2 - (self.R.T @ self.R))
-        #self.r_correction = (self.bm2 + self.bt - self.br) 
+        self.r_logdet = torch.logdet(self.I2 - (self.R.T @ self.R))
 
-        qlogdet_b = self.df * (jackknife_value['logdetq_jack'] - self.raw_q_logdet.item()) if jackknife else 0
-        rlogdet_b = self.df * (jackknife_value['logdetr_jack'] - self.raw_r_logdet.item()) if jackknife else 0
-
-        self.q_logdet = self.raw_q_logdet - qlogdet_b
-        self.r_logdet = self.raw_r_logdet - rlogdet_b
-
+        #Mutual Information
         self.i_m1_t = -0.5*self.q_logdet
         self.i_m2_t = -0.5*self.r_logdet
 
         #M7:
         mat = self.constraint_cov_dict['c_model_7']
         block7 = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
-        nume7_raw = torch.logdet(self.I1-(block7.T@block7)) 
-        deno7_raw = self.raw_q_logdet + self.raw_r_logdet
-        m7_raw = 0.5*(nume7_raw- deno7_raw) 
-        m7_jack = jackknife_value['m7_jack'] if jackknife else 0
+        nume7 = torch.logdet(self.I1-(block7.T@block7)) 
+        deno7 = self.q_logdet + self.r_logdet
+        m7 = 0.5*(nume7- deno7) 
 
-        m7b = self.df * (m7_jack - m7_raw.item()) if jackknife else 0
-        m7 = m7_raw - m7b 
+        
         
         #M8:
         mat = self.constraint_cov_dict['c_model_8']
-        nume8_raw = torch.logdet(self.I1 - (self.P.T @ self.P))
-        deno8_raw = torch.logdet(mat)
-        m8_raw = 0.5*(nume8_raw-deno8_raw)
-        m8_jack = jackknife_value['m8_jack'] if jackknife else 0
-
-        m8b = self.df * (m8_jack - m8_raw.item()) if jackknife else 0
-        m8 = m8_raw - m8b
-
-
+        nume8 = torch.logdet(self.I1 - (self.P.T @ self.P))
+        deno8 = torch.logdet(mat)
+        m8 = 0.5*(nume8-deno8)
+        
         #Calculate unique 1
         i = m7  - self.i_m2_t 
         k = m8  - self.i_m2_t
@@ -383,7 +353,6 @@ class Idep_multivariate_gauss:
 
         
         self.i_m1_m2_t = 0.5*torch.logdet((self.I1 - self.P.T @ self.P)) - 0.5*torch.logdet(self.constraint_cov_dict['c_model_8']) 
-        #self.i_m1_m2_t += self.b_tmi
         # Redundant information
         red0 = self.i_m1_t.item() - unique_1
         red1 = self.i_m2_t.item() - unique_2
@@ -419,7 +388,7 @@ class Idep_multivariate_gauss:
 
         self.dependency_matrix(cov_matrix=cov_matrix)
  
-        idep_values = self.compute_Idep(jackknife=False)
+        idep_values = self.compute_Idep()
         self.unique_1_raw = idep_values['unique_1']
         self.unique_2_raw = idep_values['unique_2']
         pid_raw, mi_raw = self.pid_values(self.unique_1_raw, self.unique_2_raw)

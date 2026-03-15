@@ -38,10 +38,10 @@ def get_run_config() -> dict:
         "parent_submission_dir": "/mnt/data4tb/data_algonauts/submissions",
         "subj": 1, 
         "method": "ridge_cv",
-        "n_s": 7000,
+        "n_s": 3000,
         "n_f": 500,
         "rng_seed": np.random.default_rng(seed=30),
-        "n_seeds": 20000,
+        "n_seeds": 100,
         "seed_start": 0,
         "snr": 10,
         "mixing_dimension": 100,
@@ -120,7 +120,7 @@ def run_suppression_pipeline(config: dict, selected_features: np.ndarray, encode
     sources = [m1, m2]
     targets = [t]
     idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=True)
-    pid, mi = idep_class.idep()
+    pid, mi = idep_class.idep(jackknife=True)
     return ca, pid,mi
 
 
