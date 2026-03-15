@@ -9,7 +9,14 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
 from toy_examples.toy_example import run_all_methods,run_experiment,commonality_analysis
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
-from utils import Tee
+from utils import (
+    Tee,
+    extract_all_components,
+    get_seed_runs_csv_path,
+    print_seed_summary,
+    run_multi_seed_experiment,
+    save_seed_summary_csv,
+)
 from Partial_Information_Decomposition.PID_util import standardize, singularity_report,vif_summary,std_scaling_summary
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
@@ -83,8 +90,8 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,simple_example
     
     sources = [M1,M2]
     targets = [T]
-    idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=True)
-    pid , mi = idep_class.idep()
+    idep_class = Idep_multivariate_gauss(sources,targets)
+    pid , mi = idep_class.idep(jackknife=True)
     return vp_results,pid,mi
 
 def check_supression_effect(vp_results,pid_results):
@@ -213,6 +220,67 @@ def compare_results(vp_results,pid_results,mi_results):
 
     
     #check_supression_effect(vp_results,pid_results)
+
+
+def get_seed_sweep_config() -> dict:
+    """Configuration for fixed-parameter suppression simulations across seeds."""
+    return {
+        "n_seeds": 100,
+        "seed_start": 0,
+        "N": 3000,
+        "P": 100,
+        "suppresion_strength": 0.5,
+        "simple_example": False,
+        "snr": 5.0,
+        "method": "ridge_cv",
+        "mixing_dimension": 50,
+        "jackknife": True,
+        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example",
+        "results_prefix": "seed_summary",
+        "all_runs_results_prefix": "seed_runs",
+        "progress_print_every": 10,
+        "test_name": "toyexample_supp_gauss_multivariate",
+    }
+
+
+def run_single_seed_fixed(seed: int, config: dict) -> dict:
+    """Run one suppression experiment seed with all other parameters fixed."""
+    vp_results, pid_results, mi_results = test_suppresion(
+        N=config["N"],
+        P=config["P"],
+        suppresion_strength=config["suppresion_strength"],
+        rng_seed=seed,
+        simple_example=config["simple_example"],
+        snr=config["snr"],
+        method=config["method"],
+        mixing_dimension=config["mixing_dimension"],
+    )
+    return extract_all_components(vp_results, pid_results, mi_results)
+
+
+def run_fixed_params_across_seeds(config: dict | None = None) -> tuple[dict, list[dict]]:
+    """
+    Sweep over seeds while keeping all other simulation parameters fixed,
+    then save the per-seed results and mean/std summary.
+    """
+    run_config = get_seed_sweep_config() if config is None else config
+
+    summary, seed_rows = run_multi_seed_experiment(
+        run_config,
+        per_seed_runner=run_single_seed_fixed,
+    )
+
+    print_seed_summary(
+        summary,
+        n_seeds=run_config["n_seeds"],
+        seed_start=run_config["seed_start"],
+    )
+    all_runs_path = get_seed_runs_csv_path(run_config)
+    summary_path = save_seed_summary_csv(summary, run_config)
+    print(f"\nSaved all seed run results to: {all_runs_path}")
+    print(f"Saved summary to: {summary_path}")
+
+    return summary, seed_rows
         
 
 
@@ -220,11 +288,11 @@ def compare_results(vp_results,pid_results,mi_results):
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 1000000, 100
+    N, P = 3000, 100
     rng_seed = 10
     snr = 1
     method = 'ridge_cv'
-    mixing_dimension = 70
+    mixing_dimension = 50
     simple_example = False
     suppresion_strength = 0.5
     print("\n" + "="*70)
@@ -264,4 +332,6 @@ def main():
     print("\nAll experiments completed.")
 
 if __name__ == "__main__":
-    main()
+    #main()
+    # For fixed-parameter seed analysis and saved mean/std across seeds, run:
+    run_fixed_params_across_seeds()

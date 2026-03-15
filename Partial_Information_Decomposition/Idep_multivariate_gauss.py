@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 from torch.distributions import Normal
 from sklearn.linear_model import LinearRegression
 from sklearn.covariance import LedoitWolf
-
+from sklearn.model_selection import LeaveOneOut
 if __name__ != "__main__":
     from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report,block_singularity_check
-    from .bias_corr import entropy_bias_term
+    from .bias_corr import entropy_bias_term,matrix_beta_mi_bias
 else:
     from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report
 from typing import Optional
@@ -21,7 +21,7 @@ Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems
 
 torch.set_default_dtype(torch.float64)
 class Idep_multivariate_gauss:
-    def __init__(self, sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
+    def __init__(self, sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,bias_correction: bool = False,verbose:bool = True):
         """Initialize the Idep multivariate gaussian class
 
         input: M1,M2,T are torch tensors of shape (N,P)
@@ -29,14 +29,13 @@ class Idep_multivariate_gauss:
         P is the number of variables in each observation
 
         """
-        self.base_e = base_e  # Default to natural logarithm
-        
+        self.verbose = verbose
         self.M1 = sources[0] if sources is not None else None
         self.M2 = sources[1] if sources is not None else None
         self.T = targets[0] if targets is not None else None
         self.cov_dict = None
         self.N = self.M1.shape[0] if self.M1 is not None else None
-        df = self.N   if self.M1 is not None else None
+        self.df = self.N - 1  if self.M1 is not None else 0
         self.dim_m1 = self.M1.shape[1] if self.M1 is not None else 0
         self.dim_m2 = self.M2.shape[1] if self.M2 is not None else 0
         self.dim_t = self.T.shape[1] if self.T is not None else 0
@@ -46,7 +45,7 @@ class Idep_multivariate_gauss:
         self.I2 = torch.eye(self.dim_t)
 
         if self.M1 is not None and self.M2 is not None and self.T is not None:
-            self.cov_dict = create_cov_matrix(self.M1,self.M2,self.T)
+            self.cov_dict = create_cov_matrix(self.M1,self.M2,self.T,self.verbose)
             self.cov_matrix = self.cov_dict['full_cov']
             #assert_full_rank(self.cov_matrix)
         elif cov_matrix is not None:
@@ -72,11 +71,12 @@ class Idep_multivariate_gauss:
             assert self.dim_m1 + self.dim_m2 + self.dim_t == self.cov_matrix.shape[0], f"Covariance matrix dimensions {self.cov_matrix.shape} do not match the provided source and target dimensions: {self.dim_m1 + self.dim_m2 + self.dim_t}."
             
             # Singularity check for P,Q and R blocks
-            p = (torch.eye(self.P.shape[0]) - self.P @ self.P.T).detach().cpu().numpy()
-            q = (torch.eye(self.Q.shape[0]) - self.Q @ self.Q.T).detach().cpu().numpy()
-            r = (torch.eye(self.R.shape[0]) - self.R @ self.R.T).detach().cpu().numpy()
-            block_singularity_check(np.array([p,q,r]))
-            block_singularity_check(np.array([p.T,q.T,r.T]))
+            p = (self.I1 - self.P.T @ self.P).detach().cpu().numpy()
+            q = (self.I2 - self.Q.T @ self.Q).detach().cpu().numpy()
+            r = (self.I2 - self.R.T @ self.R).detach().cpu().numpy()
+            block_singularity_check(np.array([p]))
+            block_singularity_check(np.array([q]))
+            block_singularity_check(np.array([r]))
         if bias_correction:
             self.bm1 = entropy_bias_term(df, self.dim_m1) 
             self.bm2 = entropy_bias_term(df, self.dim_m2)
@@ -117,6 +117,66 @@ class Idep_multivariate_gauss:
         LN2 = torch.log(torch.tensor(2.0, dtype=torch.float64))
         return torch.log(x) / LN2
     
+    def jackknife_bias_term(self,X_M1,X_M2,X_T):
+        """This function utilized LeaveOneOut resampling to estimate the bias of the logdet estimator for a given dataset X.
+        Args:
+            X (np.ndarray): Input data of shape (n_samples, n_features).
+            X_bar_logdet (np.ndarray): Logdet of the whole sample.
+            
+            """
+        if X_M1 is None or X_M2 is None or X_T is None:
+            return {k: torch.tensor(0.0) for k in ['logdetq_jack', 'logdetp_jack', 'logdetr_jack', 'm7_jack', 'm8_jack']}
+       
+        loo = LeaveOneOut()
+        keys = ['logdetq_jack','logdetp_jack','logdetr_jack','m7_jack','m8_jack']
+        logdet_dict_jack = {key: [] for key in keys}
+        l = 1
+        for train_idx, test_idx in loo.split(X_M1):
+            print(f"Jackknife iteration {l}/{self.N}", end="\r")
+            X_M1_train = X_M1[train_idx]
+            X_T_train = X_T[train_idx]
+            X_M2_train = X_M2[train_idx]
+
+            jack_idep = Idep_multivariate_gauss(sources=[X_M1_train,X_M2_train], targets=[X_T_train], bias_correction=False,verbose=False)
+
+            P_jack = jack_idep.P
+            Q_jack = jack_idep.Q
+            R_jack = jack_idep.R
+
+             
+            logdetp_jack = torch.logdet(jack_idep.I1 - (P_jack.T @ P_jack))
+            logdetr_jack = torch.logdet(jack_idep.I2 - (R_jack.T @ R_jack))
+            logdetq_jack = torch.logdet(jack_idep.I2 - (Q_jack.T @ Q_jack))
+            assert not torch.isnan(logdetp_jack), f"Jackknife logdetp_jack is NaN at iteration {l}."
+            assert not torch.isnan(logdetr_jack), f"Jackknife logdetr_jack is NaN at iteration {l}."
+            assert not torch.isnan(logdetq_jack), f"Jackknife logdetq_jack is NaN at iteration {l}."
+
+            dep_mat_jack = jack_idep.dependency_matrix(jack_idep.cov_matrix)
+            #M7:
+            mat = dep_mat_jack['c_model_7']
+            block7_jack = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
+            nume7_jack = torch.logdet(torch.eye(block7_jack.shape[0]) - (block7_jack.T @ block7_jack))
+            deno7_jack = logdetq_jack + logdetr_jack 
+            m7 = 0.5*(nume7_jack- deno7_jack) 
+            assert not torch.isnan(m7), f"Jackknife m7 is NaN at iteration {l}."
+            
+            #M8:s
+            mat_jack = dep_mat_jack['c_model_8']
+            nume8_jack = logdetp_jack
+            deno8_jack = torch.logdet(mat_jack)
+            m8 = 0.5*(nume8_jack-deno8_jack)
+            assert not torch.isnan(m8), f"Jackknife m8 is NaN at iteration {l}."
+            
+            logdet_dict_jack['logdetq_jack'].append(logdetq_jack.item())
+            logdet_dict_jack['logdetp_jack'].append(logdetp_jack.item())
+            logdet_dict_jack['logdetr_jack'].append(logdetr_jack.item())
+            logdet_dict_jack['m7_jack'].append(m7.item())
+            logdet_dict_jack['m8_jack'].append(m8.item())
+            l += 1
+        jack_mean = {k: torch.mean(torch.tensor(logdet_dict_jack[k])) for k in logdet_dict_jack}
+
+        return jack_mean
+    
 
     def create_model_M(self,block1:Optional[torch.tensor]=None,block2:Optional[torch.tensor]=None,block3:Optional[torch.tensor]=None) -> torch.tensor:
         """This function will create the dependency matrix for the given blocks
@@ -143,7 +203,7 @@ class Idep_multivariate_gauss:
         return M
 
 
-    def dependency_matrix(self,constraints: list,cov_matrix: Optional[torch.tensor]=None,cov_dict: Optional[dict]=None)-> dict:
+    def dependency_matrix(self,cov_matrix: Optional[torch.tensor]=None,cov_dict: Optional[dict]=None)-> dict:
         """This function will create the dependency matrix for the given constraint
 
         input: cov_matrix is a torch tensor of shape (d,d)
@@ -161,105 +221,159 @@ class Idep_multivariate_gauss:
 
         cov_matrix = self.cov_matrix if cov_matrix is None else cov_matrix
         assert (cov_dict is None) != (cov_matrix is None), "Either cov_dict or cov_matrix must be provided, but not both."
-
-
-        possible_inputs = ['c_model_1','c_model_2','c_model_3','c_model_4','c_model_5','c_model_6','c_model_7','c_model_8']
-        assert np.all([constraint in possible_inputs for constraint in constraints]), f"Constraint {constraints} not recognized. Available constraints: {possible_inputs}" 
+        
 
         self.constraint_cov_dict = {}
-        print(f"\nCovariance matrix shape: {cov_matrix.shape}")
-        print(f"dim_m1: {self.dim_m1}, dim_m2: {self.dim_m2}, dim_t: {self.dim_t}")
+        if self.verbose:
+            print(f"\nCovariance matrix shape: {cov_matrix.shape}")
+            print(f"dim_m1: {self.dim_m1}, dim_m2: {self.dim_m2}, dim_t: {self.dim_t}")
+
+        self.constraint_cov_dict['c_model_1'] = I = torch.eye(cov_matrix.shape[0], device=cov_matrix.device, dtype=cov_matrix.dtype)
+    #No constraints, all independent
+
+        M2 = self.create_model_M(block1=self.P)
+        self.constraint_cov_dict['c_model_2'] = M2 #M0 and M1 dependent
 
 
+        M3 = self.create_model_M(block2=self.Q)
+        self.constraint_cov_dict['c_model_3'] = M3 #M0 and T dependent
 
-        
-        if 'c_model_1' in constraints:
-            self.constraint_cov_dict['c_model_1'] = I = torch.eye(cov_matrix.shape[0], device=cov_matrix.device, dtype=cov_matrix.dtype)
-        #No constraints, all independent
 
-        if 'c_model_2' in constraints:
-            M2 = self.create_model_M(block1=self.P)
-            self.constraint_cov_dict['c_model_2'] = M2 #M0 and M1 dependent
+        M4 = self.create_model_M(block3=self.R)
+        self.constraint_cov_dict['c_model_4'] = M4 #M1 and T dependent
 
-        if 'c_model_3' in constraints:
-            M3 = self.create_model_M(block2=self.Q)
-            self.constraint_cov_dict['c_model_3'] = M3 #M0 and T dependent
 
-        if 'c_model_4' in constraints:
-            M4 = self.create_model_M(block3=self.R)
-            self.constraint_cov_dict['c_model_4'] = M4 #M1 and T dependent
+        P_Q = (self.P).T @ self.Q
+        M5 = self.create_model_M(block1=self.P,block2=self.Q,block3=P_Q) 
+        self.constraint_cov_dict['c_model_5'] = M5 #M1 and T dependent, M1 and M2 dependent
 
-        if 'c_model_5' in constraints:
-            P_Q = (self.P).T @ self.Q
-            M5 = self.create_model_M(block1=self.P,block2=self.Q,block3=P_Q) 
-            self.constraint_cov_dict['c_model_5'] = M5 #M1 and T dependent, M1 and M2 dependent
 
-        if 'c_model_6' in constraints:
-            P_R = self.P @ self.R  
-            M6 = self.create_model_M(block1=self.P,block2=P_R,block3=self.R)    
-            self.constraint_cov_dict['c_model_6'] = M6 #M2 and T dependent, M1 and M2 dependent
+        P_R = self.P @ self.R  
+        M6 = self.create_model_M(block1=self.P,block2=P_R,block3=self.R)    
+        self.constraint_cov_dict['c_model_6'] = M6 #M2 and T dependent, M1 and M2 dependent
 
-        if 'c_model_7' in constraints:
-            Q_R = self.Q @ self.R.T
-            M7 = self.create_model_M(block1=Q_R,block2=self.Q,block3=self.R)   
-            self.constraint_cov_dict['c_model_7'] = M7 #M1 and T dependent, M2 and T dependent
+        Q_R = self.Q @ self.R.T
+        M7 = self.create_model_M(block1=Q_R,block2=self.Q,block3=self.R)   
+        self.constraint_cov_dict['c_model_7'] = M7 #M1 and T dependent, M2 and T dependent
 
-        if 'c_model_8' in constraints: 
-            M8 = self.create_model_M(self.P,self.Q,self.R) #Full covariance, all dependent
-            self.constraint_cov_dict['c_model_8'] = M8
+        M8 = self.create_model_M(self.P,self.Q,self.R) #Full covariance, all dependent
+        self.constraint_cov_dict['c_model_8'] = M8
 
 
         return self.constraint_cov_dict
     
-    def compute_Idep(self)-> dict:
+    def compute_Idep(self, jackknife=False)-> dict:
         """This function calcualtes the mutual information for a given covariance matrix - U models in the lattice"""
         assert hasattr(self, "constraint_cov_dict"), "Run dependency_matrix(...) before compute_Idep(...)."
         
-        self.q_logdet = torch.logdet(self.I2 - (self.Q.T @ self.Q))
-        self.q_correction = (self.bm1 + self.bt - self.bq)
-        self.i_m1_t = -0.5*self.q_logdet + self.q_correction
+        if jackknife:
+            jackknife_value = self.jackknife_bias_term(self.M1.detach().cpu(), self.M2.detach().cpu(), self.T.detach().cpu()) if self.M1 is not None else self.jackknife_bias_term(None,None,None)
+        self.df = 0 if self.N is None else self.N - 1
+        self.raw_q_logdet = torch.logdet(self.I2 - (self.Q.T @ self.Q))
+        #self.q_correction = (self.bm1 + self.bt - self.bq)
         
-        self.r_logdet = torch.logdet(self.I2 - (self.R.T @ self.R))
-        self.r_correction = (self.bm2 + self.bt - self.br) 
-        self.i_m2_t = -0.5*self.r_logdet + self.r_correction
+        self.raw_r_logdet = torch.logdet(self.I2 - (self.R.T @ self.R))
+        #self.r_correction = (self.bm2 + self.bt - self.br) 
 
-        self.b_tmi = (self.bp + self.bt - self.ball)
+        qlogdet_b = self.df * (jackknife_value['logdetq_jack'] - self.raw_q_logdet.item()) if jackknife else 0
+        rlogdet_b = self.df * (jackknife_value['logdetr_jack'] - self.raw_r_logdet.item()) if jackknife else 0
+
+        self.q_logdet = self.raw_q_logdet - qlogdet_b
+        self.r_logdet = self.raw_r_logdet - rlogdet_b
+
+        self.i_m1_t = -0.5*self.q_logdet
+        self.i_m2_t = -0.5*self.r_logdet
+
         #M7:
         mat = self.constraint_cov_dict['c_model_7']
         block7 = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
-        nume7 = torch.logdet(self.I1-(block7.T@block7)) 
-        deno7 = torch.logdet(self.I2 - (self.Q.T @ self.Q)) + torch.logdet(self.I2 - (self.R.T @ self.R))  
-        biasm7 = self.bq + self.br - self.bt
-        m7 = 0.5*(nume7- deno7) + self.b_tmi
+        nume7_raw = torch.logdet(self.I1-(block7.T@block7)) 
+        deno7_raw = self.raw_q_logdet + self.raw_r_logdet
+        m7_raw = 0.5*(nume7_raw- deno7_raw) 
+        m7_jack = jackknife_value['m7_jack'] if jackknife else 0
+
+        m7b = self.df * (m7_jack - m7_raw.item()) if jackknife else 0
+        m7 = m7_raw - m7b 
         
         #M8:
         mat = self.constraint_cov_dict['c_model_8']
-        nume8 = torch.logdet(self.I1 - (self.P.T @ self.P))
-        deno8 = torch.logdet(mat)
-        m8 = 0.5*(nume8-deno8) + self.b_tmi
+        nume8_raw = torch.logdet(self.I1 - (self.P.T @ self.P))
+        deno8_raw = torch.logdet(mat)
+        m8_raw = 0.5*(nume8_raw-deno8_raw)
+        m8_jack = jackknife_value['m8_jack'] if jackknife else 0
+
+        m8b = self.df * (m8_jack - m8_raw.item()) if jackknife else 0
+        m8 = m8_raw - m8b
+
 
         #Calculate unique 1
         i = m7  - self.i_m2_t 
         k = m8  - self.i_m2_t
         b = self.i_m1_t 
         d = self.i_m1_t 
-        unique_1 = torch.min(torch.stack([b,d,i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
-        assert unique_1 == i or unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={self.unique_1}, i={i}, k={k}."
-        self.I_dep_values['unique_1'] = unique_1.item()
+        self.unique_1 = torch.min(torch.stack([i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
+        assert self.unique_1 == i or self.unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={self.unique_1}, i={i}, k={k}."
+        self.I_dep_values['unique_1'] = self.unique_1.item()
     
         #Calculate unique 2
         h = m7  - self.i_m1_t 
         j = m8  - self.i_m1_t
         c = self.i_m2_t 
         f = self.i_m2_t  
-        unique_2 = torch.min(torch.stack([c,f,h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
-        self.I_dep_values['unique_2'] = unique_2.item()
-        assert unique_2 == h or unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={unique_2}, h={h}, j={j}."
+        self.unique_2 = torch.min(torch.stack([h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
+        self.I_dep_values['unique_2'] = self.unique_2.item()
+        assert self.unique_2 == h or self.unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={self.unique_2}, h={h}, j={j}."
 
         #Check for nan values
-        assert not torch.isnan(unique_1), f"unique_0 = {unique_1} was not calculated properly."
-        assert not torch.isnan(unique_2), f"unique_2 = {unique_2} was not calculated properly."  
+        assert not torch.isnan(self.unique_1), f"unique_1 = {self.unique_1} was not calculated properly."
+        assert not torch.isnan(self.unique_2), f"unique_2 = {self.unique_2} was not calculated properly."  
         return self.I_dep_values
+    
+    def jackknife_pid(self,X_M1,X_M2,X_T):
+        """This function utilized LeaveOneOut resampling to estimate the bias of the unique information estimator for a given dataset X.
+        Args:
+            X (np.ndarray): Input data of shape (n_samples, n_features).
+            X_bar_logdet (np.ndarray): Logdet of the whole sample.
+            
+            """
+        if X_M1 is None or X_M2 is None or X_T is None:
+           raise ValueError("Input data for Jackknife PID calculation cannot be None.")
+       
+        loo = LeaveOneOut()
+
+        pid_keys = ['unq1_jack','unq2_jack','red_jack','syn_jack']
+        pid_dict_jack = {key: [] for key in pid_keys}
+
+        mi_keys = ['I(M1;T)_jack','I(M2;T)_jack','I(M1,M2;T)_jack']
+        mi_dict_jack = {key: [] for key in mi_keys}
+
+        l = 1
+        for train_idx, test_idx in loo.split(X_M1):
+            print(f"Unique Jackknife iteration {l}/{self.N}", end="\r")
+            X_M1_train = X_M1[train_idx]
+            X_T_train = X_T[train_idx]
+            X_M2_train = X_M2[train_idx]
+
+            jack_idep = Idep_multivariate_gauss(sources=[X_M1_train,X_M2_train], targets=[X_T_train], bias_correction=False,verbose=False)
+
+            jack_idep.dependency_matrix()
+            idep_values_jack = jack_idep.compute_Idep()
+            pid_values_jack, mi_values_jack = jack_idep.pid_values(idep_values_jack['unique_1'], idep_values_jack['unique_2'])
+            
+            #PID Values
+            pid_dict_jack['unq1_jack'].append(idep_values_jack['unique_1'])
+            pid_dict_jack['unq2_jack'].append(idep_values_jack['unique_2'])
+            pid_dict_jack['red_jack'].append(pid_values_jack['red'])
+            pid_dict_jack['syn_jack'].append(pid_values_jack['syn'])
+
+            #Mutual Information Values
+            mi_dict_jack['I(M1;T)_jack'].append(mi_values_jack['I(M1;T)'])
+            mi_dict_jack['I(M2;T)_jack'].append(mi_values_jack['I(M2;T)'])
+            mi_dict_jack['I(M1,M2;T)_jack'].append(mi_values_jack['I(M1,M2;T)'])
+            l += 1
+        pid_jack_mean = {k: torch.mean(torch.tensor(pid_dict_jack[k])) for k in pid_dict_jack}
+        mi_jack_mean = {k: torch.mean(torch.tensor(mi_dict_jack[k])) for k in mi_dict_jack}
+        return pid_jack_mean, mi_jack_mean
     
     def pid_values(self,unique_1, unique_2):
         """This function will compute the PID values using the I_dep values
@@ -269,25 +383,30 @@ class Idep_multivariate_gauss:
 
         
         self.i_m1_m2_t = 0.5*torch.logdet((self.I1 - self.P.T @ self.P)) - 0.5*torch.logdet(self.constraint_cov_dict['c_model_8']) 
-        self.i_m1_m2_t += self.b_tmi
+        #self.i_m1_m2_t += self.b_tmi
         # Redundant information
-        red0 = self.i_m1_t - unique_1
-        red1 = self.i_m2_t - unique_2
+        red0 = self.i_m1_t.item() - unique_1
+        red1 = self.i_m2_t.item() - unique_2
         assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
         # Synergistic information
-        syn = self.i_m1_m2_t - self.i_m1_t - unique_2
-        assert not torch.isnan(red), f"Redundant={red} information not calculated properly."
-        assert not torch.isnan(syn), f"Synergistic={syn} information not calculated properly."
+        syn = self.i_m1_m2_t.item() - self.i_m1_t.item() - unique_2
+        assert not torch.isnan(torch.tensor([red])), f"Redundant={red} information not calculated properly."
+        assert not torch.isnan(torch.tensor([syn])), f"Synergistic={syn} information not calculated properly."
         self.PID_values = {
-            'red': red.item(),
+            'red': red,
             'unq1': unique_1,
             'unq2': unique_2,
-            'syn': syn.item()
+            'syn': syn
         }
-        return self.PID_values
+        self.mi = {
+            'I(M1;T)': self.i_m1_t,
+            'I(M2;T)': self.i_m2_t,
+            'I(M1,M2;T)': self.i_m1_m2_t
+        }
+        return self.PID_values, self.mi
     
-    def idep(self,cov_matrix: Optional[torch.tensor]=None)-> dict:
+    def idep(self,cov_matrix: Optional[torch.tensor]=None,jackknife: bool=False)-> dict:
         """This function will compute the full Idep PID decomposition
 
         input: cov_matrix is a torch tensor of shape (d,d) in case you want to provide a different covariance matrix
@@ -298,14 +417,28 @@ class Idep_multivariate_gauss:
 
         self.cov_matrix = self.cov_matrix if cov_matrix is None else cov_matrix
 
-        self.dependency_matrix(constraints=[
-            'c_model_1','c_model_2','c_model_3','c_model_4',
-            'c_model_5','c_model_6','c_model_7','c_model_8'
-        ],cov_matrix=cov_matrix)
+        self.dependency_matrix(cov_matrix=cov_matrix)
+ 
+        idep_values = self.compute_Idep(jackknife=False)
+        self.unique_1_raw = idep_values['unique_1']
+        self.unique_2_raw = idep_values['unique_2']
+        pid_raw, mi_raw = self.pid_values(self.unique_1_raw, self.unique_2_raw)
+        if jackknife:
+            jackknife_pid,jackknife_mi = self.jackknife_pid(self.M1.detach().cpu(), self.M2.detach().cpu(), self.T.detach().cpu()) 
 
-        idep_values = self.compute_Idep()
-        pid = self.pid_values(idep_values['unique_1'], idep_values['unique_2'])
-        mi = {'I(M1;T)': self.i_m1_t.item(), 'I(M2;T)': self.i_m2_t.item(), 'I(M1,M2;T)': self.i_m1_m2_t.item()}
+
+            pid_b = {k: self.df * (jackknife_pid[k + '_jack'] - pid_raw[k]) for k in pid_raw}
+            mi_b = {k: self.df * (jackknife_mi[k + '_jack'] - mi_raw[k]) for k in mi_raw}
+
+            pid = {k: pid_raw[k] - pid_b[k] for k in pid_raw}
+            mi = {k: mi_raw[k] - mi_b[k] for k in mi_raw}
+
+        else:
+            self.unique_1 = self.unique_1_raw
+            self.unique_2 = self.unique_2_raw
+            pid,mi = pid_raw, mi_raw
+        
+            
         return pid , mi
     
     
@@ -355,7 +488,7 @@ def run_one(n0, n1, n2, p, q, r):
     Sigma = build_full_cov(n0, n1, n2, P, Q, R)
 
     # IMPORTANT: you pass cov_matrix, but your class needs self.cov_dict=None fix
-    obj = Idep_multivariate_gauss(sources=None, targets=None, cov_matrix=Sigma,base_e=True,bias_correction=False)
+    obj = Idep_multivariate_gauss(sources=None, targets=None, cov_matrix=Sigma,bias_correction=False)
 
     # You must set these because when cov_matrix is given, your code currently
     # doesn't populate P,Q,R and dims (unless you refactor __init__)

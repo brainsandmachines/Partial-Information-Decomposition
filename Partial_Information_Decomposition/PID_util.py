@@ -44,7 +44,7 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     return Sigma
 
 
-def create_cov_matrix(X0,X1,X2):
+def create_cov_matrix(X0,X1,X2,verbose):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
     N is the number of observations, 
@@ -61,7 +61,8 @@ def create_cov_matrix(X0,X1,X2):
         print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")
 
     cov_dict = {}
-    print(f"\nFull covariance matrix shape: {Sigma.shape}")
+    if verbose:
+        print(f"\nFull covariance matrix shape: {Sigma.shape}")
     x0_dim = X0.shape[1]
     x1_dim = X1.shape[1]
     x2_dim = X2.shape[1]
@@ -343,3 +344,4 @@ def compare_results(vp_results,pid_results,mi_results):
     print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq2']:.4f}")
     print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
     print(f"Synergy (PID): {pid_results['syn']:.4f}")
+

@@ -2,73 +2,42 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.covariance import OAS
 from scipy.special import digamma
+import torch
+from astropy.stats import jackknife_stats
 
 # --- 1. Helper Functions ---
 
 def entropy_bias_term(df, d):
     """ Analytical bias for Standard MLE (Wishart) """
-    # Returns negative value (underestimation of entropy)
     return -0.5 * (np.sum([digamma((df - i) / 2.0) for i in range(1, d + 1)]) + d * np.log(2.0 / df))
 
-
-import torch
-
 def matrix_beta_mi_bias(df: float, p: int, q: int, device: torch.device = torch.device('cpu')) -> torch.Tensor:
-    """
-    Calculates the exact bias for Mutual Information I(X; Y)
-    based on the Type I Matrix Variate Beta distribution (Wilks' Lambda).
-    
-    df: Degrees of freedom (N - 1)
-    p: Dimension of the source variable
-    q: Dimension of the target variable
-    """
     if p == 0 or q == 0:
         return torch.tensor(0.0, device=device, dtype=torch.float64)
         
     i = torch.arange(1, p + 1, device=device, dtype=torch.float64)
-    
-    # Expected value of ln|I - P^T P| (which is strictly negative)
     term1 = torch.digamma((df - q - i + 1) / 2.0)
     term2 = torch.digamma((df - i + 1) / 2.0)
     expected_logdet = torch.sum(term1 - term2)
-    
-    # Mutual Information is calculated as -0.5 * ln|I - P^T P|.
-    # Because empirical MI overestimates true MI, this positive bias 
-    # must be SUBTRACTED from your raw MI calculations.
-    mi_bias = -0.5 * expected_logdet 
-    
-    return mi_bias
+    return -0.5 * expected_logdet 
 
 def entropy_bias_term2(df: float, d: int, device: torch.device = torch.device('cpu')) -> torch.Tensor:
-    """ 
-    Analytical bias for Standard MLE (Wishart).
-    Returns a negative value (underestimation of entropy).
-    Add this term to your raw entropy estimate to correct it.
-    """
     if d == 0:
         return torch.tensor(0.0, device=device, dtype=torch.float64)
         
-    # i ranges from 1 to d
     i = torch.arange(1, d + 1, device=device, dtype=torch.float64)
-    
-    # Corrected: (df - i + 1)
     digamma_sum = torch.sum(torch.digamma((df - i + 1) / 2.0))
-    
-    # d * ln(2/df)
     log_term = d * torch.log(torch.tensor(2.0 / df, device=device, dtype=torch.float64))
     
-    bias = -1*(digamma_sum + log_term)
-    
+    bias = -1 * (digamma_sum + log_term)
     return bias
 
 def get_oas_entropy(X):
     """ Helper: Calculate H(X) using OAS covariance """
     oas = OAS(assume_centered=False)
     oas.fit(X)
-    # 0.5 * log|Sigma| (ignoring constants for MI diff)
     sign, logdet = np.linalg.slogdet(oas.covariance_)
     return 0.5 * logdet if sign > 0 else -np.inf
-    
 
 def get_mi_estimates(X, Y, N, dx, dy):
     dz = dx + dy
@@ -97,17 +66,14 @@ def get_mi_estimates(X, Y, N, dx, dy):
     by2 = entropy_bias_term2(N-1, dy)
     bz2 = entropy_bias_term2(N-1, dz)
     correction2 = bx2 + by2 - bz2
-    mi_analytic2 = mi_naive + correction2.item()  # Convert tensor to scalar
+    mi_analytic2 = mi_naive + correction2.item()
 
     # --- Method C: OAS + Permutation ---
-    # 1. Raw OAS MI
     h_x = get_oas_entropy(X)
     h_y = get_oas_entropy(Y)
     h_z = get_oas_entropy(Z)
     mi_oas_raw = h_x + h_y - h_z
     
-    # 2. Permutation (Shuffle Y to find noise floor)
-    # We only need to shuffle a few times to get a stable mean for high N
     null_mis = []
     Y_shuff = Y.copy()
     for _ in range(5):
@@ -118,84 +84,110 @@ def get_mi_estimates(X, Y, N, dx, dy):
     
     bias_est = np.mean(null_mis)
     mi_oas_perm = max(0, mi_oas_raw - bias_est)
-    
-    return mi_naive, mi_analytic,mi_analytic2, mi_oas_perm
+
+    # --- Method D: Astropy Jackknife ---
+    # Memory/Compute safeguard for Astropy array allocation
+    # --- Method D: Astropy Jackknife ---
+    # Memory/Compute safeguard for Astropy array allocation
+    if N <= 2000:
+        def mi_statistic(idx):
+            # idx is a 1D array of indices (length N-1) passed by astropy
+            # We use it to slice the global Z array safely
+            data = Z[idx.astype(int)]
+            
+            # Recalculate MLE MI for the N-1 subset
+            C_x = np.cov(data[:, :dx], rowvar=False, bias=True)
+            C_y = np.cov(data[:, dx:], rowvar=False, bias=True)
+            C_z = np.cov(data, rowvar=False, bias=True)
+            ld_x = np.linalg.slogdet(C_x)
+            ld_y = np.linalg.slogdet(C_y)
+            ld_z = np.linalg.slogdet(C_z)
+            return 0.5 * (ld_x + ld_y - ld_z)
+
+        try:
+            # Pass a 1D array of row indices to avoid astropy's flattening bug
+            indices = np.arange(N)
+            estimate, bias, stderr, conf_interval = jackknife_stats(indices, mi_statistic)
+            mi_jackknife = estimate
+        except MemoryError:
+            mi_jackknife = np.nan
+    else:
+        mi_jackknife = np.nan
+
+    return mi_naive, mi_analytic, mi_analytic2, mi_oas_perm, mi_jackknife
 
 # --- 2. Simulation Logic ---
 
 def run_simulation():
     np.random.seed(42)
     
-    # Dimensions: High dimensional setting
     dx = 500
     dy = 500
     p = dx + dy
     
-    # Sample Sizes
-    sample_sizes = [1100, 2000, 5000, 7000, 9000,50000,100000]
+    sample_sizes = [1100, 2000]
     
     # --- SCENARIO 1: ZERO MI (Independent) ---
-    print(f"\n{'='*30}\n SCENARIO 1: True MI = 0.0\n{'='*30}")
-    print(f"{'N':<6} | {'Naive':<10} | {'Analytic':<10} |{'Analytic2':<10} | {'OAS+Perm':<10}")
+    print(f"\n{'='*40}\n SCENARIO 1: True MI = 0.0\n{'='*40}")
+    print(f"{'N':<6} | {'Naive':<8} | {'Analytic':<8} | {'OAS+Perm':<8} | {'Jackknife':<8}")
     
-    res_zero = {'naive': [], 'analytic': [], 'analytic2': [], 'oas': []}
+    res_zero = {'naive': [], 'analytic': [], 'analytic2': [], 'oas': [], 'jackknife': []}
     
     for N in sample_sizes:
         X = np.random.randn(N, dx)
         Y = np.random.randn(N, dy)
         
-        naive, analytic, analytic2, oas_perm = get_mi_estimates(X, Y, N, dx, dy)
+        naive, analytic, analytic2, oas_perm, jackknife = get_mi_estimates(X, Y, N, dx, dy)
         
         res_zero['naive'].append(naive)
         res_zero['analytic'].append(analytic)
         res_zero['analytic2'].append(analytic2)
         res_zero['oas'].append(oas_perm)
+        res_zero['jackknife'].append(jackknife)
         
-        print(f"{N:<6} | {naive:.3f}      | {analytic:.3f}  | {analytic2:.3f} | {oas_perm:.3f}")
+        jack_str = f"{jackknife:.3f}" if not np.isnan(jackknife) else "N/A"
+        print(f"{N:<6} | {naive:>8.3f} | {analytic:>8.3f} | {oas_perm:>8.3f} | {jack_str:>8}")
 
     # --- SCENARIO 2: POSITIVE MI (Correlated) ---
-    # Create a fixed Ground Truth Covariance
-    print(f"\n{'='*30}\n SCENARIO 2: True MI > 0\n{'='*30}")
+    print(f"\n{'='*40}\n SCENARIO 2: True MI > 0\n{'='*40}")
     
-    # Generate random covariance with signal
     A = np.random.randn(p, p)
     True_Sigma = np.dot(A, A.T)
     
-    # Calculate True MI of this matrix
     _, ld_x = np.linalg.slogdet(True_Sigma[:dx, :dx])
     _, ld_y = np.linalg.slogdet(True_Sigma[dx:, dx:])
     _, ld_z = np.linalg.slogdet(True_Sigma)
     TRUE_MI = 0.5 * (ld_x + ld_y - ld_z)
     
     print(f"Ground Truth MI: {TRUE_MI:.3f} nats")
-    print(f"{'N':<6} | {'Naive':<10} | {'Analytic':<10} | {'Analytic2':<10} | {'OAS+Perm':<10}")
+    print(f"{'N':<6} | {'Naive':<8} | {'Analytic':<8} | {'OAS+Perm':<8} | {'Jackknife':<8}")
 
-    res_pos = {'naive': [], 'analytic': [], 'analytic2': [], 'oas': []}
+    res_pos = {'naive': [], 'analytic': [], 'analytic2': [], 'oas': [], 'jackknife': []}
 
     for N in sample_sizes:
-        # Generate data from the True Covariance
         Z = np.random.multivariate_normal(np.zeros(p), True_Sigma, size=N)
         X = Z[:, :dx]
         Y = Z[:, dx:]
         
-        naive, analytic, analytic2, oas_perm = get_mi_estimates(X, Y, N, dx, dy)
+        naive, analytic, analytic2, oas_perm, jackknife = get_mi_estimates(X, Y, N, dx, dy)
         
         res_pos['naive'].append(naive)
         res_pos['analytic'].append(analytic)
         res_pos['analytic2'].append(analytic2)
         res_pos['oas'].append(oas_perm)
+        res_pos['jackknife'].append(jackknife)
         
-        print(f"{N:<6} | {naive:.3f}      | {analytic:.3f}      | {analytic2:.3f}      | {oas_perm:.3f}")
+        jack_str = f"{jackknife:.3f}" if not np.isnan(jackknife) else "N/A"
+        print(f"{N:<6} | {naive:>8.3f} | {analytic:>8.3f} | {oas_perm:>8.3f} | {jack_str:>8}")
 
     # --- 3. Plotting ---
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
     
-    # Plot Zero MI
-    ax = axes[0]
+    ax = axes
     ax.plot(sample_sizes, res_zero['naive'], 'r-o', label='Naive MLE', linewidth=2)
     ax.plot(sample_sizes, res_zero['analytic'], 'b-s', label='Analytic Corrected', linewidth=2)
-    ax.plot(sample_sizes, res_zero['analytic2'], 'm-d', label='Analytic2', linewidth=2)
     ax.plot(sample_sizes, res_zero['oas'], 'g-^', label='OAS + Permutation', linewidth=2)
+    ax.plot(sample_sizes, res_zero['jackknife'], 'm-X', label='Astropy Jackknife', markersize=8, linewidth=2)
     ax.axhline(y=0, color='k', linestyle='--', label='True MI (0.0)')
     ax.set_title('Scenario 1: Noise (True MI=0)')
     ax.set_xlabel('Samples (N)')
@@ -203,12 +195,11 @@ def run_simulation():
     ax.legend()
     ax.grid(True, alpha=0.3)
     
-    # Plot Positive MI
-    ax = axes[1]
+    ax = axes
     ax.plot(sample_sizes, res_pos['naive'], 'r-o', label='Naive MLE', linewidth=2)
     ax.plot(sample_sizes, res_pos['analytic'], 'b-s', label='Analytic Corrected', linewidth=2)
-    ax.plot(sample_sizes, res_pos['analytic2'], 'm-d', label='Analytic2', linewidth=2)
     ax.plot(sample_sizes, res_pos['oas'], 'g-^', label='OAS + Permutation', linewidth=2)
+    ax.plot(sample_sizes, res_pos['jackknife'], 'm-X', label='Astropy Jackknife', markersize=8, linewidth=2)
     ax.axhline(y=TRUE_MI, color='k', linestyle='--', label=f'True MI ({TRUE_MI:.2f})')
     ax.set_title('Scenario 2: Signal (True MI > 0)')
     ax.set_xlabel('Samples (N)')
