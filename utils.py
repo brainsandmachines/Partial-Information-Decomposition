@@ -298,6 +298,41 @@ def seed_summary_to_table(
     return table
 
 
+def save_csv_column_means(
+    csv_path: Path | str,
+    output_csv_path: Path | str,
+    decimals: int = 6,
+) -> pd.DataFrame:
+    """
+    Compute the mean of all numeric CSV columns and save to a new CSV.
+
+    This supports both regular CSV files and the project's seed-runs format
+    where the first two rows can contain metadata.
+    """
+    csv_path = Path(csv_path)
+    if not csv_path.exists() or csv_path.stat().st_size == 0:
+        return pd.DataFrame(columns=["column", "mean"])
+
+    df = pd.read_csv(csv_path)
+    if "seed" not in df.columns:
+        # Seed-runs CSV files include metadata rows before the real header.
+        try:
+            df = pd.read_csv(csv_path, skiprows=2)
+        except Exception:
+            return pd.DataFrame(columns=["column", "mean"])
+
+    numeric_df = df.apply(pd.to_numeric, errors="coerce")
+    mean_series = numeric_df.mean(axis=0, skipna=True).dropna()
+
+    means_df = mean_series.rename("mean").reset_index().rename(columns={"index": "column"})
+    means_df["mean"] = means_df["mean"].round(decimals)
+
+    output_csv_path = Path(output_csv_path)
+    output_csv_path.parent.mkdir(parents=True, exist_ok=True)
+    means_df.to_csv(output_csv_path, index=False)
+    return means_df
+
+
 def save_seed_summary_table_image(
     csv_path: Path | str,
     image_path: Path | str,

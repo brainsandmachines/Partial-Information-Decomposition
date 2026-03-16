@@ -17,4 +17,4 @@ Test stimulus images: 159
 Training stimulus images: 9841
 
 Validation stimulus images: 0
-Running suppression experiment with FBA encoding...
+Saved column means (15 columns) to: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/seed_runs_JackKnife-FBA-Encoding-suppresion_column_means.csv

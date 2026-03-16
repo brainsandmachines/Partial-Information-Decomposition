@@ -29,6 +29,8 @@ from utils import (
     load_hist_kde_and_change_colors,
     seed_summary_to_table,
     save_seed_summary_table_image,
+    save_csv_column_means,
+    summarize_seed_results,
 )
 
 
@@ -39,22 +41,22 @@ def get_run_config() -> dict:
         "subj": 1, 
         "method": "ridge_cv",
         "n_s": 3000,
-        "n_f": 500,
+        "n_f": 100,
         "rng_seed": np.random.default_rng(seed=30),
         "n_seeds": 100,
         "seed_start": 0,
         "snr": 10,
-        "mixing_dimension": 100,
+        "mixing_dimension": 70,
         "suppression_strength": 0.5,
         "suppression_method": "permutate",
         "path_to_load": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib",
         "fmri_dict_path": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts/subj1_fmri_dicts.joblib",
         "roi_name": "FBA-1",
-        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding",
+        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
         "progress_print_every": 2,
-        "test_name": 'Bias_corr_for_TMI_FBA-Encoding-suppresion_exp1',  # Optional: specify a custom name for the summary file; if None, uses timestampW
+        "test_name": 'JackKnife-FBA-Encoding-suppresion',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 
@@ -205,12 +207,13 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    print("Running suppression experiment with FBA encoding...")
-    main()
-    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_runs_NoBiasCorrection-FBA-Encoding-suppresion_exp1.csv"
-    output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Simulation_figs/Exp1_FBA_No_Bias_Correction"
-    create_test_histograms_with_kde(csv_path, output_path,bar_color="#55A868", kde_color="#000000")
+    #print("Running suppression experiment with FBA encoding...")
+    #main()
+    # csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/seed_runs_JackKnife-FBA-Encoding-suppresion.csv"
+    # output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/Jackknife_FBA_Encoding_suppresion_histogram.png"
+    # create_test_histograms_with_kde(csv_path, output_path,bar_color="#55A868", kde_color="#000000")
 
-    summary_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/seed_summary_NoBiasCorrection-FBA-Encoding-suppresion_exp1.csv"
-    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_FBA_Encoding/NoBias_seed_summary_FBA-Encoding-suppresion_exp1_table.png"
-    save_seed_summary_table_image(summary_path,image_path=save_path) 
+    summary_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/seed_runs_JackKnife-FBA-Encoding-suppresion.csv"
+    means_save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/seed_runs_JackKnife-FBA-Encoding-suppresion_column_means.csv"
+
+    seed_summary_to_table(summary_path, save_path=means_save_path)

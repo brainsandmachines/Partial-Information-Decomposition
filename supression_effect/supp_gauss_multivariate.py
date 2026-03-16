@@ -16,6 +16,8 @@ from utils import (
     print_seed_summary,
     run_multi_seed_experiment,
     save_seed_summary_csv,
+    seed_summary_to_table,
+    save_csv_column_means
 )
 from Partial_Information_Decomposition.PID_util import standardize, singularity_report,vif_summary,std_scaling_summary
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
@@ -334,4 +336,7 @@ def main():
 if __name__ == "__main__":
     #main()
     # For fixed-parameter seed analysis and saved mean/std across seeds, run:
-    run_fixed_params_across_seeds()
+    #run_fixed_params_across_seeds()
+    csv_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/seed_runs_toyexample_supp_gauss_multivariate.csv'
+    means_save_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/seed_summary_toyexample_supp_gauss_multivariate.csv'
+    save_csv_column_means(csv_path=csv_path, output_csv_path=means_save_path)
