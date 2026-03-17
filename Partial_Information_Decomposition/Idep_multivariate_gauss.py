@@ -95,75 +95,7 @@ class Idep_multivariate_gauss:
         K   = torch.linalg.solve_triangular(Ux.T, tmp,        upper=False)
 
         return K
-            
-        
-
-    def log_base(self,x:Optional[torch.Tensor]) -> torch.Tensor:
-        if self.base_e:
-            return torch.log(x)
-        LN2 = torch.log(torch.tensor(2.0, dtype=torch.float64))
-        return torch.log(x) / LN2
-    
-    def jackknife_bias_term(self,X_M1,X_M2,X_T):
-        """This function utilized LeaveOneOut resampling to estimate the bias of the logdet estimator for a given dataset X.
-        Args:
-            X (np.ndarray): Input data of shape (n_samples, n_features).
-            X_bar_logdet (np.ndarray): Logdet of the whole sample.
-            
-            """
-        if X_M1 is None or X_M2 is None or X_T is None:
-            return {k: torch.tensor(0.0) for k in ['logdetq_jack', 'logdetp_jack', 'logdetr_jack', 'm7_jack', 'm8_jack']}
-       
-        loo = LeaveOneOut()
-        keys = ['logdetq_jack','logdetp_jack','logdetr_jack','m7_jack','m8_jack']
-        logdet_dict_jack = {key: [] for key in keys}
-        l = 1
-        for train_idx, test_idx in loo.split(X_M1):
-            print(f"Jackknife iteration {l}/{self.N}", end="\r")
-            X_M1_train = X_M1[train_idx]
-            X_T_train = X_T[train_idx]
-            X_M2_train = X_M2[train_idx]
-
-            jack_idep = Idep_multivariate_gauss(sources=[X_M1_train,X_M2_train], targets=[X_T_train], bias_correction=False,verbose=False)
-
-            P_jack = jack_idep.P
-            Q_jack = jack_idep.Q
-            R_jack = jack_idep.R
-
-             
-            logdetp_jack = torch.logdet(jack_idep.I1 - (P_jack.T @ P_jack))
-            logdetr_jack = torch.logdet(jack_idep.I2 - (R_jack.T @ R_jack))
-            logdetq_jack = torch.logdet(jack_idep.I2 - (Q_jack.T @ Q_jack))
-            assert not torch.isnan(logdetp_jack), f"Jackknife logdetp_jack is NaN at iteration {l}."
-            assert not torch.isnan(logdetr_jack), f"Jackknife logdetr_jack is NaN at iteration {l}."
-            assert not torch.isnan(logdetq_jack), f"Jackknife logdetq_jack is NaN at iteration {l}."
-
-            dep_mat_jack = jack_idep.dependency_matrix(jack_idep.cov_matrix)
-            #M7:
-            mat = dep_mat_jack['c_model_7']
-            block7_jack = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
-            nume7_jack = torch.logdet(torch.eye(block7_jack.shape[0]) - (block7_jack.T @ block7_jack))
-            deno7_jack = logdetq_jack + logdetr_jack 
-            m7 = 0.5*(nume7_jack- deno7_jack) 
-            assert not torch.isnan(m7), f"Jackknife m7 is NaN at iteration {l}."
-            
-            #M8:s
-            mat_jack = dep_mat_jack['c_model_8']
-            nume8_jack = logdetp_jack
-            deno8_jack = torch.logdet(mat_jack)
-            m8 = 0.5*(nume8_jack-deno8_jack)
-            assert not torch.isnan(m8), f"Jackknife m8 is NaN at iteration {l}."
-            
-            logdet_dict_jack['logdetq_jack'].append(logdetq_jack.item())
-            logdet_dict_jack['logdetp_jack'].append(logdetp_jack.item())
-            logdet_dict_jack['logdetr_jack'].append(logdetr_jack.item())
-            logdet_dict_jack['m7_jack'].append(m7.item())
-            logdet_dict_jack['m8_jack'].append(m8.item())
-            l += 1
-        jack_mean = {k: torch.mean(torch.tensor(logdet_dict_jack[k])) for k in logdet_dict_jack}
-
-        return jack_mean
-    
+              
 
     def create_model_M(self,block1:Optional[torch.tensor]=None,block2:Optional[torch.tensor]=None,block3:Optional[torch.tensor]=None) -> torch.tensor:
         """This function will create the dependency matrix for the given blocks
@@ -299,51 +231,7 @@ class Idep_multivariate_gauss:
         assert not torch.isnan(self.unique_2), f"unique_2 = {self.unique_2} was not calculated properly."  
         return self.I_dep_values
     
-    def jackknife_pid(self,X_M1,X_M2,X_T):
-        """This function utilized LeaveOneOut resampling to estimate the bias of the unique information estimator for a given dataset X.
-        Args:
-            X (np.ndarray): Input data of shape (n_samples, n_features).
-            X_bar_logdet (np.ndarray): Logdet of the whole sample.
-            
-            """
-        if X_M1 is None or X_M2 is None or X_T is None:
-           raise ValueError("Input data for Jackknife PID calculation cannot be None.")
-       
-        loo = LeaveOneOut()
 
-        pid_keys = ['unq1_jack','unq2_jack','red_jack','syn_jack']
-        pid_dict_jack = {key: [] for key in pid_keys}
-
-        mi_keys = ['I(M1;T)_jack','I(M2;T)_jack','I(M1,M2;T)_jack']
-        mi_dict_jack = {key: [] for key in mi_keys}
-
-        l = 1
-        for train_idx, test_idx in loo.split(X_M1):
-            print(f"Unique Jackknife iteration {l}/{self.N}", end="\r")
-            X_M1_train = X_M1[train_idx]
-            X_T_train = X_T[train_idx]
-            X_M2_train = X_M2[train_idx]
-
-            jack_idep = Idep_multivariate_gauss(sources=[X_M1_train,X_M2_train], targets=[X_T_train], bias_correction=False,verbose=False)
-
-            jack_idep.dependency_matrix()
-            idep_values_jack = jack_idep.compute_Idep()
-            pid_values_jack, mi_values_jack = jack_idep.pid_values(idep_values_jack['unique_1'], idep_values_jack['unique_2'])
-            
-            #PID Values
-            pid_dict_jack['unq1_jack'].append(idep_values_jack['unique_1'])
-            pid_dict_jack['unq2_jack'].append(idep_values_jack['unique_2'])
-            pid_dict_jack['red_jack'].append(pid_values_jack['red'])
-            pid_dict_jack['syn_jack'].append(pid_values_jack['syn'])
-
-            #Mutual Information Values
-            mi_dict_jack['I(M1;T)_jack'].append(mi_values_jack['I(M1;T)'])
-            mi_dict_jack['I(M2;T)_jack'].append(mi_values_jack['I(M2;T)'])
-            mi_dict_jack['I(M1,M2;T)_jack'].append(mi_values_jack['I(M1,M2;T)'])
-            l += 1
-        pid_jack_mean = {k: torch.mean(torch.tensor(pid_dict_jack[k])) for k in pid_dict_jack}
-        mi_jack_mean = {k: torch.mean(torch.tensor(mi_dict_jack[k])) for k in mi_dict_jack}
-        return pid_jack_mean, mi_jack_mean
     
     def pid_values(self,unique_1, unique_2):
         """This function will compute the PID values using the I_dep values
@@ -375,7 +263,7 @@ class Idep_multivariate_gauss:
         }
         return self.PID_values, self.mi
     
-    def idep(self,cov_matrix: Optional[torch.tensor]=None,jackknife: bool=False)-> dict:
+    def idep(self,cov_matrix: Optional[torch.tensor]=None,bias_correction: bool=False)-> dict:
         """This function will compute the full Idep PID decomposition
 
         input: cov_matrix is a torch tensor of shape (d,d) in case you want to provide a different covariance matrix
@@ -392,8 +280,8 @@ class Idep_multivariate_gauss:
         self.unique_1_raw = idep_values['unique_1']
         self.unique_2_raw = idep_values['unique_2']
         pid_raw, mi_raw = self.pid_values(self.unique_1_raw, self.unique_2_raw)
-        if jackknife:
-            jackknife_pid,jackknife_mi = self.jackknife_pid(self.M1.detach().cpu(), self.M2.detach().cpu(), self.T.detach().cpu()) 
+        if bias_correction:
+            jackknife_pid,jackknife_mi = self.jackknife_pid(self.M1.detach().cpu(), self.M2.detach().cpu(), self.T.detach().cpu(),func=Idep_multivariate_gauss) 
 
 
             pid_b = {k: self.df * (jackknife_pid[k + '_jack'] - pid_raw[k]) for k in pid_raw}

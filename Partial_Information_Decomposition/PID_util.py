@@ -13,7 +13,8 @@ from sklearn.covariance import MinCovDet
 import statsmodels
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.covariance import LedoitWolf
-
+import os
+from matplotlib.colors import LogNorm
 def LinearRegression_fit(X,y):
     model = LinearRegression()
     model.fit(X,y)
@@ -44,15 +45,15 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     return Sigma
 
 
-def create_cov_matrix(X0,X1,X2,verbose):
+def create_cov_matrix(rvs:list,verbose=False):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
     N is the number of observations, 
     p is the dimension of each observation.
 
-    output: a 3*pX3*dp covariance matrix"""
-
-    Z = torch.hstack([X0, X1, X2])   # shape (N, d_T+d_M1+d_M2)
+    output: a len(rvs)*len(rvs)*p covariance matrix"""
+    assert len(rvs) == 2 or len(rvs) == 3, "Length of random variable list should be either 2 or 3"
+    Z = torch.hstack(rvs)   # shape (N, len(rvs)*len(rvs)*p)
 
     Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
     #eigvenvalue_summary(Sigma.detach().cpu().numpy())
@@ -63,35 +64,39 @@ def create_cov_matrix(X0,X1,X2,verbose):
     cov_dict = {}
     if verbose:
         print(f"\nFull covariance matrix shape: {Sigma.shape}")
-    x0_dim = X0.shape[1]
-    x1_dim = X1.shape[1]
-    x2_dim = X2.shape[1]
-    N = X1.shape[0] #number of observations
-    
+    x0_dim = rvs[0].shape[1]
+    x1_dim = rvs[1].shape[1]
+    x2_dim = rvs[2].shape[1] if len(rvs) == 3 else 0
+    N = rvs[0].shape[0] #number of observations
+
     dt_dx1 = x0_dim + x1_dim
     d_all = x0_dim + x1_dim + x2_dim
 
     #Full covariance matrix
     cov_dict['full_cov'] = Sigma #Full covariance matrix ΣX0X1X2
-
     #Cross-Covariances:
-    cov_dict['cross_x0_x1'] = Sigma[0:x0_dim, x0_dim:dt_dx1] #ΣX0,X1
-    cov_dict['cross_x0_x2'] = Sigma[0:x0_dim, dt_dx1:d_all] #ΣX0,X2
-    cov_dict['cross_x1_x2'] = Sigma[x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
-    cov_dict['cross_x12_x0'] = Sigma[x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
-
+    cov_dict['cross_x0_x1'] = Sigma[0:x0_dim, x0_dim:dt_dx1] #ΣX0,X1   
     #Auto-Covariances
     cov_dict['cov_x0'] = Sigma[0:x0_dim, 0:x0_dim] #ΣX0
     cov_dict['cov_x1'] = Sigma[x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
-    cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
+   
     cov_dict['auto_x01'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
-    cov_dict['auto_x12'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
 
- 
-    ##ΣX0,X2:
-    a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=1)
-    b = torch.cat((cov_dict['cross_x0_x2'].T, cov_dict['cov_x2']),dim=1)
-    cov_dict['auto_x02'] = torch.cat((a,b),dim=0)
+
+    if len(rvs) == 3:
+        #Cross-Covariances:
+        cov_dict['cross_x1_x2'] = Sigma[x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
+        cov_dict['cross_x12_x0'] = Sigma[x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
+        cov_dict['cross_x0_x2'] = Sigma[0:x0_dim, dt_dx1:d_all] #ΣX0,X2
+
+        #Auto-Covariances:
+        cov_dict['auto_x12'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
+        cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
+
+        ##ΣX0,X2:
+        a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=1)
+        b = torch.cat((cov_dict['cross_x0_x2'].T, cov_dict['cov_x2']),dim=1)
+        cov_dict['auto_x02'] = torch.cat((a,b),dim=0)
 
 
     return cov_dict
@@ -345,3 +350,350 @@ def compare_results(vp_results,pid_results,mi_results):
     print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
     print(f"Synergy (PID): {pid_results['syn']:.4f}")
 
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def plot_mi_heatmap(
+    csv_path,
+    value_col,
+    *,
+    n_col="N",
+    p_col="p",
+    figsize=(7, 5),
+    title=None,
+    save_path=None,
+    annotate=True,
+    fmt=".3f",
+    cmap="viridis"
+):
+    """
+    Plot a block heatmap from an averaged CSV.
+
+    Parameters
+    ----------
+    csv_path : str or Path
+        Path to the averaged CSV.
+    value_col : str
+        Column to plot. For example:
+        'mi_theoretical', 'mi_sample_no_bias', or 'mi_sample_with_bias'
+    n_col : str
+        Column for sample size N.
+    p_col : str
+        Column for total dimension p = px1 + px2.
+    figsize : tuple
+        Figure size.
+    title : str or None
+        Plot title.
+    save_path : str or Path or None
+        Where to save the figure. If None, does not save.
+    annotate : bool
+        Whether to write the numeric value inside each cell.
+    fmt : str
+        Format for annotations.
+    cmap : str
+        Matplotlib colormap name.
+    """
+    df = pd.read_csv(csv_path)
+
+    # Remove possible unnamed index columns
+    df = df.loc[:, ~df.columns.str.contains(r"^Unnamed")]
+
+    # Keep only needed columns
+    required_cols = {n_col, p_col, value_col}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing columns in CSV: {missing}")
+
+    # Make sure numeric
+    df[n_col] = pd.to_numeric(df[n_col])
+    df[p_col] = pd.to_numeric(df[p_col])
+    df[value_col] = pd.to_numeric(df[value_col])
+
+    # Pivot to heatmap matrix
+    heatmap_df = df.pivot(index=p_col, columns=n_col, values=value_col)
+
+    # Sort axes
+    heatmap_df = heatmap_df.sort_index(axis=0).sort_index(axis=1)
+
+    values = heatmap_df.to_numpy(dtype=float)
+
+    # Mask missing values
+    masked_values = np.ma.masked_invalid(values)
+
+    cmap_obj = plt.get_cmap(cmap).copy()
+    cmap_obj.set_bad(color="white")
+
+    fig, ax = plt.subplots(figsize=figsize)
+    im = ax.imshow(masked_values, aspect="auto", origin="lower", cmap=cmap_obj)
+
+    # Tick labels
+    ax.set_xticks(np.arange(len(heatmap_df.columns)))
+    ax.set_xticklabels([int(x) if float(x).is_integer() else x for x in heatmap_df.columns])
+
+    ax.set_yticks(np.arange(len(heatmap_df.index)))
+    ax.set_yticklabels([int(y) if float(y).is_integer() else y for y in heatmap_df.index])
+
+    ax.set_xlabel("N")
+    ax.set_ylabel("p = px1 + px2")
+
+    if title is None:
+        title = f"Heatmap of {value_col}"
+    ax.set_title(title)
+
+    # Add grid lines between blocks
+    ax.set_xticks(np.arange(-0.5, len(heatmap_df.columns), 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, len(heatmap_df.index), 1), minor=True)
+    ax.grid(which="minor", color="white", linestyle="-", linewidth=1.5)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    # Colorbar
+    cbar = fig.colorbar(im, ax=ax)
+    cbar.set_label(value_col)
+
+    # Annotate cells
+    if annotate:
+        for i in range(values.shape[0]):
+            for j in range(values.shape[1]):
+                if not np.isnan(values[i, j]):
+                    ax.text(
+                        j, i,
+                        format(values[i, j], fmt),
+                        ha="center", va="center",
+                        color="black"
+                    )
+
+    plt.tight_layout()
+
+    if save_path is not None:
+        plt.savefig(f'{save_path}/{title}.png', dpi=300, bbox_inches="tight")
+
+    plt.show()
+
+
+
+def plot_all_mi_heatmaps(
+    csv_path,
+    title="Mutual Information Heatmaps",
+    *,
+    n_col="N",
+    p_col="p",
+    figsize=(16, 5),
+    save_path=None,
+    annotate=True,
+    mean_fmt=".2f",
+    std_fmt=".2f",
+    log_scale=False,
+    cmap="viridis",
+    annotation_mode="pm",   # "pm" or "paren"
+    fontsize=9,
+    aggfunc="mean",         # handles duplicate (N,p) rows
+):
+    """
+    Plot theoretical, naive, and bias-corrected MI heatmaps in one figure.
+
+    Cell color is determined by the mean value.
+    Cell annotation shows mean and std.
+
+    Expected columns:
+    N, p,
+    mi_theoretical_mean, mi_theoretical_std,
+    mi_sample_no_bias_mean, mi_sample_no_bias_std,
+    mi_sample_with_bias_mean, mi_sample_with_bias_std
+    """
+
+    df = pd.read_csv(csv_path)
+
+    # Remove possible unnamed index columns
+    df = df.loc[:, ~df.columns.str.contains(r"^Unnamed")]
+
+    # Ensure numeric
+    df[n_col] = pd.to_numeric(df[n_col], errors="coerce")
+    df[p_col] = pd.to_numeric(df[p_col], errors="coerce")
+
+    mean_std_pairs = [
+        ("mi_theoretical_mean", "mi_theoretical_std", "Theoretical MI"),
+        ("mi_sample_no_bias_mean", "mi_sample_no_bias_std", "Naive MI"),
+        ("mi_sample_with_bias_mean", "mi_sample_with_bias_std", "Bias-corrected MI"),
+    ]
+
+    required_cols = [n_col, p_col]
+    for mean_col, std_col, _ in mean_std_pairs:
+        required_cols.extend([mean_col, std_col])
+
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns in CSV: {missing}")
+
+    # Check duplicates
+    dup_mask = df.duplicated(subset=[n_col, p_col], keep=False)
+    if dup_mask.any():
+        print("Warning: duplicate (N, p) pairs found. Aggregating with pivot_table.")
+        print(df.loc[dup_mask, [n_col, p_col]].value_counts().sort_index())
+
+    # Global color scaling from mean columns only
+    mean_columns = [pair[0] for pair in mean_std_pairs]
+    all_mean_values = df[mean_columns].to_numpy(dtype=float)
+
+    if log_scale:
+        positive_vals = all_mean_values[all_mean_values > 0]
+        if positive_vals.size == 0:
+            raise ValueError("No positive mean values found. Cannot use log scale.")
+        vmin = positive_vals.min()
+        vmax = positive_vals.max()
+        norm = LogNorm(vmin=vmin, vmax=vmax)
+    else:
+        vmin = np.nanmin(all_mean_values)
+        vmax = np.nanmax(all_mean_values)
+        norm = plt.Normalize(vmin=vmin, vmax=vmax)
+
+    fig, axes = plt.subplots(1, 3, figsize=figsize, constrained_layout=True)
+    fig.suptitle(title, fontsize=14)
+
+    last_im = None
+
+    for ax, (mean_col, std_col, panel_title) in zip(axes, mean_std_pairs):
+        mean_df = df.pivot_table(
+            index=p_col,
+            columns=n_col,
+            values=mean_col,
+            aggfunc=aggfunc
+        )
+        std_df = df.pivot_table(
+            index=p_col,
+            columns=n_col,
+            values=std_col,
+            aggfunc=aggfunc
+        )
+
+        mean_df = mean_df.sort_index().sort_index(axis=1)
+        std_df = std_df.reindex(index=mean_df.index, columns=mean_df.columns)
+
+        mean_values = mean_df.to_numpy(dtype=float)
+        std_values = std_df.to_numpy(dtype=float)
+
+        plot_values = mean_values.copy()
+        if log_scale:
+            plot_values[plot_values <= 0] = np.nan
+
+        im = ax.imshow(
+            plot_values,
+            origin="lower",
+            aspect="auto",
+            cmap=cmap,
+            norm=norm,
+        )
+        last_im = im
+
+        ax.set_xticks(np.arange(len(mean_df.columns)))
+        ax.set_xticklabels(mean_df.columns.astype(int))
+
+        ax.set_yticks(np.arange(len(mean_df.index)))
+        ax.set_yticklabels(mean_df.index.astype(int))
+
+        ax.set_xlabel("N")
+        ax.set_ylabel("p = px1 + px2")
+        ax.set_title(panel_title)
+
+        if annotate:
+            for i in range(mean_values.shape[0]):
+                for j in range(mean_values.shape[1]):
+                    mean_val = mean_values[i, j]
+                    std_val = std_values[i, j]
+
+                    if np.isnan(mean_val):
+                        text = "nan"
+                    else:
+                        mean_text = format(mean_val, mean_fmt)
+                        std_text = "nan" if np.isnan(std_val) else format(std_val, std_fmt)
+
+                        if annotation_mode == "pm":
+                            text = f"{mean_text}\n±{std_text}"
+                        elif annotation_mode == "paren":
+                            text = f"{mean_text}\n({std_text})"
+                        else:
+                            raise ValueError("annotation_mode must be 'pm' or 'paren'")
+
+                    ax.text(
+                        j,
+                        i,
+                        text,
+                        ha="center",
+                        va="center",
+                        color="black",
+                        fontsize=fontsize,
+                    )
+
+    cbar = fig.colorbar(last_im, ax=axes, shrink=0.85)
+    cbar.set_label("Mutual Information (mean)")
+
+    if save_path is not None:
+        os.makedirs(save_path, exist_ok=True)
+        filename = f"{title}.png"
+        full_path = os.path.join(save_path, filename)
+        plt.savefig(full_path, dpi=300, bbox_inches="tight")
+
+    plt.show()
+
+
+
+def plot_block_heatmap(csv_path, save_path=None):
+
+    df = pd.read_csv(csv_path)
+    df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
+
+    N_vals = sorted(df["N"].unique())
+    p_vals = sorted(df["p"].unique())
+
+    nN = len(N_vals)
+    nP = len(p_vals)
+
+    # each cell split into 3 rows
+    block = np.full((nP * 3, nN), np.nan)
+
+    for i, p in enumerate(p_vals):
+        for j, N in enumerate(N_vals):
+
+            row = df[(df["p"] == p) & (df["N"] == N)]
+            if row.empty:
+                continue
+
+            block[i*3 + 0, j] = row["mi_theoretical"].values[0]
+            block[i*3 + 1, j] = row["mi_sample_no_bias"].values[0]
+            block[i*3 + 2, j] = row["mi_sample_with_bias"].values[0]
+
+    fig, ax = plt.subplots(figsize=(8,6))
+
+    im = ax.imshow(block, origin="lower", aspect="auto")
+
+    # x axis
+    ax.set_xticks(range(nN))
+    ax.set_xticklabels(N_vals)
+    ax.set_xlabel("N")
+
+    # y axis (only show p labels centered in blocks)
+    ax.set_yticks([i*3 + 1 for i in range(nP)])
+    ax.set_yticklabels(p_vals)
+    ax.set_ylabel("p = px1 + px2")
+
+    # grid lines between big blocks
+    for i in range(nP+1):
+        ax.axhline(i*3 - 0.5, color="white", linewidth=2)
+
+    for j in range(nN+1):
+        ax.axvline(j - 0.5, color="white", linewidth=2)
+
+    cbar = plt.colorbar(im, ax=ax)
+    cbar.set_label("MI value")
+
+    plt.title("Mutual Information Bias Simulation")
+
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300)
+
+    plt.show()
