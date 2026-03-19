@@ -92,8 +92,8 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,simple_example
     
     sources = [M1,M2]
     targets = [T]
-    idep_class = Idep_multivariate_gauss(sources,targets)
-    pid , mi = idep_class.idep(jackknife=True)
+    idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=True)
+    pid , mi = idep_class.idep()
     return vp_results,pid,mi
 
 def check_supression_effect(vp_results,pid_results):
@@ -290,12 +290,12 @@ def run_fixed_params_across_seeds(config: dict | None = None) -> tuple[dict, lis
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 3000, 100
+    N, P = 1000000, 100
     rng_seed = 10
     snr = 1
     method = 'ridge_cv'
     mixing_dimension = 50
-    simple_example = False
+    simple_example = True
     suppresion_strength = 0.5
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
@@ -334,9 +334,9 @@ def main():
     print("\nAll experiments completed.")
 
 if __name__ == "__main__":
-    #main()
+    main()
     # For fixed-parameter seed analysis and saved mean/std across seeds, run:
     #run_fixed_params_across_seeds()
     csv_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/seed_runs_toyexample_supp_gauss_multivariate.csv'
     means_save_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/seed_summary_toyexample_supp_gauss_multivariate.csv'
-    save_csv_column_means(csv_path=csv_path, output_csv_path=means_save_path)
+    #save_csv_column_means(csv_path=csv_path, output_csv_path=means_save_path)

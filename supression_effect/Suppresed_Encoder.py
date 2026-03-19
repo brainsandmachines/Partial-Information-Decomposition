@@ -40,23 +40,23 @@ def get_run_config() -> dict:
         "parent_submission_dir": "/mnt/data4tb/data_algonauts/submissions",
         "subj": 1, 
         "method": "ridge_cv",
-        "n_s": 3000,
+        "n_s": 7000,
         "n_f": 100,
         "rng_seed": np.random.default_rng(seed=30),
-        "n_seeds": 100,
+        "n_seeds": 1000,
         "seed_start": 0,
         "snr": 10,
-        "mixing_dimension": 70,
+        "mixing_dimension": 50,
         "suppression_strength": 0.5,
         "suppression_method": "permutate",
         "path_to_load": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/trained_models/roi_models/FBA-1_alexnet_features.8_subj01_1.pth/FBA-1_alexnet_features.8_subj01.pth_encoding_model.joblib",
         "fmri_dict_path": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/encoding_model/fmri_dicts/subj1_fmri_dicts.joblib",
         "roi_name": "FBA-1",
-        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife",
+        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Exp18.03",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
-        "progress_print_every": 2,
-        "test_name": 'JackKnife-FBA-Encoding-suppresion',  # Optional: specify a custom name for the summary file; if None, uses timestampW
+        "progress_print_every": 100,
+        "test_name": 'FBA-Encoding-suppresion',  # Optional: specify a custom name for the summary file; if None, uses timestampW
     }
 
 
@@ -122,7 +122,7 @@ def run_suppression_pipeline(config: dict, selected_features: np.ndarray, encode
     sources = [m1, m2]
     targets = [t]
     idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=True)
-    pid, mi = idep_class.idep(jackknife=True)
+    pid, mi = idep_class.idep()
     return ca, pid,mi
 
 
@@ -207,8 +207,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    #print("Running suppression experiment with FBA encoding...")
-    #main()
+    print("Running suppression experiment with FBA encoding...")
+    main()
     # csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/seed_runs_JackKnife-FBA-Encoding-suppresion.csv"
     # output_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Suppresion_Jackknife/Jackknife_FBA_Encoding_suppresion_histogram.png"
     # create_test_histograms_with_kde(csv_path, output_path,bar_color="#55A868", kde_color="#000000")

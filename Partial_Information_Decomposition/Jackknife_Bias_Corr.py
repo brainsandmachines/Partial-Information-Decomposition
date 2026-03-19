@@ -1,0 +1,109 @@
+import torch
+import numpy as np 
+from matplotlib.pylab import eigvals
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.covariance import OAS
+from scipy.special import digamma
+import torch
+from sklearn.model_selection import LeaveOneOut 
+import pandas as pd
+from joblib import Parallel, delayed
+import time
+from PID_util import *
+import sys
+from pathlib import Path
+root = Path(__file__).resolve().parents[1]
+sys.path.append(str(root))
+from Toy_Simulations.Bias_Corr_simulations import theoretical_covariance, sample_cov_simulation
+from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from parallel_Idep_multivariate_gauss import para_Idep_multivariate_gauss
+def lo_cov(rvs,N):
+    """
+    Compute the full covnarice matrix across smaples 
+    and the covariance matrix of the left out ovbesrvation. 
+    Using the formula for covariance matrix 
+    Σ(-j)=N-2/(S(-j)-(1/N)*s(-j)s(-j)T)
+    Where S(-j)=S-ZjZjT
+     and s(-j)=s-Zj
+   
+    S = Sum of the outer product of the samples
+    s = sum of the samples
+
+    Input: 
+    N - number of samples
+    Z - a list of RVs each with shape (N, p_i) where p_i is the dimension of the i-th variable. The list should be in the order [M1, M2, T]   
+          """
+    assert type(rvs) == list, "Input Z should be a list of torch tensors"
+    d = sum([rv.shape[1] for rv in rvs])  # Total dimension across all variables
+    Z = torch.hstack(rvs).to(torch.float64)   # shape (N, len(rvs)*len(rvs)*p)
+    cov = torch.cov(Z.T, correction=1)
+    cov_dict = create_cov_matrix(rvs=rvs)   
+    S = Z.T @ Z  # shape (len(rvs)*p, len(rvs)*p)
+    s = torch.sum(Z, axis=0)
+    s_outer = torch.outer(s, s)
+    Sigma_full = (S - (1/N)*s_outer) / (N-1) 
+    assert torch.allclose(Sigma_full, cov, atol=1e-10, rtol=1e-8), "The covariance matrix computed using the formula does not match the one computed using torch"
+    assert torch.allclose(Sigma_full, cov_dict['full_cov'], atol=1e-10, rtol=1e-8), "The covariance matrix computed using the formula does not match the one computed using create_cov_matrix"
+    # All z_j z_j^T at once
+    outer_all = Z[:, :, None] * Z[:, None, :]   # (N, d, d)
+    assert outer_all.shape == (N, d, d), f"Expected outer_all to have shape (N, d, d) but got {outer_all.shape}"
+    # All S^{(-j)}
+    S_minus_all = S.unsqueeze(0) - outer_all    # (N, d, d)
+    assert S_minus_all.shape == (N, d, d), f"Expected S_minus_all to have shape (N, d, d) but got {S_minus_all.shape}"
+    # All s^{(-j)}
+    s_minus_all = s.unsqueeze(0) - Z            # (N, d)
+    assert s_minus_all.shape == (N, d), f"Expected s_minus_all to have shape (N, d) but got {s_minus_all.shape}"
+    # All s^{(-j)} s^{(-j)T}
+    s_outer_all = s_minus_all[:, :, None] * s_minus_all[:, None, :]  # (N, d, d)
+    assert s_outer_all.shape == (N, d, d), f"Expected s_outer_all to have shape (N, d, d) but got {s_outer_all.shape}"
+    # All leave-one-out covariances
+    cov_loo_all = (S_minus_all - s_outer_all / (N - 1)) / (N - 2)
+    assert cov_loo_all.shape == (N, d, d), f"Expected cov_loo_all to have shape (N, d, d) but got {cov_loo_all.shape}"
+    return Sigma_full, cov_loo_all
+
+
+def idep_lo_cov(sources, target, N):
+
+    assert len(sources) == 2, "Expected exactly two source variables"
+    assert len(target) == 1, "Expected exactly one target variable"
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    rvs = sources + target
+    Sigma_full, cov_loo_all = lo_cov(rvs, N)
+    Sigma_raw = Sigma_full.unsqueeze(0)
+    dims = [source.shape[1] for source in sources] + [target[0].shape[1]]
+    #Calculate the PID for the full covariance matrix
+    idep_raw = para_Idep_multivariate_gauss(N=N,device=device,cov_matrix=Sigma_raw,dims=dims)
+    pid_raw = idep_raw.compute_pid()
+
+    #Calculate the PID for each leave-one-out covariance matrix
+    idep_loo = para_Idep_multivariate_gauss(N=N,device=device,cov_matrix=cov_loo_all,dims=dims)
+    pid_loo = idep_loo.compute_pid() 
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    q = 0.6
+    r = 0.5
+    N = 50
+    seed = 42
+    dims = [5, 5, 10]  # Dimensions for X1, X2, X3
+    # According to the image, Cov(X1, X2) is Q * R^T. 
+    # In scalar terms, this is simply q * r.
+    corr_matrix = np.array([
+        [1.0,   q * r,  q  ],  # Row 1: X1
+        [q * r, 1.0,    r  ],  # Row 2: X2
+        [q,     r,      1.0]   # Row 3: X3
+    ])
+
+    # true_cov = theoretical_covariance(dims, corr_matrix)
+    # rv_list, sample_cov = sample_cov_simulation(seed, N, dims, true_cov)
+    # torch_rv_list = [torch.from_numpy(rv) for rv in rv_list]  # Convert to torch tensors
+    # assert len(torch_rv_list) == 3, "Expected 3 random variables in the list"
+    # lo_cov_matrix = lo_cov(torch_rv_list,N)  # Example for the first random variable
+

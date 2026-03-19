@@ -45,17 +45,19 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     return Sigma
 
 
-def create_cov_matrix(rvs:list,verbose=False):
+def create_cov_matrix(rvs:list=None,verbose=False,Sigma=None):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
+    rvs is a list of the three variables [M1,M2,T]
     N is the number of observations, 
     p is the dimension of each observation.
 
     output: a len(rvs)*len(rvs)*p covariance matrix"""
-    assert len(rvs) == 2 or len(rvs) == 3, "Length of random variable list should be either 2 or 3"
-    Z = torch.hstack(rvs)   # shape (N, len(rvs)*len(rvs)*p)
 
-    Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
+    if Sigma is None:
+        assert len(rvs) == 2 or len(rvs) == 3, "Length of random variable list should be either 2 or 3"
+        Z = torch.hstack(rvs).to(torch.float64)   # shape (N, len(rvs)*len(rvs)*p)    
+        Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
     #eigvenvalue_summary(Sigma.detach().cpu().numpy())
     min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
     if is_singular:
@@ -100,6 +102,72 @@ def create_cov_matrix(rvs:list,verbose=False):
 
 
     return cov_dict
+
+
+def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
+    """This function will create the covariance matrix for the three variables M1,M2,T
+    input: M1,M2,T are torch tensors of shape (N,p) 
+    rvs is a list of the three variables [M1,M2,T]
+    N is the number of observations, 
+    p is the dimension of each observation.
+
+    output: a len(rvs)*len(rvs)*p covariance matrix"""
+
+    cov_dict = {}
+    if verbose:
+        print(f"\nFull covariance matrix shape: {Sigmas.shape}")
+    x0_dim = dims[0]
+    x1_dim = dims[1]
+    x2_dim = dims[2] if len(dims) == 3 else 0
+
+    dt_dx1 = x0_dim + x1_dim
+    d_all = x0_dim + x1_dim + x2_dim
+
+    #Full covariance matrix
+    cov_dict['full_cov'] =  Sigmas #Full covariance matrix ΣX0X1X2
+    #Cross-Covariances:
+    cov_dict['cross_x0_x1'] = Sigmas[:,0:x0_dim, x0_dim:dt_dx1] #ΣX0,X1   
+    #Auto-Covariances
+    cov_dict['cov_x0'] = Sigmas[:,0:x0_dim, 0:x0_dim] #ΣX0
+    cov_dict['cov_x1'] = Sigmas[:,x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
+   
+    cov_dict['auto_x01'] = Sigmas[:,0:dt_dx1, 0:dt_dx1]  #ΣX0X1
+
+
+    if len(dims) == 3:
+        #Cross-Covariances:
+        cov_dict['cross_x1_x2'] = Sigmas[:,x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
+        cov_dict['cross_x12_x0'] = Sigmas[:,x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
+        cov_dict['cross_x0_x2'] = Sigmas[:,0:x0_dim, dt_dx1:d_all] #ΣX0,X2
+
+        #Auto-Covariances:
+        cov_dict['auto_x12'] = Sigmas[:,x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
+        cov_dict['cov_x2'] = Sigmas[:,dt_dx1:d_all, dt_dx1:d_all] #ΣX2
+
+        ##ΣX0,X2:
+        a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=2)
+        b = torch.cat((cov_dict['cross_x0_x2'].mT, cov_dict['cov_x2']),dim=2)
+        cov_dict['auto_x02'] = torch.cat((a,b),dim=1)
+
+
+    return cov_dict
+
+
+def whiten_block(self,
+                    Sigma_xx: torch.Tensor,
+                    Sigma_xy: torch.Tensor,
+                    Sigma_yy: torch.Tensor) -> torch.Tensor:
+    """
+    return Ux^{-T} @ Sigma_xy @ Uy^{-1}
+    where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
+    """
+    Ux = torch.linalg.cholesky(Sigma_xx).T
+    Uy = torch.linalg.cholesky(Sigma_yy).T
+
+    tmp = torch.linalg.solve_triangular(Uy.T, Sigma_xy.T, upper=False).T
+    K   = torch.linalg.solve_triangular(Ux.T, tmp,        upper=False)
+
+    return K
 
 def plot_cov_blocks(cov_dict, x0_dim, x1_dim, x2_dim,
                     *, title="Covariance (block view)",

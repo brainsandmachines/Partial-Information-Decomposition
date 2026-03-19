@@ -1,3 +1,5 @@
+import sys
+
 from matplotlib.pylab import eigvals
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,9 +7,13 @@ from sklearn.covariance import OAS
 from scipy.special import digamma
 import torch
 from sklearn.model_selection import LeaveOneOut 
+from pathlib import Path
+root = Path(__file__).resolve().parents[1]
+sys.path.append(str(root))
 from PID_util import *
 import pandas as pd
-from bias_corr import entropy_bias_term,asymptotic_entropy_bias
+
+from bias_corr import entropy_bias_term
 
 
 import numpy as np
@@ -64,7 +70,7 @@ def sample_cov_simulation(seed, N, dims, theo_cov_matrix):
     
     # Note: Using standard numpy covariance here for self-containment.
     # Replace the below line with your custom `create_cov_matrix` if you prefer your PyTorch implementation.
-    sample_covariance = np.cov(X, rowvar=False) 
+    sample_covariance = np.cov(X, rowvar=False,ddof=1) # Unbiased estimator with N-1 in the denominator
     
     return rv_list, sample_covariance
 
@@ -168,11 +174,31 @@ if __name__ == "__main__":
     py = 50
     correlation = 0
     rv_num = 3
-    exp_title = f"3rvs_TMI_Simulation=0"
+    exp_title = f"M7_3rvs_TMI_Simulation>0"
     save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Bias_Corr_Sim"
     p_list = [[100]*rv_num,[200]*rv_num,[250]*rv_num]
-    corr_matrix = np.eye(rv_num)
-    N_p_var_results = N_P_variation_simulation(seeds_list, N_values=[500,1000,1500,3000], p_values=p_list, corr_matrix=corr_matrix)
+    rho = 0.6  # Base correlation
+    corr_matrix = np.zeros((rv_num, rv_num))
+
+    # for i in range(rv_num):
+    #     for j in range(rv_num):
+    #         # Correlation decays with "distance" between indices
+    #         corr_matrix[i, j] = rho ** abs(i - j)
+    # --- Translate the Image Matrix to your input format ---
+    # Let q be the scalar representing the Q matrix (Cov between X1 and X3)
+    # Let r be the scalar representing the R matrix (Cov between X2 and X3)
+
+    q = 0.6
+    r = 0.5
+    
+    # According to the image, Cov(X1, X2) is Q * R^T. 
+    # In scalar terms, this is simply q * r.
+    corr_matrix = np.array([
+        [1.0,   q * r,  q  ],  # Row 1: X1
+        [q * r, 1.0,    r  ],  # Row 2: X2
+        [q,     r,      1.0]   # Row 3: X3
+    ])
+    N_p_var_results = N_P_variation_simulation(seeds_list, N_values=[1000,1500,2000,3000], p_values=p_list, corr_matrix=corr_matrix)
     df = pd.DataFrame(N_p_var_results)
     df.index.name = "seed"
     df.to_csv(f"{save_path}/{exp_title}_simulation.csv",index=False)  
