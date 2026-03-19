@@ -58,7 +58,7 @@ def test_lo_cov(N, p, q, r, dims, seed):
     full_cov_lo_cov, loo_covs = lo_cov(torch_rv_list, N)
     assert torch.allclose(full_cov_lo_cov, sample_cov, atol=1e-10, rtol=1e-8), "Full covariance from lo_cov does not match sample covariance"
     assert torch.allclose(ref_full_cov, full_cov_lo_cov, atol=1e-10, rtol=1e-8), "Full covariance from lo_cov does not match reference full covariance"
-    assert torch.allclose(ref_Sigma, lo_cov(torch_rv_list, N)[1], atol=1e-10, rtol=1e-8), "Leave-one-out covariance matrices do not match the reference implementation"
+    assert torch.allclose(ref_Sigma, loo_covs, atol=1e-10, rtol=1e-8), "Leave-one-out covariance matrices do not match the reference implementation"
 
 
 

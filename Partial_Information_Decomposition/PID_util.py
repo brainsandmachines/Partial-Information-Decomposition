@@ -58,7 +58,8 @@ def create_cov_matrix(rvs:list=None,verbose=False,Sigma=None):
         assert len(rvs) == 2 or len(rvs) == 3, "Length of random variable list should be either 2 or 3"
         Z = torch.hstack(rvs).to(torch.float64)   # shape (N, len(rvs)*len(rvs)*p)    
         Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
-    #eigvenvalue_summary(Sigma.detach().cpu().numpy())
+    if verbose:
+        eigvenvalue_summary(Sigma.detach().cpu().numpy())
     min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
     if is_singular:
         print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")

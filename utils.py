@@ -223,8 +223,13 @@ def _to_float_or_none(value):
     return None
 
 
-def extract_all_components(ca_results: dict, pid_results: dict, mi_results: dict, betas_dict: dict = None) -> dict:
+def extract_all_components(global_results,ca_results: dict, pid_results: dict, mi_results: dict, betas_dict: dict = None) -> dict:
     combined = {}
+
+    for key, value in global_results.items():
+        numeric_value = _to_float_or_none(value)
+        if numeric_value is not None:
+            combined[f"{key}"] = numeric_value
 
     for key, value in ca_results.items():
         numeric_value = _to_float_or_none(value)

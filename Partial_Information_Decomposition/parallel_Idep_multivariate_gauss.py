@@ -10,10 +10,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.covariance import LedoitWolf
 
 if __name__ != "__main__":
-    from .PID_util import create_cov_matrix, para_create_cov_matrix,block_singularity_check
-    from .bias_corr import entropy_bias_term
+    from Partial_Information_Decomposition.PID_util import para_create_cov_matrix,block_singularity_check
+    from Partial_Information_Decomposition.bias_corr import entropy_bias_term
 else:
-    from PID_util import create_cov_matrix,para_create_cov_matrix
+    from PID_util import para_create_cov_matrix
 from typing import Optional
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
@@ -127,91 +127,6 @@ class para_Idep_multivariate_gauss:
 
         return K
 
-
-    def create_model_M(self,block1:Optional[torch.tensor]=None,block2:Optional[torch.tensor]=None,block3:Optional[torch.tensor]=None) -> torch.tensor:
-        """This function will create the dependency matrix for the given blocks
-        input: 
-        block (1,2,3) is a torch tensor of shape (d,d) (Defined byu the paper as P or Q or R or a multiplication of them)
-        
-        output: a torch tensor of shape (d,d)
-        """
-
-        M = torch.block_diag(self.I0, self.I1, self.I2)
-        M = M.repeat(self.N, 1, 1) if self.N > 1 else M.unsqueeze(0)
-        if block1 is not None:
-            M[:,:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] = block1
-            M[:,self.dim_m1:self.dim_m1 + self.dim_m2, :self.dim_m1] = block1.mT
-        if block2 is not None:
-            M[:,self.dim_m1:self.dim_m1 + self.dim_m2, self.dim_m1 + self.dim_m2:] = block2
-            M[:,self.dim_m1 + self.dim_m2:, :self.dim_m1] = block2.mT
-        if block3 is not None:
-            M[:,self.dim_m1:self.dim_m1 + self.dim_m2, self.dim_m1 + self.dim_m2:] = block3
-            M[:,self.dim_m1 + self.dim_m2:, self.dim_m1:self.dim_m1 + self.dim_m2] = block3.mT
-
-        assert M.shape == (self.N,self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t), f"Created matrix shape {M.shape} does not match expected shape {(self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t)}."
-        
-        return M
-
-
-    def dependency_matrix(self,cov_matrix: Optional[torch.tensor]=None,cov_dict: Optional[dict]=None)-> dict:
-        """This function will create the dependency matrix for the given constraint
-
-        input: cov_matrix is a torch tensor of shape (d,d)
-        d is the dimension of each observation.
-
-        cov_dict is a dictionary containing the covariance matrices of the variables
-
-        constraint is a string indicating the constraint to be applied
-        'M1T' : M1 and T are dependent
-        'M2T' : M2 and T are dependent
-        'M1M2' : M1 and M2 are dependent
-
-        output: a torch tensor of shape (d,d)
-        dependency matrix"""
-
-        cov_matrix = self.cov_matrix if cov_matrix is None else cov_matrix
-        assert (cov_dict is None) != (cov_matrix is None), "Either cov_dict or cov_matrix must be provided, but not both."
-        
-
-        self.constraint_cov_dict = {}
-        # if self.verbose:
-        #     print(f"\nCovariance matrix shape: {cov_matrix.shape}")
-        #     print(f"dim_m1: {self.dim_m1}, dim_m2: {self.dim_m2}, dim_t: {self.dim_t}")
-
-        self.constraint_cov_dict['c_model_1'] = I = torch.eye(self.dall, device=cov_matrix.device, dtype=cov_matrix.dtype) #M0, M1 and T independent, identity covariance
-
-
-        M2 = self.create_model_M(block1=self.P)
-        self.constraint_cov_dict['c_model_2'] = M2 #M0 and M1 dependent
-
-
-        M3 = self.create_model_M(block2=self.Q)
-        self.constraint_cov_dict['c_model_3'] = M3 #M0 and T dependent
-
-
-        M4 = self.create_model_M(block3=self.R)
-        self.constraint_cov_dict['c_model_4'] = M4 #M1 and T dependent
-
-
-        P_Q = (self.P).mT @ self.Q
-        M5 = self.create_model_M(block1=self.P,block2=self.Q,block3=P_Q) 
-        self.constraint_cov_dict['c_model_5'] = M5 #M1 and T dependent, M1 and M2 dependent
-
-
-        P_R = self.P @ self.R  
-        M6 = self.create_model_M(block1=self.P,block2=P_R,block3=self.R)    
-        self.constraint_cov_dict['c_model_6'] = M6 #M2 and T dependent, M1 and M2 dependent
-
-        Q_R = self.Q @ self.R.mT
-        M7 = self.create_model_M(block1=Q_R,block2=self.Q,block3=self.R)   
-        self.constraint_cov_dict['c_model_7'] = M7 #M1 and T dependent, M2 and T dependent
-
-        M8 = self.create_model_M(self.P,self.Q,self.R) #Full covariance, all dependent
-        self.constraint_cov_dict['c_model_8'] = M8
-
-
-
-        return self.constraint_cov_dict
     
     def compute_Idep(self)-> dict:
         """This function calcualtes the mutual information for a given covariance matrix - U models in the lattice"""
@@ -243,22 +158,22 @@ class para_Idep_multivariate_gauss:
         k = m8  - self.i_m2_t
         b = self.i_m1_t 
         d = self.i_m1_t 
-        self.unique_1 = torch.min(torch.stack([i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
-        assert self.unique_1 == i or self.unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={self.unique_1}, i={i}, k={k}."
-        self.I_dep_values['unique_1'] = self.unique_1.item()
+        self.unique_1 = torch.min(torch.stack([i,k]),dim=0).values #James proved that b,d are not relavnt therefore it's just a sanity check
+        #assert self.unique_1 == i or self.unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={self.unique_1}, i={i}, k={k}."
+        self.I_dep_values['unique_1'] = self.unique_1
     
         #Calculate unique 2
         h = m7  - self.i_m1_t 
         j = m8  - self.i_m1_t
         c = self.i_m2_t 
         f = self.i_m2_t  
-        self.unique_2 = torch.min(torch.stack([h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
-        self.I_dep_values['unique_2'] = self.unique_2.item()
-        assert self.unique_2 == h or self.unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={self.unique_2}, h={h}, j={j}."
+        self.unique_2 = torch.min(torch.stack([h,j]),dim=0).values #James proved that c,f are not relavnt therefore it's just a sanity check
+        self.I_dep_values['unique_2'] = self.unique_2
+        #assert self.unique_2 == h or self.unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={self.unique_2}, h={h}, j={j}."
 
         #Check for nan values
-        assert not torch.isnan(self.unique_1), f"unique_1 = {self.unique_1} was not calculated properly."
-        assert not torch.isnan(self.unique_2), f"unique_2 = {self.unique_2} was not calculated properly."  
+        assert not torch.all(torch.isnan(self.unique_1)), f"unique_1 = {self.unique_1} was not calculated properly."
+        assert not torch.all(torch.isnan(self.unique_2)), f"unique_2 = {self.unique_2} was not calculated properly."  
         return self.I_dep_values
     
     
@@ -274,17 +189,17 @@ class para_Idep_multivariate_gauss:
         # Redundant information
         red0 = self.i_m1_t - unique_1
         red1 = self.i_m2_t - unique_2
-        assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
+        assert torch.all(abs(red0 - red1)< 1e-8), f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
         # Synergistic information
         syn = self.i_m1_m2_t - self.i_m1_t - unique_2
-        assert not torch.isnan(red), f"Redundant={red} information not calculated properly."
-        assert not torch.isnan(syn), f"Synergistic={syn} information not calculated properly."
+        assert not torch.all(torch.isnan(red)), f"Redundant={red} information not calculated properly."
+        assert not torch.all(torch.isnan(syn)), f"Synergistic={syn} information not calculated properly."
         self.PID_values = {
-            'red': red.item(),
+            'red': red,
             'unq1': unique_1,
             'unq2': unique_2,
-            'syn': syn.item()
+            'syn': syn
         }
         return self.PID_values
     
@@ -302,7 +217,7 @@ class para_Idep_multivariate_gauss:
 
         idep_values = self.compute_Idep()
         pid = self.pid_values(idep_values['unique_1'], idep_values['unique_2'])
-        mi = {'I(M1;T)': self.i_m1_t.item(), 'I(M2;T)': self.i_m2_t.item(), 'I(M1,M2;T)': self.i_m1_m2_t.item()}
+        mi = {'I(M1;T)': self.i_m1_t, 'I(M2;T)': self.i_m2_t, 'I(M1,M2;T)': self.i_m1_m2_t}
         return pid , mi
     
     
@@ -355,7 +270,7 @@ def run_one(n0, n1, n2, p, q, r):
     # IMPORTANT: you pass cov_matrix, but your class needs self.cov_dict=None fix
 
     dims = [n0, n1, n2]
-    obj = Idep_multivariate_gauss(N =1 ,device = device, sources=None, targets=None, cov_matrix=Sigma,dims=dims,bias_correction=False)
+    obj = para_Idep_multivariate_gauss(N =1 ,device = device, sources=None, targets=None, cov_matrix=Sigma,dims=dims,bias_correction=False)
 
 
     pid = obj.idep()
