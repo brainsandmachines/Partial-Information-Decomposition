@@ -9,7 +9,7 @@ import pandas as pd
 import csv
 import json
 import hashlib
-from typing import Callable
+from typing import Callable, Literal
 import seaborn as sns
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.linear_model import MultiTaskLassoCV,LassoCV
@@ -338,6 +338,74 @@ def save_csv_column_means(
     return means_df
 
 
+def load_csv_and_add_data(
+    csv_path: Path | str,
+    data: dict,
+    mode: Literal["append_row", "update_first_row", "add_columns"] = "append_row",
+    save_path: Path | str | None = None,
+    detect_seed_metadata: bool = True,
+) -> pd.DataFrame:
+    """
+    Load a CSV, add data to it, and save it back.
+
+    Args:
+        csv_path: Path to an existing or new CSV file.
+        data: Data to add.
+            - append_row/update_first_row: dict of {column: value}
+            - add_columns: dict of {column: scalar_value_for_all_rows}
+        mode:
+            - append_row: append one new row using `data`
+            - update_first_row: update row 0 with `data` (creates row 0 if empty)
+            - add_columns: add/update columns with constant values
+        save_path: Optional output path. If None, overwrites `csv_path`.
+        detect_seed_metadata: If True, retries reading with skiprows=2 when a
+            seed-runs metadata preamble is detected.
+
+    Returns:
+        The updated DataFrame.
+    """
+    csv_path = Path(csv_path)
+    target_path = Path(save_path) if save_path is not None else csv_path
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if csv_path.exists() and csv_path.stat().st_size > 0:
+        try:
+            df = pd.read_csv(csv_path)
+            if detect_seed_metadata and "seed" not in df.columns:
+                try:
+                    df = pd.read_csv(csv_path, skiprows=2)
+                except Exception:
+                    pass
+        except Exception:
+            if detect_seed_metadata:
+                df = pd.read_csv(csv_path, skiprows=2)
+            else:
+                raise
+    else:
+        df = pd.DataFrame()
+
+    if mode == "append_row":
+        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
+    elif mode == "update_first_row":
+        if df.empty:
+            df = pd.DataFrame([data])
+        else:
+            for key, value in data.items():
+                if key not in df.columns:
+                    df[key] = np.nan
+                df.at[0, key] = value
+    elif mode == "add_columns":
+        for key, value in data.items():
+            df[key] = value
+    else:
+        raise ValueError(
+            f"Unsupported mode '{mode}'. Use 'append_row', 'update_first_row', or 'add_columns'."
+        )
+
+    df.to_csv(target_path, index=False)
+    return df
+
+
 def save_seed_summary_table_image(
     csv_path: Path | str,
     image_path: Path | str,
@@ -509,13 +577,33 @@ def save_seed_summary_csv(summary: dict, config: dict) -> Path:
     }
     config_json = json.dumps(config_to_save, sort_keys=True, default=str)
 
+    # 1. Dynamically find all unique stat keys across all metrics
+    stat_keys = []
+    for stats in summary.values():
+        if isinstance(stats, dict):
+            for key in stats.keys():
+                if key not in stat_keys:
+                    stat_keys.append(key)
+
     with open(file_path, "w", newline="", encoding="utf-8") as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["config_json", config_json])
         writer.writerow([])
-        writer.writerow(["metric", "mean", "std"])
+        
+        # 2. Write the dynamic header
+        header = ["metric"] + stat_keys
+        writer.writerow(header)
+        
+        # 3. Write each row dynamically
         for metric, stats in summary.items():
-            writer.writerow([metric, stats["mean"], stats["std"]])
+            if isinstance(stats, dict):
+                # .get(key, "") ensures it won't crash if a metric is missing a specific stat
+                row = [metric] + [stats.get(key, "") for key in stat_keys]
+            else:
+                # Fallback if the value isn't a dictionary
+                row = [metric, stats] + [""] * (len(stat_keys) - 1) if stat_keys else [metric, stats]
+            
+            writer.writerow(row)
 
     return file_path
 

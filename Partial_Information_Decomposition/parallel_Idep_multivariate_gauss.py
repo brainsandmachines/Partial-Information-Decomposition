@@ -21,7 +21,7 @@ Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems
 
 torch.set_default_dtype(torch.float64)
 class para_Idep_multivariate_gauss:
-    def __init__(self,N=None,device = 'cuda',sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,dims: Optional[list] = None,bias_correction: bool = False):
+    def __init__(self,N=None,df=None,device = 'cuda',sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,dims: Optional[list] = None,bias_correction: bool = False):
         """Initialize the Idep multivariate gaussian class
 
         input: M1,M2,T are torch tensors of shape (N,P)
@@ -36,7 +36,7 @@ class para_Idep_multivariate_gauss:
         assert sources is not None or dims is not None, "Either sources or dims must be provided. If sources are provided, they should be a list of three torch tensors [M1,M2,T]. If dims are provided, they should be a list of three integers [dim_m1, dim_m2, dim_t]."
         self.M1,self.M2,self.T = sources if sources is not None else (None, None, None)
         is_sorces_provided = sources is not None
-        df = self.N - 1  if self.M1 is not None else None
+        self.df = df if df is not None else (self.N - 1 if self.M1 is not None else None)
 
         # Find features dimensions from the provided sources or from the provided dims
         self.dim_m1 = self.M1.shape[1] if is_sorces_provided else dims[0]
@@ -89,14 +89,14 @@ class para_Idep_multivariate_gauss:
             #block_singularity_check(np.array([p,q,r]))
             #block_singularity_check(np.array([p.T,q.T,r.T]))
         if bias_correction:
-            self.bm1 = entropy_bias_term(df, self.dim_m1) 
-            self.bm2 = entropy_bias_term(df, self.dim_m2)
-            self.bt = entropy_bias_term(df, self.dim_t)
+            self.bm1 = entropy_bias_term(self.df, self.dim_m1) 
+            self.bm2 = entropy_bias_term(self.df, self.dim_m2)
+            self.bt = entropy_bias_term(self.df, self.dim_t)
             
-            self.bq = entropy_bias_term(df, self.dim_t + self.dim_m1)
-            self.br = entropy_bias_term(df, self.dim_t + self.dim_m2)
-            self.bp = entropy_bias_term(df, self.dim_m1 + self.dim_m2)
-            self.ball = entropy_bias_term(df, self.dim_m1 + self.dim_m2 + self.dim_t)
+            self.bq = entropy_bias_term(self.df, self.dim_t + self.dim_m1)
+            self.br = entropy_bias_term(self.df, self.dim_t + self.dim_m2)
+            self.bp = entropy_bias_term(self.df, self.dim_m1 + self.dim_m2)
+            self.ball = entropy_bias_term(self.df, self.dim_m1 + self.dim_m2 + self.dim_t)
             
         else: 
             self.ball = self.b_tmi = self.bm1 = self.bm2 = self.bt = self.bq = self.br = self.bp = 0
@@ -135,15 +135,18 @@ class para_Idep_multivariate_gauss:
         
         self.r_logdet = torch.logdet(self.I2 - (self.R.mT @ self.R))
 
+        self.q_correction = (self.bm1 + self.bt - self.bq)
+        self.r_correction = (self.bm2 + self.bt - self.br)
+        self.b_tmi = (self.bp + self.bt - self.ball)
         #Mutual Information
-        self.i_m1_t = -0.5*self.q_logdet
-        self.i_m2_t = -0.5*self.r_logdet
+        self.i_m1_t_raw = -0.5*self.q_logdet 
+        self.i_m2_t_raw = -0.5*self.r_logdet 
 
         #M7:
         block7 = self.Q @ self.R.mT #Q@R.T
         nume7 = torch.logdet(self.I1-(block7.mT @block7)) 
         deno7 = self.q_logdet + self.r_logdet
-        m7 = 0.5*(nume7- deno7) 
+        m7 = 0.5*(nume7- deno7)
 
         
         
@@ -151,23 +154,28 @@ class para_Idep_multivariate_gauss:
         mat = self.cov_whiten
         nume8 = torch.logdet(self.I1 - (self.P.mT @ self.P))
         deno8 = torch.logdet(mat)
-        m8 = 0.5*(nume8-deno8)
+        m8 = 0.5*(nume8-deno8) 
         
         #Calculate unique 1
-        i = m7  - self.i_m2_t 
-        k = m8  - self.i_m2_t
-        b = self.i_m1_t 
-        d = self.i_m1_t 
+        i = m7  - self.i_m2_t_raw
+        k = m8  - self.i_m2_t_raw
+        b = self.i_m1_t_raw
+        d = self.i_m1_t_raw
+
+        bias_cmi_m1_given_m2 = self.bp + self.br - self.bm2 - self.ball
+        bias_cmi_m2_given_m1 = self.bp + self.bq - self.bm1 - self.ball
         self.unique_1 = torch.min(torch.stack([i,k]),dim=0).values #James proved that b,d are not relavnt therefore it's just a sanity check
         #assert self.unique_1 == i or self.unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={self.unique_1}, i={i}, k={k}."
+        self.unique_1 += bias_cmi_m1_given_m2
         self.I_dep_values['unique_1'] = self.unique_1
     
         #Calculate unique 2
-        h = m7  - self.i_m1_t 
-        j = m8  - self.i_m1_t
-        c = self.i_m2_t 
-        f = self.i_m2_t  
+        h = m7  - self.i_m1_t_raw
+        j = m8  - self.i_m1_t_raw
+        c = self.i_m2_t_raw
+        f = self.i_m2_t_raw
         self.unique_2 = torch.min(torch.stack([h,j]),dim=0).values #James proved that c,f are not relavnt therefore it's just a sanity check
+        self.unique_2 += bias_cmi_m2_given_m1
         self.I_dep_values['unique_2'] = self.unique_2
         #assert self.unique_2 == h or self.unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={self.unique_2}, h={h}, j={j}."
 
@@ -186,6 +194,8 @@ class para_Idep_multivariate_gauss:
         
         self.i_m1_m2_t = 0.5*torch.logdet((self.I1 - self.P.mT @ self.P)) - 0.5*torch.logdet(self.cov_whiten)
         self.i_m1_m2_t += self.b_tmi
+        self.i_m1_t = self.i_m1_t_raw + self.q_correction
+        self.i_m2_t = self.i_m2_t_raw + self.r_correction
         # Redundant information
         red0 = self.i_m1_t - unique_1
         red1 = self.i_m2_t - unique_2

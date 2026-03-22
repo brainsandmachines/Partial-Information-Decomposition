@@ -1,5 +1,4 @@
 import sys
-
 from matplotlib.pylab import eigvals
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,9 +14,6 @@ import pandas as pd
 
 from bias_corr import entropy_bias_term
 
-
-import numpy as np
-import torch
 
 def theoretical_covariance(dims, corr_matrix):
     """ 
@@ -187,15 +183,15 @@ if __name__ == "__main__":
     # --- Translate the Image Matrix to your input format ---
     # Let q be the scalar representing the Q matrix (Cov between X1 and X3)
     # Let r be the scalar representing the R matrix (Cov between X2 and X3)
-
-    q = 0.6
-    r = 0.5
+    p = 0
+    q = 0
+    r = 0
     
     # According to the image, Cov(X1, X2) is Q * R^T. 
     # In scalar terms, this is simply q * r.
     corr_matrix = np.array([
-        [1.0,   q * r,  q  ],  # Row 1: X1
-        [q * r, 1.0,    r  ],  # Row 2: X2
+        [1.0,   p,  q  ],  # Row 1: X1
+        [p, 1.0,    r  ],  # Row 2: X2
         [q,     r,      1.0]   # Row 3: X3
     ])
     N_p_var_results = N_P_variation_simulation(seeds_list, N_values=[1000,1500,2000,3000], p_values=p_list, corr_matrix=corr_matrix)

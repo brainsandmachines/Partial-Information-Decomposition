@@ -13,7 +13,7 @@ import time
 def entropy_bias_term(N, d):
     """ Analytical bias for Standard MLE (Wishart) """
     # Returns negative value (underestimation of entropy)
-    return -0.5 * (np.sum([digamma((N - i + 1) / 2.0) for i in range(1, d + 1)]) + d * np.log(2.0 / N))
+    return 0.5 * (np.sum([digamma((N - i + 1) / 2.0) for i in range(1, d + 1)]) + d * np.log(2.0 / N))
 
 
 # def jackknife_wrapper(raw_output,N,func,data):

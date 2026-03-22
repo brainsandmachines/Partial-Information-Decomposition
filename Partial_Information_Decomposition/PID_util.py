@@ -45,7 +45,7 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     return Sigma
 
 
-def create_cov_matrix(rvs:list=None,verbose=False,Sigma=None):
+def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
     rvs is a list of the three variables [M1,M2,T]
@@ -60,17 +60,19 @@ def create_cov_matrix(rvs:list=None,verbose=False,Sigma=None):
         Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
     if verbose:
         eigvenvalue_summary(Sigma.detach().cpu().numpy())
-    min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
+    if type(Sigma) == torch.Tensor:
+        Sigma_numpy = Sigma.detach().cpu().numpy()
+    min_eig, is_singular = block_singularity_check(Sigma_numpy)
     if is_singular:
         print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")
 
     cov_dict = {}
     if verbose:
         print(f"\nFull covariance matrix shape: {Sigma.shape}")
-    x0_dim = rvs[0].shape[1]
-    x1_dim = rvs[1].shape[1]
-    x2_dim = rvs[2].shape[1] if len(rvs) == 3 else 0
-    N = rvs[0].shape[0] #number of observations
+    x0_dim = rvs[0].shape[1] if rvs else dims[0]
+    x1_dim = rvs[1].shape[1] if rvs else dims[1]
+    x2_dim = rvs[2].shape[1] if (rvs and len(rvs) == 3) else dims[2] if dims else 0
+
 
     dt_dx1 = x0_dim + x1_dim
     d_all = x0_dim + x1_dim + x2_dim
@@ -86,7 +88,7 @@ def create_cov_matrix(rvs:list=None,verbose=False,Sigma=None):
     cov_dict['auto_x01'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
 
 
-    if len(rvs) == 3:
+    if len(rvs) == 3 or len(dims) == 3:
         #Cross-Covariances:
         cov_dict['cross_x1_x2'] = Sigma[x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
         cov_dict['cross_x12_x0'] = Sigma[x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
@@ -154,7 +156,7 @@ def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
     return cov_dict
 
 
-def whiten_block(self,
+def whiten_block(
                     Sigma_xx: torch.Tensor,
                     Sigma_xy: torch.Tensor,
                     Sigma_yy: torch.Tensor) -> torch.Tensor:
@@ -766,3 +768,5 @@ def plot_block_heatmap(csv_path, save_path=None):
         plt.savefig(save_path, dpi=300)
 
     plt.show()
+
+

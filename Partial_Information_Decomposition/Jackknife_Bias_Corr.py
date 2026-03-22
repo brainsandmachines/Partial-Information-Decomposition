@@ -27,15 +27,16 @@ from utils import (
     save_seed_summary_csv,
     create_test_histograms_with_kde,
     save_seed_summary_table_image,
+    load_csv_and_add_data
 )
 
 def get_run_config() -> dict:
     return {
         'device': 'cuda' if torch.cuda.is_available() else 'cpu',
-        "n_seeds": 3,
+        "n_seeds": 10000,
         "seed_start": 0,
         "n": 1000,
-        "dims": [50, 50, 50],
+        "dims": [50, 50, 55],  # Dimensions for X1, X2, X3
         "p": 0,
         'q': 0,
         'r': 0,
@@ -43,7 +44,7 @@ def get_run_config() -> dict:
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
         "progress_print_every": 100,
-        "test_name": "jackknife_pid",
+        "test_name": "NoWishart_jackknife_pid",
     }
 def lo_cov(rvs,N):
     """
@@ -97,19 +98,19 @@ def idep_parallel(device,sources, target, N):
     Sigma_raw = Sigma_full.unsqueeze(0)
     dims = [source.shape[1] for source in sources] + [target[0].shape[1]]
     #Calculate the PID for the full covariance matrix
-    idep_raw = para_Idep_multivariate_gauss(N=1,device=device,cov_matrix=Sigma_raw,dims=dims)
+    idep_raw = para_Idep_multivariate_gauss(N=1,df = N-1,device=device,cov_matrix=Sigma_raw,dims=dims,bias_correction=False)
     pid_raw,mi_raw = idep_raw.idep()
 
 
     #Calculate the PID for each leave-one-out covariance matrix
-    idep_loo = para_Idep_multivariate_gauss(N=N,device=device,cov_matrix=cov_loo_all,dims=dims)
+    idep_loo = para_Idep_multivariate_gauss(N=N,df=N-1,device=device,cov_matrix=cov_loo_all,dims=dims,bias_correction=False)
     pid_loo,mi_loo = idep_loo.idep() 
 
     mean_pid_loo = {key: torch.mean(torch.stack([pid_loo[key][i] for i in range(N)])) for key in pid_loo.keys()}
     mean_mi_loo = {key: torch.mean(torch.stack([mi_loo[key][i] for i in range(N)])) for key in mi_loo.keys()}
 
-    pid_bias_term = {key: (N)*(mean_pid_loo[key] - pid_raw[key]) for key in pid_raw.keys()}
-    mi_bias_term = {key: (N)*(mean_mi_loo[key] - mi_raw[key]) for key in mi_raw.keys()}
+    pid_bias_term = {key: (N-1)*(mean_pid_loo[key] - pid_raw[key]) for key in pid_raw.keys()}
+    mi_bias_term = {key: (N-1)*(mean_mi_loo[key] - mi_raw[key]) for key in mi_raw.keys()}
 
     pid_values = {key: (pid_raw[key] - pid_bias_term[key]).item() for key in pid_raw.keys()}
     mi_values = {key: (mi_raw[key] - mi_bias_term[key]).item() for key in mi_raw.keys()}
@@ -119,7 +120,25 @@ def idep_parallel(device,sources, target, N):
 def run_single_seed(seed: int,config:dict) -> dict:
 
     device = config['device']
-    #Create the ground truth covariance matrix based on the config parameters and pid values
+
+    #Sample from the multivariate Gaussian distribution defined by the covariance matrix
+    rv_list, sample_cov = sample_cov_simulation(seed, config['n'], config['dims'], config['true_cov'])
+
+    #Convert the sampled random variables to torch tensors and move to device
+    torch_rv_list = [torch.from_numpy(rv).to(device) for rv in rv_list]  # Convert to torch tensors
+
+    #Calculate the bias-corrected PID values using the parallelized idep function
+    pid_values, mi_values = idep_parallel(device = device, sources=torch_rv_list[:2], target=torch_rv_list[2:], N=config['n'])
+
+    return extract_all_components(global_results={},ca_results={} ,pid_results=pid_values, mi_results=mi_values)
+
+
+
+def main():
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    config = get_run_config()
+
+        #Create the ground truth covariance matrix based on the config parameters and pid values
     p = config['p']
     q = config['q']
     r = config['r']
@@ -129,30 +148,19 @@ def run_single_seed(seed: int,config:dict) -> dict:
         [q,     r,      1.0]   # Row 3: X3
     ])
 
+    config['true_cov'] = theoretical_covariance(config['dims'], corr_matrix)
+
+
     true_cov = theoretical_covariance(config['dims'], corr_matrix)
     torch_true_cov = torch.from_numpy(true_cov).to(device)
-    true_value,_ = para_Idep_multivariate_gauss(N=1,device=device,cov_matrix=torch_true_cov.unsqueeze(0),dims=config['dims']).idep()
-
-    #Sample from the multivariate Gaussian distribution defined by the covariance matrix
-    rv_list, sample_cov = sample_cov_simulation(seed, config['n'], config['dims'], true_cov)
-
-    #Convert the sampled random variables to torch tensors and move to device
-    torch_rv_list = [torch.from_numpy(rv).to(device) for rv in rv_list]  # Convert to torch tensors
-
-    #Calculate the bias-corrected PID values using the parallelized idep function
-    pid_values, mi_values = idep_parallel(device = device, sources=torch_rv_list[:2], target=torch_rv_list[2:], N=config['n'])
-
+    true_value,_ = para_Idep_multivariate_gauss(N=1,df=config['n']-1,device=device,cov_matrix=torch_true_cov.unsqueeze(0),dims=config['dims']).idep()
     true_value = {f'true_{key}': true_value[key].item() for key in true_value.keys()}
-    return extract_all_components(global_results=true_value,ca_results={} ,pid_results=pid_values, mi_results=mi_values)
 
-
-
-def main():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    config = get_run_config()
 
     summary, seed_rows = run_multi_seed_experiment(config, per_seed_runner=run_single_seed)
     all_runs_path = get_seed_runs_csv_path(config)
+    summary = {**summary, **true_value}
+
     summary_path = save_seed_summary_csv(summary, config)
     print(f"\nSaved all seed run results to: {all_runs_path}")
     print(f"Saved summary to: {summary_path}")

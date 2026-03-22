@@ -10,7 +10,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.covariance import LedoitWolf
 
 if __name__ != "__main__":
-    from .PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report,block_singularity_check
+    from .PID_util import create_cov_matrix,whiten_block,block_singularity_check
     from .bias_corr import entropy_bias_term
 else:
     from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report
@@ -61,9 +61,9 @@ class Idep_multivariate_gauss:
             self.sigma12 = self.cov_dict['cross_x1_x2']
 
 
-            self.P = self.whiten_block(self.sigma00, self.sigma01, self.sigma11)
-            self.Q = self.whiten_block(self.sigma00, self.sigma02, self.sigma22)
-            self.R = self.whiten_block(self.sigma11, self.sigma12, self.sigma22)
+            self.P = whiten_block(self.sigma00, self.sigma01, self.sigma11)
+            self.Q = whiten_block(self.sigma00, self.sigma02, self.sigma22)
+            self.R = whiten_block(self.sigma11, self.sigma12, self.sigma22)
 
 
             assert self.P.shape == (self.dim_m1,self.dim_m2), f"Covariance matrix dimensions {self.P.shape} do not match the provided source dimensions: {self.dim_m1,self.dim_m2}."
@@ -93,21 +93,7 @@ class Idep_multivariate_gauss:
         self.I_dep_values = {}
         self.PID_values = {}
 
-    def whiten_block(self,
-                        Sigma_xx: torch.Tensor,
-                        Sigma_xy: torch.Tensor,
-                        Sigma_yy: torch.Tensor) -> torch.Tensor:
-        """
-        return Ux^{-T} @ Sigma_xy @ Uy^{-1}
-        where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
-        """
-        Ux = torch.linalg.cholesky(Sigma_xx).T
-        Uy = torch.linalg.cholesky(Sigma_yy).T
 
-        tmp = torch.linalg.solve_triangular(Uy.T, Sigma_xy.T, upper=False).T
-        K   = torch.linalg.solve_triangular(Ux.T, tmp,        upper=False)
-
-        return K
             
         
 
@@ -231,13 +217,13 @@ class Idep_multivariate_gauss:
         block7 = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
         nume7 = torch.logdet(self.I1-(block7.T@block7)) 
         deno7 = torch.logdet(self.I2 - (self.Q.T @ self.Q)) + torch.logdet(self.I2 - (self.R.T @ self.R))  
-        m7_raw = 0.5*(nume7- deno7) 
+        m7_raw = 0.5*(nume7- deno7) + self.b_tmi
         
         #M8:
         mat = self.constraint_cov_dict['c_model_8']
         nume8 = torch.logdet(self.I1 - (self.P.T @ self.P))
         deno8 = torch.logdet(mat)
-        m8_raw = 0.5*(nume8-deno8)
+        m8_raw = 0.5*(nume8-deno8) + self.b_tmi
 
         #Calculate unique 1
         i = m7_raw  - self.i_m2_t_raw 
