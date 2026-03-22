@@ -371,9 +371,9 @@ def print_m7_bias_summary(results: dict) -> None:
 if __name__ == "__main__":
     results = simulate_m7_m8_bias_comparison(
         n_samples=1000,
-        n0=20,
-        n1=20,
-        n2=30,
+        n0=100,
+        n1=100,
+        n2=200,
         n_trials=2000,
         q_scale=0.35,
         r_scale=0.30,
