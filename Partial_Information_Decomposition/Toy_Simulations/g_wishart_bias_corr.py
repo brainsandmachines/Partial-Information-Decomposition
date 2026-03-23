@@ -53,6 +53,7 @@ def make_random_true_cov(
     r_scale: float = 0.25,
     p_scale: float = 0.25,
     seed: int | None = None,
+    M7_structural: bool = True,
 ) -> np.ndarray:
     """
     Construct a generic positive-definite Gaussian M7 covariance.
@@ -79,6 +80,9 @@ def make_random_true_cov(
     Q = q_scale * A / A_norm
     R = r_scale * B / B_norm
     P = p_scale * C / C_norm
+
+    if M7_structural:
+        P = Q @ R.T
 
     true_cov = np.block([
         [np.eye(n0), P,          Q],
