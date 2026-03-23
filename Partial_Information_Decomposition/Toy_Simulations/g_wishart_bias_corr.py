@@ -218,8 +218,9 @@ def simulate_m7_m8_bias_comparison(
     fail_m8 = 0
     fail_m7_naive = 0
 
-    for _ in range(n_trials):
-
+    for i in range(n_trials):
+        if (i+1) % 100 == 0:
+            print(f"Trial {i+1}/{n_trials}...")
 
         #Sample data and get sample covariance
         S = sample_data_from_cov(true_cov=true_cov, n_samples=n_samples, seed=rng.integers(0, 2**32 - 1))
@@ -369,12 +370,13 @@ def print_m7_bias_summary(results: dict) -> None:
 
 
 if __name__ == "__main__":
+    print("Running M7 and M8 Simulation logdet bias comparison simulation...")
     results = simulate_m7_m8_bias_comparison(
         n_samples=1000,
         n0=100,
         n1=100,
-        n2=200,
-        n_trials=2000,
+        n2=500,
+        n_trials=5000,
         q_scale=0.35,
         r_scale=0.30,
         p_scale=0.25,
