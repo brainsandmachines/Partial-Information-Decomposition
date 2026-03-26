@@ -20,8 +20,19 @@ def mean_std_csv_results(results_dict):
     return mean_results, std_results
 
 
+def m7_m8_mean_std_csv_results(results_dict):
+    """ Helper: Compute mean results across seeds """
+    m7_mean = results_dict['M7']['corrected_statistic'] #After bias correction
+    m7_std = results_dict['M7']['statistics']['m7_std'] # Before bias correction but std is additive for constant
+    m8_mean = results_dict['M8']['corrected_statistic'] #After bias correction
+    m8_std = results_dict['M8']['statistics']['m8_std'] # Before bias correction but std is additive for constant
 
-def N_P_variation_simulation(config):
+    mean_results = {'M7': m7_mean, 'M8': m8_mean}
+    std_results = {'M7': m7_std, 'M8': m8_std}
+    return mean_results, std_results
+
+
+def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
     """ Helper: Run simulations across different N and p values 
     and then create a heatamp of the results. """
     N_values = config['N_values']
@@ -34,16 +45,21 @@ def N_P_variation_simulation(config):
     for N in N_values:
         for p in p_values:
             print(f"\nRunning simulation for N={N}, p={p} ({i}/{len_N*len_P})")
+            config['n_samples'] = N
+            config['n0'] = p[0]
+            config['n1'] = p[1]
+            config['n2'] = p[2]
             results_dict = simulation_func(config)
-            mean_results, std_results = mean_std_csv_results(results_dict)
+            mean_results, std_results = mean_std_func(results_dict)
             row = {
             "N": N,
-            "p": p[0],  # Assuming all p values in the list are the same for simplicity
+            "p": p,  
         }
 
-            for key in mean_results.index:
+            for key in mean_results.keys():
                 row[f"{key}_mean"] = mean_results[key]
                 row[f"{key}_std"] = std_results[key]
+                row[f"{key}_ground_truth"] = results_dict[key]['statistics']['ground_truth']
 
                 all_results.append(row)
             print(f"Completed combination N={N}, p={p} ({i}/{len_N * len_P})")
@@ -53,7 +69,7 @@ def N_P_variation_simulation(config):
 
 
 
-def sample_data_from_cov(true_cov: np.ndarray, n_samples: int, rng: int | None = None) -> np.ndarray:
+def sample_data_from_cov(true_cov: np.ndarray, n_samples: int, rng: np.random.Generator) -> np.ndarray:
     """
     Sample multivariate Gaussian data from the specified covariance.
     and return it's covariance matrix. This is a helper function for the m7_whiten bias simulation.
@@ -90,3 +106,119 @@ def logdet_wishart_bias(df: int, d: int) -> float:
         raise ValueError(f"Need df > d-1. Got df={df}, d={d}.")
     return np.sum([digamma((df - i + 1) / 2.0) for i in range(1,d+1)]) + d * np.log(2.0 / df)
     
+
+def plot_heatmap_mean_std(
+    results,
+    x_col="N",
+    y_col="p",
+    mean_col="mean",
+    std_col="std",
+    ground_truth_col="ground_truth",
+    title=None,
+    cmap="viridis",
+    figsize=(8, 6),
+    save_path=None,
+    mean_fmt=".3f",
+    std_fmt=".3f",
+):
+    """
+    Create a heatmap where:
+        x-axis = N
+        y-axis = p
+        color  = mean
+        text   = mean ± std
+
+    Parameters
+    ----------
+    results : list[dict] or pd.DataFrame
+        Each entry should look like:
+        {'N': ..., 'p': ..., 'mean': ..., 'std': ...}
+
+        Note:
+        p can also be a list/tuple/array, and it will be converted
+        to a string label automatically.
+    """
+
+    df = pd.DataFrame(results).copy()
+
+    # Convert y values to hashable / displayable labels
+    def make_label(v):
+        if isinstance(v, np.ndarray):
+            return str(v.tolist())
+        if isinstance(v, (list, tuple)):
+            return str(list(v))
+        return str(v)
+
+    df[y_col] = df[y_col].apply(make_label)
+
+    # Safer than pivot if duplicates ever appear
+    mean_mat = df.pivot_table(index=y_col, columns=x_col, values=mean_col, aggfunc="mean")
+    std_mat = df.pivot_table(index=y_col, columns=x_col, values=std_col, aggfunc="mean")
+    ground_truth_mat = df.pivot_table(index=y_col, columns=x_col, values=ground_truth_col, aggfunc="mean")
+
+    # sort axes
+    mean_mat = mean_mat.sort_index()
+    mean_mat = mean_mat.reindex(sorted(mean_mat.columns), axis=1)
+
+    std_mat = std_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
+    ground_truth_mat = ground_truth_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
+    data = mean_mat.to_numpy(dtype=float)
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    im = ax.imshow(data, cmap=cmap, aspect="auto")
+
+    ax.set_xticks(np.arange(len(mean_mat.columns)))
+    ax.set_xticklabels(mean_mat.columns)
+    ax.set_yticks(np.arange(len(mean_mat.index)))
+    ax.set_yticklabels(mean_mat.index)
+
+    ax.set_xlabel(x_col)
+    ax.set_ylabel(y_col)
+
+    if title is not None:
+        ax.set_title(title)
+
+    threshold = np.nanmean(data)
+
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            m = mean_mat.iloc[i, j]
+            s = std_mat.iloc[i, j]
+            gt = ground_truth_mat.iloc[i, j]
+
+            if pd.isna(m):
+                text = "NA"
+            elif pd.isna(s):
+                text = f"{m:{mean_fmt}}\n\nGT={gt:{mean_fmt}}"
+            else:
+                text = f"{m:{mean_fmt}}\n±{s:{std_fmt}}\n\nGT={gt:{mean_fmt}}"
+
+            ax.text(
+                j,
+                i,
+                text,
+                ha="center",
+                va="center",
+                color="white" if pd.notna(m) and m < threshold else "black",
+                fontsize=9,
+            )
+
+    cbar = fig.colorbar(im, ax=ax)
+    cbar.set_label("Mean")
+
+    fig.tight_layout()
+
+    if save_path is not None:
+        plt.savefig(f'{save_path}/{title}.png', dpi=300, bbox_inches="tight")
+
+    plt.show()
+
+
+def corrected_statistic(statistics: np.ndarray, bias_correction: float) -> np.ndarray:
+    """
+    Apply bias correction to the raw statistics.
+    """
+    return statistics - bias_correction
+
+

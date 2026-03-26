@@ -1,0 +1,13 @@
+
+N_P_variations:
+  N_values: [500,1000,2500,5000]
+  p_values: [[10,10,10],[20,30,40],[50,75,100],[100,100,120]]
+
+
+logdet_simulation:
+  seed: 1
+  n_samples: 1000
+  n_trials: 1000
+  p_scale: 0.35
+  q_scale: 0.25
+  r_scale: 0.15
