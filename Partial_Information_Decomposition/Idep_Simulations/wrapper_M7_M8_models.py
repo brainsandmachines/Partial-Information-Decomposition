@@ -104,7 +104,7 @@ def simulation(config,functions_dict:dict,seed=None):
     """
     Run a simulation over combinations of N and p values, computing the specified statistic and bias correction.
     """
-    all_results = []
+    results_dict = {}
     rng = np.random.default_rng(seed)
 
     s_simulation_func = functions_dict["s_simulation"]
@@ -116,53 +116,29 @@ def simulation(config,functions_dict:dict,seed=None):
     statistic = s_simulation_func(m8_true_cov, m7_true_cov,config['n_samples'] ,config["n0"], config["n1"], config["n2"], config["n_trials"], rng)
 
     for statistic_key in statistic.keys():
+        print(f"Calculating bias for {statistic_key}...")
         statistic_model = statistic[statistic_key]
+
+        
         model_config = config.copy()
         model_config['statistics'] = statistic_model
+        
         model_bc_func = bias_correction_func[statistic_key]
         model_bias_correction = model_bc_func(model_config)
-        model_corr_values = corrected_statistic_func(statistic_model['avg'], model_bias_correction[f'bias'])
-        all_results.append({
-            "model": statistic_key,
-            "statistics": statistic_model,
-            "bias_correction": model_bias_correction,
-            "corrected_statistic": model_corr_values
-        })
 
-    #Update config with statistics for bias correction functions
-    m8_config = config.copy()
-    m8_config['statistics'] = statistics_m8
+        model_corr_values = corrected_statistic_func(statistic_model['avg'], model_bias_correction['bias'])
+        
+        results_dict[statistic_key] = {
+            'sample': statistic_model['sample'],
+            'avg': statistic_model['avg'],
+            'std': statistic_model['std'],
+            'emp_bias': model_bias_correction[f'bias'],
+            'corrected_statistic': model_corr_values,
+            'ground_truth': statistic_model['ground_truth']
+        }
 
-    m7_config = config.copy()
-    m7_config['statistics'] = statistics_m7
 
-    #Extract bias correction functions
-    m8_bc_func = bias_correction_func["m8"]
-    m7_bc_func = bias_correction_func["m7"]
-
-    #Calculate bias corrections
-    m8_bias_correction = m8_bc_func(m8_config)
-    m7_bias_correction = m7_bc_func(m7_config)
-
-    m8_corr_values = corrected_statistic_func(statistics_m8['m8_avg'], m8_bias_correction['m8_bias'])
-    m7_corr_values = corrected_statistic_func(statistics_m7['m7_avg'], m7_bias_correction['m7_bias'])
-
-    m8_results = {
-        "true_cov": m8_true_cov,
-        "statistics": statistics_m8,
-        "bias_correction": m8_bias_correction,
-        "corrected_statistic": m8_corr_values
-    }
-
-    m7_results = {
-        "true_cov": m7_true_cov,
-        "statistics": statistics_m7,
-        "bias_correction": m7_bias_correction,
-        "corrected_statistic": m7_corr_values
-    }
-
-    return m8_results, m7_results
-
+    return results_dict
 
 
 

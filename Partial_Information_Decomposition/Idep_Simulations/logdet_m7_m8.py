@@ -4,14 +4,13 @@ import sys
 import os
 from pathlib import Path
 from Simulation_utils import *
-from M7_M8_models import make_random_true_cov
+from wrapper_M7_M8_models import simulation
 import yaml
 from functools import partial
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import *
-from M7_M8_models import *
 
 
 
@@ -112,9 +111,9 @@ def simulate_m7_m8_log_det(
     emp_bias_m8 = avg_m8 - m8_true_logdet_full
     emp_bias_m7_whiten_naive = avg_m7_whiten_naive - m7_true_cov_logdet
 
-    m8_dict= {'m8_sample': logdets_m8_sample, 'm8_avg': avg_m8,'m8_std': np.std(logdets_m8_sample) ,'m8_emp_bias': emp_bias_m8,'ground_truth': m8_true_logdet_full}
+    m8_dict= {'sample': logdets_m8_sample, 'avg': avg_m8,'std': np.std(logdets_m8_sample) ,'emp_bias': emp_bias_m8,'ground_truth': m8_true_logdet_full}
     
-    m7_dict = {'m7_sample': logdets_m7_sample, 'm7_avg': avg_m7_whiten_naive, 'm7_std': np.std(logdets_m7_sample), 'm7_emp_bias': emp_bias_m7_whiten_naive, 'ground_truth': m7_true_cov_logdet}
+    m7_dict = {'sample': logdets_m7_sample, 'avg': avg_m7_whiten_naive, 'std': np.std(logdets_m7_sample), 'emp_bias': emp_bias_m7_whiten_naive, 'ground_truth': m7_true_cov_logdet}
 
     return {'M8': m8_dict, 'M7': m7_dict}
 
@@ -132,7 +131,7 @@ def calculate_bias(config: dict,m8: bool,m7: bool,m7_wishart: bool,bias_correcti
     if m8:
         m8_wishart_bias_corr = logdet_wishart_bias(df, d) if bias_correction else 0.0
      # 1. Calculate Marginal Biases
-        return {'m8_bias' : m8_wishart_bias_corr}
+        return {'bias' : m8_wishart_bias_corr}
     if m7:
         bias_x0 = logdet_wishart_bias(df=df, d=n0)
         bias_x1 = logdet_wishart_bias(df=df, d=n1)
@@ -144,11 +143,11 @@ def calculate_bias(config: dict,m8: bool,m7: bool,m7_wishart: bool,bias_correcti
         bias_2 = logdet_wishart_bias(df=df, d=n2)
         bias_m7_structural = bias_02 + bias_12 - bias_2
         bias_m7_structural = bias_m7_structural - (bias_x0 + bias_x1 + bias_y) if bias_correction else 0.0
-        return {'m7_bias': bias_m7_structural}
+        return {'bias': bias_m7_structural}
 
     if m7_wishart:
         bias_m7_whiten_structural = bias_m7_structural - (bias_x0 + bias_x1 + bias_y) if bias_correction else 0.0
-        return {'m7_wishart_bias': bias_m7_whiten_structural}
+        return {'bias': bias_m7_whiten_structural}
 
 
 
@@ -159,13 +158,14 @@ def simulation_wrapper(config: dict) -> dict:
     """
     seed = config['seed']
     sim_func = simulate_m7_m8_log_det
-    m8_bias_func = partial(calculate_bias, m8=True, m7=False, m7_wishart=False,bias_correction=False)
-    m7_bias_func = partial(calculate_bias, m8=False, m7=True, m7_wishart=False,bias_correction=False)
-    bias_corr_func = {'m8': m8_bias_func, 'm7': m7_bias_func}
+    m8_bias_func = partial(calculate_bias, m8=True, m7=False, m7_wishart=False,bias_correction=config['bias_correction'])
+    m7_bias_func = partial(calculate_bias, m8=False, m7=True, m7_wishart=False,bias_correction=config['bias_correction'])
+    bias_corr_func = {'M8': m8_bias_func, 'M7': m7_bias_func}
     corr_value_func  = corrected_statistic
     functions_dict = {'s_simulation': sim_func, 'bias_correction': bias_corr_func, 'corrected_statistic': corr_value_func}
-    m8_results, m7_results = simulation(config,functions_dict,seed=seed)
-    return {"M8": m8_results, "M7": m7_results}
+    results = simulation(config,functions_dict,seed=seed)
+
+    return results
     
 def sort_m7_m8_results(results_list):
     """ Helper: Sort results list by N and p values for  sperate by m7 and m8."""
@@ -186,7 +186,7 @@ def sort_m7_m8_results(results_list):
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation logdet bias comparison simulation...")
     save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/logdet_sim"
-    yaml_file = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
+    yaml_file = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/small_test.yaml"
     with open(yaml_file, 'r') as f:
         super_config = yaml.safe_load(f)
 
@@ -203,10 +203,10 @@ if __name__ == "__main__":
 
         
     #m8_results, m7_results = simulation_wrapper(config)
-    plot_heatmap_mean_std(m7_results_list, title="Bias_Corrected_MI_M7",save_path=save_path)
-    plot_heatmap_mean_std(m8_results_list, title="Bias_Corrected_MI_M8",save_path=save_path)
+    plot_heatmap_mean_std(m7_results_list, title="smalltest_Corrected_MI_M7",save_path=save_path)
+    plot_heatmap_mean_std(m8_results_list, title="smalltest_Corrected_MI_M8",save_path=save_path)
     #Save config for file
-    with open(f'{save_path}/exp_config.yaml', 'w') as f:
+    with open(f'{save_path}/smalltest_config.yaml', 'w') as f:
          yaml_config = {
             'simulation': 'logdet bias comparison for M7 and M8 models',
             'seed': config['seed'],

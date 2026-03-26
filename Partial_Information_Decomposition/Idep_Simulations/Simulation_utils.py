@@ -23,9 +23,9 @@ def mean_std_csv_results(results_dict):
 def m7_m8_mean_std_csv_results(results_dict):
     """ Helper: Compute mean results across seeds """
     m7_mean = results_dict['M7']['corrected_statistic'] #After bias correction
-    m7_std = results_dict['M7']['statistics']['m7_std'] # Before bias correction but std is additive for constant
+    m7_std = results_dict['M7']['std'] # Before bias correction but std is additive for constant
     m8_mean = results_dict['M8']['corrected_statistic'] #After bias correction
-    m8_std = results_dict['M8']['statistics']['m8_std'] # Before bias correction but std is additive for constant
+    m8_std = results_dict['M8']['std'] # Before bias correction but std is additive for constant
 
     mean_results = {'M7': m7_mean, 'M8': m8_mean}
     std_results = {'M7': m7_std, 'M8': m8_std}
@@ -59,7 +59,7 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
             for key in mean_results.keys():
                 row[f"{key}_mean"] = mean_results[key]
                 row[f"{key}_std"] = std_results[key]
-                row[f"{key}_ground_truth"] = results_dict[key]['statistics']['ground_truth']
+                row[f"{key}_ground_truth"] = results_dict[key]['ground_truth']
 
                 all_results.append(row)
             print(f"Completed combination N={N}, p={p} ({i}/{len_N * len_P})")

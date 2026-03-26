@@ -16,15 +16,16 @@ from py_compile import main
 import torch
 import numpy as np
 import argparse
-
+import yaml
+from functools import partial
 # Import all existing utilities from the user's module
-from Partial_Information_Decomposition.Idep_Simulations.logdet_m7_m8 import *
 from Simulation_utils import *
-from M7_M8_models import make_random_true_cov
+from wrapper_M7_M8_models import simulation
 from Simulation_utils import *
 from logdet_m7_m8 import  sort_m7_m8_results
 
-def simulate_m7_m8_log_det(
+
+def simulate_m7_m8_mi(
     m8_true_cov: np.ndarray,
     m7_true_cov: np.ndarray,
     n_samples: int,
@@ -56,9 +57,9 @@ def simulate_m7_m8_log_det(
     m8_true_cov_torch = torch.from_numpy(m8_true_cov).to(torch.float64)
     m8_true_cov_dict = create_cov_matrix(Sigma=m8_true_cov_torch, dims=[n0, n1, n2])
 
-    p_m8 = m8_true_cov_dict['cross_x0_x1'] #True covraince already whitened, so this is the P matrix for M8
-    r_m8 = m8_true_cov_dict['cross_x1_x2'] #True covraince already whitened, so this is the R matrix for M8
-    q_m8 = m8_true_cov_dict['cross_x0_x2'] #True covraince already whitened, so this is the Q matrix for M8
+    p_m8 = (m8_true_cov_dict['cross_x0_x1']).numpy()#True covraince already whitened, so this is the P matrix for M8
+    r_m8 = (m8_true_cov_dict['cross_x1_x2']).numpy() #True covraince already whitened, so this is the R matrix for M8
+    q_m8 = (m8_true_cov_dict['cross_x0_x2']).numpy() #True covraince already whitened, so this is the Q matrix for M8
     nume8_true = safe_logdet(np.eye(n1) - (p_m8.T @ p_m8))
     deno8_true = safe_logdet(m8_true_cov)
     m8_MI_true = 0.5*(nume8_true-deno8_true)
@@ -66,9 +67,9 @@ def simulate_m7_m8_log_det(
     m7_true_cov_torch = torch.from_numpy(m7_true_cov).to(torch.float64)
     m7_true_cov_dict = create_cov_matrix(Sigma=m7_true_cov_torch, dims=[n0, n1, n2])
 
-    p_m7 = m7_true_cov_dict['cross_x0_x1'] #True covraince already whitened, so this is the P matrix for M7
-    r_m7 = m7_true_cov_dict['cross_x1_x2'] #True covraince already whitened, so this is the R matrix for M7
-    q_m7 = m7_true_cov_dict['cross_x0_x2'] #True covraince already whitened, so this is the Q matrix for M7
+    p_m7 = (m7_true_cov_dict['cross_x0_x1']).numpy() #True covraince already whitened, so this is the P matrix for M7
+    r_m7 = (m7_true_cov_dict['cross_x1_x2']).numpy() #True covraince already whitened, so this is the R matrix for M7
+    q_m7 = (m7_true_cov_dict['cross_x0_x2']).numpy() #True covraince already whitened, so this is the Q matrix for M7
     nume7_true = safe_logdet(np.eye(n1) - (p_m7.T @ p_m7))
     deno7_true = safe_logdet(m7_true_cov)
     m7_MI_true = 0.5*(nume7_true-deno7_true)
@@ -131,15 +132,15 @@ def simulate_m7_m8_log_det(
     emp_bias_m8 = avg_m8 - m8_MI_true
     emp_bias_m7 = avg_m7 - m7_MI_true
 
-    m8_dict= {'m8_sample': mi_m8_sample, 
-              'm8_avg': avg_m8,
-              'm8_std': np.std(mi_m8_sample),
-              'm8_emp_bias': emp_bias_m8,
+    m8_dict= {'sample': mi_m8_sample, 
+              'avg': avg_m8,
+              'std': np.std(mi_m8_sample),
+              'emp_bias': emp_bias_m8,
               'ground_truth': m8_MI_true}
-    m7_dict= {'m7_sample': mi_m7_sample, 
-              'm7_avg': avg_m7,
-              'm7_std': np.std(mi_m7_sample),
-              'm7_emp_bias': emp_bias_m7,
+    m7_dict= {'sample': mi_m7_sample, 
+              'avg': avg_m7,
+              'std': np.std(mi_m7_sample),
+              'emp_bias': emp_bias_m7,
               'ground_truth': m7_MI_true}
     return {'M8': m8_dict, 'M7': m7_dict}
 
@@ -171,7 +172,7 @@ def calculate_bias(config: dict,m8:bool,m7:bool,m7_wishart:bool,bias_correction:
     
     # Final MI Bias Corrections (Whitened Scale)
     # M8 MI Bias = 0.5 * ( (B_pred - B_marginals) - (B_joint - B_marginals) )
-        return 0.5 * ( (b_pred_m8 - (b_x0 + b_x1)) - (b_joint_m8 - (b_x0 + b_x1 + b_y)) ) if bias_correction else 0.0
+        return {'bias': 0.5 * ( (b_pred_m8 - (b_x0 + b_x1)) - (b_joint_m8 - (b_x0 + b_x1 + b_y)) ) if bias_correction else 0.0}
 
     if m7:
         # M7 (Structural) Biases
@@ -181,7 +182,7 @@ def calculate_bias(config: dict,m8:bool,m7:bool,m7_wishart:bool,bias_correction:
     
         # M7 MI Bias = 0.5 * ( (B_pred_struct - B_marginals) - (B_joint_struct - B_marginals) )
         # Note: b_joint_m7 = b_c0 + b_c1 - b_sep
-        return 0.5 * (b_x0 + b_x1 + 2*b_y - b_c0 - b_c1) if bias_correction else 0.0
+        return {'bias': 0.5 * (b_x0 + b_x1 + 2*b_sep - b_c0 - b_c1) if bias_correction else 0.0}
 
 
 def simulation_wrapper(config: dict) -> dict:
@@ -189,24 +190,24 @@ def simulation_wrapper(config: dict) -> dict:
     Run the logdet bias simulation for M7 and M8 models, returning a summary of results.
     """
     seed = config['seed']
-    sim_func = simulate_m7_m8_log_det
+    sim_func = simulate_m7_m8_mi
     m8_bias_func = partial(calculate_bias, m8=True, m7=False, m7_wishart=False,bias_correction=False)
     m7_bias_func = partial(calculate_bias, m8=False, m7=True, m7_wishart=False,bias_correction=False)
-    bias_corr_func = {'m8': m8_bias_func, 'm7': m7_bias_func}
+    bias_corr_func = {'M8': m8_bias_func, 'M7': m7_bias_func}
     corr_value_func  = corrected_statistic
     functions_dict = {'s_simulation': sim_func, 'bias_correction': bias_corr_func, 'corrected_statistic': corr_value_func}
-    m8_results, m7_results = simulation(config,functions_dict,seed=seed)
-    return {"M8": m8_results, "M7": m7_results}
+    results_dict = simulation(config,functions_dict,seed=seed)
+    return results_dict
     
 
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
-    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/logdet_sim"
+    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/MI_sim"
     yaml_file = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
     with open(yaml_file, 'r') as f:
         super_config = yaml.safe_load(f)
 
-        config = super_config['MI_M7_M8_simulation']
+        config = super_config['Mutual_Information_Simulation']
 
         n_p_config = super_config['N_P_variations']
         p_values = n_p_config['p_values']
@@ -216,3 +217,21 @@ if __name__ == "__main__":
         config['simulation_func'] = simulation_wrapper
     results = N_P_variation_simulation(config)
     m7_results_list, m8_results_list = sort_m7_m8_results(results)
+
+
+        #m8_results, m7_results = simulation_wrapper(config)
+    plot_heatmap_mean_std(m7_results_list, title="smalltest_Corrected_MI_M7",save_path=save_path)
+    plot_heatmap_mean_std(m8_results_list, title="smalltest_Corrected_MI_M8",save_path=save_path)
+    #Save config for file
+    with open(f'{save_path}/MI_config.yaml', 'w') as f:
+         yaml_config = {
+            'simulation': 'logdet bias comparison for M7 and M8 models',
+            'seed': config['seed'],
+            'N_samples_values': N_values,
+            'p_values': p_values,
+            'p_scale': config['p_scale'],
+            'q_scale': config['q_scale'],
+            'r_scale': config['r_scale'],
+         }
+         yaml.safe_dump(yaml_config, f, sort_keys=False, allow_unicode=True)
+    print("\nFinished simulation.")
