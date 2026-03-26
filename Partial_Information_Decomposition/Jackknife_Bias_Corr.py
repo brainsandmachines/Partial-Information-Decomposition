@@ -1,7 +1,6 @@
 import torch
 import numpy as np 
 from matplotlib.pylab import eigvals
-import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.covariance import OAS
 from scipy.special import digamma
@@ -18,7 +17,7 @@ sys.path.append(str(root))
 from Toy_Simulations.Bias_Corr_simulations import theoretical_covariance, sample_cov_simulation
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from parallel_Idep_multivariate_gauss import para_Idep_multivariate_gauss
-
+from Partial_Information_Decomposition.Toy_Simulations.Bias_Corr_simulations import N_P_variation_simulation
 from utils import (
     extract_all_components,
     print_seed_summary,
@@ -36,7 +35,8 @@ def get_run_config() -> dict:
         "n_seeds": 10000,
         "seed_start": 0,
         "n": 1000,
-        "dims": [50, 50, 55],  # Dimensions for X1, X2, X3
+        'N_values': [800, 1000, 2000, 3000],
+        "p_values": [[5,5,10],[50, 50, 55],[100, 50, 105]],  # Dimensions for X1, X2, X3
         "p": 0,
         'q': 0,
         'r': 0,
@@ -133,12 +133,10 @@ def run_single_seed(seed: int,config:dict) -> dict:
     return extract_all_components(global_results={},ca_results={} ,pid_results=pid_values, mi_results=mi_values)
 
 
-
-def main():
+def run_simulation(config:dict) -> dict:
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     config = get_run_config()
-
-        #Create the ground truth covariance matrix based on the config parameters and pid values
+    #Create the ground truth covariance matrix based on the config parameters and pid values
     p = config['p']
     q = config['q']
     r = config['r']
@@ -164,32 +162,52 @@ def main():
     summary_path = save_seed_summary_csv(summary, config)
     print(f"\nSaved all seed run results to: {all_runs_path}")
     print(f"Saved summary to: {summary_path}")
+    return summary
+
+
+
+def main():
+    config = get_run_config()
+    summarry = N_P_variation_simulation(config=config)
+    summary = run_simulation(config)
+    standard_summary = {
+    "N": config["n"],
+    "p": config["p"],
+    "mi_theoretical_mean": ...,
+    "mi_theoretical_std": ...,
+    "mi_sample_no_bias_mean": ...,
+    "mi_sample_no_bias_std": ...,
+    "mi_sample_with_bias_mean": ...,
+    "mi_sample_with_bias_std": ...,
+}
+    df = pd.DataFrame([summary])
+    df.to_csv("summary_single_run.csv", index=False)
 
 if __name__ == "__main__":
     main()
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    # q = 0
-    # r = 0
-    # p = 0
-    # N = 1000
-    # seed = 1
-    # dims = [50, 50, 50]  # Dimensions for X1, X2, X3
-    # # According to the image, Cov(X1, X2) is Q * R^T. 
-    # # In scalar terms, this is simply q * r.
-    # corr_matrix = np.array([
-    #     [1.0,   p,  q  ],  # Row 1: X1
-    #     [p, 1.0,    r  ],  # Row 2: X2
-    #     [q,     r,      1.0]   # Row 3: X3
-    # ])
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    q = 0
+    r = 0
+    p = 0
+    N = 1000
+    seed = 1
+    dims = [5, 5, 5]  # Dimensions for X1, X2, X3
+    # According to the image, Cov(X1, X2) is Q * R^T. 
+    # In scalar terms, this is simply q * r.
+    corr_matrix = np.array([
+        [1.0,   p,  q  ],  # Row 1: X1
+        [p, 1.0,    r  ],  # Row 2: X2
+        [q,     r,      1.0]   # Row 3: X3
+    ])
 
-    # true_cov = theoretical_covariance(dims, corr_matrix)
-    # torch_true_cov = torch.from_numpy(true_cov).to(device)
-    # rv_list, sample_cov = sample_cov_simulation(seed, N, dims, true_cov)
-    # torch_rv_list = [torch.from_numpy(rv).to(device) for rv in rv_list]  # Convert to torch tensors
-    # # assert len(torch_rv_list) == 3, "Expected 3 random variables in the list"
-    # # lo_cov_matrix = lo_cov(torch_rv_list,N)  # Example for the first random variable
-    # true_value,mi_true = para_Idep_multivariate_gauss(N=1,device=device,cov_matrix=torch_true_cov.unsqueeze(0),dims=dims).idep()
-    # pid_values, mi_values = idep_parallel(torch_rv_list[:2], torch_rv_list[2:], N)
+    true_cov = theoretical_covariance(dims, corr_matrix)
+    torch_true_cov = torch.from_numpy(true_cov).to(device)
+    rv_list, sample_cov = sample_cov_simulation(seed, N, dims, true_cov)
+    torch_rv_list = [torch.from_numpy(rv).to(device) for rv in rv_list]  # Convert to torch tensors
+    # assert len(torch_rv_list) == 3, "Expected 3 random variables in the list"
+    # lo_cov_matrix = lo_cov(torch_rv_list,N)  # Example for the first random variable
+    true_value,mi_true = para_Idep_multivariate_gauss(N=1,device=device,cov_matrix=torch_true_cov.unsqueeze(0),dims=dims).idep()
+    pid_values, mi_values = idep_parallel(device=device,sources=torch_rv_list[:2],target=torch_rv_list[2:], N=N)
 
     # print("True PID values (no bias correction):")
     # for key, value in true_value.items():

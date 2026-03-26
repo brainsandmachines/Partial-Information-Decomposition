@@ -666,7 +666,7 @@ def plot_all_mi_heatmaps(
         ax.set_yticklabels(mean_df.index.astype(int))
 
         ax.set_xlabel("N")
-        ax.set_ylabel("p = px1 + px2")
+        ax.set_ylabel("p = dx0,px1,pt")
         ax.set_title(panel_title)
 
         if annotate:

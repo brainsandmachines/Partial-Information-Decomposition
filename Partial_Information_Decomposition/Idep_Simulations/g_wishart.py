@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.special import digamma
-from g_wishart_bias_corr import logdet_wishart_bias, safe_logdet, inv_sqrtm_spd, sqrtm_spd, make_random_m7_cov, build_m7_whitened_from_sample_cov
+from Partial_Information_Decomposition.Idep_Simulations.logdet_m7_m8 import logdet_wishart_bias, safe_logdet, inv_sqrtm_spd, sqrtm_spd, make_random_m7_cov, build_m7_whitened_from_sample_cov
 def logdet_wishart_bias(df: int, d: int) -> float:
     """
     Exact finite-sample bias for log|S| when S is the unbiased sample covariance.

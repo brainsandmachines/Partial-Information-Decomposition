@@ -17,7 +17,8 @@ import argparse
 
 # Import all existing utilities from the user's module
 from g_wishart_bias_corr import *
-
+from Simulation_utils import *
+from M7_M8_models import make_random_true_cov
 
 def run_MI_simulation(
     n_samples=100,
@@ -47,7 +48,6 @@ def run_MI_simulation(
             f"Need df > d-1 for stable logdet expectation. Got n_samples={n_samples}, df={df}, d={d}."
         )
 
-    rng = np.random.default_rng(seed)
 
     # True population covariance satisfying M7
     true_cov = make_random_true_cov(
@@ -58,26 +58,11 @@ def run_MI_simulation(
         r_scale=r_scale,
         p_scale=p_scale,
 
-        seed=rng.integers(0, 2**32 - 1),
-    )
-
-    true_cov_m7_torch = make_random_true_cov(
-        n0=n0,
-        n1=n1,
-        n2=n2,
-        q_scale=q_scale,
-        r_scale=r_scale,
-        p_scale=p_scale,
-        seed=rng.integers(0, 2**32 - 1),
-        M7_structural=True
+        seed=seed,
     )
 
     true_cov_torch = torch.from_numpy(true_cov).to(torch.float64)
     true_cov_dict = create_cov_matrix(Sigma=true_cov_torch, dims=[n0, n1, n2])
-    
-    true_cov_m7_torch = torch.from_numpy(true_cov_m7_torch).to(torch.float64)
-    true_cov_m7_dict = create_cov_matrix(Sigma=true_cov_m7_torch, dims=[n0, n1, n2])
-
 
 
     sigma00 = true_cov_dict['cov_x0']
@@ -104,27 +89,18 @@ def run_MI_simulation(
 
 
     print(f"True MI under M8 construction: {m8_MI_true:.6f}")
-    m7_sigma00 = true_cov_m7_dict['cov_x0']
-    m7_sigma11 = true_cov_m7_dict['cov_x1']
-    m7_sigma22 = true_cov_m7_dict['cov_x2']
-    m7_sigma01 = true_cov_m7_dict['cross_x0_x1']
-    m7_sigma02 = true_cov_m7_dict['cross_x0_x2']
-    m7_sigma12 = true_cov_m7_dict['cross_x1_x2']
 
-    m7_P_true = whiten_block(m7_sigma00, m7_sigma01, m7_sigma11).numpy()
-    m7_Q_true = whiten_block(m7_sigma00, m7_sigma02, m7_sigma22).numpy()
-    m7_R_true = whiten_block(m7_sigma11, m7_sigma12, m7_sigma22).numpy()
 
-    P_m7 = m7_Q_true @ m7_R_true.T
+    P_m7 = Q_true @ R_true.T
     m7_true_cov = np.block([
-        [np.eye(n0),        P_m7, m7_Q_true],
-        [P_m7.T,  np.eye(n1),        m7_R_true],
-        [m7_Q_true.T,           m7_R_true.T,          np.eye(n2)],
+        [np.eye(n0),        P_m7, Q_true],
+        [P_m7.T,  np.eye(n1),        R_true],
+        [Q_true.T,           R_true.T,          np.eye(n2)],
     ])
 
     
     nume7_true = safe_logdet(np.eye(n1) - (P_m7.T @ P_m7))
-    deno7_true = safe_logdet(np.eye(n2) - (m7_Q_true.T @ m7_Q_true)) + safe_logdet(np.eye(n2) - (m7_R_true.T @ m7_R_true))
+    deno7_true = safe_logdet(np.eye(n2) - (Q_true.T @ Q_true)) + safe_logdet(np.eye(n2) - (R_true.T @ R_true))
     m7_MI_true = 0.5*(nume7_true-deno7_true)
 
     print(f"True MI under M7 construction: {m7_MI_true:.6f}")
@@ -157,7 +133,7 @@ def run_MI_simulation(
     
     # M7 MI Bias = 0.5 * ( (B_pred_struct - B_marginals) - (B_joint_struct - B_marginals) )
     # Note: b_joint_m7 = b_c0 + b_c1 - b_sep
-    bias_mi_m7 = 0.5 * ( (b_pred_m8 + 2*b_y - b_c0 - b_c1) ) # Corrected sign
+    bias_mi_m7 = 0.5 * (b_x0 + b_x1 + 2*b_y - b_c0 - b_c1) # Corrected sign
 
     mi_m8_list = []
     mi_m7_naive_list = []
@@ -167,43 +143,37 @@ def run_MI_simulation(
         # Build true covariance exactly the same way
 
         # Sample data
-        Z_m8 = sample_data_from_cov(true_cov, n_samples)
-        Z_m7 = sample_data_from_cov(m7_true_cov, n_samples)
+        Z = sample_data_from_cov(true_cov, n_samples,seed=seed)
 
         # Sample covariance
-        Z_m8_torch = torch.from_numpy(Z_m8).to(torch.float64)
-        Z_m8_dict = create_cov_matrix(Sigma=Z_m8_torch, dims=[n0, n1, n2])
-        
-        Z_m7_torch = torch.from_numpy(Z_m7).to(torch.float64)
-        Z_m7_dict = create_cov_matrix(Sigma=Z_m7_torch, dims=[n0, n1, n2])
+        Z_torch = torch.from_numpy(Z).to(torch.float64)
+        Z_dict = create_cov_matrix(Sigma=Z_torch, dims=[n0, n1, n2])
 
 
-        Q_m8 = whiten_block(Z_m8_dict['cov_x0'], Z_m8_dict['cross_x0_x2'], Z_m8_dict['cov_x2']).numpy()
-        R_m8 = whiten_block(Z_m8_dict['cov_x1'], Z_m8_dict['cross_x1_x2'], Z_m8_dict['cov_x2']).numpy()
-        P_m8 = whiten_block(Z_m8_dict['cov_x0'], Z_m8_dict['cross_x0_x1'], Z_m8_dict['cov_x1']).numpy()
+        Q_m8_m7 = whiten_block(Z_dict['cov_x0'], Z_dict['cross_x0_x2'], Z_dict['cov_x2']).numpy()
+        R_m8_m7 = whiten_block(Z_dict['cov_x1'], Z_dict['cross_x1_x2'], Z_dict['cov_x2']).numpy()
+        P = whiten_block(Z_dict['cov_x0'], Z_dict['cross_x0_x1'], Z_dict['cov_x1']).numpy()
 
         #M8 true MI
         m8_white = np.block([
-            [np.eye(n0),         P_m8, Q_m8],
-            [P_m8.T,  np.eye(n1),        R_m8],
-            [Q_m8.T,           R_m8.T,          np.eye(n2)],
+            [np.eye(n0),         P, Q_m8_m7],
+            [P.T,  np.eye(n1),        R_m8_m7],
+            [Q_m8_m7.T,           R_m8_m7.T,          np.eye(n2)],
         ])
-        nume8 = safe_logdet(np.eye(n1) - (P_m8.T @ P_m8))
+        nume8 = safe_logdet(np.eye(n1) - (P.T @ P))
         deno8 = safe_logdet(m8_white)
         m8_raw = 0.5*(nume8-deno8) 
 
         #M7 true MI
-        Q_m7 = whiten_block(Z_m7_dict['cov_x0'], Z_m7_dict['cross_x0_x2'], Z_m7_dict['cov_x2']).numpy()
-        R_m7 = whiten_block(Z_m7_dict['cov_x1'], Z_m7_dict['cross_x1_x2'], Z_m7_dict['cov_x2']).numpy() 
-        P_m7 = Q_m7 @ R_m7.T  
+        P_m7 = Q_m8_m7 @ R_m8_m7.T
         m7_white = np.block([
-            [np.eye(n0),         P_m7, Q_m7],
-            [P_m7.T,  np.eye(n1),        R_m7],
-            [Q_m7.T,           R_m7.T,          np.eye(n2)],
+            [np.eye(n0),         P_m7, Q_m8_m7],
+            [P_m7.T,  np.eye(n1),        R_m8_m7],
+            [Q_m8_m7.T,           R_m8_m7.T,          np.eye(n2)],
         ])
 
         nume7 = safe_logdet(np.eye(n1) - (P_m7.T @ P_m7))
-        deno7 = safe_logdet(np.eye(n2) - (Q_m7.T @ Q_m7)) + safe_logdet(np.eye(n2) - (R_m7.T @ R_m7))
+        deno7 = safe_logdet(np.eye(n2) - (Q_m8_m7.T @ Q_m8_m7)) + safe_logdet(np.eye(n2) - (R_m8_m7.T @ R_m8_m7))
         m7_raw = 0.5*(nume7-deno7)
 
         mi_m8_list.append(m8_raw)
@@ -264,6 +234,7 @@ def run_MI_simulation(
             "M7_Naive_(Normal Wishart)": {
                 "Raw_mean_mi": avg_m7_naive,
                 "Empirical_bias_true_cov": emp_bias_m7_naive,
+                "Empirical_bias_whitened_true_cov": emp_bias_m7_naive,
                 "avg_corrected_mi": avg_m7_naive_corrected,
                 "Corrected_bias": corr_bias_m7_naive,
                 "std_mi": np.std(m7_raw, ddof=1),
@@ -330,13 +301,13 @@ def main():
     print("===============================\n")
     results_mi = run_MI_simulation(
         n_samples=1000,
-        n0=10,
-        n1=10,
-        n2=5,
-        n_trials=500,
-        q_scale=0.25,
-        r_scale=0.25,
-        p_scale=0.25 * 0.25,
+        n0=100,
+        n1=50,
+        n2=105,
+        n_trials=1000,
+        q_scale=0.0,
+        r_scale=0.0,
+        p_scale=0.0,
         seed=12345,
     )
 

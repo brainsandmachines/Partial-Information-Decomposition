@@ -136,8 +136,12 @@ def mean_std_csv_results(results_dict):
     return mean_results, std_results
 
 
-def N_P_variation_simulation(seeds, N_values, p_values, corr_matrix,cross_cov=None):
+def N_P_variation_simulation(config):
     """ Helper: Run simulations across different N and p values """
+    seeds = config['seeds']
+    N_values = config['N_values']
+    p_values = config['p_values']
+    simulation_func = config['simulation_func']
     all_results = []
     len_N = len(N_values)
     len_P = len(p_values)
@@ -145,7 +149,7 @@ def N_P_variation_simulation(seeds, N_values, p_values, corr_matrix,cross_cov=No
     for N in N_values:
         for p in p_values:
             print(f"\nRunning simulation for N={N}, p={p} ({i}/{len_N*len_P})")
-            results_dict = theoretical_cov_simulation(seeds, N, dims=p, corr_matrix=corr_matrix)
+            results_dict = simulation_func(config)
             mean_results, std_results = mean_std_csv_results(results_dict)
             row = {
             "N": N,
@@ -194,7 +198,13 @@ if __name__ == "__main__":
         [p, 1.0,    r  ],  # Row 2: X2
         [q,     r,      1.0]   # Row 3: X3
     ])
-    N_p_var_results = N_P_variation_simulation(seeds_list, N_values=[1000,1500,2000,3000], p_values=p_list, corr_matrix=corr_matrix)
+    config = {
+        'seeds': seeds_list,
+        'N_values': [1000,1500,2000,3000],
+        'p_values': p_list,
+        'corr_matrix': corr_matrix
+    }
+    N_p_var_results = N_P_variation_simulation(config=config)
     df = pd.DataFrame(N_p_var_results)
     df.index.name = "seed"
     df.to_csv(f"{save_path}/{exp_title}_simulation.csv",index=False)  
