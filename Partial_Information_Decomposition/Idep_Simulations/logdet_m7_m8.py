@@ -47,7 +47,7 @@ def simulate_m7_m8_log_det(
 
 
     #True logdet values 
-    m8_true_logdet_full = safe_logdet(m8_true_cov)
+    m8_true_logdet = safe_logdet(m8_true_cov)
     m7_true_cov_logdet = safe_logdet(m7_true_cov)
 
 
@@ -105,15 +105,15 @@ def simulate_m7_m8_log_det(
 
     # Calculate mean raw values
     avg_m8 = np.mean(logdets_m8_sample)
-    avg_m7_whiten_naive = np.mean(logdets_m7_sample)
+    avg_m7 = np.mean(logdets_m7_sample)
 
     # Calculate Emperical Biases
-    emp_bias_m8 = avg_m8 - m8_true_logdet_full
-    emp_bias_m7_whiten_naive = avg_m7_whiten_naive - m7_true_cov_logdet
+    emp_bias_m8 = avg_m8 - m8_true_logdet
+    emp_bias_m7_whiten_naive = avg_m7 - m7_true_cov_logdet
 
-    m8_dict= {'sample': logdets_m8_sample, 'avg': avg_m8,'std': np.std(logdets_m8_sample) ,'emp_bias': emp_bias_m8,'ground_truth': m8_true_logdet_full}
+    m8_dict= {'sample': logdets_m8_sample, 'avg': avg_m8,'std': np.std(logdets_m8_sample) ,'emp_bias': emp_bias_m8,'ground_truth': m8_true_logdet}
     
-    m7_dict = {'sample': logdets_m7_sample, 'avg': avg_m7_whiten_naive, 'std': np.std(logdets_m7_sample), 'emp_bias': emp_bias_m7_whiten_naive, 'ground_truth': m7_true_cov_logdet}
+    m7_dict = {'sample': logdets_m7_sample, 'avg': avg_m7, 'std': np.std(logdets_m7_sample), 'emp_bias': emp_bias_m7_whiten_naive, 'ground_truth': m7_true_cov_logdet}
 
     return {'M8': m8_dict, 'M7': m7_dict}
 

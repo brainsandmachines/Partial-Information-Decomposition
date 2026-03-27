@@ -132,7 +132,7 @@ def simulation(config,functions_dict:dict,seed=None):
             'sample': statistic_model['sample'],
             'avg': statistic_model['avg'],
             'std': statistic_model['std'],
-            'emp_bias': model_bias_correction[f'bias'],
+            'emp_bias': statistic_model['emp_bias'],
             'corrected_statistic': model_corr_values,
             'ground_truth': statistic_model['ground_truth']
         }
