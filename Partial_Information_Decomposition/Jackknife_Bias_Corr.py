@@ -46,7 +46,7 @@ def get_run_config() -> dict:
         "progress_print_every": 100,
         "test_name": "NoWishart_jackknife_pid",
     }
-def lo_cov(rvs,N):
+def lo_cov(rvs:list,N:int,Sigma=None):
     """
     Compute the full covnarice matrix across smaples 
     and the covariance matrix of the left out ovbesrvation. 
@@ -69,7 +69,7 @@ def lo_cov(rvs,N):
     S = Z.T @ Z  # shape (len(rvs)*p, len(rvs)*p)
     s = torch.sum(Z, axis=0)
     s_outer = torch.outer(s, s)
-    Sigma_full = (S - (1/N)*s_outer) / (N-1) 
+    Sigma_full = (S - (1/N)*s_outer) / (N-1) if Sigma is None else Sigma
     assert torch.allclose(Sigma_full, cov, atol=1e-10, rtol=1e-8), "The covariance matrix computed using the formula does not match the one computed using torch"
     # All z_j z_j^T at once
     outer_all = Z[:, :, None] * Z[:, None, :]   # (N, d, d)

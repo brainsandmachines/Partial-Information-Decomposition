@@ -67,28 +67,44 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
 
 
 
-def sample_data_from_cov(true_cov: np.ndarray, n_samples: int, rng: np.random.Generator) -> np.ndarray:
+def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) -> np.ndarray:
     """
     Sample multivariate Gaussian data from the specified covariance.
     and return it's covariance matrix. This is a helper function for the m7_whiten bias simulation.
     """
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
     d = true_cov.shape[0]
-    mean = np.zeros(d)
-    data =  rng.multivariate_normal(mean, true_cov, size=n_samples)
-    return np.cov(data, rowvar=False, bias=False) # Unbiased estimator with N-1 in the denominator
+    n_samples = config['n_samples']
+
+    mean = torch.zeros(d,device=config['device'])
+    dist = torch.distributions.MultivariateNormal(mean, true_cov.float())
+    data = dist.sample((n_samples,))
+    
+    X0 = data[:, :n0]
+    X1 = data[:, n0:n0+n1]
+    X2 = data[:, n0+n1:n0+n1+n2]
+    rv_list = [X0, X1, X2]
+    sample_cov = torch.cov(data.T, correction=1) # Unbiased estimator with N-1 in the denominator    
+    return sample_cov,rv_list # Unbiased estimator with N-1 in the denominator
 
 
-def safe_logdet(A: np.ndarray) -> float:
+def safe_logdet(A: torch.Tensor) -> float:
     """
     Compute log determinant and raise if matrix is not positive definite.
     """
-    sign, ld = np.linalg.slogdet(A)
-    if sign <= 0:
-        eigmin = np.min(np.linalg.eigvalsh(0.5 * (A + A.T)))
-        raise np.linalg.LinAlgError(
-            f"Matrix not positive definite in logdet. sign={sign}, min_eig={eigmin:.3e}"
+    sign, ld = torch.linalg.slogdet(A)
+
+    if torch.any(sign <= 0):
+        eigmin = torch.min(torch.linalg.eigvalsh(0.5 * (A + A.T)))
+        raise RuntimeError(
+            f"Matrix not positive definite in logdet. sign={sign}, min_eig={eigmin.item():.3e}"
         )
+
     return ld
+
+import torch
 
 def logdet_wishart_bias(df: int, d: int) -> float:
     """
@@ -102,8 +118,13 @@ def logdet_wishart_bias(df: int, d: int) -> float:
     """
     if df <= d - 1:
         raise ValueError(f"Need df > d-1. Got df={df}, d={d}.")
-    return np.sum([digamma((df - i + 1) / 2.0) for i in range(1,d+1)]) + d * np.log(2.0 / df)
-    
+
+    i = torch.arange(1, d + 1, dtype=torch.float64)
+    term = torch.special.digamma((df - i + 1) / 2.0)
+
+    bias = torch.sum(term) + d * torch.log(torch.tensor(2.0 / df, dtype=torch.float64))
+
+    return bias.item()
 
 def plot_heatmap_mean_std(
     results,

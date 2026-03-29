@@ -277,7 +277,7 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
     
-    exp_name = '0MI_bias_corrected'
+    exp_name = 'MI_bias_corrected'
     yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
     folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/MI_sim"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")
@@ -311,7 +311,7 @@ if __name__ == "__main__":
     plot_heatmap_mean_std(deno_m7_list, title=f"denominator M7 -{exp_name} - denominator M7",save_path=save_path)
     plot_heatmap_mean_std(deno_m8_list, title=f"denominator M8 -{exp_name} - denominator M8",save_path=save_path)
     #Save config for file
-    with open(f'{save_path}/MI_config.yaml', 'w') as f:
+    with open(f'{save_path}/{exp_name}_config.yaml', 'w') as f:
          yaml_config = {
             'simulation': 'logdet bias comparison for M7 and M8 models',
             'seed': config['seed'],

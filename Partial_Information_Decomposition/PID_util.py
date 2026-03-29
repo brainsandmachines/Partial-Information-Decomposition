@@ -15,6 +15,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.covariance import LedoitWolf
 import os
 from matplotlib.colors import LogNorm
+
 def LinearRegression_fit(X,y):
     model = LinearRegression()
     model.fit(X,y)
@@ -45,7 +46,7 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     return Sigma
 
 
-def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None):
+def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device='cpu'):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
     rvs is a list of the three variables [M1,M2,T]
@@ -57,12 +58,11 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None):
     if Sigma is None:
         assert len(rvs) == 2 or len(rvs) == 3, "Length of random variable list should be either 2 or 3"
         Z = torch.hstack(rvs).to(torch.float64)   # shape (N, len(rvs)*len(rvs)*p)    
-        Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
+        Sigma = torch.cov(Z.T,correction=1,device=device) #Correction means unbiased estimator (N-1 in denominator)
     if verbose:
         eigvenvalue_summary(Sigma.detach().cpu().numpy())
-    if type(Sigma) == torch.Tensor:
-        Sigma_numpy = Sigma.detach().cpu().numpy()
-    min_eig, is_singular = block_singularity_check(Sigma_numpy)
+
+    min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
     if is_singular:
         print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")
 
@@ -99,12 +99,13 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None):
         cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
 
         ##ΣX0,X2:
-        a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=1)
+        a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=1,)
         b = torch.cat((cov_dict['cross_x0_x2'].T, cov_dict['cov_x2']),dim=1)
         cov_dict['auto_x02'] = torch.cat((a,b),dim=0)
 
 
     return cov_dict
+
 
 
 def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
@@ -169,6 +170,30 @@ def whiten_block(
 
     tmp = torch.linalg.solve_triangular(Uy.T, Sigma_xy.T, upper=False).T
     K   = torch.linalg.solve_triangular(Ux.T, tmp,        upper=False)
+
+    return K
+
+
+def para_whiten_block(
+                Sigma_xx: torch.Tensor,
+                Sigma_xy: torch.Tensor,
+                Sigma_yy: torch.Tensor) -> torch.Tensor:
+    """
+    Computes: Ux^{-T} @ Sigma_xy @ Uy^{-1}
+    where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
+    Supports batched inputs of shape (N, d, d).
+    """
+    # Use .mT to transpose only the last two dimensions (matrix transpose)
+    Ux = torch.linalg.cholesky(Sigma_xx).mT
+    Uy = torch.linalg.cholesky(Sigma_yy).mT
+
+    # Uy.mT is lower triangular. 
+    # solve_triangular computes X where Uy.mT @ X = Sigma_xy.mT
+    tmp = torch.linalg.solve_triangular(Uy.mT, Sigma_xy.mT, upper=False).mT
+    
+    # Ux.mT is lower triangular.
+    # solve_triangular computes Y where Ux.mT @ Y = tmp
+    K = torch.linalg.solve_triangular(Ux.mT, tmp, upper=False)
 
     return K
 

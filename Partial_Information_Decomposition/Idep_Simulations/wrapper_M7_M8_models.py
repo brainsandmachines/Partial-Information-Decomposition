@@ -26,13 +26,14 @@ def _build_whitened_blocks_from_cov(S, n0, n1, n2):
 
 
 def make_random_true_cov(
+    config: dict,
     n0: int,
     n1: int,
     n2: int,
     q_scale: float = 0.25,
     r_scale: float = 0.25,
     p_scale: float = 0.25,
-    rng: np.random.Generator | None = None,
+    rng:  torch.Generator | None = None,
     m7_whiten_structural: bool = True,
 ) -> np.ndarray:
     """
@@ -46,13 +47,13 @@ def make_random_true_cov(
         P = Q @ R.T
     """
 
-    A = rng.standard_normal((n0, n2))
-    B = rng.standard_normal((n1, n2))
-    C =  rng.standard_normal((n0, n1))
+    A = torch.randn((n0, n2), generator=rng, dtype=torch.float64,device=config['device'])
+    B = torch.randn((n1, n2), generator=rng, dtype=torch.float64,device=config['device'])
+    C = torch.randn((n0, n1), generator=rng, dtype=torch.float64,device=config['device'])
 
-    A_norm = np.linalg.norm(A, ord=2)
-    B_norm = np.linalg.norm(B, ord=2)
-    C_norm = np.linalg.norm(C, ord=2)   
+    A_norm = torch.linalg.norm(A, ord=2)
+    B_norm = torch.linalg.norm(B, ord=2)
+    C_norm = torch.linalg.norm(C, ord=2)   
     if A_norm == 0 or B_norm == 0 or C_norm == 0:
         raise RuntimeError("Unexpected zero spectral norm in random construction.")
 
@@ -61,32 +62,30 @@ def make_random_true_cov(
     P = p_scale * C / C_norm
 
     # Construct M8 covariance - sample coavraiance after whitening each block
-    true_cov_M8 = np.block([
-        [np.eye(n0), P,          Q],
-        [P.T,        np.eye(n1), R],
-        [Q.T,        R.T,        np.eye(n2)]
-    ])
+    row1_m8 = torch.cat([torch.eye(n0, device=config['device']), P, Q], dim=1)
+    row2_m8 = torch.cat([P.T, torch.eye(n1, device=config['device']), R], dim=1)
+    row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
+    true_cov_m8 = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
 
-    eigvals = np.linalg.eigvalsh(true_cov_M8)
-    if np.min(eigvals) <= 1e-10:
+    eigvals = torch.linalg.eigvalsh(true_cov_m8)
+    if torch.min(eigvals) <= 1e-10:
         raise ValueError(
-            f"Constructed covariance not sufficiently PD. min eig={np.min(eigvals):.3e}"
+            f"Constructed covariance not sufficiently PD. min eig={torch.min(eigvals):.3e}"
         )
 
     # Construct M7 covariance - sample coavraiance after whitening each block
     P_m7 = Q @ R.T
-    true_cov_M7 = np.block([
-        [np.eye(n0), P_m7,          Q],
-        [P_m7.T,        np.eye(n1), R],
-        [Q.T,        R.T,        np.eye(n2)]
-    ])
+    row1_m7 = torch.cat([torch.eye(n0, device=config['device']), P_m7, Q], dim=1)
+    row2_m7 = torch.cat([P_m7.T, torch.eye(n1, device=config['device']), R], dim=1)
+    row3_m7 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
+    true_cov_m7 = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
 
 
     
-    eigvals_m7 = np.linalg.eigvalsh(true_cov_M7)
-    if np.min(eigvals_m7) <= 1e-10:
+    eigvals_m7 = torch.linalg.eigvalsh(true_cov_m7)
+    if torch.min(eigvals_m7) <= 1e-10:
         raise ValueError(
-            f"Constructed M7 covariance not sufficiently PD. min eig={np.min(eigvals_m7):.3e}"
+            f"Constructed M7 covariance not sufficiently PD. min eig={torch.min(eigvals_m7):.3e}"
         )
 
     # # Check precision-matrix m7_whiten condition: K_{X0,X1} = 0
@@ -95,7 +94,7 @@ def make_random_true_cov(
     # if not np.allclose(K01, 0, atol=1e-10):
     #     raise ValueError("Constructed covariance does not satisfy the m7_whiten precision condition.")
 
-    return true_cov_M8, true_cov_M7
+    return true_cov_m8, true_cov_m7
 
 
 
@@ -105,15 +104,20 @@ def simulation(config,functions_dict:dict,seed=None):
     Run a simulation over combinations of N and p values, computing the specified statistic and bias correction.
     """
     results_dict = {}
-    rng = np.random.default_rng(seed)
-
+    device = config['device']
+    rng = torch.Generator(device=device).manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    bias_method = config['bias_method']
     s_simulation_func = functions_dict["s_simulation"]
     bias_correction_func = functions_dict["bias_correction"]
     corrected_statistic_func = functions_dict["corrected_statistic"]
 
-    m8_true_cov, m7_true_cov = make_random_true_cov(config["n0"], config["n1"], config["n2"], q_scale=config["q_scale"], r_scale=config["r_scale"], p_scale=config["p_scale"], rng=rng)
+    m8_true_cov, m7_true_cov = make_random_true_cov(config,config["n0"], config["n1"], config["n2"], q_scale=config["q_scale"], r_scale=config["r_scale"], p_scale=config["p_scale"], rng=rng)
 
-    statistic = s_simulation_func(m8_true_cov, m7_true_cov,config['n_samples'] ,config["n0"], config["n1"], config["n2"], config["n_trials"], rng)
+    data = [m8_true_cov, m7_true_cov]
+    sim_config = config.copy()
+    sim_config['bias_correction_func'] = bias_correction_func
+    statistic = s_simulation_func(data, sim_config, rng)
 
     for statistic_key in statistic.keys():
         print(f"Calculating bias for {statistic_key}...")
@@ -123,11 +127,15 @@ def simulation(config,functions_dict:dict,seed=None):
         model_config = config.copy()
         model_config['statistics'] = statistic_model
         
-        model_bc_func = bias_correction_func[statistic_key]
-        model_bias_correction = model_bc_func(model_config)
+        if bias_method == 'analytic':
+            model_bc_func = bias_correction_func[statistic_key]
+            model_bias_correction = model_bc_func(model_config)
 
-        model_corr_values = corrected_statistic_func(statistic_model['avg'], model_bias_correction['bias'])
+            model_corr_values = corrected_statistic_func(statistic_model['avg'], model_bias_correction['bias'])
         
+        else: 
+                model_corr_values = statistic_model['avg_resample']
+                
         results_dict[statistic_key] = {
             'sample': statistic_model['sample'],
             'avg': statistic_model['avg'],

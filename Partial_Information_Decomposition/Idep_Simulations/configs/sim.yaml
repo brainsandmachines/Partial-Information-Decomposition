@@ -1,16 +1,22 @@
 
 N_P_variations:
-  N_values: [500,2500,5000]
-  p_values: [[10,10,10],[20,30,40],[50,75,100]]
+  N_values: [500,1000,2000]
+  p_values: [[10,10,10],[20,30,40],[50,75,100],[100,105,120]]
 
 
 logdet_simulation:
+  device: 'cuda'
   seed: 1
   n_samples: 1000
   n_trials: 1000
-  p_scale: 0.35
+  p_scale: 0.15
   q_scale: 0.25
-  r_scale: 0.15
+  r_scale: 0.35
+  bias_correction: True
+  bias_method: ['bootstrap']
+  n_bootstraps: 200
+  
+
 
 Mutual_Information_Simulation:
   seed: 1

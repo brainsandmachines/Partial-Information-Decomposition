@@ -104,28 +104,7 @@ class para_Idep_multivariate_gauss:
         self.I_dep_values = {}
         self.PID_values = {}
 
-    def whiten_block(self,
-                    Sigma_xx: torch.Tensor,
-                    Sigma_xy: torch.Tensor,
-                    Sigma_yy: torch.Tensor) -> torch.Tensor:
-        """
-        Computes: Ux^{-T} @ Sigma_xy @ Uy^{-1}
-        where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
-        Supports batched inputs of shape (N, d, d).
-        """
-        # Use .mT to transpose only the last two dimensions (matrix transpose)
-        Ux = torch.linalg.cholesky(Sigma_xx).mT
-        Uy = torch.linalg.cholesky(Sigma_yy).mT
 
-        # Uy.mT is lower triangular. 
-        # solve_triangular computes X where Uy.mT @ X = Sigma_xy.mT
-        tmp = torch.linalg.solve_triangular(Uy.mT, Sigma_xy.mT, upper=False).mT
-        
-        # Ux.mT is lower triangular.
-        # solve_triangular computes Y where Ux.mT @ Y = tmp
-        K = torch.linalg.solve_triangular(Ux.mT, tmp, upper=False)
-
-        return K
 
     
     def compute_Idep(self)-> dict:
