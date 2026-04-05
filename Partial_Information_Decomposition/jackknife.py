@@ -20,12 +20,17 @@ def jackkinfe_func(config,cov_loo,calculate_statistic_func):
     Returns:
     - bias_correction: the jackknife bias correction estimate for the statistic, calculated as (n_samples - 1) * (mean of leave-one-out statistics - statistic calculated on full sample covariance).
     """
-    values = calculate_statistic_func(cov_loo)
+    values = calculate_statistic_func(config,cov_loo)
     assert values.ndim == 1, "Expected calculate_statistic_func to return a 1D array of statistics, one per leave-one-out sample"
     assert values.shape[0] == config['n_samples'], f"Expected number of leave-one-out statistics to match n_samples. Got {values.shape[0]} statistics but expected {config['n_samples']}."
     values_mean = torch.mean(values).item()
     raw_value = config['sample_statistic']
-    bias = (config['n_samples'] - 1) * (values_mean - raw_value)
+    raw_value = raw_value['nume'].item() if type(raw_value) == dict else raw_value
+    n2 = config['n2']
+    n1 = config['n1']
+    n0 = config['n0']
+    df = config['n_samples'] - 2 - n2
+    bias = (df) * (values_mean - raw_value)
     return bias
 
 def jackknife_resample(config:dict) -> list:
@@ -47,6 +52,7 @@ def jackknife_resample(config:dict) -> list:
     rvs = config['rvs_list']
     N = config['n_samples']
     Sigma = config.get('Sigma', None)
+    
     assert type(rvs) == list, "Input Z should be a list of torch tensors"
     d = sum([rv.shape[1] for rv in rvs])  # Total dimension across all variables
     if type(rvs[0]) == np.ndarray:
@@ -58,9 +64,12 @@ def jackknife_resample(config:dict) -> list:
     Sigma_full = (S - (1/N)*s_outer) / (N-1)
     Sigma_full_dict = para_create_cov_matrix([config['n0'],config['n1'],config['n2']], Sigma_full.unsqueeze(0))
     Sigma_full = jackknife_whiten(config,Sigma_full_dict)
+    Sigma_dict = para_create_cov_matrix([config['n0'],config['n1'],config['n2']], Sigma.unsqueeze(0))
+    Sigma = jackknife_whiten(config,Sigma_dict) 
+    #Sigma_full = oas_cov_torch(Sigma_full, N=N-1)
     if type(Sigma_full) == np.ndarray:
         Sigma_full = torch.from_numpy(Sigma_full).to(torch.float64)
-    assert torch.allclose(Sigma_full.to(torch.float32), Sigma, atol=1e-7, rtol=1e-5), "The covariance matrix computed using the formula does not match the one computed using torch"
+    assert torch.allclose(Sigma_full, Sigma, atol=1e-8, rtol=1e-5), "The covariance matrix computed using the formula does not match the one computed using torch"
     # All z_j z_j^T at once
     outer_all = Z[:, :, None] * Z[:, None, :]   # (N, d, d)
     assert outer_all.shape == (N, d, d), f"Expected outer_all to have shape (N, d, d) but got {outer_all.shape}"
@@ -76,8 +85,15 @@ def jackknife_resample(config:dict) -> list:
     # All leave-one-out covariances
     cov_loo_all = (S_minus_all - s_outer_all / (N - 1)) / (N - 2)
     assert cov_loo_all.shape == (N, d, d), f"Expected cov_loo_all to have shape (N, d, d) but got {cov_loo_all.shape}"
+    
+    # ==========================================
+    # NEW: Apply Anchored Shrinkage
+    # ==========================================
+    #Sigma_full, cov_loo_all = anchored_oas_shrinkage(Sigma_full, cov_loo_all, N)
+
     cov_loo_all_dict = para_create_cov_matrix([config['n0'],config['n1'],config['n2']], cov_loo_all)
     cov_loo_all_whiten = jackknife_whiten(config, cov_loo_all_dict)
+    
     return Sigma_full, cov_loo_all_whiten
 
 def jackknife_whiten(config,m7_cov_dict):

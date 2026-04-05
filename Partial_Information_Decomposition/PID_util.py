@@ -795,3 +795,73 @@ def plot_block_heatmap(csv_path, save_path=None):
     plt.show()
 
 
+def anchored_oas_shrinkage(Sigma_full: torch.Tensor, cov_loo_all: torch.Tensor, n_samples: int):
+    """
+    Calculates OAS parameters ONCE on the full matrix, 
+    and applies the EXACT SAME linear shrinkage to all LOO matrices.
+    """
+    # Fix: Ensure Sigma_full is 2D [d, d] for trace and matrix multiplication
+    if Sigma_full.ndim == 3:
+        Sigma_full = Sigma_full.squeeze(0)
+    
+    p = Sigma_full.shape[0]
+    
+    # 1. Calculate Anchor Parameters strictly from the Full Matrix
+    tr_S = torch.trace(Sigma_full)
+    tr_S2 = torch.trace(Sigma_full @ Sigma_full) # Now works because Sigma_full is 2D
+    mu_anchor = tr_S / p
+    
+    # OAS formula using the full degrees of freedom (N - 1)
+    N_for_formula = n_samples - 1
+    numerator = (1.0 - 2.0/p) * tr_S2 + (tr_S ** 2)
+    denominator = (N_for_formula + 1.0 - 2.0/p) * (tr_S2 - (tr_S ** 2) / p)
+    
+    # Handle edge case where denominator is 0
+    if denominator == 0:
+        alpha_anchor = torch.tensor(1.0, device=Sigma_full.device)
+    else:
+        alpha_anchor = numerator / denominator
+        
+    alpha_anchor = torch.clamp(alpha_anchor, 0.0, 1.0)
+    
+    T_anchor = mu_anchor * torch.eye(p, dtype=Sigma_full.dtype, device=Sigma_full.device)
+    
+    # 2. Apply the EXACT SAME constant anchor to everything
+    Sigma_full_shrunk = (1.0 - alpha_anchor) * Sigma_full + alpha_anchor * T_anchor
+    
+    # Expand T_anchor to match the batch size of the LOO matrices (N, d, d)
+    T_batch = T_anchor.unsqueeze(0).expand_as(cov_loo_all)
+    cov_loo_all_shrunk = (1.0 - alpha_anchor) * cov_loo_all + alpha_anchor * T_batch
+    
+    # Return Sigma_full_shrunk as [1, d, d] to maintain consistency with the rest of your pipeline
+    return Sigma_full_shrunk.unsqueeze(0), cov_loo_all_shrunk
+
+def oas_cov_torch(S: torch.Tensor, N: int) -> torch.Tensor:
+    """
+    Apply Oracle Approximating Shrinkage (OAS) to a covariance matrix.
+    Requires ONLY the sample covariance matrix S and sample size N.
+    """
+    p = S.shape[0]
+    
+    # Trace of S and Trace of S^2
+    tr_S = torch.trace(S)
+    tr_S2 = torch.trace(S @ S)
+    
+    # Calculate target matrix T (scaled identity)
+    mu = tr_S / p
+    T = mu * torch.eye(p, dtype=S.dtype, device=S.device)
+    
+    # Calculate optimal shrinkage alpha
+    numerator = (1.0 - 2.0/p) * tr_S2 + (tr_S ** 2)
+    denominator = (N + 1.0 - 2.0/p) * (tr_S2 - (tr_S ** 2) / p)
+    
+    # Handle edge case where denominator is 0 (perfectly spherical data)
+    if denominator == 0:
+        alpha = torch.tensor(1.0, dtype=S.dtype, device=S.device)
+    else:
+        alpha = numerator / denominator
+        alpha = torch.clamp(alpha, min=0.0, max=1.0)
+        
+    # Apply shrinkage
+    S_shrunk = (1.0 - alpha) * S + alpha * T
+    return S_shrunk

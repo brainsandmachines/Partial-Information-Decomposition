@@ -120,21 +120,27 @@ def simulation(config,functions_dict:dict,seed=None):
     statistic = s_simulation_func(data, sim_config, rng)
 
     for statistic_key in statistic.keys():
-        print(f"Calculating bias for {statistic_key}...")
+        print(f"Finishing for {statistic_key}...")
         statistic_model = statistic[statistic_key]
 
         
         model_config = config.copy()
         model_config['statistics'] = statistic_model
-        
-        if bias_method == 'analytic':
-            model_bc_func = bias_correction_func[statistic_key]
-            model_bias_correction = model_bc_func(model_config)
 
-            model_corr_values = corrected_statistic_func(statistic_model['avg'], model_bias_correction['bias'])
+        if  f"corrected_avg" in statistic_model:
+            model_corr_values = statistic_model['corrected_avg']
         
-        else: 
-                model_corr_values = statistic_model['avg_resample']
+        else:
+            if bias_method[0] == 'analytic':
+                model_bc_func = bias_correction_func[statistic_key]
+                model_bias_correction = model_bc_func(model_config)
+                
+                model_corr_values = corrected_statistic_func(statistic_model['avg'], model_bias_correction['bias'])
+            
+            else: 
+                    model_corr_values = statistic_model['avg_resample']
+
+       
                 
         results_dict[statistic_key] = {
             'sample': statistic_model['sample'],

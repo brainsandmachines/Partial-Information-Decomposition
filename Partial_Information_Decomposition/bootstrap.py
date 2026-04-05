@@ -8,7 +8,6 @@ from pathlib import Path
 from PID_util import *
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
-from Idep_Simulations.Simulation_utils import *
 from PID_util import *
 
 
@@ -77,6 +76,8 @@ def _estimate_fitted_model_cov(config: dict) -> torch.Tensor:
 
 
 
+
+
 def bootstrap_func(config: dict, cov_bootstrap: torch.Tensor, calculate_statistic_func: callable):
     """Estimate parametric-bootstrap bias for a statistic.
 
@@ -97,26 +98,35 @@ def bootstrap_func(config: dict, cov_bootstrap: torch.Tensor, calculate_statisti
         Estimated bias E[T* | theta_hat] - T(data), which fits the existing
         corrected-statistic convention raw - bias.
     """
-    values = calculate_statistic_func(cov_bootstrap)
-    if not torch.is_tensor(values):
-        values = torch.as_tensor(values, dtype=torch.float64, device=cov_bootstrap.device)
-    values = values.reshape(-1)
+    bias_dict = {}
+    config['cov_bootstrap'] = cov_bootstrap
+    values_dict = calculate_statistic_func(config)
+    for key in values_dict.keys():
+        values = values_dict[key]
+        if not torch.is_tensor(values):
+            values = torch.as_tensor(values, dtype=torch.float64, device=cov_bootstrap.device)
+        values = values.reshape(-1)
 
-    n_boot = _get_bootstrap_count(config)
-    assert values.ndim == 1, (
-        "Expected calculate_statistic_func to return a 1D array/tensor of statistics, "
-        "one per bootstrap replicate."
-    )
-    assert values.shape[0] == n_boot, (
-        f"Expected {n_boot} bootstrap statistics but received {values.shape[0]}."
-    )
+        n_boot = _get_bootstrap_count(config)
+        assert values.ndim == 1, (
+            "Expected calculate_statistic_func to return a 1D array/tensor of statistics, "
+            "one per bootstrap replicate."
+        )
+        assert values.shape[0] == n_boot, (
+            f"Expected {n_boot} bootstrap statistics but received {values.shape[0]}."
+        )
 
-    raw_value = config['sample_statistic']
-    if torch.is_tensor(raw_value):
-        raw_value = raw_value.item()
+        raw_value = config['sample_statistic']
 
-    bias = values.mean().item() - float(raw_value)
-    return bias
+
+        if torch.is_tensor(raw_value):
+            raw_value = raw_value.item()
+        if type(raw_value) == dict:
+            raw_value = raw_value[key]
+        bias = values.mean().item() - float(raw_value)
+        bias_dict[key] = bias
+
+    return bias_dict
 
 
 
@@ -145,9 +155,13 @@ def bootstrap_resample(config: dict) -> list:
     mean = torch.zeros(d, dtype=torch.float64, device=device)
     dist = torch.distributions.MultivariateNormal(mean, covariance_matrix=Sigma_model)
     samples = dist.sample((B, N))
-
+    cov_list = []
+    for sample in samples: 
+        cov = torch.cov(sample.T, correction=1)
+        cov_list.append(cov)
+    cov_bootstrap = torch.stack(cov_list, dim=0)
     #centered = samples - samples.mean(dim=1, keepdim=True)
-    cov_bootstrap = samples.transpose(1, 2) @ samples / (N - 1)
+    cov_bootstrap_handy = samples.transpose(1, 2) @ samples / (N - 1)
 
     cov_bootstrap_dict = para_create_cov_matrix(
         [config['n0'], config['n1'], config['n2']],

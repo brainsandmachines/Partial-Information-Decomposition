@@ -1,7 +1,7 @@
 
 N_P_variations:
-  N_values: [500,1000,2000]
-  p_values: [[10,10,10],[20,30,40],[50,75,100],[100,105,120]]
+  N_values: [800,1000,3000]
+  p_values: [[100,105,120],[150,150,150],[150,160,200]]
 
 
 logdet_simulation:
@@ -9,19 +9,23 @@ logdet_simulation:
   seed: 1
   n_samples: 1000
   n_trials: 1000
-  p_scale: 0.15
-  q_scale: 0.25
-  r_scale: 0.35
-  bias_correction: True
-  bias_method: ['bootstrap']
-  n_bootstraps: 200
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+  bias_correction: False
+  bias_method: ['analytic'] # options: ['bootstrap', 'jackknife', 'analytic'] or 
+  n_bootstraps: 400
   
 
 
 Mutual_Information_Simulation:
+  device: 'cuda'
   seed: 1
-  n_samples: 1000
-  n_trials: 1000
-  p_scale: 0.35
-  q_scale: 0.25
-  r_scale: 0.15
+  n_samples: 500
+  n_trials: 500
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+  bias_correction: True
+  bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] s
+  n_bootstraps: 20

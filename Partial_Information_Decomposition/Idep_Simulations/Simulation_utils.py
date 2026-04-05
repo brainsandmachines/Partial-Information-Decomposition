@@ -78,8 +78,9 @@ def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) 
     d = true_cov.shape[0]
     n_samples = config['n_samples']
 
-    mean = torch.zeros(d,device=config['device'])
-    dist = torch.distributions.MultivariateNormal(mean, true_cov.float())
+    true_cov = true_cov.to(device=config['device'], dtype=torch.float64)
+    mean = torch.zeros(d,device=config['device']).to(torch.float64)
+    dist = torch.distributions.MultivariateNormal(mean, true_cov)
     data = dist.sample((n_samples,))
     
     X0 = data[:, :n0]
@@ -97,14 +98,112 @@ def safe_logdet(A: torch.Tensor) -> float:
     sign, ld = torch.linalg.slogdet(A)
 
     if torch.any(sign <= 0):
-        eigmin = torch.min(torch.linalg.eigvalsh(0.5 * (A + A.T)))
+        eigmin = torch.min(torch.linalg.eigvalsh(0.5 * (A + A.mT)))
         raise RuntimeError(
             f"Matrix not positive definite in logdet. sign={sign}, min_eig={eigmin.item():.3e}"
         )
 
     return ld
 
-import torch
+def mi_calculation_from_cov(nume_matrix,denoq_matrix,denor_matrix,only_mi=False ) -> float:
+    """
+    Compute MI from covariance matrices using the formula:
+    MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)
+    """
+    logdet_deno = 0.5*safe_logdet(denoq_matrix) + 0.5*safe_logdet(denor_matrix)
+    logdet_nume = 0.5*safe_logdet(nume_matrix)
+    if only_mi:
+        return logdet_nume - logdet_deno
+    mi = (logdet_nume - logdet_deno)
+    return mi.item(),logdet_deno.item(), logdet_nume.item()
+
+def extract_num_den_matrices(config:dict,matrix:torch.tensor):
+    """Extract the numerator and denominator covariance matrices for M7/M8 from the full covariance matrix. 
+    assumes whitening"""
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    if len(matrix.shape) == 2:
+        nume_matrix = matrix[:n0+n1, :n0+n1]
+        denoq_matrix = matrix[:n0, :n0]
+        denor_matrix = matrix[n0:n0+n1, n0:n0+n1]
+    return nume_matrix,denoq_matrix,denor_matrix
+
+
+def mi_bias_calc(config:dict):
+    model = config['model']
+    bias_corr_func_model = config['bias_correction_func'] #Dict with keys to bias correction for each statistic (mi,nume,deno...)
+
+    bias_corr_funcs_model = bias_corr_func_model[f'{model}']
+
+
+    assert type(bias_corr_funcs_model) == dict, "Expected bias_corr_func to be a dict with keys 'M7' and 'M8'."
+
+    bias_dict ={}
+    for st,bc_func in zip(bias_corr_funcs_model.keys(), bias_corr_funcs_model.values()):
+        config['st'] = st
+        bias = bc_func(config)
+        if type(bias) == dict:
+            bias = bias['bias']
+        bias_dict[st] = bias
+    return bias_dict
+
+
+def para_nume_logdet(config,Sigmas: torch.Tensor) -> float:
+    """Helper function to compute log determinant of the numerator covariance matrix."""
+    n0 = config['n0']
+    n1 = config['n1']
+    P = Sigmas[:, :n0, n0:n0+n1]                 # already whitened/projected P block
+    I1 = torch.eye(n1, dtype=Sigmas.dtype, device=Sigmas.device).repeat(P.shape[0], 1, 1)
+    
+    return 0.5*safe_logdet(I1 - P.mT @ P)   
+    
+def para_unique_bias_calc(config:dict):
+    """Helper function to compute bias for the unique information estimator."""
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    df = config['n_samples'] - 1
+    device = config.get('device', 'cpu')
+    d = n0 + n1 + n2
+    Sigma = config['cov_bootstrap'] #(B, d, d)
+
+    Sigma_dict = para_create_cov_matrix([n0, n1, n2], Sigma)
+    P = Sigma_dict['cross_x0_x1']
+    Q = Sigma_dict['cross_x0_x2']
+    R = Sigma_dict['cross_x1_x2']
+
+    I1 = torch.eye(n1, dtype=Sigma.dtype, device=Sigma.device).repeat(P.shape[0], 1, 1)
+    I2 = torch.eye(n2, dtype=Sigma.dtype, device=Sigma.device).repeat(P.shape[0], 1, 1)
+
+    m1_t_mi = -0.5*safe_logdet(I2 - (Q.mT @ Q))
+    m2_t_mi = -0.5*safe_logdet(I2 - (R.mT @ R))
+
+    #M8
+    nume_m8 = 0.5*safe_logdet(I1 - P.mT @ P)
+    deno_m8 = 0.5*safe_logdet(Sigma)
+    mi_m8 = nume_m8 - deno_m8
+
+    #M7
+    P_m7 = Q @ R.mT
+    nume_m7 = 0.5*safe_logdet(I1 - P_m7.mT @ P_m7)
+    deno7_q = torch.eye(n2, device=device)-(Q.mT @ Q)
+    deno7_r = torch.eye(n2, device=device)-(R.mT @ R)
+    deno7_raw = 0.5*safe_logdet(deno7_q) + 0.5*safe_logdet(deno7_r)
+    mi_m7 = nume_m7 - deno7_raw
+    
+
+    i_value = mi_m7 - m2_t_mi - config['analytic_bias']['i']
+    k_value = mi_m8 - m2_t_mi - config['analytic_bias']['k']
+    h_value = mi_m7 - m1_t_mi - config['analytic_bias']['h']
+    j_value = mi_m8 - m1_t_mi - config['analytic_bias']['j']
+
+    return {
+        'i': i_value,
+        'k': k_value,
+        'h': h_value,
+        'j': j_value,}
+
 
 def logdet_wishart_bias(df: int, d: int) -> float:
     """
@@ -154,28 +253,32 @@ def plot_heatmap_mean_std(
         {'N': ..., 'p': ..., 'mean': ..., 'std': ...}
 
         Note:
-        p can also be a list/tuple/array, and it will be converted
-        to a string label automatically.
+        p can also be a list/tuple/array.
     """
-
     df = pd.DataFrame(results).copy()
 
-    # Convert y values to hashable / displayable labels
-    def make_label(v):
+    # Keep y values sortable numerically, not as strings
+    def normalize_y(v):
         if isinstance(v, np.ndarray):
-            return str(v.tolist())
-        if isinstance(v, (list, tuple)):
+            return tuple(v.tolist())
+        if isinstance(v, list):
+            return tuple(v)
+        return v
+
+    # Pretty labels only for display
+    def display_label(v):
+        if isinstance(v, tuple):
             return str(list(v))
         return str(v)
 
-    df[y_col] = df[y_col].apply(make_label)
+    df[y_col] = df[y_col].apply(normalize_y)
 
     # Safer than pivot if duplicates ever appear
     mean_mat = df.pivot_table(index=y_col, columns=x_col, values=mean_col, aggfunc="mean")
     std_mat = df.pivot_table(index=y_col, columns=x_col, values=std_col, aggfunc="mean")
     ground_truth_mat = df.pivot_table(index=y_col, columns=x_col, values=ground_truth_col, aggfunc="mean")
 
-    # sort axes
+    # Sort axes numerically
     mean_mat = mean_mat.sort_index()
     mean_mat = mean_mat.reindex(sorted(mean_mat.columns), axis=1)
 
@@ -185,12 +288,14 @@ def plot_heatmap_mean_std(
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    im = ax.imshow(data, cmap=cmap, aspect="auto")
+    # origin="lower" puts the smallest row at the bottom
+    im = ax.imshow(data, cmap=cmap, aspect="auto", origin="lower")
 
     ax.set_xticks(np.arange(len(mean_mat.columns)))
     ax.set_xticklabels(mean_mat.columns)
+
     ax.set_yticks(np.arange(len(mean_mat.index)))
-    ax.set_yticklabels(mean_mat.index)
+    ax.set_yticklabels([display_label(v) for v in mean_mat.index])
 
     ax.set_xlabel(x_col)
     ax.set_ylabel(y_col)
@@ -229,9 +334,8 @@ def plot_heatmap_mean_std(
     fig.tight_layout()
 
     if save_path is not None:
-        plt.savefig(f'{save_path}/{title}.png', dpi=300, bbox_inches="tight")
+        plt.savefig(f"{save_path}/{title}.png", dpi=300, bbox_inches="tight")
 
-    plt.show()
 
 
 def corrected_statistic(statistics: np.ndarray, bias_correction: float) -> np.ndarray:

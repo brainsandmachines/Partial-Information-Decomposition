@@ -47,7 +47,7 @@ def calculate_bias(config:dict,statistic_dict:dict,bias_func:callable) -> dict:
     return {'bias': bias, 'statistic': statistic, 'org_pop': org_pop}
 
 
-def bias_resampling(config:dict) -> dict:
+def bias_resampling(config:dict,calc_func:callable=None) -> dict:
     """This function will calculate the statistics value and it's and will return a dictionary with the following keys:
     
     Input: data: the data to calculate the statistic on (covariance etc )
@@ -65,15 +65,15 @@ def bias_resampling(config:dict) -> dict:
     """
     bias_method = config['bias_method']
 
-    if bias_method == 'jackknife':
+    if bias_method[0] == 'jackknife':
         resample_method = jackknife_resample
         bias_func = jackkinfe_func
 
-    elif bias_method == 'bootstrap':
+    elif bias_method[0] == 'bootstrap':
         resample_method = bootstrap_resample
         bias_func = bootstrap_func
 
-    calc_func = config['calc_statistic_func']
+    calc_func = config['calc_statistic_func'] if calc_func is None else calc_func
 
     _,resample_pop = resample_method(config)
     bias = bias_func(config,resample_pop,calc_func)

@@ -1,0 +1,18 @@
+simulation: logdet bias comparison for M7 and M8 models
+seed: 1
+N_samples_values:
+- 800
+- 1000
+p_values:
+- - 100
+  - 105
+  - 120
+- - 150
+  - 150
+  - 150
+- - 150
+  - 160
+  - 200
+p_scale: 0.0
+q_scale: 0.0
+r_scale: 0.0
