@@ -20,10 +20,10 @@ Mutual_Information_Simulation:
   device: 'cuda'
   seed: 1
   n_samples: 500
-  n_trials: 1000
-  p_scale: 0.0
-  q_scale: 0.0
-  r_scale: 0.0
+  n_trials: 200
+  p_scale: 0.25
+  q_scale: 0.35
+  r_scale: 0.45
   bias_correction: True
-  bias_method: ['jackknife']
-  n_bootstraps: 2000
+  bias_method: ['bootstrap']
+  n_bootstraps: 5000

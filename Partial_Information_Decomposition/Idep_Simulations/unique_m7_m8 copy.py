@@ -215,26 +215,33 @@ def simulate_m7_m8_mi(
     avg_corrected_j = torch.mean(torch.tensor(unq2_corrected['j']))
     avg_corrected_h = torch.mean(torch.tensor(unq2_corrected['h']))
 
-
+    emp_bias_i = avg_i_ - i_true
+    emp_bias_k = avg_k_ - k_true
+    emp_bias_h = avg_h_ - h_true
+    emp_bias_j = avg_j_ - j_true
     i_dict= {'sample': i_sample, 
               'avg': avg_i_,
               'corrected_avg': avg_corrected_i,
               'std': torch.std(i_sample),
+              'emp_bias': emp_bias_i,
               'ground_truth': i_true}
     k_dict = {'sample': k_sample,
                     'avg': avg_k_,
                     'corrected_avg': avg_corrected_k,
                     'std': torch.std(k_sample),
+                    'emp_bias': emp_bias_k,
                     'ground_truth': k_true}
     h_dict = {'sample': h_sample,
                     'avg': avg_h_,
                     'corrected_avg': avg_corrected_h,
                     'std': torch.std(h_sample),
+                    'emp_bias': emp_bias_h,
                     'ground_truth': h_true}
     j_dict= {'sample': j_sample, 
               'avg': avg_j_,
                 'corrected_avg': avg_corrected_j,
               'std': torch.std(j_sample),
+                'emp_bias': emp_bias_j,
               'ground_truth': j_true}
 
 
@@ -281,13 +288,8 @@ def calculate_bias(config: dict,m8:bool=False,m8_nume:bool=False,m8_deno:bool=Fa
         return {'bias': mi_bias_m7 if m7 else bias_m7}
     
     if m7_nume:
-        c0 = n0/(n_samples)
-        c1 = n1/(n_samples)
-        bias_m7_nume = (
-    -0.5 * torch.log(torch.tensor(1.0 - c0 - c1, dtype=torch.float64))
-    + 0.5 * c0 * torch.log(torch.tensor(1.0 - c1, dtype=torch.float64))
-    + 0.5 * c1 * torch.log(torch.tensor(1.0 - c0, dtype=torch.float64))).item()
-        return {'bias': bias_m7_nume}
+        pass
+        
     
     # M8 (Saturated) Biases
     else:
@@ -303,9 +305,10 @@ def calculate_bias(config: dict,m8:bool=False,m8_nume:bool=False,m8_deno:bool=Fa
     
 def sort_m7_m8_results(results_list):
     """ Helper: Sort results list by N and p values for  sperate by m7 and m8."""
-    mi_m7_results_list = []
-    nome_m7_results_list = []
-    deno_m7_results_list = []
+    i_results_list = []
+    j_results_list = []
+    k_results_list = []
+    h_results_list = []
 
     mi_m8_results_list = []
     nome_m8_results_list = []
@@ -313,15 +316,12 @@ def sort_m7_m8_results(results_list):
     for res in results_list:
         N = res['N']
         p = res['p']
-        mi_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_mi_mean'], 'std': res['M7_mi_std'], 'ground_truth': res['M7_mi_ground_truth']})
-        nome_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_nume_mean'], 'std': res['M7_nume_std'], 'ground_truth': res['M7_nume_ground_truth']})
-        deno_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_deno_mean'], 'std': res['M7_deno_std'], 'ground_truth': res['M7_deno_ground_truth']})
+        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth']})
+        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth']})
+        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth']})
+        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth']})
 
-        mi_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_mi_mean'], 'std': res['M8_mi_std'], 'ground_truth': res['M8_mi_ground_truth']})
-        nome_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_nume_mean'], 'std': res['M8_nume_std'], 'ground_truth': res['M8_nume_ground_truth']})
-        deno_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_deno_mean'], 'std': res['M8_deno_std'], 'ground_truth': res['M8_deno_ground_truth']})
-
-    return [mi_m7_results_list, nome_m7_results_list, deno_m7_results_list], [mi_m8_results_list, nome_m8_results_list, deno_m8_results_list]
+    return [i_results_list, j_results_list, k_results_list, h_results_list]
 
 
 def simulation_wrapper(config: dict) -> dict:
@@ -343,9 +343,9 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
     
-    exp_name = 'NoBias_bigtest'
+    exp_name = 'MI=0_WishartBias_bigtest'
     yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
-    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/MI_sim2.0"
+    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/Idep"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")
     save_path.mkdir(parents=True, exist_ok=True)    
     with open(yaml_file, 'r') as f:
@@ -360,22 +360,17 @@ if __name__ == "__main__":
         config['N_values'] = N_values
         config['simulation_func'] = simulation_wrapper
     results = N_P_variation_simulation(config)
-    m7_results_list, m8_results_list = sort_m7_m8_results(results)
+    nodes_results_list = sort_m7_m8_results(results)
 
-    mi_m7_result,nome_m7_list,deno_m7_list =m7_results_list[0] ,m7_results_list[1], m7_results_list[2]
-    mi_m8_result,nome_m8_list,deno_m8_list =m8_results_list[0] ,m8_results_list[1], m8_results_list[2]
-   
-    #Plt Mutual Information results
-    plot_heatmap_mean_std(mi_m7_result, title=f"Mutual Information M7 -{exp_name} - Mutual Information M7",save_path=save_path)
-    plot_heatmap_mean_std(mi_m8_result, title=f"Mutual Information M8 -{exp_name} - Mutual Information M8",save_path=save_path)
-    
-    #Plot numerator
-    plot_heatmap_mean_std(nome_m7_list, title=f"numerator M7 -{exp_name} - numerator M7",save_path=save_path)
-    plot_heatmap_mean_std(nome_m8_list, title=f"numerator M8 -{exp_name} - numerator M8",save_path=save_path)
-    
-    #Plot denominator
-    plot_heatmap_mean_std(deno_m7_list, title=f"denominator M7 -{exp_name} - denominator M7",save_path=save_path)
-    plot_heatmap_mean_std(deno_m8_list, title=f"denominator M8 -{exp_name} - denominator M8",save_path=save_path)
+    i_result,j_result,k_result,h_result =nodes_results_list[0] ,nodes_results_list[1], nodes_results_list[2], nodes_results_list[3]
+
+    #Plot Unique 1 results
+    plot_heatmap_mean_std(i_result, title=f"Unique-1-i-node-{exp_name}",save_path=save_path)
+    plot_heatmap_mean_std(k_result, title=f"Unique-1-k-node-{exp_name}",save_path=save_path)
+
+    #Plot Unique 2 results
+    plot_heatmap_mean_std(j_result, title=f"Unique-2-j-node-{exp_name}",save_path=save_path)
+    plot_heatmap_mean_std(h_result, title=f"Unique-2-h-node-{exp_name}",save_path=save_path)
     #Save config for file
     with open(f'{save_path}/{exp_name}_config.yaml', 'w') as f:
          yaml_config = {

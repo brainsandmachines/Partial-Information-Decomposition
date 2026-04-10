@@ -99,8 +99,9 @@ def bootstrap_func(config: dict, cov_bootstrap: torch.Tensor, calculate_statisti
         corrected-statistic convention raw - bias.
     """
     bias_dict = {}
-    config['cov_bootstrap'] = cov_bootstrap
-    values_dict = calculate_statistic_func(config)
+    config_bootstrap = config.copy()
+    config_bootstrap['Sigma'] = cov_bootstrap
+    values_dict = calculate_statistic_func(config_bootstrap)
     for key in values_dict.keys():
         values = values_dict[key]
         if not torch.is_tensor(values):
@@ -119,11 +120,13 @@ def bootstrap_func(config: dict, cov_bootstrap: torch.Tensor, calculate_statisti
         raw_value = config['sample_statistic']
 
 
+
+
         if torch.is_tensor(raw_value):
             raw_value = raw_value.item()
         if type(raw_value) == dict:
             raw_value = raw_value[key]
-        bias = values.mean().item() - float(raw_value)
+        bias = values.mean().item() - raw_value
         bias_dict[key] = bias
 
     return bias_dict
@@ -161,7 +164,7 @@ def bootstrap_resample(config: dict) -> list:
         cov_list.append(cov)
     cov_bootstrap = torch.stack(cov_list, dim=0)
     #centered = samples - samples.mean(dim=1, keepdim=True)
-    cov_bootstrap_handy = samples.transpose(1, 2) @ samples / (N - 1)
+    #cov_bootstrap = samples.transpose(1, 2) @ samples / (N - 1)
 
     cov_bootstrap_dict = para_create_cov_matrix(
         [config['n0'], config['n1'], config['n2']],

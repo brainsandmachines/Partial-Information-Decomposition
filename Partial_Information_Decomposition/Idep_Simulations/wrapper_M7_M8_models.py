@@ -72,13 +72,8 @@ def make_random_true_cov(
         raise ValueError(
             f"Constructed covariance not sufficiently PD. min eig={torch.min(eigvals):.3e}"
         )
-
-    # Construct M7 covariance - sample coavraiance after whitening each block
-    P_m7 = Q @ R.T
-    row1_m7 = torch.cat([torch.eye(n0, device=config['device']), P_m7, Q], dim=1)
-    row2_m7 = torch.cat([P_m7.T, torch.eye(n1, device=config['device']), R], dim=1)
-    row3_m7 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
-    true_cov_m7 = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
+ 
+    true_cov_m7 = create_m7_cov(config,true_cov_m8, whitening_normalize=True)
 
 
     
@@ -97,7 +92,28 @@ def make_random_true_cov(
     return true_cov_m8, true_cov_m7
 
 
+def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
+    "Takes covariance of m8 and creates m7"
 
+    cov_m8_dict = create_cov_matrix(Sigma=cov_m8, dims=[config['n0'], config['n1'], config['n2']])
+    diag0 = torch.eye(config['n0']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x0"]) 
+    diag1 = torch.eye(config['n1']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x1"])
+    diag2 = torch.eye(config['n2']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x2"])
+    if whitening_normalize: 
+        Q = whiten_block(cov_m8_dict["cov_x0"], cov_m8_dict["cross_x0_x2"], cov_m8_dict["cov_x2"])
+        R = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_x2"], cov_m8_dict["cov_x2"])
+        P = Q @ R.T
+
+    else:
+        Q = cov_m8_dict["cross_x0_x2"]
+        R = cov_m8_dict["cross_x1_x2"]
+        P = Q @ torch.linalg.inv(cov_m8_dict["cov_x2"]) @ R.T
+
+    #Construct M7 covariance 
+    row1 = torch.cat([diag0, P, Q], dim=1)
+    row2 = torch.cat([P.T, diag1, R], dim=1)
+    row3 = torch.cat([Q.T, R.T, diag2], dim=1)
+    return torch.cat([row1, row2, row3], dim=0)
 
 def simulation(config,functions_dict:dict,seed=None):
     """

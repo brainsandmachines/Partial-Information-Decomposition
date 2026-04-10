@@ -85,7 +85,7 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
     cov_dict['cov_x0'] = Sigma[0:x0_dim, 0:x0_dim] #ΣX0
     cov_dict['cov_x1'] = Sigma[x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
    
-    cov_dict['auto_x01'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
+    cov_dict['joint_x0_x1'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
 
 
     if len(rvs) == 3 or len(dims) == 3:
@@ -95,7 +95,7 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
         cov_dict['cross_x0_x2'] = Sigma[0:x0_dim, dt_dx1:d_all] #ΣX0,X2
 
         #Auto-Covariances:
-        cov_dict['auto_x12'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
+        cov_dict['joint_x1_x2'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
         cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
 
         ##ΣX0,X2:
@@ -135,7 +135,7 @@ def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
     cov_dict['cov_x0'] = Sigmas[:,0:x0_dim, 0:x0_dim] #ΣX0
     cov_dict['cov_x1'] = Sigmas[:,x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
    
-    cov_dict['auto_x01'] = Sigmas[:,0:dt_dx1, 0:dt_dx1]  #ΣX0X1
+    cov_dict['joint_x0_x1'] = Sigmas[:,0:dt_dx1, 0:dt_dx1]  #ΣX0X1
 
 
     if len(dims) == 3:
@@ -145,7 +145,7 @@ def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
         cov_dict['cross_x0_x2'] = Sigmas[:,0:x0_dim, dt_dx1:d_all] #ΣX0,X2
 
         #Auto-Covariances:
-        cov_dict['auto_x12'] = Sigmas[:,x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
+        cov_dict['joint_x1_x2'] = Sigmas[:,x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
         cov_dict['cov_x2'] = Sigmas[:,dt_dx1:d_all, dt_dx1:d_all] #ΣX2
 
         ##ΣX0,X2:

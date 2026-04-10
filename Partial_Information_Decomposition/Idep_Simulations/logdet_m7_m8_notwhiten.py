@@ -83,36 +83,37 @@ def simulate_m7_m8_log_det(
         S,rv_list = sample_data_from_cov(config,true_cov=m8_true_cov,rng=rng)
         S_dict = create_cov_matrix(Sigma=S, dims=[n0, n1, n2],device=device)
 
-        Q_m8_whiten = whiten_block(S_dict['cov_x0'], S_dict['cross_x0_x2'], S_dict['cov_x2'])
-        R_m8_whiten = whiten_block(S_dict['cov_x1'], S_dict['cross_x1_x2'], S_dict['cov_x2'])
-        P_m8_whiten = whiten_block(S_dict['cov_x0'], S_dict['cross_x0_x1'], S_dict['cov_x1'])
-        row1_m8 = torch.cat([torch.eye(n0, device=device), P_m8_whiten, Q_m8_whiten], dim=1)
-        row2_m8 = torch.cat([P_m8_whiten.T, torch.eye(n1, device=device), R_m8_whiten], dim=1)
-        row3_m8 = torch.cat([Q_m8_whiten.T, R_m8_whiten.T, torch.eye(n2, device=device)], dim=1)
-        m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+        #M8 
+        m8_sigma = S #Denominator of M8 is just the sample covariance
+        deno_m8 = 0.5 * safe_logdet(m8_sigma)
+        #Numerator
+        joint_x0_x1 = S_dict['joint_x0_x1']
+        cov_x2 = S_dict['cov_x2']
+        nume_m8_joint_raw = 0.5 * safe_logdet(joint_x0_x1)
+        nume_m8_target_raw = 0.5 * safe_logdet(cov_x2)
+        nume_m8 = nume_m8_joint_raw + nume_m8_target_raw
+        m8_logdet_raw = nume_m8 - deno_m8
+        m8_Sigma = S
 
 
 
         #Calculate m7_whiten model logdets
-        Q_m7_whiten = whiten_block(S_dict['cov_x0'], S_dict['cross_x0_x2'], S_dict['cov_x2'])
-        R_m7_whiten = whiten_block(S_dict['cov_x1'], S_dict['cross_x1_x2'], S_dict['cov_x2'])
-        P_m7 = Q_m7_whiten @ R_m7_whiten.T
-        row1_m7 = torch.cat([torch.eye(n0,device=device), P_m7, Q_m7_whiten], dim=1)
-        row2_m7 = torch.cat([P_m7.T, torch.eye(n1,device=device), R_m7_whiten], dim=1)
-        row3_m7 = torch.cat([Q_m7_whiten.T, R_m7_whiten.T, torch.eye(n2,device=device)], dim=1)   
-        m7_Sigma = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
+        cross_x0_x1_m7 = S_dict['cross_x0_x2'] @ torch.linalg.inv(S_dict['cov_x2']) @ S_dict['cross_x2_x1'].T
+        cross_x1_x0_m7 = cross_x0_x1_m7.T
+        S_m7 = S.clone()
+        S_m7[:n0,n0:n0+n1] = cross_x0_x1_m7
+        S_m7[n0:n0+n1,:n0] = cross_x1_x0_m7
 
-
-                # #Calculate m7 not whiten model logdets
-        # Q_m7 = S_dict['cross_x0_x2']
-        # R_m7 = S_dict['cross_x1_x2']
-        # P_m7 = Q_m7 @ np.linalg.inv(S_dict['cov_x2']) @ R_m7.T
-        # m7_org = np.block([
-        #     [S_dict['cov_x0'].numpy(), P_m7.numpy(), S_dict['cross_x0_x2'].numpy()],
-        #     [P_m7.numpy().T, S_dict['cov_x1'].numpy(), S_dict['cross_x1_x2'].numpy()],
-        #     [S_dict['cross_x0_x2'].numpy().T, S_dict['cross_x1_x2'].numpy().T, S_dict['cov_x2'].numpy()]
-        # ])
-
+        S_m7_dict = create_cov_matrix(Sigma=S_m7, dims=[n0, n1, n2],device=device)
+        assert torch.allclose(S_m7_dict['cross_x0_x2'], S_dict['cross_x0_x2'])
+        assert torch.allclose(S_m7_dict['cross_x0_x1'], cross_x0_x1_m7)
+        
+        deno_m7 = 0.5 * safe_logdet(S_m7)
+        nume_m7_joint_raw = 0.5 * safe_logdet(S_m7_dict['joint_x0_x1'])
+        nume_m7_target_raw = 0.5 * safe_logdet(S_m7_dict['cov_x2'])
+        nume_m7 = nume_m7_joint_raw + nume_m7_target_raw
+        m7_Sigma = S_m7
+        m7_logdet_raw = nume_m7 - deno_m7
 
 
 
@@ -212,7 +213,7 @@ def calculate_bias(config: dict,m8: bool,m7: bool,m7_wishart: bool,bias_correcti
     bias_y  = logdet_wishart_bias(df=df, d=n2)
 
     if m8:
-        m8_wishart_bias_corr = logdet_wishart_bias(df, d) - (bias_x0 + bias_x1 + bias_y) if bias_correction else 0.0
+        m8_wishart_bias_corr = logdet_wishart_bias(df, d) if bias_correction else 0.0
      # 1. Calculate Marginal Biases
         return {'bias' : m8_wishart_bias_corr}
     if m7:
@@ -221,11 +222,11 @@ def calculate_bias(config: dict,m8: bool,m7: bool,m7_wishart: bool,bias_correcti
         bias_12 = logdet_wishart_bias(df=df, d=n1+n2)
         bias_2 = logdet_wishart_bias(df=df, d=n2)
         bias_m7_structural = bias_02 + bias_12 - bias_2
-        bias_m7_structural = bias_m7_structural - (bias_x0 + bias_x1 + bias_y) if bias_correction else 0.0
+        bias_m7_structural = bias_m7_structural  if bias_correction else 0.0
         return {'bias': bias_m7_structural}
 
     if m7_wishart:
-        bias_m7_whiten_structural = bias_m7_structural - (bias_x0 + bias_x1 + bias_y) if bias_correction else 0.0
+        bias_m7_whiten_structural = bias_m7_structural  if bias_correction else 0.0
         return {'bias': bias_m7_whiten_structural}
 
 
@@ -274,7 +275,7 @@ def sort_m7_m8_results(results_list):
 
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation logdet bias comparison simulation...")
-    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/logdet_sim/smalltest"
+    save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/LogDet_NotWhitened"
     yaml_file = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/small_test.yaml"
     with open(yaml_file, 'r') as f:
         super_config = yaml.safe_load(f)
