@@ -20,6 +20,8 @@ sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
 from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
 
+
+
 def simulate_m7_m8_mi(
     data: list,
     sim_config: dict,
@@ -35,7 +37,7 @@ def simulate_m7_m8_mi(
     n2 = sim_config['n2']
     n_trials = sim_config['n_trials']
     device = sim_config['device']
-    
+    bias_correction = sim_config['bias_correction']
     if n_samples < 3:
             raise ValueError("Need at least 3 samples.")
 
@@ -116,10 +118,9 @@ def simulate_m7_m8_mi(
 
         # Sample data
         Z,rv_list = sample_data_from_cov(sim_config,m8_true_cov,rng=rng)
-        Z_m7 = oas_cov_torch(Z, N=n_samples-1)
+        #Z = on_covriance(sim_config,Z)
         # Sample covariance
         Z_dict = create_cov_matrix(Sigma=Z, dims=[n0, n1, n2])
-        Z_m7 = create_cov_matrix(Sigma=Z_m7, dims=[n0, n1, n2])
 
         #Graph Model M8 
         Q_m8_whiten = whiten_block(Z_dict['cov_x0'], Z_dict['cross_x0_x2'], Z_dict['cov_x2'])
@@ -152,11 +153,15 @@ def simulate_m7_m8_mi(
         deno7_raw = 0.5*safe_logdet(deno7_q) + 0.5*safe_logdet(deno7_r)
         mi_m7_raw = (nume7_raw - deno7_raw).item()
         
+        if bias_correction:
+            i_bias = (m7_analytic_bias - m2_t_analytic_bias)
+            k_bias = (m8_analytic_bias - m2_t_analytic_bias)
+            h_bias = (m7_analytic_bias - m1_t_analytic_bias)
+            j_bias = (m8_analytic_bias - m1_t_analytic_bias)
         
-        i_bias = (m7_analytic_bias - m2_t_analytic_bias)
-        k_bias = (m8_analytic_bias - m2_t_analytic_bias)
-        h_bias = (m7_analytic_bias - m1_t_analytic_bias)
-        j_bias = (m8_analytic_bias - m1_t_analytic_bias)
+        else:
+            i_bias = k_bias = h_bias = j_bias = 0.0
+
         pid_config['analytic_bias'] = {'i': i_bias, 'k': k_bias,
                                             'h': h_bias, 'j': j_bias}
         #Raw PID Values
@@ -180,7 +185,12 @@ def simulate_m7_m8_mi(
         pid_config['Sigma'] = Z
 
         pid_config['model'] = 'pid'
-        pid_bias_dict = bias_calc_func(pid_config)
+        
+        if bias_correction:
+            pid_bias_dict = bias_calc_func(pid_config)
+
+        else:
+            pid_bias_dict = {'i': 0.0, 'k': 0.0, 'h': 0.0, 'j': 0.0}
 
         unq1_corrected['i'].append(i_raw - pid_bias_dict['i'])
         unq1_corrected['k'].append(k_raw - pid_bias_dict['k'])
@@ -316,10 +326,10 @@ def sort_m7_m8_results(results_list):
     for res in results_list:
         N = res['N']
         p = res['p']
-        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth']})
-        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth']})
-        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth']})
-        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth']})
+        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth'],'emp_bias': res['i_emp_bias']})
+        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth'],'emp_bias': res['j_emp_bias']})
+        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth'],'emp_bias': res['k_emp_bias']})
+        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth'],'emp_bias': res['h_emp_bias']})
 
     return [i_results_list, j_results_list, k_results_list, h_results_list]
 
@@ -343,9 +353,9 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
     
-    exp_name = 'MI=0_WishartBias_bigtest'
-    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
-    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/Idep"
+    exp_name = f"MI=0_raw_values"
+    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
+    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/shrinkage/Idep"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")
     save_path.mkdir(parents=True, exist_ok=True)    
     with open(yaml_file, 'r') as f:

@@ -5,6 +5,8 @@ from scipy.special import digamma
 from pathlib import Path
 import sys
 import os
+
+from shrinkaging import ledoit_wolf_cov, shrunk_cov
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import *
@@ -58,6 +60,7 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
                 row[f"{key}_mean"] = mean_results[key]
                 row[f"{key}_std"] = std_results[key]
                 row[f"{key}_ground_truth"] = results_dict[key]['ground_truth']
+                row[f"{key}_emp_bias"] = results_dict[key]['emp_bias']
 
             all_results.append(row)
             print(f"Completed combination N={N}, p={p} ({i}/{len_N * len_P})")
@@ -90,6 +93,24 @@ def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) 
     sample_cov = torch.cov(data.T, correction=1) # Unbiased estimator with N-1 in the denominator    
     return sample_cov,rv_list # Unbiased estimator with N-1 in the denominator
 
+
+def on_covriance(config,covariance_matrix):
+    """This will call an intermidate function on the covraince"""
+
+    on_cov = config['on_covariance']
+    if on_cov == 'False':
+        cov = covariance_matrix
+    
+    elif on_cov == 'ledoit_wolf':
+        cov =  ledoit_wolf_cov(covariance_matrix.cpu().numpy())
+    
+    elif on_cov == 'shrunk_cov':
+        alpha = config['alpha']
+        cov = shrunk_cov(covariance_matrix.cpu().numpy(), alpha)
+
+    if type(cov) != torch.Tensor:
+        cov = torch.from_numpy(cov).to(covariance_matrix.device).to(covariance_matrix.dtype)
+    return cov
 
 def safe_logdet(A: torch.Tensor) -> float:
     """
@@ -287,6 +308,7 @@ def plot_heatmap_mean_std(
     y_col="p",
     mean_col="mean",
     std_col="std",
+    emp_bias_col="emp_bias",
     ground_truth_col="ground_truth",
     title=None,
     cmap="viridis",
@@ -333,13 +355,14 @@ def plot_heatmap_mean_std(
     mean_mat = df.pivot_table(index=y_col, columns=x_col, values=mean_col, aggfunc="mean")
     std_mat = df.pivot_table(index=y_col, columns=x_col, values=std_col, aggfunc="mean")
     ground_truth_mat = df.pivot_table(index=y_col, columns=x_col, values=ground_truth_col, aggfunc="mean")
-
+    emp_bias = df.pivot_table(index=y_col, columns=x_col, values=emp_bias_col, aggfunc="mean")
     # Sort axes numerically
     mean_mat = mean_mat.sort_index()
     mean_mat = mean_mat.reindex(sorted(mean_mat.columns), axis=1)
 
     std_mat = std_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
     ground_truth_mat = ground_truth_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
+    emp_bias = emp_bias.reindex(index=mean_mat.index, columns=mean_mat.columns)
     data = mean_mat.to_numpy(dtype=float)
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -366,13 +389,13 @@ def plot_heatmap_mean_std(
             m = mean_mat.iloc[i, j]
             s = std_mat.iloc[i, j]
             gt = ground_truth_mat.iloc[i, j]
-
+            eb = emp_bias.iloc[i, j]
             if pd.isna(m):
                 text = "NA"
             elif pd.isna(s):
                 text = f"{m:{mean_fmt}}\n\nGT={gt:{mean_fmt}}"
             else:
-                text = f"{m:{mean_fmt}}\n±{s:{std_fmt}}\n\nGT={gt:{mean_fmt}}"
+                text = f"{m:{mean_fmt}}\n±{s:{std_fmt}}\n\nGT={gt:{mean_fmt}}\n\nEB={eb:{mean_fmt}}"
 
             ax.text(
                 j,

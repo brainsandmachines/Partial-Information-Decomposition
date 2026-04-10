@@ -35,6 +35,7 @@ def simulate_m7_m8_mi(
     n2 = sim_config['n2']
     n_trials = sim_config['n_trials']
     device = sim_config['device']
+    bias_correction = sim_config['bias_correction']
     
     if n_samples < 3:
             raise ValueError("Need at least 3 samples.")
@@ -89,6 +90,7 @@ def simulate_m7_m8_mi(
 
         #Sample data and get sample covariance
         S,rv_list = sample_data_from_cov(config,true_cov=m8_true_cov,rng=rng)
+        S = on_covriance(config,S)
         S_dict = create_cov_matrix(Sigma=S, dims=[n0, n1, n2],device=device)
 
         sim_config['Sigma'] = S.unsqueeze(0) #(1, d, d) for bias resampling
@@ -131,13 +133,12 @@ def simulate_m7_m8_mi(
 
 
 
-
-        #bias_corr_func = sim_config['bias_correction_func']
-        # m8_bias_corr = bias_corr_func['M8'](config=sim_config_m8)
-        # m7_bias_corr = bias_corr_func['M7'](config=sim_config_m7)
-        
-        m8_bias_dict = mi_bias_calc(sim_config_m8)
-        m7_bias_dict = mi_bias_calc(sim_config_m7)
+        if bias_correction:
+            m8_bias_dict = mi_bias_calc(sim_config_m8)
+            m7_bias_dict = mi_bias_calc(sim_config_m7)
+        else: 
+            m8_bias_dict = {'mi': 0.0,'nume': 0.0,'nume_joint': 0.0,'nume_target': 0.0, 'deno': 0.0}
+            m7_bias_dict = {'mi': 0.0,'nume': 0.0,'nume_joint': 0.0,'nume_target': 0.0, 'deno': 0.0}
 
         mi_m8_corrected['mi'].append(mi_m8_raw - m8_bias_dict['mi'])
         mi_m8_corrected['nume'].append(nume8_raw - m8_bias_dict['nume'])
@@ -404,8 +405,8 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
 
-    exp_name = f"MI>0Mid_dim_smalltest_Sigmam7_NoWhitened"
-    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
+    exp_name = f"MI=0_shrinkage=0.1"
+    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
     folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/LogDet_NotWhitened/{exp_name}"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")
     save_path.mkdir(parents=True, exist_ok=True)    

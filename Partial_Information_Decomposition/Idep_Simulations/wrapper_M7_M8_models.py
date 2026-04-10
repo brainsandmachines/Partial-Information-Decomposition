@@ -96,9 +96,9 @@ def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
     "Takes covariance of m8 and creates m7"
 
     cov_m8_dict = create_cov_matrix(Sigma=cov_m8, dims=[config['n0'], config['n1'], config['n2']])
-    diag0 = torch.eye(config['n0']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x0"]) 
-    diag1 = torch.eye(config['n1']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x1"])
-    diag2 = torch.eye(config['n2']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x2"])
+    diag0 = torch.eye(config['n0'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x0"]) 
+    diag1 = torch.eye(config['n1'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x1"])
+    diag2 = torch.eye(config['n2'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x2"])
     if whitening_normalize: 
         Q = whiten_block(cov_m8_dict["cov_x0"], cov_m8_dict["cross_x0_x2"], cov_m8_dict["cov_x2"])
         R = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_x2"], cov_m8_dict["cov_x2"])
