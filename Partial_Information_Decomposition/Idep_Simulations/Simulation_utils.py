@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import os
 
-from shrinkaging import ledoit_wolf_cov, shrunk_cov
+from shrinkaging import ledoit_wolf_cov, oracle_shrinkage_cov, shrunk_cov
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import *
@@ -61,6 +61,7 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
                 row[f"{key}_std"] = std_results[key]
                 row[f"{key}_ground_truth"] = results_dict[key]['ground_truth']
                 row[f"{key}_emp_bias"] = results_dict[key]['emp_bias']
+                row[f"{key}_after_corr_bias"] = results_dict[key]['after_corr_bias']
 
             all_results.append(row)
             print(f"Completed combination N={N}, p={p} ({i}/{len_N * len_P})")
@@ -94,22 +95,124 @@ def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) 
     return sample_cov,rv_list # Unbiased estimator with N-1 in the denominator
 
 
-def on_covriance(config,covariance_matrix):
-    """This will call an intermidate function on the covraince"""
+def build_m8_terms(config, cov_dict,whiten:bool='whiten_ver'):
+    '''Build the covariance matrix for M7 using the specified covariance dictionary.
+    input: 
+    config - a dictionary with keys 'n0', 'n1', 'n2' and 'device
+    cov_dict -  m7 dictionary of the covariance
+    whiten:
+            whiten_ver = String that tells to whiten
+            True = Assume the covariance is already whitened and just use the cross-covariance blocks as P,Q,R
+            False = Don't whiten and use the original covariance blocks as P,Q,R '''
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    device = config.get('device', 'cpu')
+    if whiten == 'whiten_ver':
+        P = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x1'], cov_dict['cov_x1'])
+        Q = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x2'], cov_dict['cov_x2'])
+        R = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
 
-    on_cov = config['on_covariance']
+    elif whiten == True: #If everything is already whitened 
+        P = cov_dict['cross_x0_x1']
+        Q = cov_dict['cross_x0_x2']
+        R = cov_dict['cross_x1_x2']
+
+    row1_m8 = torch.cat([torch.eye(n0, device=device), P, Q], dim=1)
+    row2_m8 = torch.cat([P.T, torch.eye(n1, device=device), R], dim=1)
+    row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=device)], dim=1)
+    m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+
+    return {'P': P,
+        'Q': Q,
+        'R': R,
+        'Sigma': m8_Sigma}
+
+
+def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver'):
+    '''Build the covariance matrix for M7 using the specified covariance dictionary.
+    input: 
+    config - a dictionary with keys 'n0', 'n1', 'n2' and 'device
+    cov_dict -  m7 dictionary of the covariance
+    whiten:
+            whiten_ver = String that tells to whiten
+            True = Assume the covariance is already whitened and just use the cross-covariance blocks as P,Q,R
+            False = Don't whiten and use the original covariance blocks as P,Q,R '''
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+
+    device = config.get('device', 'cpu')
+    if whiten:
+        Q = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x2'], cov_dict['cov_x2'])
+        R = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
+        cov_tt = torch.eye(n2,device=device)
+    elif whiten== True: #If everything is already whitened
+        Q = cov_dict['cross_x0_x2']
+        R = cov_dict['cross_x1_x2']
+        cov_tt = cov_dict['cov_x2'] #IDentity matrix
+        assert torch.allclose(cov_tt, torch.eye(n2, device=device)), "Expected cov_x2 to be identity when whiten is True."
+
+    else:
+        Q = cov_dict['cross_x0_x2']
+        R = cov_dict['cross_x1_x2']
+        cov_tt = cov_dict['cov_x2'] #IDentity matrix
+
+    tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
+    P_m7 = Q @ tt_inv @ R.T
+    
+    row1_m7 = torch.cat([torch.eye(n0,device=device), P_m7, Q], dim=1)
+    row2_m7 = torch.cat([P_m7.T, torch.eye(n1,device=device), R], dim=1)
+    row3_m7 = torch.cat([Q.T, R.T, torch.eye(n2,device=device)], dim=1)   
+    m7_Sigma = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
+    return {'P': P_m7,
+        'Q': Q,
+        'R': R,
+        'Sigma': m7_Sigma}
+
+
+def on_covariance(config,data):
+    """This will call an intermidate function on the covariance
+    
+    Input: data: a tuple containing the covariance matrix and a list of random variables
+    
+    config: a dictionary with data and parameters for the function to apply on the covariance matrix.
+        config['on_cov'] = 'ledoit_wolf' or 'oas' or 'shrunk_cov' or 'False etc...'
+        config['alpha'] = the alpha parameter for the shrunk_cov function if on_cov is 'shrunk_cov'
+  
+    
+    Output: the covariance matrix after applying the function on it."""
+
+    covariance_matrix, _ = data
+    cov_list = []
+    on_cov = config['on_covariance'] #Check for srhinkage method 
     if on_cov == 'False':
-        cov = covariance_matrix
+        return covariance_matrix
     
-    elif on_cov == 'ledoit_wolf':
-        cov =  ledoit_wolf_cov(covariance_matrix.cpu().numpy())
-    
-    elif on_cov == 'shrunk_cov':
-        alpha = config['alpha']
-        cov = shrunk_cov(covariance_matrix.cpu().numpy(), alpha)
+    if covariance_matrix.ndim == 2:
+        covariance_matrix = covariance_matrix.unsqueeze(0)
 
-    if type(cov) != torch.Tensor:
-        cov = torch.from_numpy(cov).to(covariance_matrix.device).to(covariance_matrix.dtype)
+    for cov in covariance_matrix:
+        if torch.any(torch.isnan(cov)):
+            raise ValueError("Covariance matrix contains NaN values.")
+        if torch.any(torch.isinf(cov)):
+            raise ValueError("Covariance matrix contains Inf values.")
+        
+        elif on_cov == 'ledoit_wolf':
+            cov =  ledoit_wolf_cov(cov.cpu().numpy())
+        
+        elif on_cov == 'shrunk_cov':
+            alpha = config['alpha']
+            cov = shrunk_cov(cov.cpu().numpy(), alpha)
+        
+        if on_cov == 'oas':
+            cov =  oracle_shrinkage_cov(cov.cpu().numpy())
+
+        if type(cov) != torch.Tensor:
+            cov = torch.from_numpy(cov).to(covariance_matrix.device).to(covariance_matrix.dtype)
+        cov_list.append(cov)
+    cov = torch.stack(cov_list, dim=0)    
+    assert cov.shape == covariance_matrix.shape, f"Expected output shape {covariance_matrix.shape}, got {cov.shape}." 
     return cov
 
 def safe_logdet(A: torch.Tensor) -> float:
@@ -424,3 +527,25 @@ def corrected_statistic(statistics: np.ndarray, bias_correction: float) -> np.nd
     return statistics - bias_correction
 
 
+def plot_nodes_as_alpha(node_dict, title=None, save_path=None):
+    """Helper function to plot the bias-corrected statistics as a function of alpha."""
+    alphas = list(node_dict.keys())
+    i_values = [node_dict[alpha]['i'] for alpha in alphas]
+    j_values = [node_dict[alpha]['j'] for alpha in alphas]
+    k_values = [node_dict[alpha]['k'] for alpha in alphas]
+    h_values = [node_dict[alpha]['h'] for alpha in alphas]
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(alphas, i_values, label='I', marker=None)
+    plt.plot(alphas, j_values, label='J', marker=None)
+    plt.plot(alphas, k_values, label='K', marker=None)
+    plt.plot(alphas, h_values, label='H', marker=None)
+    plt.xlabel('Alpha')
+    plt.ylabel('Node Value')
+    if title is not None:
+        plt.title(title)
+    plt.legend()
+    plt.grid(True)
+
+    if save_path is not None:
+        plt.savefig(f"{save_path}/{title}_nodes.png", dpi=300, bbox_inches="tight")

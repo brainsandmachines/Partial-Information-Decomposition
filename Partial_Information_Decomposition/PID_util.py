@@ -15,11 +15,41 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.covariance import LedoitWolf
 import os
 from matplotlib.colors import LogNorm
+from sklearn.linear_model import RidgeCV, LinearRegression
 
 def LinearRegression_fit(X,y):
     model = LinearRegression()
     model.fit(X,y)
     return model
+
+
+
+def compute_ridge_cv_r2(X, y, alphas=None):
+    """
+    Compute cross-validated R² using RidgeCV with efficient LOO cross-validation.
+    
+    RidgeCV uses generalized cross-validation (GCV) which is an efficient 
+    approximation to leave-one-out CV for ridge regression.
+    
+    Args:
+        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
+        y (np.ndarray): Target variable (shape: [n,]).
+        alphas (array-like, optional): Array of alpha values to try.
+            Defaults to DEFAULT_RIDGE_ALPHAS.
+        
+    Returns:
+        float: Best cross-validated R² across all alpha values.
+    """
+    if alphas is None:
+        alphas = np.logspace(-3, 3, 50)
+    
+    # RidgeCV with leave-one-out CV (efficient GCV approximation)
+    # cv=None means use efficient LOO via GCV
+    ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
+    ridge_cv.fit(X, y)
+    
+    return ridge_cv.best_score_, ridge_cv
+
 
 
 def cond_cov(sigma_1,sigma_2,sigma12,sigma21):
@@ -46,7 +76,7 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     return Sigma
 
 
-def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device='cpu'):
+def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device='cpu',check_singular=True):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
     rvs is a list of the three variables [M1,M2,T]
@@ -62,9 +92,10 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
     if verbose:
         eigvenvalue_summary(Sigma.detach().cpu().numpy())
 
-    min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
-    if is_singular:
-        print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")
+    if check_singular:
+        min_eig, is_singular = block_singularity_check(Sigma.detach().cpu().numpy())
+        if is_singular:
+            print(f"Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: {min_eig:.2e}")
 
     cov_dict = {}
     if verbose:

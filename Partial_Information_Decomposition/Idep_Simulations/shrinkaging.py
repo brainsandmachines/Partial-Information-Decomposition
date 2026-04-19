@@ -1,6 +1,6 @@
 import torch
 import numpy as np 
-from sklearn.covariance import LedoitWolf,ShrunkCovariance
+from sklearn.covariance import LedoitWolf,ShrunkCovariance,OAS
 from Simulation_utils import *
 from wrapper_M7_M8_models import create_m7_cov, make_random_true_cov
 import torch
@@ -11,6 +11,32 @@ def ledoit_wolf_cov(X):
     lw = LedoitWolf().fit(X)
     return lw.covariance_
 
+def oracle_shrinkage_cov(X, assume_centered=False, return_shrinkage=False):
+    """
+    Oracle Approximating Shrinkage covariance estimator.
+
+    Parameters
+    ----------
+    X : array-like of shape (n_samples, n_features)
+        Data matrix.
+    assume_centered : bool, default=False
+        If True, data are assumed to be centered already.
+    return_shrinkage : bool, default=False
+        If True, also return the estimated shrinkage coefficient.
+
+    Returns
+    -------
+    cov : ndarray of shape (n_features, n_features)
+        Shrunk covariance estimate.
+
+    shrinkage : float, optional
+        Estimated shrinkage coefficient, returned only if
+        return_shrinkage=True.
+    """
+    oas = OAS(assume_centered=assume_centered).fit(X)
+    if return_shrinkage:
+        return oas.covariance_, oas.shrinkage_
+    return oas.covariance_
 
 def shrunk_cov(X, alpha=0.1):
     if type(alpha) == list:
@@ -20,7 +46,7 @@ def shrunk_cov(X, alpha=0.1):
             sc_list.append(sc.covariance_)
         return sc_list
     else:
-        sc = ShrunkCovariance(shrinkage=alpha).fit(X)
+        sc = (ShrunkCovariance(shrinkage=alpha).fit(X))
     return sc.covariance_
 
 
@@ -32,6 +58,50 @@ def shrinkage_covariance(X, method='ledoit_wolf', alpha=0.1):
         return shrunk_cov(X, alpha)
     else:
         raise ValueError("Unsupported method. Use 'ledoit_wolf' or 'shrunk_cov'.")
+    
+
+def custom_shrunk_cov(X, alpha=0.1, target=None, assume_centered=False, ddof=0):
+    """
+    Shrink sample covariance toward a user-supplied symmetric target matrix.
+
+    Parameters
+    ----------
+    X : ndarray, shape (n_samples, n_features)
+    alpha : float in [0, 1]
+        Shrinkage intensity.
+    target : ndarray, shape (p, p)
+        Symmetric target matrix.
+    assume_centered : bool, default=False
+        If False, center X first.
+    ddof : int, default=0
+        Use ddof=0 to match sklearn covariance scaling more closely.
+        Use ddof=1 for unbiased sample covariance.
+
+    Returns
+    -------
+    Sigma_hat : ndarray, shape (p, p)
+    """
+    if not assume_centered:
+        X = X - X.mean(axis=0, keepdims=True)
+
+    n, p = X.shape
+    if not (0.0 <= alpha <= 1.0):
+        raise ValueError("alpha must be in [0, 1]")
+
+    S = np.cov(X, rowvar=False, bias=(ddof == 0), ddof=ddof)
+
+    if target is None:
+        raise ValueError("You must provide a target matrix")
+
+    T = np.asarray(target, dtype=float)
+    if T.shape != (p, p):
+        raise ValueError(f"target must have shape {(p, p)}, got {T.shape}")
+
+    if not np.allclose(T, T.T, atol=1e-10):
+        raise ValueError("target must be symmetric")
+
+    Sigma_hat = (1 - alpha) * S + alpha * T
+    return Sigma_hat
     
 
 

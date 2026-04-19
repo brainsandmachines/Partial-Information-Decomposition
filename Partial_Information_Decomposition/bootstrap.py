@@ -6,6 +6,7 @@ import os
 import time
 from pathlib import Path
 from PID_util import *
+from Idep_Simulations.Simulation_utils import on_covariance
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from PID_util import *
@@ -120,8 +121,6 @@ def bootstrap_func(config: dict, cov_bootstrap: torch.Tensor, calculate_statisti
         raw_value = config['sample_statistic']
 
 
-
-
         if torch.is_tensor(raw_value):
             raw_value = raw_value.item()
         if type(raw_value) == dict:
@@ -165,7 +164,8 @@ def bootstrap_resample(config: dict) -> list:
     cov_bootstrap = torch.stack(cov_list, dim=0)
     #centered = samples - samples.mean(dim=1, keepdim=True)
     #cov_bootstrap = samples.transpose(1, 2) @ samples / (N - 1)
-
+    
+    cov_bootstrap = on_covariance(config,cov_bootstrap)
     cov_bootstrap_dict = para_create_cov_matrix(
         [config['n0'], config['n1'], config['n2']],
         cov_bootstrap,

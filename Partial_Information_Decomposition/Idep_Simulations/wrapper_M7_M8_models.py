@@ -46,7 +46,9 @@ def make_random_true_cov(
     and here Sigma_22 = I, so:
         P = Q @ R.T
     """
-
+    q_scale = config.get('q_scale', q_scale)
+    r_scale = config.get('r_scale', r_scale)
+    p_scale = config.get('p_scale', p_scale)
     A = torch.randn((n0, n2), generator=rng, dtype=torch.float64,device=config['device'])
     B = torch.randn((n1, n2), generator=rng, dtype=torch.float64,device=config['device'])
     C = torch.randn((n0, n1), generator=rng, dtype=torch.float64,device=config['device'])
@@ -83,17 +85,11 @@ def make_random_true_cov(
             f"Constructed M7 covariance not sufficiently PD. min eig={torch.min(eigvals_m7):.3e}"
         )
 
-    # # Check precision-matrix m7_whiten condition: K_{X0,X1} = 0
-    # K = np.linalg.inv(true_cov)
-    # K01 = K[:n0, n0:n0+n1]
-    # if not np.allclose(K01, 0, atol=1e-10):
-    #     raise ValueError("Constructed covariance does not satisfy the m7_whiten precision condition.")
-
     return true_cov_m8, true_cov_m7
 
 
 def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
-    "Takes covariance of m8 and creates m7"
+    "Takes covariance of M8 and creates M7 out of M8"
 
     cov_m8_dict = create_cov_matrix(Sigma=cov_m8, dims=[config['n0'], config['n1'], config['n2']])
     diag0 = torch.eye(config['n0'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x0"]) 
@@ -163,6 +159,7 @@ def simulation(config,functions_dict:dict,seed=None):
             'avg': statistic_model['avg'],
             'std': statistic_model['std'],
             'emp_bias': statistic_model['emp_bias'],
+            'after_corr_bias': statistic_model.get('after_corr_bias', 100000),
             'corrected_statistic': model_corr_values,
             'ground_truth': statistic_model['ground_truth']
         }

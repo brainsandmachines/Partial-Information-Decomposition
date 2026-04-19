@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 import time
 import sys
 from pathlib import Path
+from Idep_Simulations.Simulation_utils import on_covariance
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.jackknife import *
@@ -76,6 +77,7 @@ def bias_resampling(config:dict,calc_func:callable=None) -> dict:
     calc_func = config['calc_statistic_func'] if calc_func is None else calc_func
 
     _,resample_pop = resample_method(config)
+
     bias = bias_func(config,resample_pop,calc_func)
 
     return bias

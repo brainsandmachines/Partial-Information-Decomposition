@@ -15,6 +15,7 @@ from Simulation_utils import *
 from logdet_m7_m8 import  sort_m7_m8_results
 import sys
 from pathlib import Path
+from mi7_bias import raw_m7_bias_corrected_logdet_from_m7_dict
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
@@ -90,7 +91,7 @@ def simulate_m7_m8_mi(
 
         #Sample data and get sample covariance
         S,rv_list = sample_data_from_cov(config,true_cov=m8_true_cov,rng=rng)
-        S = on_covriance(config,S)
+        #S = on_covriance(config,S)
         S_dict = create_cov_matrix(Sigma=S, dims=[n0, n1, n2],device=device)
 
         sim_config['Sigma'] = S.unsqueeze(0) #(1, d, d) for bias resampling
@@ -98,6 +99,7 @@ def simulate_m7_m8_mi(
         raw_results,sigmas = mi_calculation_not_whiten(config=sim_config)
         sigma_m8 = sigmas['M8']
         sigma_m7 = sigmas['M7']
+        sigma_m7_dict = create_cov_matrix(Sigma=sigma_m7.squeeze(0), dims=[n0, n1, n2],device=device,check_singular=False)
         #M8
         mi_m8_raw = raw_results['M8']['mi']
         nume8_raw = raw_results['M8']['nume']
@@ -129,7 +131,7 @@ def simulate_m7_m8_mi(
         sim_config_m7['rvs_list'] = rv_list
 
         sim_config_m8['Sigma'] = S
-        sim_config_m7['Sigma'] = sigma_m7
+        sim_config_m7['Sigma'] = sigma_m7.squeeze(0)
 
 
 
@@ -140,6 +142,8 @@ def simulate_m7_m8_mi(
             m8_bias_dict = {'mi': 0.0,'nume': 0.0,'nume_joint': 0.0,'nume_target': 0.0, 'deno': 0.0}
             m7_bias_dict = {'mi': 0.0,'nume': 0.0,'nume_joint': 0.0,'nume_target': 0.0, 'deno': 0.0}
 
+        nume_bias = raw_m7_bias_corrected_logdet_from_m7_dict(cov_dict=sigma_m7_dict, n_samples=n_samples, order=0)
+        m7_bias_dict['nume'] = nume_bias['bias_correction']
         mi_m8_corrected['mi'].append(mi_m8_raw - m8_bias_dict['mi'])
         mi_m8_corrected['nume'].append(nume8_raw - m8_bias_dict['nume'])
         mi_m8_corrected['nume_joint'].append(nume_m8_joint_raw - m8_bias_dict['nume_joint'])
@@ -215,6 +219,20 @@ def simulate_m7_m8_mi(
     emp_bias_m8_target = avg_m8_target - nume8_target_true
     emp_bias_m8_deno = avg_m8_deno - deno8_true
 
+    after_corr_bias_m8_mi = avg_corrected_m8_mi - mi_m8_true
+    after_corr_bias_m8_nume = avg_corrected_m8_nume - nume8_true
+    after_corr_bias_m8_joint = avg_corrected_m8_nume_joint - nume8_joint_true
+    after_corr_bias_m8_target = avg_corrected_m8_nume_target - nume8_target_true
+    after_corr_bias_m8_deno = avg_corrected_m8_deno - deno8_true
+
+
+    after_corr_bias_m7_mi = avg_corrected_m7_mi - mi_m7_true
+    after_corr_bias_m7_nume = avg_corrected_m7_nume - nume7_true
+    after_corr_bias_m7_joint = avg_corrected_m7_nume_joint - nume7_joint_true
+    after_corr_bias_m7_target = avg_corrected_m7_nume_target - nume7_target_true
+    after_corr_bias_m7_deno = avg_corrected_m7_deno - deno7_true
+
+
     emp_bias_m7_mi = avg_m7_mi - mi_m7_true
     emp_bias_m7_nume = avg_m7_nume - nume7_true
     emp_bias_m7_joint = avg_m7_joint - nume7_joint_true
@@ -226,42 +244,50 @@ def simulate_m7_m8_mi(
               'corrected_avg': avg_corrected_m8_mi,
               'std': torch.std(mi_m8_sample),
               'emp_bias': emp_bias_m8_mi,
+              'after_corr_bias': after_corr_bias_m8_mi,
               'ground_truth': mi_m8_true}
     nume_m8_dict = {'sample': nume_m8_sample,
                     'avg': avg_m8_nume,
                     'corrected_avg': avg_corrected_m8_nume,
                     'std': torch.std(nume_m8_sample),
                     'emp_bias': emp_bias_m8_nume,
+                    'after_corr_bias': after_corr_bias_m8_nume,
                     'ground_truth': nume8_true}
     nume_joint_m8_dict = {'sample': nume_m8_joint_sample,
                     'avg': avg_m8_joint,
                     'corrected_avg': avg_corrected_m8_nume_joint,
                     'std': torch.std(nume_m8_joint_sample),
                     'emp_bias': emp_bias_m8_joint,
+                    'after_corr_bias': after_corr_bias_m8_joint,
+
                     'ground_truth': nume8_joint_true}
     nume_target_m8_dict = {'sample': nume_m8_target_sample,
                     'avg': avg_m8_target,
                     'corrected_avg': avg_corrected_m8_nume_target,
                     'std': torch.std(nume_m8_target_sample),
                     'emp_bias': emp_bias_m8_target,
+                    'after_corr_bias': after_corr_bias_m8_target,
                     'ground_truth': nume8_target_true}
     deno_m8_dict = {'sample': deno_m8_sample,
                     'avg': avg_m8_deno,
                     'corrected_avg': avg_corrected_m8_deno,
                     'std': torch.std(deno_m8_sample),
                     'emp_bias': emp_bias_m8_deno,
+                    'after_corr_bias': after_corr_bias_m8_deno,
                     'ground_truth': deno8_true}
     mi_m7_dict= {'sample': mi_m7_sample, 
               'avg': avg_m7_mi  ,
                 'corrected_avg': avg_corrected_m7_mi,
               'std': torch.std(mi_m7_sample),
               'emp_bias': emp_bias_m7_mi,
+              'after_corr_bias': after_corr_bias_m7_mi,
               'ground_truth': mi_m7_true}
     nume_m7_dict = {'sample': nume_m7_sample,
                     'avg': avg_m7_nume,
                     'corrected_avg': avg_corrected_m7_nume,
                     'std': torch.std(nume_m7_sample),
                     'emp_bias': emp_bias_m7_nume,
+                    'after_corr_bias': after_corr_bias_m7_nume,
                     'ground_truth': nume7_true}
     
     nume_joint_m7_dict = {'sample': nume_m7_joint_sample,
@@ -269,18 +295,21 @@ def simulate_m7_m8_mi(
                     'corrected_avg': avg_corrected_m7_nume_joint,
                     'std': torch.std(nume_m7_joint_sample),
                     'emp_bias': emp_bias_m7_joint,
+                    'after_corr_bias': after_corr_bias_m7_joint,
                     'ground_truth': nume7_joint_true}  
     nume_target_m7_dict = {'sample': nume_m7_target_sample,
                     'avg': avg_m7_target,
                     'corrected_avg': avg_corrected_m7_nume_target,
                     'std': torch.std(nume_m7_target_sample),
                     'emp_bias': emp_bias_m7_target,
+                    'after_corr_bias': after_corr_bias_m7_target,
                     'ground_truth': nume7_target_true}  
     deno_m7_dict = {'sample': deno_m7_sample,
                     'avg': avg_m7_deno,
                     'corrected_avg': avg_corrected_m7_deno,
                     'std': torch.std(deno_m7_sample),
                     'emp_bias': emp_bias_m7_deno,
+                    'after_corr_bias': after_corr_bias_m7_deno,
                     'ground_truth': deno7_true}
 
 
@@ -359,17 +388,17 @@ def sort_m7_m8_results(results_list):
     for res in results_list:
         N = res['N']
         p = res['p']
-        mi_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_mi_mean'], 'std': res['M7_mi_std'], 'ground_truth': res['M7_mi_ground_truth']})
-        nome_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_nume_mean'], 'std': res['M7_nume_std'], 'ground_truth': res['M7_nume_ground_truth']})
-        nome_joint_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_joint_mean'], 'std': res['M7_joint_std'], 'ground_truth': res['M7_joint_ground_truth']})
-        nome_target_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_target_mean'], 'std': res['M7_target_std'], 'ground_truth': res['M7_target_ground_truth']})
-        deno_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_deno_mean'], 'std': res['M7_deno_std'], 'ground_truth': res['M7_deno_ground_truth']})
+        mi_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_mi_mean'], 'std': res['M7_mi_std'], 'ground_truth': res['M7_mi_ground_truth'],'emp_bias': res['M7_mi_emp_bias'], 'after_corr_bias': res['M7_mi_after_corr_bias']})
+        nome_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_nume_mean'], 'std': res['M7_nume_std'], 'ground_truth': res['M7_nume_ground_truth'],'emp_bias': res['M7_nume_emp_bias'], 'after_corr_bias': res['M7_nume_after_corr_bias']})
+        nome_joint_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_joint_mean'], 'std': res['M7_joint_std'], 'ground_truth': res['M7_joint_ground_truth'],'emp_bias': res['M7_joint_emp_bias'], 'after_corr_bias': res['M7_joint_after_corr_bias']})
+        nome_target_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_target_mean'], 'std': res['M7_target_std'], 'ground_truth': res['M7_target_ground_truth'],'emp_bias': res['M7_target_emp_bias'], 'after_corr_bias': res['M7_target_after_corr_bias']})
+        deno_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_deno_mean'], 'std': res['M7_deno_std'], 'ground_truth': res['M7_deno_ground_truth'],'emp_bias': res['M7_deno_emp_bias'], 'after_corr_bias': res['M7_deno_after_corr_bias']})
         
-        mi_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_mi_mean'], 'std': res['M8_mi_std'], 'ground_truth': res['M8_mi_ground_truth']})
-        nome_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_nume_mean'], 'std': res['M8_nume_std'], 'ground_truth': res['M8_nume_ground_truth']})
-        nome_joint_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_joint_mean'], 'std': res['M8_joint_std'], 'ground_truth': res['M8_joint_ground_truth']})
-        nome_target_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_target_mean'], 'std': res['M8_target_std'], 'ground_truth': res['M8_target_ground_truth']})
-        deno_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_deno_mean'], 'std': res['M8_deno_std'], 'ground_truth': res['M8_deno_ground_truth']})
+        mi_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_mi_mean'], 'std': res['M8_mi_std'], 'ground_truth': res['M8_mi_ground_truth'],'emp_bias': res['M8_mi_emp_bias'], 'after_corr_bias': res['M8_mi_after_corr_bias']})
+        nome_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_nume_mean'], 'std': res['M8_nume_std'], 'ground_truth': res['M8_nume_ground_truth'],'emp_bias': res['M8_nume_emp_bias'], 'after_corr_bias': res['M8_nume_after_corr_bias']})
+        nome_joint_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_joint_mean'], 'std': res['M8_joint_std'], 'ground_truth': res['M8_joint_ground_truth'],'emp_bias': res['M8_joint_emp_bias'], 'after_corr_bias': res['M8_joint_after_corr_bias']})
+        nome_target_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_target_mean'], 'std': res['M8_target_std'], 'ground_truth': res['M8_target_ground_truth'],'emp_bias': res['M8_target_emp_bias'], 'after_corr_bias': res['M8_target_after_corr_bias']})
+        deno_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_deno_mean'], 'std': res['M8_deno_std'], 'ground_truth': res['M8_deno_ground_truth'],'emp_bias': res['M8_deno_emp_bias'], 'after_corr_bias': res['M8_deno_after_corr_bias']})
 
     return [mi_m7_results_list, nome_m7_results_list, nome_joint_m7_results_list, nome_target_m7_results_list, deno_m7_results_list], [mi_m8_results_list, nome_m8_results_list, nome_joint_m8_results_list, nome_target_m8_results_list, deno_m8_results_list]
 
@@ -405,9 +434,9 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
 
-    exp_name = f"MI=0_shrinkage=0.1"
-    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
-    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/LogDet_NotWhitened/{exp_name}"
+    exp_name = f"MI=0_bias_m7"
+    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
+    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/m7_bias/{exp_name}"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")
     save_path.mkdir(parents=True, exist_ok=True)    
     with open(yaml_file, 'r') as f:

@@ -22,10 +22,26 @@ Mutual_Information_Simulation:
   device: 'cuda'
   seed: 1
   n_samples: 500
-  n_trials: 200
-  p_scale: 0.0
-  q_scale: 0.0
-  r_scale: 0.0
-  bias_correction: True
+  n_trials: 1000
+  p_scale: 0.15
+  q_scale: 0.25
+  r_scale: 0.35
+  bias_correction: True,
+  'on_covariance': False,
+  bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] s
+  n_bootstraps: 400
+
+
+LR_Idep_Simulation:
+  device: 'cuda'
+  seed: 1
+  n_samples: 500
+  n_trials: 1000
+  p_scale: 0.15
+  q_scale: 0.25
+  r_scale: 0.35
+  lr_type: 'ols' # options: ['ols', 'ridge', 'lasso']
+  bias_correction: False,
+  'on_covariance': False,
   bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] s
   n_bootstraps: 400
