@@ -322,7 +322,6 @@ def para_unique_bias_calc(config:dict):
 
 
 
-    return bias.item()
 
 def plot_heatmap_mean_std(
     results,

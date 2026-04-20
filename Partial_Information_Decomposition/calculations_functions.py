@@ -108,6 +108,8 @@ def logdet_wishart_bias(df: int, d: int) -> float:
 
 
 def calcualte_mi(config,sigma_dict):
+    """This function calculates the tri-variate mutual information using the covariance 
+    matrices and the formula MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)"""
     n0 = config['n0']
     n1 = config['n1']
     n2 = config['n2']
@@ -124,3 +126,37 @@ def calcualte_mi(config,sigma_dict):
 
     mi_raw = (nume_raw - deno_raw).item()
     return {"mi": mi_raw,'nume': nume_raw.item(),'deno': deno_raw.item()}
+
+
+def calulate_mi_lr(config,sigma_dict):
+    """This function calculates the  trivarite (X1;X2,T) mutual information using the
+    covaraince matrix especially for functions that use linear regression. 
+    The function above uses matrices that ill-conditioned using linear regression. 
+    Therefore we use the next equations:  [logdetΣX-logdet(Σ1|T)-logdet(Σ2|T)]
+    where X = joint_cov_x1_x2
+    
+    inputs: 
+    config: dict - contains the dimensions of the random variables and the device
+    sigma_dict: dict - contains the covariance matrices needed for the calculation 
+            using: create_con_matrix function in PID_util.py
+
+            
+    output: dict - contains the mutual information and the numerator and denominator of the calculation"""
+
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    device = config['device']
+
+    joint_cov_x1_x2 = sigma_dict['joint_x1_x2']
+# Solve the linear system instead of explicitly inverting cov_xt
+    solve_x1 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x1_xt'].T)
+    solve_x2 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x2_xt'].T)
+
+    # Calculate conditional covariances
+    cov_x1_given_t = (sigma_dict['cov_x1'] - sigma_dict['cross_x1_xt'] @ solve_x1).to(device)
+    cov_x2_given_t = (sigma_dict['cov_x2'] - sigma_dict['cross_x2_xt'] @ solve_x2).to(device)
+
+    mi = 0.5 * (safe_logdet(joint_cov_x1_x2) - safe_logdet(cov_x1_given_t) - safe_logdet(cov_x2_given_t))
+    return {'mi':mi.item(),'nume': (0.5 * safe_logdet(joint_cov_x1_x2)).item(), 'deno': (0.5 * safe_logdet(cov_x1_given_t) + 0.5 * safe_logdet(cov_x2_given_t)).item()}
+
