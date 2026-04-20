@@ -130,7 +130,7 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
     cov_dict['cov_x1'] = Sigma[0:x1_dim, 0:x1_dim] #ΣX1
     cov_dict['cov_x2'] = Sigma[x1_dim:dt_dx2, x1_dim:dt_dx2] #ΣX2
    
-    cov_dict['joint_x0_x1'] = Sigma[0:dt_dx2, 0:dt_dx2]  #ΣX1X2
+    cov_dict['joint_x1_x2'] = Sigma[0:dt_dx2, 0:dt_dx2]  #ΣX1X2
 
 
     if len(rvs) == 3 or len(dims) == 3:
