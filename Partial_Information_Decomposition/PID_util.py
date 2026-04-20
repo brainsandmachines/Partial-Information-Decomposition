@@ -17,10 +17,16 @@ import os
 from matplotlib.colors import LogNorm
 from sklearn.linear_model import RidgeCV, LinearRegression
 
+
 def LinearRegression_fit(X,y):
     model = LinearRegression()
+    if X.device != 'cpu':
+        X = X.cpu().numpy()
+    if y.device != 'cpu':
+        y = y.cpu().numpy()
     model.fit(X,y)
     return model
+
 
 
 
@@ -46,6 +52,12 @@ def compute_ridge_cv_r2(X, y, alphas=None):
     # RidgeCV with leave-one-out CV (efficient GCV approximation)
     # cv=None means use efficient LOO via GCV
     ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
+    
+    if X.device != 'cpu':
+        X = X.cpu().numpy()
+    if y.device != 'cpu':
+        y = y.cpu().numpy()
+    
     ridge_cv.fit(X, y)
     
     return ridge_cv.best_score_, ridge_cv
@@ -88,7 +100,9 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
     if Sigma is None:
         assert len(rvs) == 2 or len(rvs) == 3, "Length of random variable list should be either 2 or 3"
         Z = torch.hstack(rvs).to(torch.float64)   # shape (N, len(rvs)*len(rvs)*p)    
-        Sigma = torch.cov(Z.T,correction=1,device=device) #Correction means unbiased estimator (N-1 in denominator)
+        Sigma = torch.cov(Z.T,correction=1) #Correction means unbiased estimator (N-1 in denominator)
+        Sigma = Sigma.to(device)
+    
     if verbose:
         eigvenvalue_summary(Sigma.detach().cpu().numpy())
 
@@ -100,39 +114,39 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
     cov_dict = {}
     if verbose:
         print(f"\nFull covariance matrix shape: {Sigma.shape}")
-    x0_dim = rvs[0].shape[1] if rvs else dims[0]
-    x1_dim = rvs[1].shape[1] if rvs else dims[1]
-    x2_dim = rvs[2].shape[1] if (rvs and len(rvs) == 3) else dims[2] if dims else 0
+    x1_dim = rvs[0].shape[1] if rvs else dims[0]
+    x2_dim = rvs[1].shape[1] if rvs else dims[1]
+    xt_dim = rvs[2].shape[1] if (rvs and len(rvs) == 3) else dims[2] if dims else 0
 
 
-    dt_dx1 = x0_dim + x1_dim
-    d_all = x0_dim + x1_dim + x2_dim
+    dt_dx2 = x2_dim + xt_dim
+    d_all = x1_dim + x2_dim + xt_dim
 
     #Full covariance matrix
-    cov_dict['full_cov'] = Sigma #Full covariance matrix ΣX0X1X2
+    cov_dict['full_cov'] = Sigma #Full covariance matrix ΣX1X2T
     #Cross-Covariances:
-    cov_dict['cross_x0_x1'] = Sigma[0:x0_dim, x0_dim:dt_dx1] #ΣX0,X1   
+    cov_dict['cross_x1_x2'] = Sigma[0:x1_dim, x1_dim:dt_dx2] #ΣX1,X2   
     #Auto-Covariances
-    cov_dict['cov_x0'] = Sigma[0:x0_dim, 0:x0_dim] #ΣX0
-    cov_dict['cov_x1'] = Sigma[x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
+    cov_dict['cov_x1'] = Sigma[0:x1_dim, 0:x1_dim] #ΣX1
+    cov_dict['cov_x2'] = Sigma[x1_dim:dt_dx2, x1_dim:dt_dx2] #ΣX2
    
-    cov_dict['joint_x0_x1'] = Sigma[0:dt_dx1, 0:dt_dx1]  #ΣX0X1
+    cov_dict['joint_x0_x1'] = Sigma[0:dt_dx2, 0:dt_dx2]  #ΣX1X2
 
 
     if len(rvs) == 3 or len(dims) == 3:
         #Cross-Covariances:
-        cov_dict['cross_x1_x2'] = Sigma[x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
-        cov_dict['cross_x12_x0'] = Sigma[x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
-        cov_dict['cross_x0_x2'] = Sigma[0:x0_dim, dt_dx1:d_all] #ΣX0,X2
+        cov_dict['cross_x1_xt'] = Sigma[x1_dim:dt_dx2, dt_dx2:d_all]#ΣX2,XT
+        cov_dict['cross_x1t_x1'] = Sigma[x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
+        cov_dict['cross_x1_xt'] = Sigma[0:x1_dim, dt_dx2:d_all] #ΣX1,XT
 
         #Auto-Covariances:
-        cov_dict['joint_x1_x2'] = Sigma[x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
-        cov_dict['cov_x2'] = Sigma[dt_dx1:d_all, dt_dx1:d_all] #ΣX2
+        cov_dict['joint_x1_xt'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
+        cov_dict['cov_xt'] = Sigma[dt_dx2:d_all, dt_dx2:d_all] #ΣXT
 
-        ##ΣX0,X2:
-        a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=1,)
-        b = torch.cat((cov_dict['cross_x0_x2'].T, cov_dict['cov_x2']),dim=1)
-        cov_dict['auto_x02'] = torch.cat((a,b),dim=0)
+        ##ΣX1,XT:
+        a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_xt']),dim=1,)
+        b = torch.cat((cov_dict['cross_x1_xt'].T, cov_dict['cov_xt']),dim=1)
+        cov_dict['joint_x1_xt'] = torch.cat((a,b),dim=0)
 
 
     return cov_dict

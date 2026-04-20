@@ -8,7 +8,9 @@ Mutual_Information_Simulation:
   seed: 1
   n_trials: 1000
   analytic_bias_correction: False
-  resample_bias_correction: True
+  resample_bias_correction: False
+  lr_type: 'ridge' # options: 'ols', 'ridge', 'lasso'
+  lasso_alpha: 0.1 # only used if lr_type is 'lasso
   on_covariance: 'ledoit_wolf' # options: 'False', 'ledoit_wolf', 'shrunk_cov' , 'oas'
   alpha : 0.5 # only used if on_covariance is 'shrunk_cov'
   bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] 

@@ -10,21 +10,24 @@ from PID_util import *
 
 
 
-def create_cov_lr(config:dict,cov:torch.Tensor,rv:torch.Tensor) -> dict:
+def create_cov_lr(config:dict,data) -> dict:
     """Take the Random Varibles and create predictions of the X1 and X2 using T"""
-
-    X1,X2,T = rv[0],rv[1],rv[2]
+    cov, rv_list = data
+    X1,X2,T = rv_list[0],rv_list[1],rv_list[2]
     lr_type = config['lr_type']
     if lr_type == 'ols':
-        model1 = LinearRegression_fit(X1,T)
-        model2 = LinearRegression_fit(X2,T)
+        model1 = LinearRegression_fit(T,X1)
+        model2 = LinearRegression_fit(T,X2)
     elif lr_type == 'ridge':
-        alpha = config.get('ridge_alpha', 1.0)
-        _,model1 = compute_ridge_cv_r2(X1,T,alpha)
-        _,model2 = compute_ridge_cv_r2(X2,T,alpha)
+        alpha = config.get('ridge_alpha', None)
+        _,model1 = compute_ridge_cv_r2(T,X1,alpha)
+        _,model2 = compute_ridge_cv_r2(T,X2,alpha)
+    T_np = T.detach().cpu().numpy()
+    X1_pred = model1.predict(T_np)
+    X2_pred = model2.predict(T_np)
 
-    X1_pred = model1.predict(X1)
-    X2_pred = model2.predict(X2)
+    X1_pred = torch.from_numpy(X1_pred).to(config['device'])
+    X2_pred = torch.from_numpy(X2_pred).to(config['device'])
 
     rvs = [X1_pred,X2_pred,T]
     cov_dict = create_cov_matrix(rvs=rvs,device=config['device'])

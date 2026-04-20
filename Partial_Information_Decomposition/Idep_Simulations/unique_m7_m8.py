@@ -27,6 +27,7 @@ def simulate_m7_m8_idep(
     sim_config: dict,
     rng: torch.Generator | None = None,
     intermediate_func: callable = None,
+    mi_func: callable = None
 ):
     """
     Run MI simulation under the same covariance construction used
@@ -46,7 +47,7 @@ def simulate_m7_m8_idep(
     d = n0 + n1 + n2
     df = n_samples - 1
 
-
+    assert mi_func is not None, "Must provide a mutual information calculation function (mi_func) for the simulation."
 
 
     if df <= d - 1:
@@ -118,40 +119,29 @@ def simulate_m7_m8_idep(
         # Sample data
         data_raw = sample_data_from_cov(sim_config,m8_true_cov,rng=rng) # (sample_cov,rv_list)
         inter_vars  = intermediate_func(sim_config,data_raw) #Intermediate function can be used to apply shrinkage or other covariance transformations before calculating the sample covariance. It should return the transformed data and the corresponding RV list.
+        Z = inter_vars.get('cov', data_raw[0]) #If the intermediate function does not return a new covariance, use the original one from data_raw.
+        rv_list = inter_vars.get('rv_list', data_raw[1]) #If the intermediate function does not return a new rv_list, use the original one from data_raw.
         Z_dict = inter_vars.get('cov_dict', None)
-        Z = inter_vars['cov']
-        rv_list = inter_vars['rv_list']
 
         Z = Z.squeeze(0) if Z.ndim == 3 and Z.shape[0] == 1 else Z
         # Sample covariance
         Z_dict = create_cov_matrix(Sigma=Z, dims=[n0, n1, n2]) if Z_dict is None else Z_dict
 
         #Graph Model M8 
-        m8_sample = build_m8_terms(sim_config, Z_dict, whiten=True)
+        m8_sample = build_m8_terms(sim_config, Z_dict, whiten='whiten_ver')
         Q_m8 = m8_sample['Q']
         R_m8 = m8_sample['R']
         P_m8 = m8_sample['P']
         m8_Sigma = m8_sample['Sigma']
 
-        nume8_raw = 0.5*safe_logdet((torch.eye(n1, device=device) - (P_m8.T @ P_m8)))
-        deno8_q = torch.eye(n2, device=device)-(Q_m8.T @ Q_m8)
-        deno8_r = torch.eye(n2, device=device)-(R_m8.T @ R_m8)
-        deno8_raw = 0.5*safe_logdet(m8_Sigma)
-        mi_m8_raw = (nume8_raw - deno8_raw).item()
+        mi_m8_dict = mi_func(sim_config,m8_sample)
+        mi_m8_raw = mi_m8_dict['mi']
         
 
         #Graph Model M7 denominator
-        m7_sample = build_m7_terms(sim_config, Z_dict, whiten=True)
-        Q_m7 = m7_sample['Q']
-        R_m7 = m7_sample['R']
-        P_m7 = m7_sample['P']
-        m7_Sigma = m7_sample['Sigma']
-
-        nume7_raw = 0.5*safe_logdet(torch.eye(n1, device=device) - (P_m7.T @ P_m7))
-        deno7_q = torch.eye(n2, device=device)-(Q_m7.T @ Q_m7)
-        deno7_r = torch.eye(n2, device=device)-(R_m7.T @ R_m7)
-        deno7_raw = 0.5*safe_logdet(deno7_q) + 0.5*safe_logdet(deno7_r)
-        mi_m7_raw = (nume7_raw - deno7_raw).item()
+        m7_sample = build_m7_terms(sim_config, Z_dict, whiten='whiten_ver')
+        mi_m7_dict = mi_func(sim_config,m7_sample)
+        mi_m7_raw = mi_m7_dict['mi']
 
         i_x1_t_raw = -0.5*safe_logdet(torch.eye(n2, device=device) - (Q_m8.T @ Q_m8)).item() #Under M8 
         i_x2_t_raw = -0.5*safe_logdet(torch.eye(n2, device=device) - (R_m8.T @ R_m8)).item() #Under M8
@@ -185,7 +175,7 @@ def simulate_m7_m8_idep(
 
         pid_config['sample_statistic'] = {'i': i_raw, 'k': k_raw,'h': h_raw, 'j': j_raw}
 
-        pid_config['rvs_list'] = rv_list_raw
+        pid_config['rvs_list'] = rv_list
         pid_config['Sigma'] = Z
 
         pid_config['model'] = 'pid'
@@ -345,18 +335,19 @@ def sort_m7_m8_results(results_list):
     return [i_results_list, j_results_list, k_results_list, h_results_list]
 
 
-def simulation_wrapper(config: dict,intermediate_func: callable) -> dict:
+def simulation_wrapper(config: dict,mi_func:callable,intermediate_func: callable) -> dict:
     """
     Run the logdet bias simulation for M7 and M8 models, returning a summary of results.
     """
     seed = config['seed']
-    sim_func = partial(simulate_m7_m8_idep, intermediate_func=intermediate_func)
+    sim_func = partial(simulate_m7_m8_idep, intermediate_func=intermediate_func,mi_func=mi_func)
 
 
     pid_bootstrap_func = partial(bias_resampling,calc_func=para_unique_bias_calc)
     
     corr_value_func  = corrected_statistic
-    functions_dict = {'s_simulation': sim_func, 'bias_correction': pid_bootstrap_func, 'corrected_statistic': corr_value_func}
+    functions_dict = {'s_simulation': sim_func, 'bias_correction': pid_bootstrap_func, 
+                      'corrected_statistic': corr_value_func,'mi_func': mi_func}
     results_dict = simulation(config,functions_dict,seed=seed)
     return results_dict
 

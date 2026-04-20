@@ -9,6 +9,7 @@ import os
 from shrinkaging import ledoit_wolf_cov, oracle_shrinkage_cov, shrunk_cov
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
+from calculations_functions import safe_logdet
 from PID_util import *
 import pandas as pd
 
@@ -143,7 +144,7 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver'):
     n2 = config['n2']
 
     device = config.get('device', 'cpu')
-    if whiten:
+    if whiten == 'whiten_ver':
         Q = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x2'], cov_dict['cov_x2'])
         R = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
         cov_tt = torch.eye(n2,device=device)
@@ -151,7 +152,7 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver'):
         Q = cov_dict['cross_x0_x2']
         R = cov_dict['cross_x1_x2']
         cov_tt = cov_dict['cov_x2'] #IDentity matrix
-        assert torch.allclose(cov_tt, torch.eye(n2, device=device)), "Expected cov_x2 to be identity when whiten is True."
+        assert torch.allclose(cov_tt, torch.eye(n2, device=device).to(dtype=cov_tt.dtype)), "Expected cov_x2 to be identity when whiten is True."
 
     else:
         Q = cov_dict['cross_x0_x2']
@@ -213,21 +214,9 @@ def on_covariance(config,data):
         cov_list.append(cov)
     cov = torch.stack(cov_list, dim=0)    
     assert cov.shape == covariance_matrix.shape, f"Expected output shape {covariance_matrix.shape}, got {cov.shape}." 
-    return cov
+    return {'cov':cov}
 
-def safe_logdet(A: torch.Tensor) -> float:
-    """
-    Compute log determinant and raise if matrix is not positive definite.
-    """
-    sign, ld = torch.linalg.slogdet(A)
 
-    if torch.any(sign <= 0):
-        eigmin = torch.min(torch.linalg.eigvalsh(0.5 * (A + A.mT)))
-        raise RuntimeError(
-            f"Matrix not positive definite in logdet. sign={sign}, min_eig={eigmin.item():.3e}"
-        )
-
-    return ld
 
 def mi_calculation_from_cov(nume_matrix,denoq_matrix,denor_matrix,only_mi=False ) -> float:
     """
@@ -242,60 +231,7 @@ def mi_calculation_from_cov(nume_matrix,denoq_matrix,denor_matrix,only_mi=False 
     return mi.item(),logdet_deno.item(), logdet_nume.item()
 
 
-def mi_calculation_not_whiten(config) -> float:
-    """
-    Compute MI from covariance matrices using the formula:
-    MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)
-    """
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
-    device = config.get('device', 'cpu')
-    S = config['Sigma'] #(B, d, d)
-    S_dict = para_create_cov_matrix([config['n0'], config['n1'], config['n2']], S)
 
-    if config['model'] == 'M8' or config['model'] == 'M8_M7':
-        #M8 
-        m8_sigma = S #Denominator of M8 is just the sample covariance
-        deno8_raw = 0.5 * safe_logdet(m8_sigma)
-        #Numerator
-        joint_x0_x1 = S_dict['joint_x0_x1']
-        cov_x2 = S_dict['cov_x2']
-        nume_m8_joint_raw = 0.5 * safe_logdet(joint_x0_x1)
-        nume_m8_target_raw = 0.5 * safe_logdet(cov_x2)
-        nume8_raw = nume_m8_joint_raw + nume_m8_target_raw
-        mi_m8_raw = nume8_raw - deno8_raw
-        m8_Sigma = S
-        final_dict_m8 = {'mi': mi_m8_raw,'nume': nume8_raw,'nume_joint': nume_m8_joint_raw,'nume_target': nume_m8_target_raw,'deno': deno8_raw}
-
-    if config['model'] == 'M7' or config['model'] == 'M8_M7':
-        #Calculate m7_whiten model logdets
-        cross_x0_x1_m7 = S_dict['cross_x0_x2'] @ torch.linalg.inv(S_dict['cov_x2']) @ S_dict['cross_x1_x2'].mT
-        cross_x1_x0_m7 = cross_x0_x1_m7.mT
-        S_m7 = S.clone()
-        S_m7[:, :n0, n0:n0+n1] = cross_x0_x1_m7
-        S_m7[:, n0:n0+n1, :n0] = cross_x1_x0_m7
-
-        S_m7_dict = para_create_cov_matrix([config['n0'], config['n1'], config['n2']], S_m7)
-        assert torch.allclose(S_m7_dict['cross_x0_x2'], S_dict['cross_x0_x2'])
-        assert torch.allclose(S_m7_dict['cross_x0_x1'], cross_x0_x1_m7)
-        
-        deno7_raw = 0.5 * safe_logdet(S_m7)
-        nume_m7_joint_raw = 0.5 * safe_logdet(S_m7_dict['joint_x0_x1'])
-        nume_m7_target_raw = 0.5 * safe_logdet(S_m7_dict['cov_x2'])
-        nume7_raw = nume_m7_joint_raw + nume_m7_target_raw
-        m7_Sigma = S_m7
-        mi_m7_raw = nume7_raw - deno7_raw
-
-        final_dict_m7 = {'mi': mi_m7_raw,'nume': nume7_raw,'nume_joint': nume_m7_joint_raw,'nume_target': nume_m7_target_raw,'deno': deno7_raw}
-    if config['model'] == 'M8_M7':
-        final_dict = {'M8': final_dict_m8, 'M7': final_dict_m7}
-
-    else:
-            final_dict = final_dict_m8 if config['model'] == 'M8' else final_dict_m7
-
-    
-    return (final_dict,{'M8': S, 'M7': S_m7}) if config['model'] == 'M8_M7' else final_dict
 
 def extract_num_den_matrices(config:dict,matrix:torch.tensor):
     """Extract the numerator and denominator covariance matrices for M7/M8 from the full covariance matrix. 
@@ -385,23 +321,6 @@ def para_unique_bias_calc(config:dict):
         'j': j_value,}
 
 
-def logdet_wishart_bias(df: int, d: int) -> float:
-    """
-    Exact finite-sample bias for log|S| when S is the unbiased sample covariance
-    from Gaussian data and (df) * S ~ Wishart_d(Sigma, df).
-
-    Returns
-    -------
-    bias : float
-        E[log|S|] - log|Sigma|
-    """
-    if df <= d - 1:
-        raise ValueError(f"Need df > d-1. Got df={df}, d={d}.")
-
-    i = torch.arange(1, d + 1, dtype=torch.float64)
-    term = torch.special.digamma((df - i + 1) / 2.0)
-
-    bias = torch.sum(term) + d * torch.log(torch.tensor(2.0 / df, dtype=torch.float64))
 
     return bias.item()
 
