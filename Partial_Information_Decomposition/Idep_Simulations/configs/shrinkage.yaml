@@ -15,6 +15,8 @@ Mutual_Information_Simulation:
   alpha : 0.5 # only used if on_covariance is 'shrunk_cov'
   bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] 
   n_bootstraps: 20
+  mi_type: 'whiten'
+  bi_mi_type: 'whiten'
 
 0=Mutual_Information_Simulation:
   p_scale: 0.0

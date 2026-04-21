@@ -19,19 +19,24 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
 from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
-
+from calculations_functions import mi_calculation_not_whiten,safe_logdet,logdet_wishart_bias,mi_wrapper
 
 
 def simulate_m7_m8_idep(
     data: list,
     sim_config: dict,
     rng: torch.Generator | None = None,
-    intermediate_func: callable = None,
-    mi_func: callable = None
-):
+    intermediate_func: callable = None,):
     """
     Run MI simulation under the same covariance construction used
     in the logdet experiments.
+
+    Inputs: 
+        data - True Covriances for M7 and M8 models, in the form of a list [m8_cov, m7_cov]
+        sim_config - Simulation configuration dictionary containing parameters for the simulation.
+        rng - Optional random number generator for reproducibility.
+        intermediate_func - Optional function to apply transformations to the sampled data before calculating covariances.
+        mi_func - Mutual information calculation function to use for the simulation. Must accept sim_config and
     """
     n_samples = sim_config['n_samples']
     n0 = sim_config['n0']
@@ -47,7 +52,6 @@ def simulate_m7_m8_idep(
     d = n0 + n1 + n2
     df = n_samples - 1
 
-    assert mi_func is not None, "Must provide a mutual information calculation function (mi_func) for the simulation."
 
 
     if df <= d - 1:
@@ -59,35 +63,21 @@ def simulate_m7_m8_idep(
     m8_true_cov, m7_true_cov = data
 
     m8_true_cov_dict = create_cov_matrix(Sigma=m8_true_cov, dims=[n0, n1, n2])
-    
-
-    m8 = build_m8_terms(sim_config, m8_true_cov_dict, whiten=True)
-    Q_m8 = m8['Q']
-    R_m8 = m8['R']
-    P_m8 = m8['P']
-    m8_Sigma = m8['Sigma']
-
-    nume_m8_true = 0.5*safe_logdet(torch.eye(n1,device=device) - (P_m8.T @ P_m8)).item()
-    deno_m8_true = 0.5*safe_logdet(m8_true_cov).item()
-    m8_MI_true = (nume_m8_true-deno_m8_true)
-
-    #Mutual Information between M1 or M2 with T
-    i_x1_t_true = -0.5*safe_logdet(torch.eye(n2, device=device) - (Q_m8.T @ Q_m8)).item()
-    i_x2_t_true = -0.5*safe_logdet(torch.eye(n2, device=device) - (R_m8.T @ R_m8)).item()
-
-
     m7_true_cov_dict = create_cov_matrix(Sigma=m7_true_cov, dims=[n0, n1, n2])
-    m7 = build_m7_terms(sim_config, m7_true_cov_dict, whiten=True)
-    Q_m7_whiten = m7['Q']
-    R_m7_whiten = m7['R']
-    P_m7_whiten = m7['P']
-    m7_Sigma = m7['Sigma']
 
-    nume_m7_true = 0.5*safe_logdet(torch.eye(n1,device=device) - (P_m7_whiten.T @ P_m7_whiten)).item()
-    deno_m7_true = 0.5*safe_logdet(m7_true_cov).item()
 
-    m7_MI_true = (nume_m7_true-deno_m7_true)
+    m8 = build_m8_terms(sim_config, m8_true_cov_dict, whiten=sim_config['whiten'])
+    m7 = build_m7_terms(sim_config, m7_true_cov_dict, whiten=sim_config['whiten'])
 
+    mi_m8 = mi_wrapper(sim_config,m8,m8_true_cov_dict)
+    mi_m7 = mi_wrapper(sim_config,m7,m7_true_cov_dict)
+
+    m8_MI_true = mi_m8['mi']
+    m7_MI_true = mi_m7['mi']
+
+    #Calculate bi_variate MIs for bias calculations
+    i_x1_t_true = mi_wrapper(sim_config,m8,m8_true_cov_dict,tri_variate=False)['mi_bi_1'] #Calculated differently
+    i_x2_t_true = mi_wrapper(sim_config,m8,m8_true_cov_dict,tri_variate=False)['mi_bi_2'] #Calculated differently
     #Unique 1
     i_true = m7_MI_true - i_x2_t_true
     k_true = m8_MI_true - i_x2_t_true
@@ -134,17 +124,19 @@ def simulate_m7_m8_idep(
         P_m8 = m8_sample['P']
         m8_Sigma = m8_sample['Sigma']
 
-        mi_m8_dict = mi_func(sim_config,m8_sample)
+        mi_m8_dict = mi_wrapper(sim_config,m8_sample)
         mi_m8_raw = mi_m8_dict['mi']
+ 
         
 
         #Graph Model M7 denominator
         m7_sample = build_m7_terms(sim_config, Z_dict, whiten='whiten_ver')
-        mi_m7_dict = mi_func(sim_config,m7_sample)
+        mi_m7_dict = mi_wrapper(sim_config,m7_sample)
         mi_m7_raw = mi_m7_dict['mi']
 
-        i_x1_t_raw = -0.5*safe_logdet(torch.eye(n2, device=device) - (Q_m8.T @ Q_m8)).item() #Under M8 
-        i_x2_t_raw = -0.5*safe_logdet(torch.eye(n2, device=device) - (R_m8.T @ R_m8)).item() #Under M8
+        #Calculate bi-variate MIs 
+        i_x1_t_raw = mi_wrapper(sim_config,m7_sample,tri_variate=False)['mi_bi_1'] #Calculated differently
+        i_x2_t_raw = mi_wrapper(sim_config,m7_sample,tri_variate=False)['mi_bi_2'] #Calculated differently
 
         
         if analytic_bias_correction:
@@ -335,19 +327,19 @@ def sort_m7_m8_results(results_list):
     return [i_results_list, j_results_list, k_results_list, h_results_list]
 
 
-def simulation_wrapper(config: dict,mi_func:callable,intermediate_func: callable) -> dict:
+def simulation_wrapper(config: dict,intermediate_func: callable) -> dict:
     """
     Run the logdet bias simulation for M7 and M8 models, returning a summary of results.
     """
     seed = config['seed']
-    sim_func = partial(simulate_m7_m8_idep, intermediate_func=intermediate_func,mi_func=mi_func)
+    sim_func = partial(simulate_m7_m8_idep, intermediate_func=intermediate_func)
 
 
     pid_bootstrap_func = partial(bias_resampling,calc_func=para_unique_bias_calc)
     
     corr_value_func  = corrected_statistic
     functions_dict = {'s_simulation': sim_func, 'bias_correction': pid_bootstrap_func, 
-                      'corrected_statistic': corr_value_func,'mi_func': mi_func}
+                      'corrected_statistic': corr_value_func}
     results_dict = simulation(config,functions_dict,seed=seed)
     return results_dict
 

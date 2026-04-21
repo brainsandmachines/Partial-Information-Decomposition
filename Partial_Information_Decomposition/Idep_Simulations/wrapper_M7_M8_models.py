@@ -96,14 +96,14 @@ def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
     diag1 = torch.eye(config['n1'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x1"])
     diag2 = torch.eye(config['n2'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x2"])
     if whitening_normalize: 
-        Q = whiten_block(cov_m8_dict["cov_x0"], cov_m8_dict["cross_x0_x2"], cov_m8_dict["cov_x2"])
-        R = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_x2"], cov_m8_dict["cov_x2"])
+        Q = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_xt"], cov_m8_dict["cov_xt"])
+        R = whiten_block(cov_m8_dict["cov_x2"], cov_m8_dict["cross_x2_xt"], cov_m8_dict["cov_xt"])
         P = Q @ R.T
 
     else:
-        Q = cov_m8_dict["cross_x0_x2"]
-        R = cov_m8_dict["cross_x1_x2"]
-        P = Q @ torch.linalg.inv(cov_m8_dict["cov_x2"]) @ R.T
+        Q = cov_m8_dict["cross_x1_xt"]
+        R = cov_m8_dict["cross_x2_xt"]
+        P = Q @ torch.linalg.inv(cov_m8_dict["cov_xt"]) @ R.T
 
     #Construct M7 covariance 
     row1 = torch.cat([diag0, P, Q], dim=1)

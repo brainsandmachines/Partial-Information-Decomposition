@@ -20,7 +20,7 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
 from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
-
+from calculations_functions import mi_calculation_not_whiten,safe_logdet,logdet_wishart_bias
 def simulate_m7_m8_mi(
     data: list,
     sim_config: dict,

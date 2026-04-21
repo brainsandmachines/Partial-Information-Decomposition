@@ -124,11 +124,13 @@ def calcualte_mi(config,sigma_dict):
     deno_r = torch.eye(n2, device=device)-(R.T @ R)
     deno_raw = 0.5*safe_logdet(sigma)
 
-    mi_raw = (nume_raw - deno_raw).item()
-    return {"mi": mi_raw,'nume': nume_raw.item(),'deno': deno_raw.item()}
+    mi_tri = (nume_raw - deno_raw).item()
+    mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.T @ Q)))
+    mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.T @ R)))
+    return {"mi": mi_tri,'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
 
 
-def calulate_mi_lr(config,sigma_dict):
+def calculate_mi_lr(config,sigma_dict):
     """This function calculates the  trivarite (X1;X2,T) mutual information using the
     covaraince matrix especially for functions that use linear regression. 
     The function above uses matrices that ill-conditioned using linear regression. 
@@ -157,6 +159,29 @@ def calulate_mi_lr(config,sigma_dict):
     cov_x1_given_t = (sigma_dict['cov_x1'] - sigma_dict['cross_x1_xt'] @ solve_x1).to(device)
     cov_x2_given_t = (sigma_dict['cov_x2'] - sigma_dict['cross_x2_xt'] @ solve_x2).to(device)
 
-    mi = 0.5 * (safe_logdet(joint_cov_x1_x2) - safe_logdet(cov_x1_given_t) - safe_logdet(cov_x2_given_t))
-    return {'mi':mi.item(),'nume': (0.5 * safe_logdet(joint_cov_x1_x2)).item(), 'deno': (0.5 * safe_logdet(cov_x1_given_t) + 0.5 * safe_logdet(cov_x2_given_t)).item()}
+    mi_tri = 0.5 * (safe_logdet(joint_cov_x1_x2) - safe_logdet(cov_x1_given_t) - safe_logdet(cov_x2_given_t))
+    mi_bi_1 = 0.5 * (safe_logdet(sigma_dict['cov_x1']) - safe_logdet(cov_x1_given_t))
+    mi_bi_2 = 0.5 * (safe_logdet(sigma_dict['cov_x2']) - safe_logdet(cov_x2_given_t))
+    return {'mi_tri':mi_tri.item(),'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': safe_logdet(joint_cov_x1_x2).item(),'deno_1': safe_logdet(cov_x1_given_t).item(),'deno_2': safe_logdet(cov_x2_given_t).item()}
 
+
+
+def mi_wrapper(config,sigma_dict,whiten_terms_dict,tri_variate=True):
+    """This function is a wrapper for the mutual information calculation functions. 
+    It takes in the config and sigma_dict and calls the appropriate function based on the mi_type argument.
+    
+    inputs: 
+    config: dict - contains the dimensions of the random variables and the device
+    sigma_dict: dict - contains the covariance matrices needed for the calculation 
+            using: create_con_matrix function in PID_util.py
+    mi_type: str - type of mutual information to calculate, either 'not_whiten' or 'lr'
+    
+    output: dict - contains the mutual information and the numerator and denominator of the calculation"""
+
+    mi_type = config['mi_type'] if tri_variate else config['bi_mi_type']
+    if mi_type == 'whiten':
+        return calcualte_mi(config,whiten_terms_dict)
+    elif mi_type == 'lr':
+        return calculate_mi_lr(config,sigma_dict)
+    else:
+        raise ValueError(f"Invalid mi_type: {mi_type}. Must be either 'not_whiten' or 'lr'.")

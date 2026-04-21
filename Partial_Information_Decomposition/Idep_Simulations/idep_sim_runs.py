@@ -1,13 +1,4 @@
 
-
-
-
-
-
-
-
-import pathlib
-
 import numpy as np
 import yaml
 from pathlib import Path
@@ -149,9 +140,9 @@ if __name__ == "__main__":
     folder_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/lr")
 
 
-    linear_regression_simulation(exp_list, yaml_file, folder_path)
+    #linear_regression_simulation(exp_list, yaml_file, folder_path)
 
     shrinkage_list = ["shrunk_cov"]
     alpha_list = np.linspace(0.00001, 1.0, 100)
     plot_heat_map = False
-    #shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder_path, plot_heat_map)
+    shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder_path, plot_heat_map)

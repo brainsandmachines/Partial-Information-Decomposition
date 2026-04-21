@@ -135,12 +135,12 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
 
     if len(rvs) == 3 or len(dims) == 3:
         #Cross-Covariances:
-        cov_dict['cross_x1_xt'] = Sigma[x1_dim:dt_dx2, dt_dx2:d_all]#ΣX2,XT
-        cov_dict['cross_x1t_x1'] = Sigma[x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
+        cov_dict['cross_x2_xt'] = Sigma[x1_dim:dt_dx2, dt_dx2:d_all]#ΣX2,XT
+        cov_dict['cross_x2t_x1'] = Sigma[x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
         cov_dict['cross_x1_xt'] = Sigma[0:x1_dim, dt_dx2:d_all] #ΣX1,XT
 
         #Auto-Covariances:
-        cov_dict['joint_x1_xt'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
+        cov_dict['joint_x2_xt'] = Sigma[x2_dim:d_all, x2_dim:d_all]  #ΣX2XT
         cov_dict['cov_xt'] = Sigma[dt_dx2:d_all, dt_dx2:d_all] #ΣXT
 
         ##ΣX1,XT:
