@@ -8,7 +8,6 @@ import argparse
 import yaml
 from functools import partial
 # Import all existing utilities from the user's module
-
 from Simulation_utils import *
 from wrapper_M7_M8_models import simulation
 from Simulation_utils import *
@@ -19,7 +18,7 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
 from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
-from calculations_functions import mi_calculation_not_whiten,safe_logdet,logdet_wishart_bias,mi_wrapper
+from Partial_Information_Decomposition.mi_functions import mi_calculation_not_whiten,safe_logdet,logdet_wishart_bias,mi_wrapper
 
 
 def simulate_m7_m8_idep(
@@ -66,18 +65,19 @@ def simulate_m7_m8_idep(
     m7_true_cov_dict = create_cov_matrix(Sigma=m7_true_cov, dims=[n0, n1, n2])
 
 
-    m8 = build_m8_terms(sim_config, m8_true_cov_dict, whiten=sim_config['whiten'])
-    m7 = build_m7_terms(sim_config, m7_true_cov_dict, whiten=sim_config['whiten'])
+    m8 = build_m8_terms(sim_config, m8_true_cov_dict, whiten=sim_config['normalization'])
+    m7 = build_m7_terms(sim_config, m7_true_cov_dict, whiten=sim_config['normalization'])
 
-    mi_m8 = mi_wrapper(sim_config,m8,m8_true_cov_dict)
-    mi_m7 = mi_wrapper(sim_config,m7,m7_true_cov_dict)
+    mi_m8 = mi_wrapper(sim_config,m8_true_cov_dict,m8)
+    mi_m7 = mi_wrapper(sim_config,m7_true_cov_dict,m7)
 
-    m8_MI_true = mi_m8['mi']
-    m7_MI_true = mi_m7['mi']
+    m8_MI_true = mi_m8['mi_tri']
+    m7_MI_true = mi_m7['mi_tri']
 
     #Calculate bi_variate MIs for bias calculations
-    i_x1_t_true = mi_wrapper(sim_config,m8,m8_true_cov_dict,tri_variate=False)['mi_bi_1'] #Calculated differently
-    i_x2_t_true = mi_wrapper(sim_config,m8,m8_true_cov_dict,tri_variate=False)['mi_bi_2'] #Calculated differently
+    mi_bi_true = mi_wrapper(sim_config,m8_true_cov_dict,m8,tri_variate=False) #Calculated differently
+    i_x1_t_true = mi_bi_true['mi_bi_1'] 
+    i_x2_t_true = mi_bi_true['mi_bi_2'] 
     #Unique 1
     i_true = m7_MI_true - i_x2_t_true
     k_true = m8_MI_true - i_x2_t_true
@@ -111,32 +111,28 @@ def simulate_m7_m8_idep(
         inter_vars  = intermediate_func(sim_config,data_raw) #Intermediate function can be used to apply shrinkage or other covariance transformations before calculating the sample covariance. It should return the transformed data and the corresponding RV list.
         Z = inter_vars.get('cov', data_raw[0]) #If the intermediate function does not return a new covariance, use the original one from data_raw.
         rv_list = inter_vars.get('rv_list', data_raw[1]) #If the intermediate function does not return a new rv_list, use the original one from data_raw.
-        Z_dict = inter_vars.get('cov_dict', None)
+        Z_dict = inter_vars.get('cov_dict', create_cov_matrix(Sigma=Z, dims=[n0, n1, n2]))
 
         Z = Z.squeeze(0) if Z.ndim == 3 and Z.shape[0] == 1 else Z
-        # Sample covariance
-        Z_dict = create_cov_matrix(Sigma=Z, dims=[n0, n1, n2]) if Z_dict is None else Z_dict
 
+        Z_raw_dict = create_cov_matrix(Sigma=data_raw[0], dims=[n0, n1, n2])
         #Graph Model M8 
-        m8_sample = build_m8_terms(sim_config, Z_dict, whiten='whiten_ver')
-        Q_m8 = m8_sample['Q']
-        R_m8 = m8_sample['R']
-        P_m8 = m8_sample['P']
-        m8_Sigma = m8_sample['Sigma']
-
-        mi_m8_dict = mi_wrapper(sim_config,m8_sample)
-        mi_m8_raw = mi_m8_dict['mi']
+        m8_sample = build_m8_terms(sim_config, Z_dict, whiten='whiten_ver') 
+        
+        mi_m8_dict = mi_wrapper(sim_config,Z_dict,m8_sample)
+        mi_m8_raw = mi_m8_dict['mi_tri']
  
         
 
         #Graph Model M7 denominator
         m7_sample = build_m7_terms(sim_config, Z_dict, whiten='whiten_ver')
-        mi_m7_dict = mi_wrapper(sim_config,m7_sample)
-        mi_m7_raw = mi_m7_dict['mi']
+        mi_m7_dict = mi_wrapper(sim_config,Z_dict,m7_sample)
+        mi_m7_raw = mi_m7_dict['mi_tri']
 
         #Calculate bi-variate MIs 
-        i_x1_t_raw = mi_wrapper(sim_config,m7_sample,tri_variate=False)['mi_bi_1'] #Calculated differently
-        i_x2_t_raw = mi_wrapper(sim_config,m7_sample,tri_variate=False)['mi_bi_2'] #Calculated differently
+        mi_bi_dict = mi_wrapper(sim_config,Z_raw_dict,m8_sample,tri_variate=False) #Calculated differently
+        i_x1_t_raw = mi_bi_dict['mi_bi_1']
+        i_x2_t_raw = mi_bi_dict['mi_bi_2']
 
         
         if analytic_bias_correction:
@@ -152,15 +148,15 @@ def simulate_m7_m8_idep(
                                             'h': h_bias, 'j': j_bias}
         #Raw PID Values
         i_raw =  mi_m7_raw - i_x2_t_raw
-        i_raw -= i_bias
+        i_corr = i_raw - i_bias
         k_raw = mi_m8_raw - i_x2_t_raw
-        k_raw -= k_bias
+        k_corr = k_raw - k_bias
 
         h_raw = mi_m7_raw - i_x1_t_raw
-        h_raw -= h_bias
+        h_corr = h_raw - h_bias
 
         j_raw = mi_m8_raw - i_x1_t_raw
-        j_raw -= j_bias
+        j_corr = j_raw - j_bias
 
 
 
@@ -178,11 +174,11 @@ def simulate_m7_m8_idep(
         else:
             pid_bias_dict = {'i': 0.0, 'k': 0.0, 'h': 0.0, 'j': 0.0}
 
-        unq1_corrected['i'].append(i_raw - pid_bias_dict['i'])
-        unq1_corrected['k'].append(k_raw - pid_bias_dict['k'])
+        unq1_corrected['i'].append(i_corr - pid_bias_dict['i'])
+        unq1_corrected['k'].append(k_corr - pid_bias_dict['k'])
         
-        unq2_corrected['h'].append(h_raw - pid_bias_dict['h'])
-        unq2_corrected['j'].append(j_raw - pid_bias_dict['j'])
+        unq2_corrected['h'].append(h_corr - pid_bias_dict['h'])
+        unq2_corrected['j'].append(j_corr - pid_bias_dict['j'])
 
 
 
@@ -327,11 +323,12 @@ def sort_m7_m8_results(results_list):
     return [i_results_list, j_results_list, k_results_list, h_results_list]
 
 
-def simulation_wrapper(config: dict,intermediate_func: callable) -> dict:
+def simulation_wrapper(config: dict) -> dict:
     """
     Run the logdet bias simulation for M7 and M8 models, returning a summary of results.
     """
     seed = config['seed']
+    intermediate_func = config['intermediate_func']
     sim_func = partial(simulate_m7_m8_idep, intermediate_func=intermediate_func)
 
 
@@ -359,66 +356,11 @@ def run(main_func,exp_name, config,save_path,plot_heatmaps:bool=True):
             plot_heatmap_mean_std(h_result, title=f"Unique-2-h-node-{exp_name}",save_path=save_path)
             #Save config for file
             with open(f'{save_path}/{exp_name}_config.yaml', 'w') as f:
-                yaml_config = config.copy()
+                yaml_config = {key: value for key, value in config.items() if not callable(value)}
+                
                 yaml.safe_dump(yaml_config, f, sort_keys=False, allow_unicode=True)
         print("\nFinished simulation.")
 
         return nodes_results_list
     
 
-if __name__ == "__main__":
-    print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
-    exp_list = ['MI>0', 'MI=0']
-    shrinkage = ['shrunk_cov']
-    alpha_list = np.linspace(0.00001,1.0,100)
-    yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
-    folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/shrinkage/func_alpha"
-    plot_heat_map = False
-    with open(yaml_file, 'r') as f:
-        super_duper_config = yaml.safe_load(f)
-    node_dict = {}
-    bias_dict = {}
-    after_corr_bias_dict = {}
-    MI_config = super_duper_config['Mutual_Information_Simulation'].copy()
-    mi0_config = super_duper_config['0=Mutual_Information_Simulation'].copy()
-    above0_mi_config = super_duper_config['0<Mutual_Information_Simulation'].copy()
-    n_p_config = super_duper_config['N_P_variations'].copy()
-    for exp in exp_list:
-        if exp == 'MI=0':
-            pre_config = {**MI_config, **mi0_config, **n_p_config}
-
-        else:
-            pre_config = {**MI_config, **above0_mi_config, **n_p_config}
-
-        for shrink in shrinkage:
-            pre_config['on_covariance'] = shrink
-
-            if shrink == 'shrunk_cov':
-                for alpha in alpha_list:
-                    exp_name = f"3.0Bootstrap_{exp}_shrinkage_{shrink}_alpha_{alpha}"
-                    if plot_heat_map:
-                        save_path = pathlib.Path(f"{folder_path}/{exp_name}")
-                        save_path.mkdir(parents=True, exist_ok=True)  
-                    print(f"\nRunning experiment: {exp_name}") 
-                    pre_config['alpha'] = alpha.item()
-                    run_result = run(exp_name, pre_config.copy(), save_path=None,plot_heatmaps=plot_heat_map)
-                    i_result,j_result,k_result,h_result =run_result[0] ,run_result[1], run_result[2], run_result[3]
-                    node_dict[alpha] = {'i': i_result[0]['mean'], 'j': j_result[0]['mean'], 'k': k_result[0]['mean'], 'h': h_result[0]['mean']}
-                    bias_dict[alpha] = {'i': i_result[0]['emp_bias'], 'j': j_result[0]['emp_bias'], 'k': k_result[0]['emp_bias'], 'h': h_result[0]['emp_bias']}
-                    after_corr_bias_dict[alpha] = {'i': i_result[0]['after_corr_bias'], 'j': j_result[0]['after_corr_bias'], 'k': k_result[0]['after_corr_bias'], 'h': h_result[0]['after_corr_bias']}
-            else:
-                exp_name = f"2.0Bootstrap_{exp}_shrinkage_{shrink}"
-                save_path = pathlib.Path(f"{folder_path}/{exp_name}")
-                save_path.mkdir(parents=True, exist_ok=True)  
-                print(f"\nRunning experiment: {exp_name}")
-                run_result = run(exp_name, pre_config, save_path,plot_heatmaps=False)
-
-            title = f"Bootstrap_seed{pre_config['seed']}_{exp}_sample-{pre_config['N_values'][0]}_dim-{pre_config['p_values'][0]}"
-            save_path = pathlib.Path(f"{folder_path}/{exp_name}")
-            save_path.mkdir(parents=True, exist_ok=True) 
-            plot_nodes_as_alpha(node_dict, title=title, save_path=save_path)
-            plot_nodes_as_alpha(bias_dict, title="Bias_"+title, save_path=save_path)
-            plot_nodes_as_alpha(after_corr_bias_dict, title="After_Corr_Bias_"+title, save_path=save_path)
-            with open(f'{save_path}/{title}_config.yaml', 'w') as f:
-                yaml_config = pre_config.copy()
-                yaml.safe_dump(yaml_config, f, sort_keys=False, allow_unicode=True)

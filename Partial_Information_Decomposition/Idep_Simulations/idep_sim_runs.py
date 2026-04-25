@@ -50,7 +50,7 @@ def shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder
                     alpha = float(alpha)
                     pre_config["alpha"] = alpha
 
-                    exp_name = f"3.0Bootstrap_{exp}_shrinkage_{shrink}_alpha_{alpha}"
+                    exp_name = f"ahatahat_{exp}_shrinkage_{shrink}_alpha_{alpha}"
                     print(f"\nRunning experiment: {exp_name}")
 
                     run_result = run(
@@ -99,7 +99,7 @@ def shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder
                     yaml.safe_dump(pre_config.copy(), f, sort_keys=False, allow_unicode=True)
 
             else:
-                exp_name = f"2.0Bootstrap_{exp}_shrinkage_{shrink}"
+                exp_name = f"ahatahat_{exp}_shrinkage_{shrink}"
                 save_path = folder_path / exp_name
                 save_path.mkdir(parents=True, exist_ok=True)
 
@@ -120,8 +120,9 @@ def linear_regression_simulation(exp_list,yaml_file,folder_path):
         save_path.mkdir(parents=True, exist_ok=True)
 
         print(f"\nRunning experiment: {exp_name}")
-        func = partial(simulation_wrapper, intermediate_func=create_cov_lr)
-        run(func, exp_name, pre_config.copy(), save_path=save_path, plot_heatmaps=False)
+        func = simulation_wrapper
+        pre_config['intermediate_func'] = create_cov_lr
+        run(func, exp_name, pre_config.copy(), save_path=save_path, plot_heatmaps=True)
 
         title = (
             f"LR_seed{pre_config['seed']}_"
@@ -132,17 +133,47 @@ def linear_regression_simulation(exp_list,yaml_file,folder_path):
         with open(save_path / f"{title}_config.yaml", "w") as f:
             yaml.safe_dump(pre_config.copy(), f, sort_keys=False, allow_unicode=True)
 
+def idep_simulation(exp_list, yaml_file, folder_path):
+    print("Running M7 and M8 Idep simulation...")
+
+    MI_config, mi0_config, above0_mi_config, n_p_config = load_config_parts(yaml_file)
+
+    for exp in exp_list:
+        pre_config = make_pre_config(exp, MI_config, mi0_config, above0_mi_config, n_p_config)
+
+        exp_name = f"5.0Idep_{exp}"
+        save_path = folder_path / exp_name
+        save_path.mkdir(parents=True, exist_ok=True)
+        pre_config['intermediate_func'] = on_covariance  # Set whiten to False for Idep simulation
+        print(f"\nRunning experiment: {exp_name}")
+        run(simulation_wrapper, exp_name, pre_config.copy(), save_path=save_path, plot_heatmaps=True)
+
+        title = (
+            f"Idep_seed{pre_config['seed']}_"
+            f"{exp}_sample-{pre_config['N_values'][0]}_"
+            f"dim-{pre_config['p_values'][0]}"
+        )
+
+        with open(save_path / f"{title}_config.yaml", "w") as f:
+            save_config = {key: value for key, value in pre_config.items() if not callable(value)}
+            yaml.safe_dump(save_config, f, sort_keys=False, allow_unicode=True)
+
 
 if __name__ == "__main__":
 
     exp_list = ["MI>0", "MI=0"]
-    yaml_file = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
+    yaml_file_lr = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
     folder_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/lr")
 
 
-    #linear_regression_simulation(exp_list, yaml_file, folder_path)
+   # linear_regression_simulation(exp_list, yaml_file_lr, folder_path)
 
     shrinkage_list = ["shrunk_cov"]
-    alpha_list = np.linspace(0.00001, 1.0, 100)
+    alpha_list = np.linspace(0.00001, 1.0, 50)
     plot_heat_map = False
-    shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder_path, plot_heat_map)
+    #shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder_path, plot_heat_map)
+
+
+    folder_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/idep_LB")
+    yaml_bias_correction = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml'
+    idep_simulation(exp_list, yaml_bias_correction, folder_path)

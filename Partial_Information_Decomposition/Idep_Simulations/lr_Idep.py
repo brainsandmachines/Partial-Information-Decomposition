@@ -26,8 +26,8 @@ def create_cov_lr(config:dict,data) -> dict:
     X1_pred = model1.predict(T_np)
     X2_pred = model2.predict(T_np)
 
-    X1_pred = torch.from_numpy(X1_pred).to(config['device'])
-    X2_pred = torch.from_numpy(X2_pred).to(config['device'])
+    X1_pred = torch.from_numpy(X1_pred).to(config['device']) if len(X1_pred.shape) > 1 else torch.from_numpy(X1_pred).unsqueeze(1).to(config['device'])
+    X2_pred = torch.from_numpy(X2_pred).to(config['device']) if len(X2_pred.shape) > 1 else torch.from_numpy(X2_pred).unsqueeze(1).to(config['device'])
 
     rvs = [X1_pred,X2_pred,T]
     cov_dict = create_cov_matrix(rvs=rvs,device=config['device'])

@@ -1,13 +1,13 @@
 
 N_P_variations:
-  N_values: [400,200,300]
-  p_values: [[51,52,53],[30,30,30],[40,50,50]]
+  N_values: [200,300,400]
+  p_values: [[30,40,50],[50,50,50],[40,60,100]]
 
 
 logdet_simulation:
-  device: 'cuda'
+  device: 'cpu'
   seed: 1
-  n_samples: 1000
+  n_samples: 100
   n_trials: 200
   p_scale: 0.0
   q_scale: 0.0
@@ -19,17 +19,36 @@ logdet_simulation:
 
 
 Mutual_Information_Simulation:
-  device: 'cuda'
+  device: 'cpu'
   seed: 1
-  n_samples: 500
-  n_trials: 1000
-  p_scale: 0.15
-  q_scale: 0.25
-  r_scale: 0.35
-  bias_correction: True,
-  'on_covariance': False,
-  bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] s
-  n_bootstraps: 400
+  n_trials: 100
+  analytic_bias_correction: True
+  resample_bias_correction: False
+  lr_type: 'ridge' # options: 'ols', 'ridge', 'lasso'
+  lasso_alpha: 0.1 # only used if lr_type is 'lasso
+  on_covariance: 'False' # options: 'False', 'ledoit_wolf', 'shrunk_cov' , 'oas'
+  alpha : 0.5 # only used if on_covariance is 'shrunk_cov'
+  bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] 
+  n_bootstraps: 20
+  mi_type: 'whiten' # options: 'whiten', 'lr'
+  bi_mi_type: 'whiten'
+  n_perm : 20
+  normalization: 'True' #If we need to whiten, is it already whiten or leave it not whiened. Options: 'True' (already whitened), 'False' (leave not whitened), 'whiten_ver' (whitened with the same method as the one used for the mi estimation)
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+
+0=Mutual_Information_Simulation:
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+
+
+
+0<Mutual_Information_Simulation:
+  p_scale: 0.35
+  q_scale: 0.55
+  r_scale: 0.45
 
 
 LR_Idep_Simulation:

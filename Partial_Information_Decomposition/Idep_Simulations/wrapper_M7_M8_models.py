@@ -27,12 +27,6 @@ def _build_whitened_blocks_from_cov(S, n0, n1, n2):
 
 def make_random_true_cov(
     config: dict,
-    n0: int,
-    n1: int,
-    n2: int,
-    q_scale: float = 0.25,
-    r_scale: float = 0.25,
-    p_scale: float = 0.25,
     rng:  torch.Generator | None = None,
     m7_whiten_structural: bool = True,
 ) -> np.ndarray:
@@ -46,9 +40,12 @@ def make_random_true_cov(
     and here Sigma_22 = I, so:
         P = Q @ R.T
     """
-    q_scale = config.get('q_scale', q_scale)
-    r_scale = config.get('r_scale', r_scale)
-    p_scale = config.get('p_scale', p_scale)
+    q_scale = config['q_scale']
+    r_scale = config['r_scale']
+    p_scale = config['p_scale']
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
     A = torch.randn((n0, n2), generator=rng, dtype=torch.float64,device=config['device'])
     B = torch.randn((n1, n2), generator=rng, dtype=torch.float64,device=config['device'])
     C = torch.randn((n0, n1), generator=rng, dtype=torch.float64,device=config['device'])
@@ -92,9 +89,9 @@ def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
     "Takes covariance of M8 and creates M7 out of M8"
 
     cov_m8_dict = create_cov_matrix(Sigma=cov_m8, dims=[config['n0'], config['n1'], config['n2']])
-    diag0 = torch.eye(config['n0'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x0"]) 
-    diag1 = torch.eye(config['n1'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x1"])
-    diag2 = torch.eye(config['n2'],device=config['device']) if whitening_normalize else torch.diag(cov_m8_dict["cov_x2"])
+    diag0 = torch.eye(config['n0'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_x1"]
+    diag1 = torch.eye(config['n1'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_x2"]
+    diag2 = torch.eye(config['n2'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_xt"]
     if whitening_normalize: 
         Q = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_xt"], cov_m8_dict["cov_xt"])
         R = whiten_block(cov_m8_dict["cov_x2"], cov_m8_dict["cross_x2_xt"], cov_m8_dict["cov_xt"])
@@ -124,7 +121,7 @@ def simulation(config,functions_dict:dict,seed=None):
     bias_correction_func = functions_dict["bias_correction"]
     corrected_statistic_func = functions_dict["corrected_statistic"]
 
-    m8_true_cov, m7_true_cov = make_random_true_cov(config,config["n0"], config["n1"], config["n2"], q_scale=config["q_scale"], r_scale=config["r_scale"], p_scale=config["p_scale"], rng=rng)
+    m8_true_cov, m7_true_cov = make_random_true_cov(config, rng=rng)
 
     data = [m8_true_cov, m7_true_cov]
     sim_config = config.copy()

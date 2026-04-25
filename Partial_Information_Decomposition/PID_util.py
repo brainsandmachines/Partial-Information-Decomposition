@@ -120,28 +120,29 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
 
 
     dt_dx2 = x2_dim + xt_dim
+    dx1_dx2 = x1_dim + x2_dim
     d_all = x1_dim + x2_dim + xt_dim
 
     #Full covariance matrix
     cov_dict['full_cov'] = Sigma #Full covariance matrix ΣX1X2T
     #Cross-Covariances:
-    cov_dict['cross_x1_x2'] = Sigma[0:x1_dim, x1_dim:dt_dx2] #ΣX1,X2   
+    cov_dict['cross_x1_x2'] = Sigma[0:x1_dim, x1_dim:dx1_dx2] #ΣX1,X2   
     #Auto-Covariances
     cov_dict['cov_x1'] = Sigma[0:x1_dim, 0:x1_dim] #ΣX1
-    cov_dict['cov_x2'] = Sigma[x1_dim:dt_dx2, x1_dim:dt_dx2] #ΣX2
+    cov_dict['cov_x2'] = Sigma[x1_dim:dx1_dx2, x1_dim:dx1_dx2] #ΣX2
    
-    cov_dict['joint_x1_x2'] = Sigma[0:dt_dx2, 0:dt_dx2]  #ΣX1X2
+    cov_dict['joint_x1_x2'] = Sigma[0:dx1_dx2, 0:dx1_dx2]  #ΣX1X2
 
 
-    if len(rvs) == 3 or len(dims) == 3:
+    if (rvs and len(rvs) == 3) or (dims and len(dims) == 3):
         #Cross-Covariances:
-        cov_dict['cross_x2_xt'] = Sigma[x1_dim:dt_dx2, dt_dx2:d_all]#ΣX2,XT
+        cov_dict['cross_x2_xt'] = Sigma[x1_dim:dx1_dx2, dx1_dx2:d_all]#ΣX2,XT
         cov_dict['cross_x2t_x1'] = Sigma[x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
-        cov_dict['cross_x1_xt'] = Sigma[0:x1_dim, dt_dx2:d_all] #ΣX1,XT
+        cov_dict['cross_x1_xt'] = Sigma[0:x1_dim, dx1_dx2:d_all] #ΣX1,XT
 
         #Auto-Covariances:
-        cov_dict['joint_x2_xt'] = Sigma[x2_dim:d_all, x2_dim:d_all]  #ΣX2XT
-        cov_dict['cov_xt'] = Sigma[dt_dx2:d_all, dt_dx2:d_all] #ΣXT
+        cov_dict['joint_x2_xt'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
+        cov_dict['cov_xt'] = Sigma[dx1_dx2:d_all, dx1_dx2:d_all] #ΣXT
 
         ##ΣX1,XT:
         a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_xt']),dim=1,)

@@ -8,7 +8,6 @@ import argparse
 import yaml
 from functools import partial
 # Import all existing utilities from the user's module
-
 from Simulation_utils import *
 from wrapper_M7_M8_models import simulation
 from Simulation_utils import *
@@ -19,7 +18,7 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
 from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
-
+from Partial_Information_Decomposition.bias_functions import logdet_wishart_bias, permutation_null_debias, permuteation_debiased
 def simulate_m7_m8_mi(
     data: list,
     sim_config: dict,
@@ -35,7 +34,7 @@ def simulate_m7_m8_mi(
     n2 = sim_config['n2']
     n_trials = sim_config['n_trials']
     device = sim_config['device']
-    
+    sim_config['rng'] = rng
     if n_samples < 3:
             raise ValueError("Need at least 3 samples.")
 
@@ -56,9 +55,9 @@ def simulate_m7_m8_mi(
     m8_true_cov_dict = create_cov_matrix(Sigma=m8_true_cov, dims=[n0, n1, n2])
     
 
-    Q_m8_whiten = whiten_block(m8_true_cov_dict['cov_x0'], m8_true_cov_dict['cross_x0_x2'], m8_true_cov_dict['cov_x2'])
-    R_m8_whiten = whiten_block(m8_true_cov_dict['cov_x1'], m8_true_cov_dict['cross_x1_x2'], m8_true_cov_dict['cov_x2'])
-    P_m8_whiten = whiten_block(m8_true_cov_dict['cov_x0'], m8_true_cov_dict['cross_x0_x1'], m8_true_cov_dict['cov_x1'])
+    Q_m8_whiten = whiten_block(m8_true_cov_dict['cov_x1'], m8_true_cov_dict['cross_x1_xt'], m8_true_cov_dict['cov_xt'])
+    R_m8_whiten = whiten_block(m8_true_cov_dict['cov_x2'], m8_true_cov_dict['cross_x2_xt'], m8_true_cov_dict['cov_xt'])
+    P_m8_whiten = whiten_block(m8_true_cov_dict['cov_x1'], m8_true_cov_dict['cross_x1_x2'], m8_true_cov_dict['cov_x2'])
     row1_m8 = torch.cat([torch.eye(n0, device=device), P_m8_whiten, Q_m8_whiten], dim=1)
     row2_m8 = torch.cat([P_m8_whiten.T, torch.eye(n1, device=device), R_m8_whiten], dim=1)
     row3_m8 = torch.cat([Q_m8_whiten.T, R_m8_whiten.T, torch.eye(n2, device=device)], dim=1)
@@ -70,8 +69,8 @@ def simulate_m7_m8_mi(
 
     m7_true_cov_dict = create_cov_matrix(Sigma=m7_true_cov, dims=[n0, n1, n2])
 
-    Q_m7_whiten = whiten_block(m7_true_cov_dict['cov_x0'], m7_true_cov_dict['cross_x0_x2'], m7_true_cov_dict['cov_x2'])
-    R_m7_whiten = whiten_block(m7_true_cov_dict['cov_x1'], m7_true_cov_dict['cross_x1_x2'], m7_true_cov_dict['cov_x2'])
+    Q_m7_whiten = whiten_block(m7_true_cov_dict['cov_x1'], m7_true_cov_dict['cross_x1_xt'], m7_true_cov_dict['cov_xt'])
+    R_m7_whiten = whiten_block(m7_true_cov_dict['cov_x2'], m7_true_cov_dict['cross_x2_xt'], m7_true_cov_dict['cov_xt'])
     P_m7 = Q_m7_whiten @ R_m7_whiten.T
     row1_m7 = torch.cat([torch.eye(n0,device=device), P_m7, Q_m7_whiten], dim=1)
     row2_m7 = torch.cat([P_m7.T, torch.eye(n1,device=device), R_m7_whiten], dim=1)
@@ -110,9 +109,9 @@ def simulate_m7_m8_mi(
         Z_m7 = create_cov_matrix(Sigma=Z_m7, dims=[n0, n1, n2])
 
         #Graph Model M8 
-        Q_m8_whiten = whiten_block(Z_dict['cov_x0'], Z_dict['cross_x0_x2'], Z_dict['cov_x2'])
-        R_m8_whiten = whiten_block(Z_dict['cov_x1'], Z_dict['cross_x1_x2'], Z_dict['cov_x2'])
-        P_m8_whiten = whiten_block(Z_dict['cov_x0'], Z_dict['cross_x0_x1'], Z_dict['cov_x1'])
+        Q_m8_whiten = whiten_block(Z_dict['cov_x1'], Z_dict['cross_x1_xt'], Z_dict['cov_xt'])
+        R_m8_whiten = whiten_block(Z_dict['cov_x2'], Z_dict['cross_x2_xt'], Z_dict['cov_xt'])
+        P_m8_whiten = whiten_block(Z_dict['cov_x1'], Z_dict['cross_x1_x2'], Z_dict['cov_x2'])
         row1_m8 = torch.cat([torch.eye(n0, device=device), P_m8_whiten, Q_m8_whiten], dim=1)
         row2_m8 = torch.cat([P_m8_whiten.T, torch.eye(n1, device=device), R_m8_whiten], dim=1)
         row3_m8 = torch.cat([Q_m8_whiten.T, R_m8_whiten.T, torch.eye(n2, device=device)], dim=1)
@@ -135,8 +134,8 @@ def simulate_m7_m8_mi(
         
 
         #Graph Model M7 denominator
-        Q_m7_whiten = whiten_block(Z_dict['cov_x0'], Z_dict['cross_x0_x2'], Z_dict['cov_x2'])
-        R_m7_whiten = whiten_block(Z_dict['cov_x1'], Z_dict['cross_x1_x2'], Z_dict['cov_x2'])
+        Q_m7_whiten = whiten_block(Z_dict['cov_x1'], Z_dict['cross_x1_xt'], Z_dict['cov_xt'])
+        R_m7_whiten = whiten_block(Z_dict['cov_x2'], Z_dict['cross_x2_xt'], Z_dict['cov_xt'])
         P_m7 = Q_m7_whiten @ R_m7_whiten.T
         row1_m7 = torch.cat([torch.eye(n0,device=device), P_m7, Q_m7_whiten], dim=1)
         row2_m7 = torch.cat([P_m7.T, torch.eye(n1,device=device), R_m7_whiten], dim=1)
@@ -164,7 +163,8 @@ def simulate_m7_m8_mi(
         sim_config_m8['Sigma'] = Z_dict['full_cov']
         sim_config_m7['Sigma'] = Z
         sim_config_m7['p'] = P_m7.detach().clone()
-
+        
+        sim_config_m7['X1'],sim_config_m7['X2'],sim_config_m7['T'] = rv_list[0],rv_list[1],rv_list[2]
 
 
         bias_corr_func = sim_config['bias_correction_func']
@@ -179,7 +179,7 @@ def simulate_m7_m8_mi(
         mi_m8_corrected['deno'].append(deno8_raw - m8_bias_dict['deno'])
 
         mi_m7_corrected['mi'].append(mi_m7_raw - m7_bias_dict['mi'])
-        mi_m7_corrected['nume'].append(nume7_raw + m7_bias_dict['nume'])
+        mi_m7_corrected['nume'].append(nume7_raw - m7_bias_dict['nume'])
         mi_m7_corrected['deno'].append(deno7_raw - m7_bias_dict['deno'])
 
 
@@ -299,13 +299,14 @@ def calculate_bias(config: dict,m8:bool=False,m8_nume:bool=False,m8_deno:bool=Fa
     bias_x0 = logdet_wishart_bias(df, n0)
     bias_x1 = logdet_wishart_bias(df, n1)
     bias_y  = logdet_wishart_bias(df, n2)
-    
+
+    # M7 (Structural) Biases
+    bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
+    bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
+    bias_2 = bias_y # seperator 2
 
     if m7 or m7_deno:
-        # M7 (Structural) Biases
-        bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
-        bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
-        bias_2 = bias_y # seperator 2
+
 
         # M7 MI Bias = 0.5 * ( (B_pred_struct - B_marginals) - (B_joint_struct - B_marginals) )
         # Note: b_joint_m7 = b_c0 + b_c1 - b_sep
@@ -315,12 +316,7 @@ def calculate_bias(config: dict,m8:bool=False,m8_nume:bool=False,m8_deno:bool=Fa
         return {'bias': mi_bias_m7 if m7 else bias_m7}
     
     if m7_nume:
-        c0 = n0/(n_samples)
-        c1 = n1/(n_samples)
-        bias_m7_nume = (
-    -0.5 * torch.log(torch.tensor(1.0 - c0 - c1, dtype=torch.float64))
-    + 0.5 * c0 * torch.log(torch.tensor(1.0 - c1, dtype=torch.float64))
-    + 0.5 * c1 * torch.log(torch.tensor(1.0 - c0, dtype=torch.float64))).item()
+        bias_m7_nume = 0.5 * (bias_02 + bias_12 - bias_2 - bias_x0 - bias_x1)
         return {'bias': bias_m7_nume}
     
     # M8 (Saturated) Biases
@@ -347,13 +343,13 @@ def sort_m7_m8_results(results_list):
     for res in results_list:
         N = res['N']
         p = res['p']
-        mi_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_mi_mean'], 'std': res['M7_mi_std'], 'ground_truth': res['M7_mi_ground_truth']})
-        nome_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_nume_mean'], 'std': res['M7_nume_std'], 'ground_truth': res['M7_nume_ground_truth']})
-        deno_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_deno_mean'], 'std': res['M7_deno_std'], 'ground_truth': res['M7_deno_ground_truth']})
+        mi_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_mi_mean'], 'std': res['M7_mi_std'], 'ground_truth': res['M7_mi_ground_truth'],'emp_bias': res['M7_mi_emp_bias']})
+        nome_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_nume_mean'], 'std': res['M7_nume_std'], 'ground_truth': res['M7_nume_ground_truth'],'emp_bias': res['M7_nume_emp_bias']})
+        deno_m7_results_list.append({'N': N, 'p': p, 'mean': res['M7_deno_mean'], 'std': res['M7_deno_std'], 'ground_truth': res['M7_deno_ground_truth'],'emp_bias': res['M7_deno_emp_bias']})
 
-        mi_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_mi_mean'], 'std': res['M8_mi_std'], 'ground_truth': res['M8_mi_ground_truth']})
-        nome_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_nume_mean'], 'std': res['M8_nume_std'], 'ground_truth': res['M8_nume_ground_truth']})
-        deno_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_deno_mean'], 'std': res['M8_deno_std'], 'ground_truth': res['M8_deno_ground_truth']})
+        mi_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_mi_mean'], 'std': res['M8_mi_std'], 'ground_truth': res['M8_mi_ground_truth'],'emp_bias': res['M8_mi_emp_bias']})
+        nome_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_nume_mean'], 'std': res['M8_nume_std'], 'ground_truth': res['M8_nume_ground_truth'],'emp_bias': res['M8_nume_emp_bias']})
+        deno_m8_results_list.append({'N': N, 'p': p, 'mean': res['M8_deno_mean'], 'std': res['M8_deno_std'], 'ground_truth': res['M8_deno_ground_truth'],'emp_bias': res['M8_deno_emp_bias']})
 
     return [mi_m7_results_list, nome_m7_results_list, deno_m7_results_list], [mi_m8_results_list, nome_m8_results_list, deno_m8_results_list]
 
@@ -366,12 +362,12 @@ def simulation_wrapper(config: dict) -> dict:
     sim_func = simulate_m7_m8_mi
 
     #Set every bias correction function to it needs.
-    m8_bias_func = partial(calculate_bias,m8=True,bias_correction=False)
-    m7_bias_func = partial(calculate_bias, m7=True, bias_correction=False)
-    m8_nume_fuc = partial(calculate_bias,m8_nume=True, bias_correction=False)
-    m8_deno_func = partial(calculate_bias, m8_deno=True, bias_correction=False)
-    m7_nume_func = partial(calculate_bias,m7_nume = True, bias_correction=False) #Assume no bias or numerator (NOT)
-    m7_deno_func = partial(calculate_bias,m7_deno=True, bias_correction=False)
+    m8_bias_func = partial(calculate_bias,m8=True)
+    m7_bias_func = partial(calculate_bias, m7=True)
+    m8_nume_fuc = partial(calculate_bias,m8_nume=True)
+    m8_deno_func = partial(calculate_bias, m8_deno=True)
+    m7_nume_func = partial(permutation_null_debias,func=partial(permuteation_debiased,term='nume')) #Assume no bias or numerator (NOT)
+    m7_deno_func = partial(calculate_bias,m7_deno=True)
 
     bias_corr_func = {'M8': {'mi': m8_bias_func,'nume': m8_nume_fuc, 'deno': m8_deno_func}, 
                       'M7': {'mi': m7_bias_func, 'nume': m7_nume_func, 'deno': m7_deno_func}}
@@ -385,7 +381,7 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
     
-    exp_name = 'NoBias_bigtest'
+    exp_name = '2.0Nume_permutation_debias'
     yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
     folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/MI_sim2.0"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")
@@ -394,7 +390,6 @@ if __name__ == "__main__":
         super_config = yaml.safe_load(f)
 
         config = super_config['Mutual_Information_Simulation']
-
         n_p_config = super_config['N_P_variations']
         p_values = n_p_config['p_values']
         N_values = n_p_config['N_values']

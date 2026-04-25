@@ -5,7 +5,6 @@ import yaml
 import sys
 from pathlib import Path
 
-
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import *
@@ -86,25 +85,18 @@ def safe_logdet(A: torch.Tensor) -> float:
 
 
 
-def logdet_wishart_bias(df: int, d: int) -> float:
-    """
-    Exact finite-sample bias for log|S| when S is the unbiased sample covariance
-    from Gaussian data and (df) * S ~ Wishart_d(Sigma, df).
 
-    Returns
-    -------
-    bias : float
-        E[log|S|] - log|Sigma|
-    """
-    if df <= d - 1:
-        raise ValueError(f"Need df > d-1. Got df={df}, d={d}.")
 
-    i = torch.arange(1, d + 1, dtype=torch.float64)
-    term = torch.special.digamma((df - i + 1) / 2.0)
+def np_safe_logdet(A, eps=1e-8):
+    """Stable logdet for covariance matrices."""
+    A = A + eps * np.eye(A.shape[0])
+    sign, val = np.linalg.slogdet(A)
+    if sign <= 0:
+        raise ValueError("Matrix is not positive definite.")
+    return val
 
-    bias = torch.sum(term) + d * torch.log(torch.tensor(2.0 / df, dtype=torch.float64))
 
-    return bias.item()
+
 
 
 def calcualte_mi(config,sigma_dict):
@@ -127,7 +119,7 @@ def calcualte_mi(config,sigma_dict):
     mi_tri = (nume_raw - deno_raw).item()
     mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.T @ Q)))
     mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.T @ R)))
-    return {"mi": mi_tri,'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
+    return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
 
 
 def calculate_mi_lr(config,sigma_dict):
@@ -151,7 +143,7 @@ def calculate_mi_lr(config,sigma_dict):
     device = config['device']
 
     joint_cov_x1_x2 = sigma_dict['joint_x1_x2']
-# Solve the linear system instead of explicitly inverting cov_xt
+    # Solve the linear system instead of explicitly inverting cov_xt
     solve_x1 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x1_xt'].T)
     solve_x2 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x2_xt'].T)
 
@@ -185,3 +177,5 @@ def mi_wrapper(config,sigma_dict,whiten_terms_dict,tri_variate=True):
         return calculate_mi_lr(config,sigma_dict)
     else:
         raise ValueError(f"Invalid mi_type: {mi_type}. Must be either 'not_whiten' or 'lr'.")
+    
+

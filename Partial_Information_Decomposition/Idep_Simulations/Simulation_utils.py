@@ -9,7 +9,7 @@ import os
 from shrinkaging import ledoit_wolf_cov, oracle_shrinkage_cov, shrunk_cov
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from calculations_functions import safe_logdet
+from mi_functions import safe_logdet
 from PID_util import *
 import pandas as pd
 
@@ -109,20 +109,27 @@ def build_m8_terms(config, cov_dict,whiten:bool='whiten_ver'):
     n1 = config['n1']
     n2 = config['n2']
     device = config.get('device', 'cpu')
-    if whiten == 'whiten_ver':
-        P = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x1'], cov_dict['cov_x1'])
-        Q = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x2'], cov_dict['cov_x2'])
-        R = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
 
-    elif whiten == True: #If everything is already whitened 
-        P = cov_dict['cross_x0_x1']
-        Q = cov_dict['cross_x0_x2']
-        R = cov_dict['cross_x1_x2']
+    if whiten == 'False':
+        P = cov_dict['cross_x1_x2']
+        Q = cov_dict['cross_x1_xt']
+        R = cov_dict['cross_x2_xt']
+        
+    elif whiten == 'whiten_ver':
+        P = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
+        Q = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
+        R = whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
+
+    elif whiten == 'True': #If everything is already whitened 
+        P = cov_dict['cross_x1_x2']
+        Q = cov_dict['cross_x1_xt']
+        R = cov_dict['cross_x2_xt']
 
     row1_m8 = torch.cat([torch.eye(n0, device=device), P, Q], dim=1)
     row2_m8 = torch.cat([P.T, torch.eye(n1, device=device), R], dim=1)
     row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=device)], dim=1)
-    m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+
+    m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=0) if whiten != 'False' else cov_dict['full_cov']
 
     return {'P': P,
         'Q': Q,
@@ -144,27 +151,32 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver'):
     n2 = config['n2']
 
     device = config.get('device', 'cpu')
-    if whiten == 'whiten_ver':
-        Q = whiten_block(cov_dict['cov_x0'], cov_dict['cross_x0_x2'], cov_dict['cov_x2'])
-        R = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
+    if whiten == 'False':
+        Q = cov_dict['cross_x1_xt']
+        R = cov_dict['cross_x2_xt']
+        cov_tt = cov_dict['cov_xt'] 
+
+    elif whiten == 'whiten_ver':
+        Q = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
+        R = whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
         cov_tt = torch.eye(n2,device=device)
-    elif whiten== True: #If everything is already whitened
-        Q = cov_dict['cross_x0_x2']
-        R = cov_dict['cross_x1_x2']
-        cov_tt = cov_dict['cov_x2'] #IDentity matrix
+    elif whiten== 'True': #If everything is already whitened
+        Q = cov_dict['cross_x1_xt']
+        R = cov_dict['cross_x2_xt']
+        cov_tt = cov_dict['cov_xt'] #IDentity matrix
         assert torch.allclose(cov_tt, torch.eye(n2, device=device).to(dtype=cov_tt.dtype)), "Expected cov_x2 to be identity when whiten is True."
 
-    else:
-        Q = cov_dict['cross_x0_x2']
-        R = cov_dict['cross_x1_x2']
-        cov_tt = cov_dict['cov_x2'] #IDentity matrix
+    cov_11 = torch.eye(n0, device=device) if whiten != 'False' else cov_dict['cov_x1']
+    cov_22 = torch.eye(n1, device=device) if whiten != 'False' else cov_dict['cov_x2']
+    cov_tt = torch.eye(n2, device=device) if whiten != 'False' else cov_dict['cov_xt']
+
 
     tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
     P_m7 = Q @ tt_inv @ R.T
     
-    row1_m7 = torch.cat([torch.eye(n0,device=device), P_m7, Q], dim=1)
-    row2_m7 = torch.cat([P_m7.T, torch.eye(n1,device=device), R], dim=1)
-    row3_m7 = torch.cat([Q.T, R.T, torch.eye(n2,device=device)], dim=1)   
+    row1_m7 = torch.cat([cov_11, P_m7, Q], dim=1)
+    row2_m7 = torch.cat([P_m7.T, cov_22, R], dim=1)
+    row3_m7 = torch.cat([Q.T, R.T, cov_tt], dim=1)   
     m7_Sigma = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
     return {'P': P_m7,
         'Q': Q,
@@ -188,7 +200,7 @@ def on_covariance(config,data):
     cov_list = []
     on_cov = config['on_covariance'] #Check for srhinkage method 
     if on_cov == 'False':
-        return covariance_matrix
+        return {'cov': covariance_matrix}
     
     if covariance_matrix.ndim == 2:
         covariance_matrix = covariance_matrix.unsqueeze(0)
@@ -258,9 +270,9 @@ def mi_bias_calc(config:dict):
     bias_dict ={}
     for st,bc_func in zip(bias_corr_funcs_model.keys(), bias_corr_funcs_model.values()):
         config['st'] = st
-        bias = bc_func(config)
+        bias = bc_func(config=config)
         if type(bias) == dict:
-            bias = bias[st]
+            bias = bias['bias']
         bias_dict[st] = bias
     return bias_dict
 
