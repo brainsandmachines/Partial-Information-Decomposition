@@ -5,6 +5,7 @@ import yaml
 import sys
 from pathlib import Path
 
+
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import *
@@ -99,7 +100,7 @@ def np_safe_logdet(A, eps=1e-8):
 
 
 
-def calcualte_mi(config,sigma_dict):
+def calcualte_mi(config,sigma_dict,term='full'):
     """This function calculates the tri-variate mutual information using the covariance 
     matrices and the formula MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)"""
     n0 = config['n0']
@@ -120,6 +121,37 @@ def calcualte_mi(config,sigma_dict):
     mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.T @ Q)))
     mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.T @ R)))
     return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
+
+
+def para_calcualte_mi(config,sigma_dict,term='full',assumed_whitened = True):
+    """This function calculates the tri-variate mutual information using the for 
+    multiple covariances 
+    matrices and the formula MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)"""
+    assert sigma_dict.keys() == {'P', 'Q', 'R', 'Sigma'}, f"Expected keys 'P', 'Q', 'R', 'Sigma' in sigma_dict, got {sigma_dict.keys()}"
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    device = config['device']
+
+    Q = sigma_dict['Q']
+    R = sigma_dict['R']
+    P = sigma_dict['P']
+    sigma = sigma_dict['Sigma']
+    nume_raw = 0.5*safe_logdet((torch.eye(n1, device=device) - (P.mT @ P)))
+    deno_q = torch.eye(n2, device=device)-(Q.mT @ Q)
+    deno_r = torch.eye(n2, device=device)-(R.mT @ R)
+    deno_raw = 0.5*safe_logdet(sigma)
+
+    mi_tri = (nume_raw - deno_raw)
+    mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.mT @ Q)))
+    mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.mT @ R)))
+    
+    all_terms_dict = {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2,'nume': nume_raw,'deno': deno_raw}
+    if term == 'full':
+        return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
+    else:
+        return {term: all_terms_dict[term]}
+
 
 
 def calculate_mi_lr(config,sigma_dict):

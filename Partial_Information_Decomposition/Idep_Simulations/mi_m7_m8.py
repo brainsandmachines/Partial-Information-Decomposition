@@ -8,6 +8,7 @@ import argparse
 import yaml
 from functools import partial
 # Import all existing utilities from the user's module
+
 from Simulation_utils import *
 from wrapper_M7_M8_models import simulation
 from Simulation_utils import *
@@ -19,6 +20,7 @@ sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
 from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
 from Partial_Information_Decomposition.bias_functions import logdet_wishart_bias, permutation_null_debias, permuteation_debiased
+from mi_functions import calcualte_mi,para_calcualte_mi
 def simulate_m7_m8_mi(
     data: list,
     sim_config: dict,
@@ -154,8 +156,8 @@ def simulate_m7_m8_mi(
         sim_config_m8['sample_statistic'] = {'mi': mi_m8_raw, 'nume': nume8_raw, 'deno': deno8_raw}
         sim_config_m7['sample_statistic'] = {'mi': mi_m7_raw, 'nume': nume7_raw, 'deno': deno7_raw}
 
-        sim_config_m8['calc_statistic_func'] = mi_calculation_from_cov
-        sim_config_m7['calc_statistic_func'] = mi_calculation_from_cov
+        #sim_config_m8['calc_statistic_func'] = mi_calculation_from_cov
+        #sim_config_m7['calc_statistic_func'] = mi_calculation_from_cov
 
         sim_config_m8['rvs_list'] = rv_list
         sim_config_m7['rvs_list'] = rv_list
@@ -363,11 +365,11 @@ def simulation_wrapper(config: dict) -> dict:
 
     #Set every bias correction function to it needs.
     m8_bias_func = partial(calculate_bias,m8=True)
-    m7_bias_func = partial(calculate_bias, m7=True)
+    m7_bias_func = partial(calculate_bias,m7=True)
     m8_nume_fuc = partial(calculate_bias,m8_nume=True)
     m8_deno_func = partial(calculate_bias, m8_deno=True)
-    m7_nume_func = partial(permutation_null_debias,func=partial(permuteation_debiased,term='nume')) #Assume no bias or numerator (NOT)
-    m7_deno_func = partial(calculate_bias,m7_deno=True)
+    m7_nume_func = partial(bias_resampling,calc_func = partial(para_calcualte_mi,term='nume'))
+    m7_deno_func = partial(calculate_bias, m7_deno=True)
 
     bias_corr_func = {'M8': {'mi': m8_bias_func,'nume': m8_nume_fuc, 'deno': m8_deno_func}, 
                       'M7': {'mi': m7_bias_func, 'nume': m7_nume_func, 'deno': m7_deno_func}}
@@ -381,7 +383,7 @@ def simulation_wrapper(config: dict) -> dict:
 if __name__ == "__main__":
     print("Running m7_whiten and M8 Simulation Mutual Information comparison simulation...")
     
-    exp_name = '2.0Nume_permutation_debias'
+    exp_name = 'MI>0_nume_bootstrap_debias'
     yaml_file = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml"
     folder_path = f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/MI_sim2.0"
     save_path = pathlib.Path(f"{folder_path}/{exp_name}")

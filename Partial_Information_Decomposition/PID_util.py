@@ -152,9 +152,55 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
 
     return cov_dict
 
-
-
 def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
+    """This function will create the covariance matrix for the three variables M1,M2,T
+
+    output: a len(rvs)*len(rvs)*p covariance matrix"""
+
+    
+    cov_dict = {}
+    if verbose:
+        print(f"\nFull covariance matrix shape: {Sigmas.shape}")
+
+    x1_dim = dims[0]
+    x2_dim = dims[1]
+    xt_dim = dims[2] if len(dims) == 3 else 0
+
+
+    dt_dx2 = x2_dim + xt_dim
+    dx1_dx2 = x1_dim + x2_dim
+    d_all = x1_dim + x2_dim + xt_dim
+
+    #Full covariance matrix
+    cov_dict['full_cov'] = Sigmas #Full covariance matrix ΣX1X2T
+    #Cross-Covariances:
+    cov_dict['cross_x1_x2'] = Sigmas[:,0:x1_dim, x1_dim:dx1_dx2] #ΣX1,X2   
+    #Auto-Covariances
+    cov_dict['cov_x1'] = Sigmas[:,0:x1_dim, 0:x1_dim] #ΣX1
+    cov_dict['cov_x2'] = Sigmas[:,x1_dim:dx1_dx2, x1_dim:dx1_dx2] #ΣX2
+   
+    cov_dict['joint_x1_x2'] = Sigmas[:,0:dx1_dx2, 0:dx1_dx2]  #ΣX1X2
+
+
+    if ( len(dims) == 3):
+        #Cross-Covariances:
+        cov_dict['cross_x2_xt'] = Sigmas[:,x1_dim:dx1_dx2, dx1_dx2:d_all]#ΣX2,XT
+        cov_dict['cross_x2t_x1'] = Sigmas[:,x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
+        cov_dict['cross_x1_xt'] = Sigmas[:,0:x1_dim, dx1_dx2:d_all] #ΣX1,XT
+
+        #Auto-Covariances:
+        cov_dict['joint_x2_xt'] = Sigmas[:,x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
+        cov_dict['cov_xt'] = Sigmas[:,dx1_dx2:d_all, dx1_dx2:d_all] #ΣXT
+
+        ##ΣX1,XT:
+        a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_xt']),dim=2)
+        b = torch.cat((cov_dict['cross_x1_xt'].mT, cov_dict['cov_xt']),dim=2)
+        cov_dict['joint_x1_xt'] = torch.cat((a,b),dim=1)
+
+
+    return cov_dict
+
+def old_para_create_cov_matrix(dims,Sigmas=None,verbose=False):
     """This function will create the covariance matrix for the three variables M1,M2,T
     input: M1,M2,T are torch tensors of shape (N,p) 
     rvs is a list of the three variables [M1,M2,T]
@@ -229,6 +275,8 @@ def para_whiten_block(
     where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
     Supports batched inputs of shape (N, d, d).
     """
+    if Sigma_xx.ndim == 2 and Sigma_yy.ndim == 2 and Sigma_xy.ndim == 2:
+        return whiten_block(Sigma_xx, Sigma_xy, Sigma_yy)
     # Use .mT to transpose only the last two dimensions (matrix transpose)
     Ux = torch.linalg.cholesky(Sigma_xx).mT
     Uy = torch.linalg.cholesky(Sigma_yy).mT

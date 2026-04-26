@@ -6,7 +6,7 @@ import os
 import time
 from pathlib import Path
 from PID_util import *
-from Idep_Simulations.Simulation_utils import on_covariance
+from Idep_Simulations.Simulation_utils import build_m7_terms, build_m8_terms, on_covariance
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from PID_util import *
@@ -102,7 +102,7 @@ def bootstrap_func(config: dict, cov_bootstrap: torch.Tensor, calculate_statisti
     bias_dict = {}
     config_bootstrap = config.copy()
     config_bootstrap['Sigma'] = cov_bootstrap
-    values_dict = calculate_statistic_func(config_bootstrap)
+    values_dict = calculate_statistic_func(config_bootstrap,cov_bootstrap)
     for key in values_dict.keys():
         values = values_dict[key]
         if not torch.is_tensor(values):
@@ -158,52 +158,26 @@ def bootstrap_resample(config: dict) -> list:
     dist = torch.distributions.MultivariateNormal(mean, covariance_matrix=Sigma_model)
     samples = dist.sample((B, N))
     cov_list = []
-    for sample in samples: 
-        cov = torch.cov(sample.T, correction=1)
-        cov_list.append(cov)
-    cov_bootstrap = torch.stack(cov_list, dim=0)
-    #centered = samples - samples.mean(dim=1, keepdim=True)
-    #cov_bootstrap = samples.transpose(1, 2) @ samples / (N - 1)
+
+    centered = samples - samples.mean(dim=1, keepdim=True)
+    cov_bootstrap = centered.transpose(1, 2) @ centered / (N - 1)
     
-    cov_bootstrap = on_covariance(config,cov_bootstrap)
+    cov_bootstrap = on_covariance(config,cov_bootstrap)['cov']
     cov_bootstrap_dict = para_create_cov_matrix(
         [config['n0'], config['n1'], config['n2']],
         cov_bootstrap,
     )
     cov_bootstrap_whitened = bootstrap_whiten(config, cov_bootstrap_dict)
-    return Sigma_model, cov_bootstrap_whitened
+    return Sigma_model, cov_bootstrap_dict, cov_bootstrap_whitened
 
 
 
 def bootstrap_whiten(config: dict, cov_dict: dict) -> torch.Tensor:
     """Project batched covariance estimates onto the M7/M8 whitened model space."""
     device = config.get('device', 'cpu')
+    if config['model'] == 'M8':
+        terms_dict = build_m8_terms(config, cov_dict, whiten='whiten_ver', para=True)
 
-    Q = para_whiten_block(
-        cov_dict['cov_x0'],
-        cov_dict['cross_x0_x2'],
-        cov_dict['cov_x2'],
-    ).to(device)
-    R = para_whiten_block(
-        cov_dict['cov_x1'],
-        cov_dict['cross_x1_x2'],
-        cov_dict['cov_x2'],
-    ).to(device)
-    P = para_whiten_block(
-        cov_dict['cov_x0'],
-        cov_dict['cross_x0_x1'],
-        cov_dict['cov_x1'],
-    ).to(device)
-
-    if config['model'] == 'M7':
-        P = Q @ R.mT
-
-    batch_size = P.shape[0]
-    I0 = torch.eye(config['n0'], dtype=torch.float64, device=device).repeat(batch_size, 1, 1)
-    I1 = torch.eye(config['n1'], dtype=torch.float64, device=device).repeat(batch_size, 1, 1)
-    I2 = torch.eye(config['n2'], dtype=torch.float64, device=device).repeat(batch_size, 1, 1)
-
-    row1 = torch.cat([I0, P, Q], dim=-1)
-    row2 = torch.cat([P.mT, I1, R], dim=-1)
-    row3 = torch.cat([Q.mT, R.mT, I2], dim=-1)
-    return torch.cat([row1, row2, row3], dim=-2)
+    else:
+        terms_dict = build_m7_terms(config, cov_dict, whiten='whiten_ver', para=True)
+    return terms_dict

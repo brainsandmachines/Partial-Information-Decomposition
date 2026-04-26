@@ -96,7 +96,7 @@ def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) 
     return sample_cov,rv_list # Unbiased estimator with N-1 in the denominator
 
 
-def build_m8_terms(config, cov_dict,whiten:bool='whiten_ver'):
+def build_m8_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
     '''Build the covariance matrix for M7 using the specified covariance dictionary.
     input: 
     config - a dictionary with keys 'n0', 'n1', 'n2' and 'device
@@ -125,19 +125,27 @@ def build_m8_terms(config, cov_dict,whiten:bool='whiten_ver'):
         Q = cov_dict['cross_x1_xt']
         R = cov_dict['cross_x2_xt']
 
-    row1_m8 = torch.cat([torch.eye(n0, device=device), P, Q], dim=1)
-    row2_m8 = torch.cat([P.T, torch.eye(n1, device=device), R], dim=1)
-    row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=device)], dim=1)
+    if not para:
+        row1_m8 = torch.cat([torch.eye(n0, device=device), P, Q], dim=1)
+        row2_m8 = torch.cat([P.T, torch.eye(n1, device=device), R], dim=1)
+        row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=device)], dim=1)
 
-    m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=0) if whiten != 'False' else cov_dict['full_cov']
+        m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=0) if whiten != 'False' else cov_dict['full_cov']
+    else:
+        assert len(cov_dict['full_cov'].shape) == 3, "Expected full_cov to have shape (B, d, d) for parallel M8 construction."
+        batch_size = cov_dict['cov_x1'].shape[0]
+        row1_m8 = torch.cat([torch.eye(n0, device=device).repeat(batch_size, 1, 1), P, Q], dim=2)
+        row2_m8 = torch.cat([P.mT, torch.eye(n1, device=device).repeat(batch_size, 1, 1), R], dim=2)
+        row3_m8 = torch.cat([Q.mT, R.mT, torch.eye(n2, device=device).repeat(batch_size, 1, 1)], dim=2)
 
+        m8_Sigma = torch.cat([row1_m8, row2_m8, row3_m8], dim=1) if whiten != 'False' else cov_dict['full_cov']
     return {'P': P,
         'Q': Q,
         'R': R,
         'Sigma': m8_Sigma}
 
 
-def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver'):
+def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
     '''Build the covariance matrix for M7 using the specified covariance dictionary.
     input: 
     config - a dictionary with keys 'n0', 'n1', 'n2' and 'device
@@ -157,27 +165,45 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver'):
         cov_tt = cov_dict['cov_xt'] 
 
     elif whiten == 'whiten_ver':
-        Q = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
-        R = whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
+        Q = para_whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
+        R = para_whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
         cov_tt = torch.eye(n2,device=device)
     elif whiten== 'True': #If everything is already whitened
         Q = cov_dict['cross_x1_xt']
         R = cov_dict['cross_x2_xt']
         cov_tt = cov_dict['cov_xt'] #IDentity matrix
         assert torch.allclose(cov_tt, torch.eye(n2, device=device).to(dtype=cov_tt.dtype)), "Expected cov_x2 to be identity when whiten is True."
-
-    cov_11 = torch.eye(n0, device=device) if whiten != 'False' else cov_dict['cov_x1']
-    cov_22 = torch.eye(n1, device=device) if whiten != 'False' else cov_dict['cov_x2']
-    cov_tt = torch.eye(n2, device=device) if whiten != 'False' else cov_dict['cov_xt']
-
-
-    tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
-    P_m7 = Q @ tt_inv @ R.T
     
-    row1_m7 = torch.cat([cov_11, P_m7, Q], dim=1)
-    row2_m7 = torch.cat([P_m7.T, cov_22, R], dim=1)
-    row3_m7 = torch.cat([Q.T, R.T, cov_tt], dim=1)   
-    m7_Sigma = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
+    if not para:
+        cov_11 = torch.eye(n0, device=device) if whiten != 'False' else cov_dict['cov_x1']
+        cov_22 = torch.eye(n1, device=device) if whiten != 'False' else cov_dict['cov_x2']
+        cov_tt = torch.eye(n2, device=device) if whiten != 'False' else cov_dict['cov_xt']
+
+
+        tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
+        P_m7 = Q @ tt_inv @ R.T
+        
+        row1_m7 = torch.cat([cov_11, P_m7, Q], dim=1)
+        row2_m7 = torch.cat([P_m7.T, cov_22, R], dim=1)
+        row3_m7 = torch.cat([Q.T, R.T, cov_tt], dim=1)   
+        m7_Sigma = torch.cat([row1_m7, row2_m7, row3_m7], dim=0)
+
+    else:
+        assert len(cov_dict['full_cov'].shape) == 3, "Expected full_cov to have shape (B, d, d) for parallel M7 construction."
+        batch_size = cov_dict['cov_x1'].shape[0]
+        cov_11 = torch.eye(n0, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x1']
+        cov_22 = torch.eye(n1, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x2']
+        cov_tt = torch.eye(n2, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_xt']
+
+
+        tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
+        P_m7 = Q @ tt_inv @ R.mT
+        
+        row1_m7 = torch.cat([cov_11, P_m7, Q], dim=2)
+        row2_m7 = torch.cat([P_m7.mT, cov_22, R], dim=2)
+        row3_m7 = torch.cat([Q.mT, R.mT, cov_tt], dim=2)   
+        m7_Sigma = torch.cat([row1_m7, row2_m7, row3_m7], dim=1)
+
     return {'P': P_m7,
         'Q': Q,
         'R': R,
@@ -196,7 +222,7 @@ def on_covariance(config,data):
     
     Output: the covariance matrix after applying the function on it."""
 
-    covariance_matrix, _ = data
+    covariance_matrix = data
     cov_list = []
     on_cov = config['on_covariance'] #Check for srhinkage method 
     if on_cov == 'False':
@@ -230,17 +256,17 @@ def on_covariance(config,data):
 
 
 
-def mi_calculation_from_cov(nume_matrix,denoq_matrix,denor_matrix,only_mi=False ) -> float:
-    """
-    Compute MI from covariance matrices using the formula:
-    MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)
-    """
-    logdet_deno = 0.5*safe_logdet(denoq_matrix) + 0.5*safe_logdet(denor_matrix)
-    logdet_nume = 0.5*safe_logdet(nume_matrix)
-    if only_mi:
-        return logdet_nume - logdet_deno
-    mi = (logdet_nume - logdet_deno)
-    return mi.item(),logdet_deno.item(), logdet_nume.item()
+# def mi_calculation_from_cov(nume_matrix,denoq_matrix,denor_matrix,only_mi=False ) -> float:
+#     """
+#     Compute MI from covariance matrices using the formula:
+#     MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)
+#     """
+#     logdet_deno = 0.5*safe_logdet(denoq_matrix) + 0.5*safe_logdet(denor_matrix)
+#     logdet_nume = 0.5*safe_logdet(nume_matrix)
+#     if only_mi:
+#         return logdet_nume - logdet_deno
+#     mi = (logdet_nume - logdet_deno)
+#     return mi.item(),logdet_deno.item(), logdet_nume.item()
 
 
 
@@ -272,7 +298,10 @@ def mi_bias_calc(config:dict):
         config['st'] = st
         bias = bc_func(config=config)
         if type(bias) == dict:
-            bias = bias['bias']
+            try:
+                bias = bias['bias']
+            except KeyError:
+                bias = bias[st]
         bias_dict[st] = bias
     return bias_dict
 

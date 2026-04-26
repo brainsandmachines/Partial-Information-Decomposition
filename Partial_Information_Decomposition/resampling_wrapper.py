@@ -76,8 +76,8 @@ def bias_resampling(config:dict,calc_func:callable=None) -> dict:
 
     calc_func = config['calc_statistic_func'] if calc_func is None else calc_func
 
-    _,resample_pop = resample_method(config)
+    _,resample_pop,resample_pop_whitened = resample_method(config)
 
-    bias = bias_func(config,resample_pop,calc_func)
+    bias = bias_func(config,resample_pop_whitened,calc_func)
 
     return bias
