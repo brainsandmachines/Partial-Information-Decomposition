@@ -63,7 +63,8 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
                 row[f"{key}_ground_truth"] = results_dict[key]['ground_truth']
                 row[f"{key}_emp_bias"] = results_dict[key]['emp_bias']
                 row[f"{key}_after_corr_bias"] = results_dict[key]['after_corr_bias']
-
+                row[f"{key}_var"] = results_dict[key]['var']
+                row[f"{key}_mse"] = results_dict[key]['mse']
             all_results.append(row)
             print(f"Completed combination N={N}, p={p} ({i}/{len_N * len_P})")
             i += 1
@@ -306,6 +307,9 @@ def mi_bias_calc(config:dict):
     return bias_dict
 
 
+
+
+
 def para_nume_logdet(config,Sigmas: torch.Tensor) -> float:
     """Helper function to compute log determinant of the numerator covariance matrix."""
     n0 = config['n0']
@@ -372,6 +376,8 @@ def plot_heatmap_mean_std(
     std_col="std",
     emp_bias_col="emp_bias",
     ground_truth_col="ground_truth",
+    var_col="var",
+    mse_col="mse",
     title=None,
     cmap="viridis",
     figsize=(8, 6),
@@ -418,6 +424,8 @@ def plot_heatmap_mean_std(
     std_mat = df.pivot_table(index=y_col, columns=x_col, values=std_col, aggfunc="mean")
     ground_truth_mat = df.pivot_table(index=y_col, columns=x_col, values=ground_truth_col, aggfunc="mean")
     emp_bias = df.pivot_table(index=y_col, columns=x_col, values=emp_bias_col, aggfunc="mean")
+    var_mat = df.pivot_table(index=y_col, columns=x_col, values=var_col, aggfunc="mean")
+    mse_mat = df.pivot_table(index=y_col, columns=x_col, values=mse_col, aggfunc="mean")
     # Sort axes numerically
     mean_mat = mean_mat.sort_index()
     mean_mat = mean_mat.reindex(sorted(mean_mat.columns), axis=1)
@@ -425,6 +433,8 @@ def plot_heatmap_mean_std(
     std_mat = std_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
     ground_truth_mat = ground_truth_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
     emp_bias = emp_bias.reindex(index=mean_mat.index, columns=mean_mat.columns)
+    var_mat = var_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
+    mse_mat = mse_mat.reindex(index=mean_mat.index, columns=mean_mat.columns)
     data = mean_mat.to_numpy(dtype=float)
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -457,7 +467,7 @@ def plot_heatmap_mean_std(
             elif pd.isna(s):
                 text = f"{m:{mean_fmt}}\n\nGT={gt:{mean_fmt}}"
             else:
-                text = f"{m:{mean_fmt}}\n±{s:{std_fmt}}\n\nGT={gt:{mean_fmt}}\n\nEB={eb:{mean_fmt}}"
+                text = f"{m:{mean_fmt}}\n±{s:{std_fmt}}\n\nGT={gt:{mean_fmt}}\n\nEB={eb:{mean_fmt}}\n\nVar={var_mat.iloc[i, j]:{mean_fmt}}\n\nMSE={mse_mat.iloc[i, j]:{mean_fmt}}"
 
             ax.text(
                 j,

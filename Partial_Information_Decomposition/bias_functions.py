@@ -86,7 +86,7 @@ def permutation_null_debias(config,func):
 
     if n_perm == 0:
         return {
-            "debiased": None,
+            "debiased": 0.0,
             "perm_mean": 0.0,
             "perm_std": 0.0,
             "perm_se": 0.0,
@@ -123,3 +123,24 @@ def permutation_null_debias(config,func):
         "perm_values": perm_values,
         "n_perm": n_perm,
     }
+
+
+
+def unique_bias(config,functions_dict:dict = None):
+
+    nodes = {'M7':['i','h'],'M8':['k','j']} #The unique nodes for each model, used to extract the relevant bias correction for each statistic
+    assert type(functions_dict) == dict, "Expected bias_corr_func to be a dict with keys 'M7' and 'M8'."
+    
+    bias_dict ={}
+    for model,bc_func in zip(nodes.keys(), functions_dict.values()):
+        config['model'] = model
+        bias = bc_func(config=config,model=model)
+
+        node_0 = nodes[model][0] # i or k depending on the model
+        node_1 = nodes[model][1] # h or j depending on the model
+
+        bias_dict[node_0] = bias[node_0]
+        bias_dict[node_1] = bias[node_1]
+
+        
+    return bias_dict

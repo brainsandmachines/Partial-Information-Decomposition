@@ -18,7 +18,6 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
-from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
 from Partial_Information_Decomposition.bias_functions import logdet_wishart_bias, permutation_null_debias, permuteation_debiased
 from mi_functions import calcualte_mi,para_calcualte_mi
 def simulate_m7_m8_mi(

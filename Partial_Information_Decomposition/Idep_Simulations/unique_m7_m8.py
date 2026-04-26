@@ -17,9 +17,8 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
-from Partial_Information_Decomposition.numertaor_m7_bias import  bias_m7_nume_second_order
-from Partial_Information_Decomposition.mi_functions import mi_calculation_not_whiten,safe_logdet,logdet_wishart_bias,mi_wrapper
-
+from Partial_Information_Decomposition.mi_functions import mi_calculation_not_whiten,safe_logdet,mi_wrapper
+from Partial_Information_Decomposition.bias_functions import permuteation_debiased,unique_bias,permutation_null_debias,logdet_wishart_bias
 
 def simulate_m7_m8_idep(
     data: list,
@@ -43,8 +42,8 @@ def simulate_m7_m8_idep(
     n2 = sim_config['n2']
     n_trials = sim_config['n_trials']
     device = sim_config['device']
-    analytic_bias_correction = sim_config['analytic_bias_correction']
-    resample_bias_correction = sim_config['resample_bias_correction']
+    bias_correction = sim_config['bias_correction']
+    
     if n_samples < 3:
             raise ValueError("Need at least 3 samples.")
 
@@ -95,12 +94,6 @@ def simulate_m7_m8_idep(
 
     pid_config = sim_config.copy()
 
-    if analytic_bias_correction:
-        bias_calc_func = sim_config['bias_correction_func']
-        m7_analytic_bias = calculate_bias(sim_config, m7=True, bias_correction=True)['bias']
-        m8_analytic_bias = calculate_bias(sim_config, m8=True, bias_correction=True)['bias']
-        m1_t_analytic_bias = 0.5*logdet_wishart_bias(df, n0) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n0+n2)
-        m2_t_analytic_bias = 0.5*logdet_wishart_bias(df, n1) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n1+n2)
 
     for i in range(n_trials):
         print(f"Trial {i+1}/{n_trials}", end="\r")
@@ -108,14 +101,14 @@ def simulate_m7_m8_idep(
 
         # Sample data
         data_raw = sample_data_from_cov(sim_config,m8_true_cov,rng=rng) # (sample_cov,rv_list)
-        inter_vars  = intermediate_func(sim_config,data_raw) #Intermediate function can be used to apply shrinkage or other covariance transformations before calculating the sample covariance. It should return the transformed data and the corresponding RV list.
+        inter_vars  = intermediate_func(sim_config,data_raw[0]) #Intermediate function can be used to apply shrinkage or other covariance transformations before calculating the sample covariance. It should return the transformed data and the corresponding RV list.
         Z = inter_vars.get('cov', data_raw[0]) #If the intermediate function does not return a new covariance, use the original one from data_raw.
         rv_list = inter_vars.get('rv_list', data_raw[1]) #If the intermediate function does not return a new rv_list, use the original one from data_raw.
         Z_dict = inter_vars.get('cov_dict', create_cov_matrix(Sigma=Z, dims=[n0, n1, n2]))
 
         Z = Z.squeeze(0) if Z.ndim == 3 and Z.shape[0] == 1 else Z
 
-        Z_raw_dict = create_cov_matrix(Sigma=data_raw[0], dims=[n0, n1, n2])
+        Z_raw_dict = create_cov_matrix(Sigma=Z, dims=[n0, n1, n2])
         #Graph Model M8 
         m8_sample = build_m8_terms(sim_config, Z_dict, whiten='whiten_ver') 
         
@@ -134,18 +127,17 @@ def simulate_m7_m8_idep(
         i_x1_t_raw = mi_bi_dict['mi_bi_1']
         i_x2_t_raw = mi_bi_dict['mi_bi_2']
 
-        
-        if analytic_bias_correction:
-            i_bias = (m7_analytic_bias - m2_t_analytic_bias)
-            k_bias = (m8_analytic_bias - m2_t_analytic_bias)
-            h_bias = (m7_analytic_bias - m1_t_analytic_bias)
-            j_bias = (m8_analytic_bias - m1_t_analytic_bias)
-        
+
+        sim_config['M8_raw'] = mi_m8_dict
+        sim_config['M7_raw'] = mi_m7_dict
+        sim_config['X1'],sim_config['X2'],sim_config['T'] = rv_list
+        sim_config['rng'] = rng
+        if bias_correction:
+            bias_dict = sim_config['bias_correction_func'](config=sim_config)
+            i_bias,k_bias,j_bias,h_bias = bias_dict['i'],bias_dict['k'],bias_dict['j'],bias_dict['h']
         else:
             i_bias = k_bias = h_bias = j_bias = 0.0
 
-        pid_config['analytic_bias'] = {'i': i_bias, 'k': k_bias,
-                                            'h': h_bias, 'j': j_bias}
         #Raw PID Values
         i_raw =  mi_m7_raw - i_x2_t_raw
         i_corr = i_raw - i_bias
@@ -160,25 +152,16 @@ def simulate_m7_m8_idep(
 
 
 
-
-        pid_config['sample_statistic'] = {'i': i_raw, 'k': k_raw,'h': h_raw, 'j': j_raw}
-
-        pid_config['rvs_list'] = rv_list
-        pid_config['Sigma'] = Z
-
-        pid_config['model'] = 'pid'
+        unq1_corrected['i'].append(i_corr)
+        unq1_corrected['k'].append(k_corr)
         
-        if resample_bias_correction:
-            pid_bias_dict = bias_calc_func(pid_config)
+        unq2_corrected['h'].append(h_corr)
+        unq2_corrected['j'].append(j_corr)
 
-        else:
-            pid_bias_dict = {'i': 0.0, 'k': 0.0, 'h': 0.0, 'j': 0.0}
-
-        unq1_corrected['i'].append(i_corr - pid_bias_dict['i'])
-        unq1_corrected['k'].append(k_corr - pid_bias_dict['k'])
-        
-        unq2_corrected['h'].append(h_corr - pid_bias_dict['h'])
-        unq2_corrected['j'].append(j_corr - pid_bias_dict['j'])
+        i_corr_sample = torch.tensor(unq1_corrected['i'])
+        k_corr_sample = torch.tensor(unq1_corrected['k'])
+        h_corr_sample = torch.tensor(unq2_corrected['h'])
+        j_corr_sample = torch.tensor(unq2_corrected['j'])
 
 
 
@@ -217,34 +200,52 @@ def simulate_m7_m8_idep(
     after_corr_bias_h = avg_corrected_h - h_true
     after_corr_bias_j = avg_corrected_j - j_true
 
+    i_corr_var = torch.var(i_corr_sample, correction=1)
+    k_corr_var = torch.var(k_corr_sample, correction=1)
+    h_corr_var = torch.var(h_corr_sample, correction=1)
+    j_corr_var = torch.var(j_corr_sample, correction=1)
+
+    i_corr_mse = torch.mean((i_corr_sample - i_true) ** 2)
+    k_corr_mse = torch.mean((k_corr_sample - k_true) ** 2)
+    h_corr_mse = torch.mean((h_corr_sample - h_true) ** 2)
+    j_corr_mse = torch.mean((j_corr_sample - j_true) ** 2)
+
     i_dict= {'sample': i_sample, 
               'avg': avg_i_,
               'corrected_avg': avg_corrected_i,
               'std': torch.std(i_sample),
               'emp_bias': emp_bias_i,
               'after_corr_bias': after_corr_bias_i,
-              'ground_truth': i_true}
+              'ground_truth': i_true,
+              'var': i_corr_var,
+              'mse': i_corr_mse}
     k_dict = {'sample': k_sample,
                     'avg': avg_k_,
                     'corrected_avg': avg_corrected_k,
                     'std': torch.std(k_sample),
                     'emp_bias': emp_bias_k,
                     'after_corr_bias': after_corr_bias_k,
-                    'ground_truth': k_true}
+                    'ground_truth': k_true,
+                    'var': k_corr_var,
+                    'mse': k_corr_mse}
     h_dict = {'sample': h_sample,
                     'avg': avg_h_,
                     'corrected_avg': avg_corrected_h,
                     'std': torch.std(h_sample),
                     'emp_bias': emp_bias_h,
                     'after_corr_bias': after_corr_bias_h,
-                    'ground_truth': h_true}
+                    'ground_truth': h_true,
+                    'var': h_corr_var,
+                    'mse': h_corr_mse}
     j_dict= {'sample': j_sample, 
               'avg': avg_j_,
                 'corrected_avg': avg_corrected_j,
               'std': torch.std(j_sample),
                 'emp_bias': emp_bias_j,
                 'after_corr_bias': after_corr_bias_j,
-              'ground_truth': j_true}
+              'ground_truth': j_true,
+              'var': j_corr_var,
+              'mse': j_corr_mse}
 
 
     
@@ -252,58 +253,36 @@ def simulate_m7_m8_idep(
 
 
 
-
-def calculate_bias(config: dict,m8:bool=False,m8_nume:bool=False,m8_deno:bool=False, 
-                   m7:bool=False,m7_deno:bool=False,m7_nume:bool=False,bias_correction:bool=True) -> dict:
-   
-    """
-    Run the specified simulation function over combinations of N and p values, calculating mean and std of results.
-    """
-    if not bias_correction:
-        return {'bias': 0.0} 
     
-    assert m7 or m8 or m8_nume or m8_deno or m7_deno or m7_nume, "Must specify at least one of m7, m8, m8_nume, m8_deno, m7_deno, or m7_nume for bias calculation."
+def bias_func(config,model):
     n0 = config['n0']
     n1 = config['n1']
     n2 = config['n2']
     n_samples = config['n_samples']
     d = n0 + n1 + n2
     df = n_samples - 1
-    # A. DEFINE BIAS TERMS
-    # Marginal Biases (Fixed by whitening)
+
     bias_x0 = logdet_wishart_bias(df, n0)
     bias_x1 = logdet_wishart_bias(df, n1)
     bias_y  = logdet_wishart_bias(df, n2)
-    
+    # M7 (Structural) Biases
+    bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
+    bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
+    bias_2 = bias_y # seperator 2
+    bi_variate_mix2t_bias = 0.5*logdet_wishart_bias(df, n1) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n1+n2)
+    bi_variate_mix1t_bias = 0.5*logdet_wishart_bias(df, n0) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n0+n2)
 
-    if m7 or m7_deno:
-        # M7 (Structural) Biases
-        bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
-        bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
-        bias_2 = bias_y # seperator 2
-
-        # M7 MI Bias = 0.5 * ( (B_pred_struct - B_marginals) - (B_joint_struct - B_marginals) )
-        # Note: b_joint_m7 = b_c0 + b_c1 - b_sep
+    if model == 'M7':
+        nume_bias = permutation_null_debias(config,partial(permuteation_debiased,term='nume'))['bias']
         bias_m7_structural = bias_02 + bias_12 - bias_2
-        bias_m7 = 0.5 * (bias_m7_structural - (bias_x0 + bias_x1 + bias_y))
-        mi_bias_m7 = 0.5 * (bias_x0 + bias_x1 + 2*bias_2 - bias_02 - bias_12)
-        return {'bias': mi_bias_m7 if m7 else bias_m7}
+        deno_bias = 0.5 * (bias_m7_structural - (bias_x0 + bias_x1 + bias_y))
+        return {'i': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'h': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
     
-    if m7_nume:
-        pass
-        
-    
-    # M8 (Saturated) Biases
-    else:
-        b_pred_m8 = logdet_wishart_bias(df, n0 + n1)
-        b_joint_m8 = logdet_wishart_bias(df, d)
-    
-        nume_m8_bias = 0.5*(b_pred_m8 - (bias_x0 + bias_x1))
-        deno_m8_bias =0.5*(b_joint_m8 - (bias_x0 + bias_x1 + bias_y))
-        bias_m8_mi = (nume_m8_bias - deno_m8_bias)
+    elif model == 'M8':
+        deno_bias = 0.5*(logdet_wishart_bias(df, d)-(bias_x0 + bias_x1 + bias_y))
+        nume_bias = 0.5*(logdet_wishart_bias(df, n0 + n1) - (bias_x0 + bias_x1))
+        return {'k': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'j': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
 
-        bias_model = bias_m8_mi if m8 else (nume_m8_bias if m8_nume else deno_m8_bias)
-        return {'bias': bias_model} 
     
 def sort_m7_m8_results(results_list):
     """ Helper: Sort results list by N and p values for  sperate by m7 and m8."""
@@ -315,10 +294,10 @@ def sort_m7_m8_results(results_list):
     for res in results_list:
         N = res['N']
         p = res['p']
-        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth'],'emp_bias': res['i_emp_bias'],'after_corr_bias': res['i_after_corr_bias']})
-        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth'],'emp_bias': res['j_emp_bias'],'after_corr_bias': res['j_after_corr_bias']})
-        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth'],'emp_bias': res['k_emp_bias'],'after_corr_bias': res['k_after_corr_bias']})
-        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth'],'emp_bias': res['h_emp_bias'],'after_corr_bias': res['h_after_corr_bias']})
+        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth'],'emp_bias': res['i_emp_bias'],'after_corr_bias': res['i_after_corr_bias'],'var': res['i_var'],'mse': res['i_mse']})
+        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth'],'emp_bias': res['j_emp_bias'],'after_corr_bias': res['j_after_corr_bias'],'var': res['j_var'],'mse': res['j_mse']})
+        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth'],'emp_bias': res['k_emp_bias'],'after_corr_bias': res['k_after_corr_bias'],'var': res['k_var'],'mse': res['k_mse']})
+        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth'],'emp_bias': res['h_emp_bias'],'after_corr_bias': res['h_after_corr_bias'],'var': res['h_var'],'mse': res['h_mse']})
 
     return [i_results_list, j_results_list, k_results_list, h_results_list]
 
@@ -331,11 +310,12 @@ def simulation_wrapper(config: dict) -> dict:
     intermediate_func = config['intermediate_func']
     sim_func = partial(simulate_m7_m8_idep, intermediate_func=intermediate_func)
 
-
-    pid_bootstrap_func = partial(bias_resampling,calc_func=para_unique_bias_calc)
+    bias_functions_dict = {
+        'M7': partial(bias_func, model='M7'),
+        'M8': partial(bias_func, model='M8')}
     
     corr_value_func  = corrected_statistic
-    functions_dict = {'s_simulation': sim_func, 'bias_correction': pid_bootstrap_func, 
+    functions_dict = {'s_simulation': sim_func, 'bias_correction': partial(unique_bias, functions_dict=bias_functions_dict),
                       'corrected_statistic': corr_value_func}
     results_dict = simulation(config,functions_dict,seed=seed)
     return results_dict

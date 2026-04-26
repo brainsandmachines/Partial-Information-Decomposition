@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import sys
 import os 
 from pathlib import Path
+
+
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import whiten_block, create_cov_matrix
-
+from mi_functions import calcualte_mi
 
 
 
@@ -25,64 +27,165 @@ def _build_whitened_blocks_from_cov(S, n0, n1, n2):
     return P, Q, R, S_dict
 
 
+
 def make_random_true_cov(
     config: dict,
-    rng:  torch.Generator | None = None,
-    m7_whiten_structural: bool = True,
-) -> np.ndarray:
+    rng: torch.Generator | None = None,
+):
     """
-    Construct a generic positive-definite Gaussian M7_whiten and M8_Whiten covariance.
+    Construct a whitened Gaussian M8 covariance and its corresponding M7 covariance.
 
-    Block order is [X0, X1, Y].
+    New config parameters:
+        mode: one of {"exact_m7", "m8_side", "m7_side"}
+        delta: size of perturbation away from P_m7 = Q @ R.T
+        max_tries: retry budget to find a covariance in the requested regime
+        delta_margin: minimum separation in MI gap to accept the sample
 
-    m7_whiten population structure:
-        Sigma_01 = Sigma_02 @ Sigma_22^{-1} @ Sigma_21
-    and here Sigma_22 = I, so:
-        P = Q @ R.T
+    Notes:
+        - "exact_m7" gives P = Q @ R.T exactly.
+        - "m8_side" means keep only draws with I_M8 - I_M7 < 0.
+        - "m7_side" means keep only draws with I_M8 - I_M7 > 0.
     """
-    q_scale = config['q_scale']
-    r_scale = config['r_scale']
-    p_scale = config['p_scale']
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
-    A = torch.randn((n0, n2), generator=rng, dtype=torch.float64,device=config['device'])
-    B = torch.randn((n1, n2), generator=rng, dtype=torch.float64,device=config['device'])
-    C = torch.randn((n0, n1), generator=rng, dtype=torch.float64,device=config['device'])
+    q_scale = config["q_scale"]
+    r_scale = config["r_scale"]
+    n0 = config["n0"]
+    n1 = config["n1"]
+    n2 = config["n2"]
+    device = config["device"]
 
-    A_norm = torch.linalg.norm(A, ord=2)
-    B_norm = torch.linalg.norm(B, ord=2)
-    C_norm = torch.linalg.norm(C, ord=2)   
-    if A_norm == 0 or B_norm == 0 or C_norm == 0:
-        raise RuntimeError("Unexpected zero spectral norm in random construction.")
+    mode = config.get("mode", "exact_m7")       # "exact_m7", "m8_side", "m7_side"
+    delta = config.get("delta", 0.0)            # perturbation size
+    max_tries = config.get("max_tries", 1000)
+    delta_margin = config.get("delta_margin", 1e-3)
+    alpha = config.get("alpha", 0.5)            # only used for shrinkage versions, ignored otherwise
+    dtype = torch.float64
 
-    Q = q_scale * A / A_norm
-    R = r_scale * B / B_norm
-    P = p_scale * C / C_norm
+    for _ in range(max_tries):
+        A = torch.randn((n0, n2), generator=rng, dtype=dtype, device=device)
+        B = torch.randn((n1, n2), generator=rng, dtype=dtype, device=device)
+        C = torch.randn((n0, n1), generator=rng, dtype=dtype, device=device)
 
-    # Construct M8 covariance - sample coavraiance after whitening each block
-    row1_m8 = torch.cat([torch.eye(n0, device=config['device']), P, Q], dim=1)
-    row2_m8 = torch.cat([P.T, torch.eye(n1, device=config['device']), R], dim=1)
-    row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
-    true_cov_m8 = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+        A_norm = torch.linalg.norm(A, ord=2)
+        B_norm = torch.linalg.norm(B, ord=2)
+        C_norm = torch.linalg.norm(C, ord=2)
 
-    eigvals = torch.linalg.eigvalsh(true_cov_m8)
-    if torch.min(eigvals) <= 1e-10:
-        raise ValueError(
-            f"Constructed covariance not sufficiently PD. min eig={torch.min(eigvals):.3e}"
-        )
+        if A_norm == 0 or B_norm == 0 or C_norm == 0:
+            continue
+
+        Q = q_scale * A / A_norm
+        R = r_scale * B / B_norm
+
+        # Exact M7 block
+        P_m7 = Q @ R.T
+
+        # Choose P according to desired regime
+        if mode == "exact_m7":
+            P = P_m7
+        elif mode in {"m8_side", "m7_side"}:
+            D = C / C_norm
+            P = alpha*P_m7 + delta * D
+        else:
+            raise ValueError(f"Unknown mode: {mode}")
+
+        # Build M8 covariance
+        row1_m8 = torch.cat([torch.eye(n0, device=device, dtype=dtype), P, Q], dim=1)
+        row2_m8 = torch.cat([P.T, torch.eye(n1, device=device, dtype=dtype), R], dim=1)
+        row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=device, dtype=dtype)], dim=1)
+        true_cov_m8 = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+
+        # Check PD for M8
+        eigvals_m8 = torch.linalg.eigvalsh(true_cov_m8)
+        if torch.min(eigvals_m8) <= 1e-10:
+            continue
+
+        # Build M7 covariance from your existing helper
+        true_cov_m7 = create_m7_cov(config, true_cov_m8, whitening_normalize=True)
+
+        # Check PD for M7
+        eigvals_m7 = torch.linalg.eigvalsh(true_cov_m7)
+        if torch.min(eigvals_m7) <= 1e-10:
+            continue
+
+        # exact M7 case: accept immediately
+        if mode == "exact_m7":
+            return true_cov_m8, true_cov_m7
+
+        # Otherwise check which side won
+        try:
+            dict_terms_M8 = {'P': P, 'Q': Q, 'R': R, 'Sigma': true_cov_m8}
+            dict_terms_M7 = {'P': P_m7, 'Q': Q, 'R': R, 'Sigma': true_cov_m7}
+            mi_m8 = calcualte_mi(config, dict_terms_M8, term='mi_tri')['mi_tri']
+            mi_m7 = calcualte_mi(config, dict_terms_M7, term='mi_tri')['mi_tri']
+            delta_mi = mi_m8 - mi_m7
+        except RuntimeError:
+            continue
+
+        if mode == "m8_side" and delta_mi < -delta_margin:
+            return true_cov_m8, true_cov_m7
+
+        if mode == "m7_side" and delta_mi > delta_margin:
+            return true_cov_m8, true_cov_m7
+
+    return true_cov_m8, true_cov_m7  # return the last one even if it doesn't meet criteria after max_tries
+
+# def make_random_true_cov(
+#     config: dict,
+#     rng:  torch.Generator | None = None,
+#     m7_whiten_structural: bool = True,
+# ) -> np.ndarray:
+#     """
+#     Construct a generic positive-definite Gaussian M7_whiten and M8_Whiten covariance.
+
+#     Block order is [X0, X1, Y].
+
+#     m7_whiten population structure:
+#         Sigma_01 = Sigma_02 @ Sigma_22^{-1} @ Sigma_21
+#     and here Sigma_22 = I, so:
+#         P = Q @ R.T
+#     """
+#     q_scale = config['q_scale']
+#     r_scale = config['r_scale']
+#     p_scale = config['p_scale']
+#     n0 = config['n0']
+#     n1 = config['n1']
+#     n2 = config['n2']
+#     A = torch.randn((n0, n2), generator=rng, dtype=torch.float64,device=config['device'])
+#     B = torch.randn((n1, n2), generator=rng, dtype=torch.float64,device=config['device'])
+#     C = torch.randn((n0, n1), generator=rng, dtype=torch.float64,device=config['device'])
+
+#     A_norm = torch.linalg.norm(A, ord=2)
+#     B_norm = torch.linalg.norm(B, ord=2)
+#     C_norm = torch.linalg.norm(C, ord=2)   
+#     if A_norm == 0 or B_norm == 0 or C_norm == 0:
+#         raise RuntimeError("Unexpected zero spectral norm in random construction.")
+
+#     Q = q_scale * A / A_norm
+#     R = r_scale * B / B_norm
+#     P = p_scale * C / C_norm
+
+#     # Construct M8 covariance - sample coavraiance after whitening each block
+#     row1_m8 = torch.cat([torch.eye(n0, device=config['device']), P, Q], dim=1)
+#     row2_m8 = torch.cat([P.T, torch.eye(n1, device=config['device']), R], dim=1)
+#     row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
+#     true_cov_m8 = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+
+#     eigvals = torch.linalg.eigvalsh(true_cov_m8)
+#     if torch.min(eigvals) <= 1e-10:
+#         raise ValueError(
+#             f"Constructed covariance not sufficiently PD. min eig={torch.min(eigvals):.3e}"
+#         )
  
-    true_cov_m7 = create_m7_cov(config,true_cov_m8, whitening_normalize=True)
+#     true_cov_m7 = create_m7_cov(config,true_cov_m8, whitening_normalize=True)
 
 
     
-    eigvals_m7 = torch.linalg.eigvalsh(true_cov_m7)
-    if torch.min(eigvals_m7) <= 1e-10:
-        raise ValueError(
-            f"Constructed M7 covariance not sufficiently PD. min eig={torch.min(eigvals_m7):.3e}"
-        )
+#     eigvals_m7 = torch.linalg.eigvalsh(true_cov_m7)
+#     if torch.min(eigvals_m7) <= 1e-10:
+#         raise ValueError(
+#             f"Constructed M7 covariance not sufficiently PD. min eig={torch.min(eigvals_m7):.3e}"
+#         )
 
-    return true_cov_m8, true_cov_m7
+#     return true_cov_m8, true_cov_m7
 
 
 def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
@@ -158,7 +261,9 @@ def simulation(config,functions_dict:dict,seed=None):
             'emp_bias': statistic_model['emp_bias'],
             'after_corr_bias': statistic_model.get('after_corr_bias', 100000),
             'corrected_statistic': model_corr_values,
-            'ground_truth': statistic_model['ground_truth']
+            'ground_truth': statistic_model['ground_truth'],
+            'var': statistic_model['var'],
+            'mse': statistic_model['mse'],
         }
 
 

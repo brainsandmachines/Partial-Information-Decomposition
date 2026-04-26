@@ -1,7 +1,7 @@
 
 N_P_variations:
-  N_values: [200,300,500]
-  p_values: [[30,40,50],[50,50,50],[40,50,100]]
+  N_values: [300,500,1000]
+  p_values: [[30,40,50],[50,50,50],[40,50,100],[80,80,120]]
 
 
 logdet_simulation:
@@ -22,33 +22,45 @@ Mutual_Information_Simulation:
   device: 'cpu'
   seed: 1
   n_trials: 100
-  analytic_bias_correction: True
-  resample_bias_correction: False
+  bias_correction: True
   lr_type: 'ridge' # options: 'ols', 'ridge', 'lasso'
-  lasso_alpha: 0.1 # only used if lr_type is 'lasso
+  lasso_alpha: 0.1 # only used if lr_type is 'lasso'
   on_covariance: 'False' # options: 'False', 'ledoit_wolf', 'shrunk_cov' , 'oas'
   alpha : 0.5 # only used if on_covariance is 'shrunk_cov'
   bias_method: ['bootstrap'] # options: ['bootstrap', 'jackknife', 'analytic'] 
   n_bootstraps: 20
   mi_type: 'whiten' # options: 'whiten', 'lr'
   bi_mi_type: 'whiten'
-  n_perm : 50
+  n_perm : 20
   normalization: 'True' #If we need to whiten, is it already whiten or leave it not whiened. Options: 'True' (already whitened), 'False' (leave not whitened), 'whiten_ver' (whitened with the same method as the one used for the mi estimation)
-  p_scale: 0.35
-  q_scale: 0.45
-  r_scale: 0.50
+
 
 0=Mutual_Information_Simulation:
   p_scale: 0.0
   q_scale: 0.0
   r_scale: 0.0
+  #For Create True Covriance matrix
+  mode: 'exact_m7' # "exact_m7", "m8_side", "m7_side"
+  delta: 0 # 0<delta<1, only used if mode is "m8_side" or "m7_side". The bigger the delta the bigger the difference between M7 and M8, and the bigger the Idep value.
 
 
 
-0<Mutual_Information_Simulation:
-  p_scale: 0.35
-  q_scale: 0.55
-  r_scale: 0.45
+M8_Mutual_Information_Simulation: #[For M8 case use: p_scale: 0.05, q_scale: 0.65, r_scale: 0.75, mode: 'm8_side', delta: 0.2,alpha: 2]
+  p_scale: 0.05
+  q_scale: 0.65
+  r_scale: 0.75
+  mode: 'm8_side' # "exact_m7", "m8_side", "m7_side"
+  delta: 0.2 # 0<delta<1, only used if mode is "m8_side" or "m7_side". The bigger the delta the bigger the difference between M7 and M8, and the bigger the Idep value.
+  alpha: 2
+
+
+M7_Mutual_Information_Simulation: #[For M8 case use: p_scale: 0.05, q_scale: 0.65, r_scale: 0.75, mode: 'm8_side', delta: 0.2,alpha: 2]
+  p_scale: 0.15
+  q_scale: 0.25
+  r_scale: 0.35
+  mode: 'm7_side' # "exact_m7", "m8_side", "m7_side"
+  delta: 0.2 # 0<delta<1, only used if mode is "m8_side" or "m7_side". The bigger the delta the bigger the difference between M7 and M8, and the bigger the Idep value.
+  alpha: 1
 
 
 LR_Idep_Simulation:

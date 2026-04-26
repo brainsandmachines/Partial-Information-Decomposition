@@ -120,8 +120,11 @@ def calcualte_mi(config,sigma_dict,term='full'):
     mi_tri = (nume_raw - deno_raw).item()
     mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.T @ Q)))
     mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.T @ R)))
-    return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
-
+    all_terms_dict = {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2,'nume': nume_raw,'deno': deno_raw}
+    if term == 'full':
+        return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
+    else:
+        return {term: all_terms_dict[term]}
 
 def para_calcualte_mi(config,sigma_dict,term='full',assumed_whitened = True):
     """This function calculates the tri-variate mutual information using the for 
@@ -204,10 +207,12 @@ def mi_wrapper(config,sigma_dict,whiten_terms_dict,tri_variate=True):
 
     mi_type = config['mi_type'] if tri_variate else config['bi_mi_type']
     if mi_type == 'whiten':
-        return calcualte_mi(config,whiten_terms_dict)
+        mi = calcualte_mi(config,whiten_terms_dict)
     elif mi_type == 'lr':
-        return calculate_mi_lr(config,sigma_dict)
+        mi = calculate_mi_lr(config,sigma_dict)
     else:
         raise ValueError(f"Invalid mi_type: {mi_type}. Must be either 'not_whiten' or 'lr'.")
     
+    return mi
+
 
