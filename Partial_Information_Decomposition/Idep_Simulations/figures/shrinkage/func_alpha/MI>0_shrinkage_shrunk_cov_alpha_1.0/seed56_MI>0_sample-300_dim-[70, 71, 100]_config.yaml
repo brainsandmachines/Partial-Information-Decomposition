@@ -1,0 +1,18 @@
+device: cuda
+seed: 56
+n_trials: 1000
+bias_correction: false
+on_covariance: shrunk_cov
+alpha: 1.0
+bias_method:
+- bootstrap
+n_bootstraps: 400
+p_scale: 0.15
+q_scale: 0.25
+r_scale: 0.35
+N_values:
+- 300
+p_values:
+- - 70
+  - 71
+  - 100
