@@ -22,16 +22,19 @@ def load_config_parts(yaml_file):
         cfg["M7_Mutual_Information_Simulation"].copy(),
         cfg["M8_Mutual_Information_Simulation"].copy(),
         cfg["N_P_variations"].copy(),
+        cfg["Unknown_Mutual_Information_Simulation"].copy()
     )
 
 
-def make_pre_config(exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config):
+def make_pre_config(exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config,unk_cfg):
     if exp == "MI=0":
         return {**MI_config, **mi0_config, **n_p_config}
     if exp == "M7_MI>0":
         return {**MI_config, **above0__M7_mi_config, **n_p_config}
     if exp == "M8_MI>0":
         return {**MI_config, **above0__M8_mi_config, **n_p_config}
+    if exp == "unknown":
+        return {**MI_config, **unk_cfg, **n_p_config} # The unknown case will use the same config as M7, but with different covariance generation (see below)
 
 
 def shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder_path, plot_heat_map):
@@ -140,17 +143,17 @@ def linear_regression_simulation(exp_list,yaml_file,folder_path):
 def idep_simulation(exp_list, yaml_file, folder_path):
     print("Running M7 and M8 Idep simulation...")
 
-    MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config = load_config_parts(yaml_file)
+    MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config, unk_cfg = load_config_parts(yaml_file)
 
     for exp in exp_list:
-        pre_config = make_pre_config(exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config)
+        pre_config = make_pre_config(exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config, unk_cfg)
 
-        exp_name = f"IdepBIGTest_{exp}"
+        exp_name = f"IdepRedTest_{exp}"
         save_path = folder_path / exp_name
         save_path.mkdir(parents=True, exist_ok=True)
         pre_config['intermediate_func'] = on_covariance  # Set whiten to False for Idep simulation
         print(f"\nRunning experiment: {exp_name}")
-        run(simulation_wrapper, exp_name, pre_config.copy(), save_path=save_path, plot_heatmaps=True)
+        run(simulation_wrapper, exp_name, pre_config.copy(), save_path=save_path, plot_heatmaps=True,plot_graphs=False)
 
         title = (
             f"Idep_seed{pre_config['seed']}_"
@@ -166,6 +169,7 @@ def idep_simulation(exp_list, yaml_file, folder_path):
 if __name__ == "__main__":
 
     exp_list = ["M7_MI>0", "M8_MI>0", "MI=0"]
+    #exp_list = ["unknown"]
     yaml_file_lr = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/shrinkage.yaml"
     folder_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/lr")
 
@@ -179,5 +183,5 @@ if __name__ == "__main__":
 
 
     folder_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/figures/idep_LB")
-    yaml_bias_correction = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/small_test.yaml'
+    yaml_bias_correction = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/Idep_Simulations/configs/sim.yaml'
     idep_simulation(exp_list, yaml_bias_correction, folder_path)

@@ -1,23 +1,25 @@
 
-
-import pathlib
-from py_compile import main
 import torch
-import numpy as np
-import argparse
 import yaml
 from functools import partial
-# Import all existing utilities from the user's module
-from Simulation_utils import *
+from Simulation_utils import (
+    N_P_variation_simulation,
+    sample_data_from_cov,
+    build_m8_terms,
+    build_m7_terms,
+    corrected_statistic,
+    plot_heatmap_mean_std,
+    save_nodes_results_csv,
+    plot_pid_trajectory_vs_p_over_N,
+    _build_pid_rows_from_node,
+)
 from wrapper_M7_M8_models import simulation
-from Simulation_utils import *
-from logdet_m7_m8 import  sort_m7_m8_results
 import sys
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from Partial_Information_Decomposition.resampling_wrapper import bias_resampling
-from Partial_Information_Decomposition.mi_functions import mi_calculation_not_whiten,safe_logdet,mi_wrapper
+from PID_util import create_cov_matrix
+from Partial_Information_Decomposition.mi_functions import mi_wrapper
 from Partial_Information_Decomposition.bias_functions import permuteation_debiased,unique_bias,permutation_null_debias,logdet_wishart_bias
 
 def simulate_m7_m8_idep(
@@ -94,6 +96,11 @@ def simulate_m7_m8_idep(
 
     pid_config = sim_config.copy()
 
+    mi_m7_samples = []
+    mi_m8_samples = []
+    mi_bi_1_samples = []
+    mi_bi_2_samples = []
+
 
     for i in range(n_trials):
         print(f"Trial {i+1}/{n_trials}", end="\r")
@@ -126,6 +133,11 @@ def simulate_m7_m8_idep(
         mi_bi_dict = mi_wrapper(sim_config,Z_raw_dict,m8_sample,tri_variate=False) #Calculated differently
         i_x1_t_raw = mi_bi_dict['mi_bi_1']
         i_x2_t_raw = mi_bi_dict['mi_bi_2']
+
+        mi_m7_samples.append(mi_m7_raw)
+        mi_m8_samples.append(mi_m8_raw)
+        mi_bi_1_samples.append(i_x1_t_raw)
+        mi_bi_2_samples.append(i_x2_t_raw)
 
 
         sim_config['M8_raw'] = mi_m8_dict
@@ -210,6 +222,16 @@ def simulate_m7_m8_idep(
     h_corr_mse = torch.mean((h_corr_sample - h_true) ** 2)
     j_corr_mse = torch.mean((j_corr_sample - j_true) ** 2)
 
+    bias_x0 = logdet_wishart_bias(df, n0)
+    bias_x1 = logdet_wishart_bias(df, n1)
+    bias_y  = logdet_wishart_bias(df, n2)
+    tri_mi_bias = 0.5*(logdet_wishart_bias(df, n0 + n1) - (bias_x0 + bias_x1)) - 0.5*(logdet_wishart_bias(df, d)-(bias_x0 + bias_x1 + bias_y))
+    bi_mi_bias_1 = 0.5*logdet_wishart_bias(df, n0) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n0+n2)
+    bi_mi_bias_2 = 0.5*logdet_wishart_bias(df, n1) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n1+n2)
+    avg_mi_m8 = torch.mean(torch.tensor(mi_m8_samples)-tri_mi_bias)
+    avg_mi_bi_1 = torch.mean(torch.tensor(mi_bi_1_samples)-bi_mi_bias_1)
+    avg_mi_bi_2 = torch.mean(torch.tensor(mi_bi_2_samples)-bi_mi_bias_2)
+
     i_dict= {'sample': i_sample, 
               'avg': avg_i_,
               'corrected_avg': avg_corrected_i,
@@ -218,7 +240,13 @@ def simulate_m7_m8_idep(
               'after_corr_bias': after_corr_bias_i,
               'ground_truth': i_true,
               'var': i_corr_var,
-              'mse': i_corr_mse}
+                            'mse': i_corr_mse,
+                            'mi_tri_avg': avg_mi_m8,
+                            'mi_bi_1_avg': avg_mi_bi_1,
+                            'mi_bi_2_avg': avg_mi_bi_2,
+                            'mi_tri_ground_truth': m8_MI_true,
+                            'mi_bi_1_ground_truth': i_x1_t_true,
+                            'mi_bi_2_ground_truth': i_x2_t_true}
     k_dict = {'sample': k_sample,
                     'avg': avg_k_,
                     'corrected_avg': avg_corrected_k,
@@ -227,7 +255,13 @@ def simulate_m7_m8_idep(
                     'after_corr_bias': after_corr_bias_k,
                     'ground_truth': k_true,
                     'var': k_corr_var,
-                    'mse': k_corr_mse}
+                                        'mse': k_corr_mse,
+                                        'mi_tri_avg': avg_mi_m8,
+                                        'mi_bi_1_avg': avg_mi_bi_1,
+                                        'mi_bi_2_avg': avg_mi_bi_2,
+                                        'mi_tri_ground_truth': m8_MI_true,
+                                        'mi_bi_1_ground_truth': i_x1_t_true,
+                                        'mi_bi_2_ground_truth': i_x2_t_true}
     h_dict = {'sample': h_sample,
                     'avg': avg_h_,
                     'corrected_avg': avg_corrected_h,
@@ -236,7 +270,13 @@ def simulate_m7_m8_idep(
                     'after_corr_bias': after_corr_bias_h,
                     'ground_truth': h_true,
                     'var': h_corr_var,
-                    'mse': h_corr_mse}
+                                        'mse': h_corr_mse,
+                                        'mi_tri_avg': avg_mi_m8,
+                                        'mi_bi_1_avg': avg_mi_bi_1,
+                                        'mi_bi_2_avg': avg_mi_bi_2,
+                                        'mi_tri_ground_truth': m8_MI_true,
+                                        'mi_bi_1_ground_truth': i_x1_t_true,
+                                        'mi_bi_2_ground_truth': i_x2_t_true}
     j_dict= {'sample': j_sample, 
               'avg': avg_j_,
                 'corrected_avg': avg_corrected_j,
@@ -245,7 +285,13 @@ def simulate_m7_m8_idep(
                 'after_corr_bias': after_corr_bias_j,
               'ground_truth': j_true,
               'var': j_corr_var,
-              'mse': j_corr_mse}
+                            'mse': j_corr_mse,
+                            'mi_tri_avg': avg_mi_m8,
+                            'mi_bi_1_avg': avg_mi_bi_1,
+                            'mi_bi_2_avg': avg_mi_bi_2,
+                            'mi_tri_ground_truth': m8_MI_true,
+                            'mi_bi_1_ground_truth': i_x1_t_true,
+                            'mi_bi_2_ground_truth': i_x2_t_true}
 
 
     
@@ -294,10 +340,10 @@ def sort_m7_m8_results(results_list):
     for res in results_list:
         N = res['N']
         p = res['p']
-        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth'],'emp_bias': res['i_emp_bias'],'after_corr_bias': res['i_after_corr_bias'],'var': res['i_var'],'mse': res['i_mse']})
-        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth'],'emp_bias': res['j_emp_bias'],'after_corr_bias': res['j_after_corr_bias'],'var': res['j_var'],'mse': res['j_mse']})
-        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth'],'emp_bias': res['k_emp_bias'],'after_corr_bias': res['k_after_corr_bias'],'var': res['k_var'],'mse': res['k_mse']})
-        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth'],'emp_bias': res['h_emp_bias'],'after_corr_bias': res['h_after_corr_bias'],'var': res['h_var'],'mse': res['h_mse']})
+        i_results_list.append({'N': N, 'p': p, 'mean': res['i_mean'], 'std': res['i_std'], 'ground_truth': res['i_ground_truth'],'emp_bias': res['i_emp_bias'],'after_corr_bias': res['i_after_corr_bias'],'var': res['i_var'],'mse': res['i_mse'], 'mi_tri': res.get('i_mi_tri_avg'), 'mi_bi_1': res.get('i_mi_bi_1_avg'), 'mi_bi_2': res.get('i_mi_bi_2_avg'), 'mi_tri_ground_truth': res.get('i_mi_tri_ground_truth'), 'mi_bi_1_ground_truth': res.get('i_mi_bi_1_ground_truth'), 'mi_bi_2_ground_truth': res.get('i_mi_bi_2_ground_truth')})
+        j_results_list.append({'N': N, 'p': p, 'mean': res['j_mean'], 'std': res['j_std'], 'ground_truth': res['j_ground_truth'],'emp_bias': res['j_emp_bias'],'after_corr_bias': res['j_after_corr_bias'],'var': res['j_var'],'mse': res['j_mse'], 'mi_tri': res.get('j_mi_tri_avg'), 'mi_bi_1': res.get('j_mi_bi_1_avg'), 'mi_bi_2': res.get('j_mi_bi_2_avg'), 'mi_tri_ground_truth': res.get('j_mi_tri_ground_truth'), 'mi_bi_1_ground_truth': res.get('j_mi_bi_1_ground_truth'), 'mi_bi_2_ground_truth': res.get('j_mi_bi_2_ground_truth')})
+        k_results_list.append({'N': N, 'p': p, 'mean': res['k_mean'], 'std': res['k_std'], 'ground_truth': res['k_ground_truth'],'emp_bias': res['k_emp_bias'],'after_corr_bias': res['k_after_corr_bias'],'var': res['k_var'],'mse': res['k_mse'], 'mi_tri': res.get('k_mi_tri_avg'), 'mi_bi_1': res.get('k_mi_bi_1_avg'), 'mi_bi_2': res.get('k_mi_bi_2_avg'), 'mi_tri_ground_truth': res.get('k_mi_tri_ground_truth'), 'mi_bi_1_ground_truth': res.get('k_mi_bi_1_ground_truth'), 'mi_bi_2_ground_truth': res.get('k_mi_bi_2_ground_truth')})
+        h_results_list.append({'N': N, 'p': p, 'mean': res['h_mean'], 'std': res['h_std'], 'ground_truth': res['h_ground_truth'],'emp_bias': res['h_emp_bias'],'after_corr_bias': res['h_after_corr_bias'],'var': res['h_var'],'mse': res['h_mse'], 'mi_tri': res.get('h_mi_tri_avg'), 'mi_bi_1': res.get('h_mi_bi_1_avg'), 'mi_bi_2': res.get('h_mi_bi_2_avg'), 'mi_tri_ground_truth': res.get('h_mi_tri_ground_truth'), 'mi_bi_1_ground_truth': res.get('h_mi_bi_1_ground_truth'), 'mi_bi_2_ground_truth': res.get('h_mi_bi_2_ground_truth')})
 
     return [i_results_list, j_results_list, k_results_list, h_results_list]
 
@@ -320,25 +366,61 @@ def simulation_wrapper(config: dict) -> dict:
     results_dict = simulation(config,functions_dict,seed=seed)
     return results_dict
 
-def run(main_func,exp_name, config,save_path,plot_heatmaps:bool=True):
+
+def _save_config_yaml(config, save_path, exp_name):
+    with open(f'{save_path}/{exp_name}_config.yaml', 'w') as f:
+        yaml_config = {key: value for key, value in config.items() if not callable(value)}
+        yaml.safe_dump(yaml_config, f, sort_keys=False, allow_unicode=True)
+
+
+def _render_heatmaps(i_result, j_result, k_result, h_result, save_path, exp_name):
+    plot_heatmap_mean_std(i_result, title=f"Unique-1-i-node-{exp_name}", save_path=save_path)
+    plot_heatmap_mean_std(k_result, title=f"Unique-1-k-node-{exp_name}", save_path=save_path)
+    plot_heatmap_mean_std(j_result, title=f"Unique-2-j-node-{exp_name}", save_path=save_path)
+    plot_heatmap_mean_std(h_result, title=f"Unique-2-h-node-{exp_name}", save_path=save_path)
+
+
+def _render_pid_trajectories(config, i_result, j_result, k_result, h_result, save_path, exp_name):
+    single_p = len(config.get('p_values', [])) == 1
+    multi_n = len(config.get('N_values', [])) > 1
+    if not (single_p and multi_n):
+        print("Skipping PID trajectory plots: requires exactly one p value and multiple N values.")
+        return
+
+    plot_specs = [
+        (i_result, 'unique1', f"PID components vs p/N - Unique-1-i-node-{exp_name}"),
+        (k_result, 'unique1', f"PID components vs p/N - Unique-1-k-node-{exp_name}"),
+        (j_result, 'unique2', f"PID components vs p/N - Unique-2-j-node-{exp_name}"),
+        (h_result, 'unique2', f"PID components vs p/N - Unique-2-h-node-{exp_name}"),
+    ]
+
+    for node_rows, known_component, title in plot_specs:
+        pid_rows, pid_ground_truth = _build_pid_rows_from_node(node_rows, known_component)
+        if not pid_rows:
+            print(f"Skipping PID trajectory plot for {title}: missing MI terms.")
+            continue
+
+        plot_pid_trajectory_vs_p_over_N(
+            results=pid_rows,
+            ground_truth=pid_ground_truth,
+            save_path=save_path,
+            title=title,
+        )
+
+def run(main_func,exp_name, config,save_path,plot_heatmaps:bool=True,plot_graphs:bool=False):
         config['simulation_func'] = main_func
         results = N_P_variation_simulation(config)
         nodes_results_list = sort_m7_m8_results(results)
 
         i_result,j_result,k_result,h_result =nodes_results_list[0] ,nodes_results_list[1], nodes_results_list[2], nodes_results_list[3]
+        save_nodes_results_csv(i_result,j_result,k_result,h_result,save_path)
         if plot_heatmaps:
-            #Plot Unique 1 results  
-            plot_heatmap_mean_std(i_result, title=f"Unique-1-i-node-{exp_name}",save_path=save_path)
-            plot_heatmap_mean_std(k_result, title=f"Unique-1-k-node-{exp_name}",save_path=save_path)
+            _render_heatmaps(i_result, j_result, k_result, h_result, save_path, exp_name)
+            _save_config_yaml(config, save_path, exp_name)
 
-            #Plot Unique 2 results
-            plot_heatmap_mean_std(j_result, title=f"Unique-2-j-node-{exp_name}",save_path=save_path)
-            plot_heatmap_mean_std(h_result, title=f"Unique-2-h-node-{exp_name}",save_path=save_path)
-            #Save config for file
-            with open(f'{save_path}/{exp_name}_config.yaml', 'w') as f:
-                yaml_config = {key: value for key, value in config.items() if not callable(value)}
-                
-                yaml.safe_dump(yaml_config, f, sort_keys=False, allow_unicode=True)
+        if plot_graphs:
+            _render_pid_trajectories(config, i_result, j_result, k_result, h_result, save_path, exp_name)
+
         print("\nFinished simulation.")
 
         return nodes_results_list

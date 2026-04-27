@@ -216,3 +216,51 @@ def mi_wrapper(config,sigma_dict,whiten_terms_dict,tri_variate=True):
     return mi
 
 
+
+
+def pid_components(pid_config):
+    """Calculate PID components with the known components. 
+    Input: 
+        pid_config: dict - contains all need mutual information (I(T,X1), I(T,X2), I(T,X1,X2)) and 
+        at least one of the PID components (redundancy, synergy, unique1, unique2)
+        
+    Output:
+        pid_dict: dict - contains all PID components calculated from the known components and the mutual information values"""
+    
+    mi_tri = pid_config['mi_tri']
+    mi_bi_1 = pid_config['mi_bi_1']
+    mi_bi_2 = pid_config['mi_bi_2']
+    redundancy = pid_config.get('redundancy', None)
+    synergy = pid_config.get('synergy', None)
+    unique1 = pid_config.get('unique1', None)
+    unique2 = pid_config.get('unique2', None)
+
+    if redundancy is not None:
+        unique1 = mi_bi_1 - redundancy
+        unique2 = mi_bi_2 - redundancy
+        synergy = mi_tri - unique1 - unique2 - redundancy
+    elif synergy is not None:
+        unique1 = mi_bi_1 - (mi_tri - synergy - mi_bi_2)
+        unique2 = mi_bi_2 - (mi_tri - synergy - mi_bi_1)
+        redundancy = mi_bi_1 - unique1
+    elif unique1 is not None:
+        redundancy = mi_bi_1 - unique1
+        unique2 = mi_bi_2 - redundancy
+        synergy = mi_tri - unique1 - unique2 - redundancy
+    elif unique2 is not None:
+        redundancy = mi_bi_2 - unique2
+        unique1 = mi_bi_1 - redundancy
+        synergy = mi_tri - unique1 - unique2 - redundancy
+    else:
+        raise ValueError("At least one of redundancy, synergy, unique1, or unique2 must be provided in pid_config.")
+    
+    pid_dict = {
+        'mi_tri': mi_tri,
+        'mi_bi_1': mi_bi_1,
+        'mi_bi_2': mi_bi_2,
+        'redundancy': redundancy,
+        'unique1': unique1,
+        'unique2': unique2,
+        'synergy': synergy
+    }
+    return pid_dict

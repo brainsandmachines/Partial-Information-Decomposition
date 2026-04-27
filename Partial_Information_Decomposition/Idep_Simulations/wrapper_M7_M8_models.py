@@ -88,10 +88,7 @@ def make_random_true_cov(
             raise ValueError(f"Unknown mode: {mode}")
 
         # Build M8 covariance
-        row1_m8 = torch.cat([torch.eye(n0, device=device, dtype=dtype), P, Q], dim=1)
-        row2_m8 = torch.cat([P.T, torch.eye(n1, device=device, dtype=dtype), R], dim=1)
-        row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=device, dtype=dtype)], dim=1)
-        true_cov_m8 = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+        true_cov_m8 = create_cov_m8(config, P, Q, R)
 
         # Check PD for M8
         eigvals_m8 = torch.linalg.eigvalsh(true_cov_m8)
@@ -264,6 +261,12 @@ def simulation(config,functions_dict:dict,seed=None):
             'ground_truth': statistic_model['ground_truth'],
             'var': statistic_model['var'],
             'mse': statistic_model['mse'],
+            'mi_tri_avg': statistic_model.get('mi_tri_avg'),
+            'mi_bi_1_avg': statistic_model.get('mi_bi_1_avg'),
+            'mi_bi_2_avg': statistic_model.get('mi_bi_2_avg'),
+            'mi_tri_ground_truth': statistic_model.get('mi_tri_ground_truth'),
+            'mi_bi_1_ground_truth': statistic_model.get('mi_bi_1_ground_truth'),
+            'mi_bi_2_ground_truth': statistic_model.get('mi_bi_2_ground_truth'),
         }
 
 
@@ -274,3 +277,20 @@ def simulation(config,functions_dict:dict,seed=None):
 
 
 
+def create_cov_m8(config, P, Q, R):
+    "Helper to create M8 covariance from P,Q,R blocks for logging purposes"
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    ver = config.get("ver",'raw') #Raw means the regular M8 covraince
+
+    if ver == 'red':
+        Q = P@R
+        assert Q.shape == (n0,n2),"Shape mismatch for Q in red version"
+
+
+    row1_m8 = torch.cat([torch.eye(n0, device=config['device']), P, Q], dim=1)
+    row2_m8 = torch.cat([P.T, torch.eye(n1, device=config['device']), R], dim=1)
+    row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
+    m8_true_cov = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
+    return  m8_true_cov

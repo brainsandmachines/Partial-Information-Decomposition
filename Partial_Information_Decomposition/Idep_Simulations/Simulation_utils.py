@@ -10,6 +10,7 @@ from shrinkaging import ledoit_wolf_cov, oracle_shrinkage_cov, shrunk_cov
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from mi_functions import safe_logdet
+from mi_functions import pid_components
 from PID_util import *
 import pandas as pd
 
@@ -65,6 +66,17 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
                 row[f"{key}_after_corr_bias"] = results_dict[key]['after_corr_bias']
                 row[f"{key}_var"] = results_dict[key]['var']
                 row[f"{key}_mse"] = results_dict[key]['mse']
+                optional_scalar_keys = [
+                    'mi_tri_avg',
+                    'mi_bi_1_avg',
+                    'mi_bi_2_avg',
+                    'mi_tri_ground_truth',
+                    'mi_bi_1_ground_truth',
+                    'mi_bi_2_ground_truth',
+                ]
+                for optional_key in optional_scalar_keys:
+                    if optional_key in results_dict[key]:
+                        row[f"{key}_{optional_key}"] = results_dict[key][optional_key]
             all_results.append(row)
             print(f"Completed combination N={N}, p={p} ({i}/{len_N * len_P})")
             i += 1
@@ -476,7 +488,8 @@ def plot_heatmap_mean_std(
                 ha="center",
                 va="center",
                 color="white" if pd.notna(m) and m < threshold else "black",
-                fontsize=9,
+                fontsize=8,
+                linespacing=1,
             )
 
     cbar = fig.colorbar(im, ax=ax)
@@ -518,3 +531,229 @@ def plot_nodes_as_alpha(node_dict, title=None, save_path=None):
 
     if save_path is not None:
         plt.savefig(f"{save_path}/{title}_nodes.png", dpi=300, bbox_inches="tight")
+
+
+
+
+def save_nodes_results_csv(i_result, j_result, k_result, h_result, save_path):
+    nodes = {
+        "i": i_result,
+        "j": j_result,
+        "k": k_result,
+        "h": h_result,
+    }
+
+    # Node names become the rows
+    df = pd.DataFrame.from_dict(nodes, orient="index")
+
+    df.index.name = "node"
+
+    save_path = Path(save_path)
+    save_path.mkdir(parents=True, exist_ok=True)
+
+    df.to_csv(save_path / "nodes_results.csv", index=True)
+
+    return df
+
+
+def _to_scalar(value):
+    if value is None:
+        return None
+    if hasattr(value, "item"):
+        return value.item()
+    return float(value)
+
+
+def _build_pid_rows_from_node(node_rows, known_component):
+    """Build PID rows from node summaries by filling missing components.
+
+    Required keys in each row: N, p, mean, mi_tri, mi_bi_1, mi_bi_2.
+    Optional ground-truth keys: ground_truth, mi_tri_ground_truth, mi_bi_1_ground_truth, mi_bi_2_ground_truth.
+    """
+    pid_rows = []
+    pid_ground_truth = None
+
+    for row in node_rows:
+        mi_tri = _to_scalar(row.get("mi_tri"))
+        mi_bi_1 = _to_scalar(row.get("mi_bi_1"))
+        mi_bi_2 = _to_scalar(row.get("mi_bi_2"))
+        known_value = _to_scalar(row.get("mean"))
+
+        if None in (mi_tri, mi_bi_1, mi_bi_2, known_value):
+            continue
+
+        pid_input = {
+            "mi_tri": mi_tri,
+            "mi_bi_1": mi_bi_1,
+            "mi_bi_2": mi_bi_2,
+            known_component: known_value,
+        }
+        pid_row = pid_components(pid_input)
+        pid_row["N"] = row["N"]
+        pid_row["p"] = row["p"]
+        pid_rows.append(pid_row)
+
+        if pid_ground_truth is None:
+            gt_mi_tri = _to_scalar(row.get("mi_tri_ground_truth"))
+            gt_mi_bi_1 = _to_scalar(row.get("mi_bi_1_ground_truth"))
+            gt_mi_bi_2 = _to_scalar(row.get("mi_bi_2_ground_truth"))
+            gt_known = _to_scalar(row.get("ground_truth"))
+
+            if None not in (gt_mi_tri, gt_mi_bi_1, gt_mi_bi_2, gt_known):
+                pid_ground_truth = pid_components(
+                    {
+                        "mi_tri": gt_mi_tri,
+                        "mi_bi_1": gt_mi_bi_1,
+                        "mi_bi_2": gt_mi_bi_2,
+                        known_component: gt_known,
+                    }
+                )
+
+    return pid_rows, pid_ground_truth
+
+
+
+def plot_pid_trajectory_vs_p_over_N(
+    results,
+    ground_truth=None,
+    save_path=None,
+    title="PID components vs p/N",
+    p_col="p",
+    n_col="N",
+    components=None,
+    figsize=(10, 6),
+    dpi=300,
+    descending_x=True,
+):
+    """
+    Plot PID components and mutual information terms as a function of p/N.
+
+    Parameters
+    ----------
+    results : list[dict] or pd.DataFrame
+        Each row should contain N, p, and PID/MI values.
+
+    ground_truth : dict, optional
+        Dictionary containing ground-truth values for the same components.
+        Example:
+            {
+                "redundancy": 0.1,
+                "unique1": 0.2,
+                "unique2": 0.3,
+                "synergy": 0.0,
+                "mi_tri": 0.6,
+                "mi_bi_1": 0.3,
+                "mi_bi_2": 0.4,
+            }
+
+    save_path : str or Path, optional
+        Folder where the figure will be saved.
+
+    components : list[str], optional
+        Which components to plot.
+
+    descending_x : bool, optional
+        If True, reverse the x-axis so larger p/N values (close to 1)
+        appear at the start (left side) of the axis.
+    """
+
+    df = pd.DataFrame(results).copy()
+
+    if components is None:
+        components = [
+            "redundancy",
+            "unique1",
+            "unique2",
+            "synergy",
+            "mi_tri",
+            "mi_bi_1",
+            "mi_bi_2",
+        ]
+
+    def get_total_p(p):
+        if isinstance(p, np.ndarray):
+            return np.sum(p)
+        if isinstance(p, (list, tuple)):
+            return sum(p)
+        return p
+
+    def normalize_dims(p):
+        if isinstance(p, np.ndarray):
+            return tuple(p.tolist())
+        if isinstance(p, list):
+            return tuple(p)
+        if isinstance(p, tuple):
+            return p
+        return None
+
+    df["p_total"] = df[p_col].apply(get_total_p)
+    df["p_over_N"] = df["p_total"] / df[n_col]
+
+    dims_values = [d for d in df[p_col].apply(normalize_dims).unique().tolist() if d is not None]
+
+    # Keep only components that actually exist in the dataframe
+    components = [c for c in components if c in df.columns]
+
+    # Average repeated simulations with the same p/N
+    traj = (
+        df.groupby("p_over_N")[components]
+        .mean()
+        .reset_index()
+        .sort_values("p_over_N")
+    )
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    for comp in components:
+        line, = ax.plot(
+            traj["p_over_N"],
+            traj[comp],
+            marker="o",
+            linewidth=2,
+            label=comp,
+        )
+
+        if ground_truth is not None and comp in ground_truth:
+            gt_value = ground_truth[comp]
+
+            if hasattr(gt_value, "item"):
+                gt_value = gt_value.item()
+
+            ax.axhline(
+                gt_value,
+                linestyle="--",
+                linewidth=1.2,
+                color=line.get_color(),
+                alpha=0.7,
+                label=f"GT {comp}",
+            )
+
+    ax.set_xlabel("p / N")
+    ax.set_ylabel("Value")
+    ax.set_title(title)
+    ax.grid(True, alpha=0.3)
+
+    if len(dims_values) == 1:
+        dims_label = f"dims={list(dims_values[0])}"
+        ax.plot([], [], linestyle="", label=dims_label)
+    elif len(dims_values) > 1:
+        dims_preview = ", ".join(str(list(d)) for d in dims_values[:3])
+        suffix = " ..." if len(dims_values) > 3 else ""
+        ax.plot([], [], linestyle="", label=f"dims={dims_preview}{suffix}")
+
+    ax.legend(fontsize=8, ncol=2)
+
+    if descending_x:
+        ax.invert_xaxis()
+
+    fig.tight_layout()
+
+    if save_path is not None:
+        save_path = Path(save_path)
+        save_path.mkdir(parents=True, exist_ok=True)
+        safe_title = str(title).replace("/", "_").replace("\\", "_")
+        fig.savefig(save_path / f"{safe_title}.png", dpi=dpi, bbox_inches="tight")
+
+    plt.close(fig)
+
+    return traj

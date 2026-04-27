@@ -1,7 +1,7 @@
 
 N_P_variations:
   N_values: [300,500,1000]
-  p_values: [[30,40,50],[50,50,50],[40,50,100],[80,80,120]]
+  p_values: [[30,40,50],[50,50,50],[40,50,100]]
 
 
 logdet_simulation:
@@ -21,7 +21,7 @@ logdet_simulation:
 Mutual_Information_Simulation:
   device: 'cpu'
   seed: 1
-  n_trials: 100
+  n_trials: 1000
   bias_correction: True
   lr_type: 'ridge' # options: 'ols', 'ridge', 'lasso'
   lasso_alpha: 0.1 # only used if lr_type is 'lasso'
@@ -33,6 +33,7 @@ Mutual_Information_Simulation:
   bi_mi_type: 'whiten'
   n_perm : 20
   normalization: 'True' #If we need to whiten, is it already whiten or leave it not whiened. Options: 'True' (already whitened), 'False' (leave not whitened), 'whiten_ver' (whitened with the same method as the one used for the mi estimation)
+  ver: 'raw' # options: 'raw', 'red'. If 'red', then the M8 covariance is the same as M7 covariance, and thus the Idep value is 0. This is used to check that when there is no difference between M7 and M8, the Idep value is 0.
 
 
 0=Mutual_Information_Simulation:
@@ -62,6 +63,14 @@ M7_Mutual_Information_Simulation: #[For M8 case use: p_scale: 0.05, q_scale: 0.6
   delta: 0.2 # 0<delta<1, only used if mode is "m8_side" or "m7_side". The bigger the delta the bigger the difference between M7 and M8, and the bigger the Idep value.
   alpha: 1
 
+
+Unknown_Mutual_Information_Simulation: #[For M8 case use: p_scale: 0.05, q_scale: 0.65, r_scale: 0.75, mode: 'm8_side', delta: 0.2,alpha: 2]
+  p_scale: 0.05
+  q_scale: 0.65
+  r_scale: 0.75
+  mode: 'exact_m7' # "exact_m7", "m8_side", "m7_side"
+  delta: 0.2 # 0<delta<1, only used if mode is "m8_side" or "m7_side". The bigger the delta the bigger the difference between M7 and M8, and the bigger the Idep value.
+  alpha: 1
 
 LR_Idep_Simulation:
   device: 'cuda'
