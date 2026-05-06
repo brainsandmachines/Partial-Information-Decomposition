@@ -1,0 +1,128 @@
+
+======================================================================
+Experiment 1: snr = 0.9
+
+Covariance matrix shape: torch.Size([300, 300])
+dim_m1: 100, dim_m2: 100, dim_t: 100
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.6629 | I(T;M1): 43.3249
+M2 R² (VP): 0.2817 | I(T;M2): 16.5044
+Both M1 and M2 R² (VP): 0.7854 | I(T;M1,M2): 97.7039
+
+Unique to M1 (VP): 0.5038 | Unique(T;M1\M2): 34.7963
+Unique to M2 (VP): 0.1225 | Unique(T;M2\M1): 7.9758
+Common (VP): 0.1592 | Redundant (PID): 8.5286
+Synergy (PID): 46.4032
+
+======================================================================
+Experiment 2: snr = 0.9 multivariate gaussian with different seeds
+
+Covariance matrix shape: torch.Size([300, 300])
+dim_m1: 100, dim_m2: 100, dim_t: 100
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.6674 | I(T;M1): 43.6713
+M2 R² (VP): 0.2945 | I(T;M2): 16.9837
+Both M1 and M2 R² (VP): 0.7863 | I(T;M1,M2): 93.9290
+
+Unique to M1 (VP): 0.4918 | Unique(T;M1\M2): 34.7727
+Unique to M2 (VP): 0.1189 | Unique(T;M2\M1): 8.0851
+Common (VP): 0.1756 | Redundant (PID): 8.8986
+Synergy (PID): 42.1726
+
+======================================================================
+Experiment 3: snr = 5
+
+Covariance matrix shape: torch.Size([300, 300])
+dim_m1: 100, dim_m2: 100, dim_t: 100
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9804 | I(T;M1): 181.7631
+M2 R² (VP): 0.4795 | I(T;M2): 51.9056
+Both M1 and M2 R² (VP): 0.9835 | I(T;M1,M2): 201.5742
+
+Unique to M1 (VP): 0.5040 | Unique(T;M1\M2): 135.9663
+Unique to M2 (VP): 0.0031 | Unique(T;M2\M1): 6.1088
+Common (VP): 0.4764 | Redundant (PID): 45.7968
+Synergy (PID): 13.7022
+
+======================================================================
+Experiment 4: snr = 5 multivariate gaussian with different seeds
+
+Covariance matrix shape: torch.Size([300, 300])
+dim_m1: 100, dim_m2: 100, dim_t: 100
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.9807 | I(T;M1): 182.0176
+M2 R² (VP): 0.4916 | I(T;M2): 52.5279
+Both M1 and M2 R² (VP): 0.9836 | I(T;M1,M2): 198.7449
+
+Unique to M1 (VP): 0.4920 | Unique(T;M1\M2): 135.6421
+Unique to M2 (VP): 0.0029 | Unique(T;M2\M1): 6.1524
+Common (VP): 0.4887 | Redundant (PID): 46.3755
+Synergy (PID): 10.5749
+
+======================================================================
+Experiment 5: snr = 10
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/supp_gauss_multivariate.py", line 337, in <module>
+    main()
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/supp_gauss_multivariate.py", line 326, in main
+    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/supression_effect/supp_gauss_multivariate.py", line 72, in test_suppresion
+    vp_results , t_m_dict = run_experiment(rng,suppresion_strength,mode,N,P,mixing_dimension,snr,method) #Variance Partitioning and sources and target
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_examples/toy_example.py", line 273, in run_experiment
+    decomp = commonality_analysis(X_M1, X_M2, y_real, method=method)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_examples/toy_example.py", line 141, in commonality_analysis
+    modelA,r2_A = compute_r2_fn(features_A, target)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_examples/toy_example.py", line 134, in <lambda>
+    compute_r2_fn = lambda X, y: compute_ridge_cv_r2(X, y, alphas)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/toy_examples/toy_example.py", line 55, in compute_ridge_cv_r2
+    ridge_cv.fit(X, y)
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/base.py", line 1365, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2694, in fit
+    super().fit(X, y, sample_weight=sample_weight, **params)
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2425, in fit
+    estimator.fit(
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2201, in fit
+    alpha_score = self._score(
+                  ^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py", line 2288, in _score
+    _score = scorer(identity_estimator, predictions, y, **score_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/metrics/_scorer.py", line 308, in __call__
+    return self._score(partial(_cached_call, None), estimator, X, y_true, **_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/metrics/_scorer.py", line 408, in _score
+    return self._sign * self._score_func(y_true, y_pred, **scoring_kwargs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/utils/_param_validation.py", line 191, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/sklearn/metrics/_regression.py", line 1292, in r2_score
+    numerator = xp.sum(weight * (y_true - y_pred) ** 2, axis=0)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/numpy/_core/fromnumeric.py", line 2333, in _sum_dispatcher
+    def _sum_dispatcher(a, axis=None, dtype=None, out=None, keepdims=None,
+    
+KeyboardInterrupt

@@ -11,10 +11,18 @@ from sklearn.covariance import LedoitWolf
 
 if __name__ != "__main__":
     from .PID_util import create_cov_matrix,whiten_block,block_singularity_check
-    from .bias_corr import entropy_bias_term
 else:
     from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report
 from typing import Optional
+
+
+import sys
+from pathlib import Path
+root = Path(__file__).resolve().parents[1]
+sys.path.append(str(root))  
+from Partial_Information_Decomposition.bias_functions import logdet_wishart_bias
+from Partial_Information_Decomposition.Idep_Simulations.unique_m7_m8 import bias_func
+
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
 
@@ -53,12 +61,12 @@ class Idep_multivariate_gauss:
             self.cov_matrix = cov_matrix
 
         if self.cov_dict is not None:
-            self.sigma00 = self.cov_dict['cov_x0']
-            self.sigma11 = self.cov_dict['cov_x1']
-            self.sigma22 = self.cov_dict['cov_x2']
-            self.sigma01 = self.cov_dict['cross_x0_x1']
-            self.sigma02 = self.cov_dict['cross_x0_x2']
-            self.sigma12 = self.cov_dict['cross_x1_x2']
+            self.sigma00 = self.cov_dict['cov_x1']
+            self.sigma11 = self.cov_dict['cov_x2']
+            self.sigma22 = self.cov_dict['cov_xt']
+            self.sigma01 = self.cov_dict['cross_x1_x2']
+            self.sigma02 = self.cov_dict['cross_x1_xt']
+            self.sigma12 = self.cov_dict['cross_x2_xt']
 
 
             self.P = whiten_block(self.sigma00, self.sigma01, self.sigma11)
@@ -78,14 +86,15 @@ class Idep_multivariate_gauss:
             block_singularity_check(np.array([p,q,r]))
             block_singularity_check(np.array([p.T,q.T,r.T]))
         if bias_correction:
-            self.bm1 = entropy_bias_term(df, self.dim_m1) 
-            self.bm2 = entropy_bias_term(df, self.dim_m2)
-            self.bt = entropy_bias_term(df, self.dim_t)
+            print("Calculating bias correction terms...")
+            self.bm1 = logdet_wishart_bias(df, self.dim_m1) 
+            self.bm2 = logdet_wishart_bias(df, self.dim_m2)
+            self.bt = logdet_wishart_bias(df, self.dim_t)
             
-            self.bq = entropy_bias_term(df, self.dim_t + self.dim_m1)
-            self.br = entropy_bias_term(df, self.dim_t + self.dim_m2)
-            self.bp = entropy_bias_term(df, self.dim_m1 + self.dim_m2)
-            self.ball = entropy_bias_term(df, self.dim_m1 + self.dim_m2 + self.dim_t)
+            self.bq = logdet_wishart_bias(df, self.dim_t + self.dim_m1)
+            self.br = logdet_wishart_bias(df, self.dim_t + self.dim_m2)
+            self.bp = logdet_wishart_bias(df, self.dim_m1 + self.dim_m2)
+            self.ball = logdet_wishart_bias(df, self.dim_m1 + self.dim_m2 + self.dim_t)
             
         else: 
             self.ball = self.b_tmi = self.bm1 = self.bm2 = self.bt = self.bq = self.br = self.bp = 0
@@ -236,7 +245,7 @@ class Idep_multivariate_gauss:
 
         unique_1_raw = torch.min(torch.stack([i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
         assert unique_1_raw == i or unique_1_raw == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={unique_1_raw}, i={i}, k={k}."
-        unique_1 = unique_1_raw + bias_cmi_m1_given_m2
+        unique_1 = unique_1_raw - bias_cmi_m1_given_m2
         self.I_dep_values['unique_1'] = unique_1.item()
 
         #Calculate unique 2
@@ -246,7 +255,7 @@ class Idep_multivariate_gauss:
         unique_2_raw = torch.min(torch.stack([h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
 
         assert unique_2_raw == h or unique_2_raw == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={unique_2_raw}, h={h}, j={j}."
-        unique_2 = unique_2_raw + bias_cmi_m2_given_m1
+        unique_2 = unique_2_raw - bias_cmi_m2_given_m1
         self.I_dep_values['unique_2'] = unique_2.item()
         #Check for nan values
         assert not torch.isnan(unique_1), f"unique_0 = {unique_1} was not calculated properly."

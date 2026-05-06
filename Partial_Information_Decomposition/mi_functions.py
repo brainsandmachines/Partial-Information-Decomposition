@@ -218,7 +218,7 @@ def mi_wrapper(config,sigma_dict,whiten_terms_dict,tri_variate=True):
 
 
 
-def pid_components(pid_config):
+def pid_components(pid_config,print_results=False):
     """Calculate PID components with the known components. 
     Input: 
         pid_config: dict - contains all need mutual information (I(T,X1), I(T,X2), I(T,X1,X2)) and 
@@ -230,10 +230,10 @@ def pid_components(pid_config):
     mi_tri = pid_config['mi_tri']
     mi_bi_1 = pid_config['mi_bi_1']
     mi_bi_2 = pid_config['mi_bi_2']
-    redundancy = pid_config.get('redundancy', None)
-    synergy = pid_config.get('synergy', None)
-    unique1 = pid_config.get('unique1', None)
-    unique2 = pid_config.get('unique2', None)
+    redundancy = pid_config.get('red', None)
+    synergy = pid_config.get('sy', None)
+    unique1 = pid_config.get('unq1', None)
+    unique2 = pid_config.get('unq2', None)
 
     if redundancy is not None:
         unique1 = mi_bi_1 - redundancy
@@ -263,4 +263,8 @@ def pid_components(pid_config):
         'unique2': unique2,
         'synergy': synergy
     }
+    if print_results:
+        print("PID Components:")
+        for key, value in pid_dict.items():
+            print(f"  {key}: {value:.6f}")
     return pid_dict

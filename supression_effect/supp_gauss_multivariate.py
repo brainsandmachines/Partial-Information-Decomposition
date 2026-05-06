@@ -40,7 +40,7 @@ def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
     return (X - mean) / (std + eps)
 
 
-def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,simple_example=True, snr=1.0,method='ridge_cv',mixing_dimension=None):
+def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,mode='simple', snr=1.0,method='ridge_cv',mixing_dimension=None):
     """Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds.
     Parameters
     ----------
@@ -69,7 +69,7 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,simple_example
 
     rng = np.random.default_rng(seed=rng_seed)
     # --- generate data ---
-    vp_results , t_m_dict = run_experiment(rng,suppresion_strength,simple_example,N,P,mixing_dimension,snr,method) #Variance Partitioning and sources and target
+    vp_results , t_m_dict = run_experiment(rng,suppresion_strength,mode,N,P,mixing_dimension,snr,method) #Variance Partitioning and sources and target
 
     M1 = t_m_dict['X_M1']
     M2 = t_m_dict['X_M2']
@@ -92,7 +92,7 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,simple_example
     
     sources = [M1,M2]
     targets = [T]
-    idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=True)
+    idep_class = Idep_multivariate_gauss(sources,targets,bias_correction=False)
     pid , mi = idep_class.idep()
     return vp_results,pid,mi
 
@@ -252,7 +252,7 @@ def run_single_seed_fixed(seed: int, config: dict) -> dict:
         P=config["P"],
         suppresion_strength=config["suppresion_strength"],
         rng_seed=seed,
-        simple_example=config["simple_example"],
+        mode=config["simple_example"],
         snr=config["snr"],
         method=config["method"],
         mixing_dimension=config["mixing_dimension"],
@@ -290,45 +290,45 @@ def run_fixed_params_across_seeds(config: dict | None = None) -> tuple[dict, lis
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 1000000, 100
+    N, P = 100000, 100
     rng_seed = 10
-    snr = 1
+    snr = 0.9
     method = 'ridge_cv'
-    mixing_dimension = 50
-    simple_example = True
+    mixing_dimension = None
+    mode = 'only_unq2_zero'
     suppresion_strength = 0.5
     print("\n" + "="*70)
     print(f"Experiment 1: snr = {snr}")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed, simple_example=simple_example, snr=1, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
     #plot_pid_results(pid_results=pid_results, sub_title="Experiment 2")
     #plot_pid_results(mi_results=mi_results, sub_title="Experiment 2")
 
     print("\n" + "="*70)
     print(f"Experiment 2: snr = {snr} multivariate gaussian with different seeds")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 5
     print(f"Experiment 3: snr = {snr}")
-    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     print(f"Experiment 4: snr = {snr} multivariate gaussian with different seeds")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 10
     print(f"Experiment 5: snr = {snr}")
-    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     print(f"Experiment 6: snr = {snr} multivariate gaussian with different seeds")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+1, simple_example=simple_example, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+1, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\nAll experiments completed.")

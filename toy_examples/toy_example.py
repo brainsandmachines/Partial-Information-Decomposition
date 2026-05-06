@@ -186,49 +186,26 @@ def permutate_models(rng,features,suppression_strength):
 
     return X_M1, X_M2
 
+def unq2_zero(rng,n,p,noise_std):
+
+    R_features = rng.standard_normal((n, p))
+    unq1_features = rng.standard_normal((n, p))
+    noise = noise_std * rng.standard_normal((n, p))
+
+    betas_R = rng.standard_normal((p, p))
+    signal_R = R_features @ betas_R
+
+    betas_unq1 = rng.standard_normal((p, p))
+    signal_unq1 = unq1_features @ betas_unq1
+
+    y = signal_R + signal_unq1 
+    X_M1 = signal_R + signal_unq1 + noise
+    X_M2 = signal_R + noise
+
+    return X_M1, X_M2, y
 
 
-
-def rotate_in_random_plane(rng, X, angle_degrees):
-    """
-    Rotate every row vector of X by angle_degrees in the SAME random 2D plane.
-    
-    Args:
-        rng: np.random.Generator
-        X: (n, p) array (rows = samples, cols = features)
-        angle_degrees: float
-        
-    Returns:
-        X_rot: (n, p) rotated features
-        u, v: the orthonormal plane directions used
-    """
-    X = np.asarray(X)
-    n, p = X.shape
-
-    theta = np.deg2rad(angle_degrees)
-    c, s = np.cos(theta), np.sin(theta)
-
-    # Sample random orthonormal u, v
-    u = rng.standard_normal(p)
-    u = u / (np.linalg.norm(u) + 1e-12)
-
-    v = rng.standard_normal(p)
-    v = v - (v @ u) * u
-    v = v / (np.linalg.norm(v) + 1e-12)
-
-    # Coordinates in the plane
-    a = X @ u   # (n,)
-    b = X @ v   # (n,)
-
-    # Rotate (a,b) -> (a', b')
-    a_rot = c * a - s * b
-    b_rot = s * a + c * b
-
-    # Put back into R^p: x' = x + (a'-a)u + (b'-b)v
-    X_rot = X + np.outer(a_rot - a, u) + np.outer(b_rot - b, v)
-    return X_rot, u, v
-
-def run_experiment(rng,suppresion_strength,simple_example = False, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False):
+def run_experiment(rng,suppresion_strength,mode, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False):
     """
     Run commonality analysis experiment.
     
@@ -247,10 +224,8 @@ def run_experiment(rng,suppresion_strength,simple_example = False, n=1024, p=100
     real_features = rng.standard_normal((n, p))
     spurious_features = rng.standard_normal((n, p))
     rand_perm = rng.permutation(n)
-    
-    shuffled_real = real_features[rand_perm]
-    shuffled_spurious = spurious_features[rand_perm]
-    
+
+
     # Target: only real features contribute
     betas = rng.standard_normal((p, p))
     signal = real_features @ betas
@@ -261,14 +236,15 @@ def run_experiment(rng,suppresion_strength,simple_example = False, n=1024, p=100
     noise_Xm1 = noise_std_1 * rng.standard_normal((n, p))
     noise_Xm2 = noise_std_2 * rng.standard_normal((n, p))
 
-    if simple_example:
+    if mode == "simple":
         common_noise = noise_std * rng.standard_normal((n,p))
         X_M1 = signal + common_noise
         X_M2 = common_noise
-    else:
+    elif mode == "permuted":
         X_M1, X_M2 = permutate_models(rng, real_features, suppression_strength=suppresion_strength)
         #X_M1 += noise_Xm1
-
+    elif mode == 'only_unq2_zero':
+        X_M1, X_M2, y_real = unq2_zero(rng, n, p, noise_std)
     # else: 
     #     X_M1, X_M2 = half_permute(rng, signal, suppression_strength=0.3)
     # make sure joint covariance matrix is not singular
@@ -285,6 +261,8 @@ def run_experiment(rng,suppresion_strength,simple_example = False, n=1024, p=100
     # plot correlation matrices
     if show_diagnostic_plots:
         diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension)
+
+    
 
     # make sure joint covariance matrix is not singular
     #sing_report = singularity_report(X_M1, X_M2, y_real)

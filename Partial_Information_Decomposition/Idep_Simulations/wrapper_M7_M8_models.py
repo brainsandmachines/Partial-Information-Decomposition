@@ -9,7 +9,10 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import whiten_block, create_cov_matrix
-from mi_functions import calcualte_mi
+from mi_functions import calcualte_mi, safe_logdet
+
+# Import optimization module from same directory
+from Idep_Simulations.optimize_only_unq1_zero import make_only_unq1_zero_cov
 
 
 
@@ -27,7 +30,6 @@ def _build_whitened_blocks_from_cov(S, n0, n1, n2):
     return P, Q, R, S_dict
 
 
-
 def make_random_true_cov(
     config: dict,
     rng: torch.Generator | None = None,
@@ -35,8 +37,8 @@ def make_random_true_cov(
     """
     Construct a whitened Gaussian M8 covariance and its corresponding M7 covariance.
 
-    New config parameters:
-        mode: one of {"exact_m7", "m8_side", "m7_side"}
+    Config parameters:
+        ver: one of {"exact_m7", "m8_side", "m7_side", "only_unq1_zero"}
         delta: size of perturbation away from P_m7 = Q @ R.T
         max_tries: retry budget to find a covariance in the requested regime
         delta_margin: minimum separation in MI gap to accept the sample
@@ -45,20 +47,29 @@ def make_random_true_cov(
         - "exact_m7" gives P = Q @ R.T exactly.
         - "m8_side" means keep only draws with I_M8 - I_M7 < 0.
         - "m7_side" means keep only draws with I_M8 - I_M7 > 0.
+        - "only_unq1_zero" uses differential evolution to find Q, R such that
+          det(I - R@Q.T @ Q@R.T) = det(I - Q@Q.T), enforcing unique_1 ≈ 0.
+          
+    Config parameters for "only_unq1_zero" ver:
+        de_seed: random seed for differential evolution (default: 42)
+        de_maxiter: max iterations for DE (default: 1000)
+        de_tolerance: convergence tolerance for logdet constraint (default: 1e-10)
     """
-    q_scale = config["q_scale"]
-    r_scale = config["r_scale"]
+    q_scale = float(config["q_scale"])
+    r_scale = float(config["r_scale"])
     n0 = config["n0"]
     n1 = config["n1"]
     n2 = config["n2"]
     device = config["device"]
 
-    mode = config.get("mode", "exact_m7")       # "exact_m7", "m8_side", "m7_side"
-    delta = config.get("delta", 0.0)            # perturbation size
-    max_tries = config.get("max_tries", 1000)
-    delta_margin = config.get("delta_margin", 1e-3)
-    alpha = config.get("alpha", 0.5)            # only used for shrinkage versions, ignored otherwise
+    mode = config.get("mode", "exact_m7")       # "exact_m7", "m8_side", "m7_side", "only_unq1_zero"
+    delta = float(config.get("delta", 0.0))            # perturbation size
+    max_tries = int(config.get("max_tries", 1000))
+    delta_margin = float(config.get("delta_margin", 1e-3))
+    alpha = float(config.get("alpha", 0.5))            # only used for shrinkage versions, ignored otherwise
+    ver = config.get("ver", "raw")             # "raw" for regular M8, "red" for reduced version where Q = P@R
     dtype = torch.float64
+
 
     for _ in range(max_tries):
         A = torch.randn((n0, n2), generator=rng, dtype=dtype, device=device)
@@ -85,7 +96,7 @@ def make_random_true_cov(
             D = C / C_norm
             P = alpha*P_m7 + delta * D
         else:
-            raise ValueError(f"Unknown mode: {mode}")
+            raise ValueError(f"Unknown ver: {ver}")
 
         # Build M8 covariance
         true_cov_m8 = create_cov_m8(config, P, Q, R)
@@ -117,10 +128,10 @@ def make_random_true_cov(
         except RuntimeError:
             continue
 
-        if mode == "m8_side" and delta_mi < -delta_margin:
+        if ver == "m8_side" and delta_mi < -delta_margin:
             return true_cov_m8, true_cov_m7
 
-        if mode == "m7_side" and delta_mi > delta_margin:
+        if ver == "m7_side" and delta_mi > delta_margin:
             return true_cov_m8, true_cov_m7
 
     return true_cov_m8, true_cov_m7  # return the last one even if it doesn't meet criteria after max_tries
@@ -288,7 +299,9 @@ def create_cov_m8(config, P, Q, R):
         Q = P@R
         assert Q.shape == (n0,n2),"Shape mismatch for Q in red version"
 
-
+    if ver == 'only_unq1_zero':
+        # In this version we don't use the P,Q,R from the random construction, but rather the ones optimized for unique_1=0. So we just build the M8 covariance directly from those optimized blocks.
+        P, Q, R = make_only_unq1_zero_cov(config)
     row1_m8 = torch.cat([torch.eye(n0, device=config['device']), P, Q], dim=1)
     row2_m8 = torch.cat([P.T, torch.eye(n1, device=config['device']), R], dim=1)
     row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   

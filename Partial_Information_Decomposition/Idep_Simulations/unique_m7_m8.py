@@ -19,7 +19,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import create_cov_matrix
-from Partial_Information_Decomposition.mi_functions import mi_wrapper
+from Partial_Information_Decomposition.mi_functions import mi_wrapper,pid_components
 from Partial_Information_Decomposition.bias_functions import permuteation_debiased,unique_bias,permutation_null_debias,logdet_wishart_bias
 
 def simulate_m7_m8_idep(
@@ -82,10 +82,17 @@ def simulate_m7_m8_idep(
     #Unique 1
     i_true = m7_MI_true - i_x2_t_true
     k_true = m8_MI_true - i_x2_t_true
-    
+    true_unq1 = min(i_true, k_true)
     #Unique 2
     h_true = m7_MI_true - i_x1_t_true
     j_true = m8_MI_true - i_x1_t_true
+    true_unq2 = min(h_true, j_true)
+    true_pid_conffig = {'mi_tri': m8_MI_true, 'mi_bi_1': i_x1_t_true, 'mi_bi_2': i_x2_t_true,'unq1': true_unq1, 'unq2': true_unq2}
+    _ = pid_components(true_pid_conffig, print_results=True)
+    print(f"\nTrue i node value: {i_true:.6f}")
+    print(f"True k node value: {k_true:.6f}")
+    print(f"True h node value: {h_true:.6f}")
+    print(f"True j node value: {j_true:.6f}")
 
 
     unq1_dict_values = {'i':[],'k':[]}
@@ -388,10 +395,10 @@ def _render_pid_trajectories(config, i_result, j_result, k_result, h_result, sav
         return
 
     plot_specs = [
-        (i_result, 'unique1', f"PID components vs p/N - Unique-1-i-node-{exp_name}"),
-        (k_result, 'unique1', f"PID components vs p/N - Unique-1-k-node-{exp_name}"),
-        (j_result, 'unique2', f"PID components vs p/N - Unique-2-j-node-{exp_name}"),
-        (h_result, 'unique2', f"PID components vs p/N - Unique-2-h-node-{exp_name}"),
+        (i_result, 'unq1', f"PID components vs p/N - Unique-1-i-node-{exp_name}"),
+        (k_result, 'unq1', f"PID components vs p/N - Unique-1-k-node-{exp_name}"),
+        (j_result, 'unq2', f"PID components vs p/N - Unique-2-j-node-{exp_name}"),
+        (h_result, 'unq2', f"PID components vs p/N - Unique-2-h-node-{exp_name}"),
     ]
 
     for node_rows, known_component, title in plot_specs:

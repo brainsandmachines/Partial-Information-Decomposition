@@ -1,7 +1,7 @@
 import torch
 from pathlib import Path
 import sys
-from Idep_Simulations.wrapper_M7_M8_models import make_random_true_cov,create_m7_cov
+from Partial_Information_Decomposition.Idep_Simulations.wrapper_M7_M8_models import make_random_true_cov,create_m7_cov
 from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import build_m7_terms
 from mi_functions import calcualte_mi
 
