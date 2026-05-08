@@ -4,6 +4,7 @@ import sys
 from Partial_Information_Decomposition.Idep_Simulations.wrapper_M7_M8_models import make_random_true_cov,create_m7_cov
 from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import build_m7_terms
 from mi_functions import calcualte_mi
+from functools import partial
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
@@ -144,3 +145,36 @@ def unique_bias(config,functions_dict:dict = None):
 
         
     return bias_dict
+
+
+def bias_func(config,model):
+    n0 = config['n0']
+    n1 = config['n1']
+    n2 = config['n2']
+    n_samples = config['n_samples']
+    d = n0 + n1 + n2
+    df = n_samples - 1
+
+    bias_x0 = logdet_wishart_bias(df, n0)
+    bias_x1 = logdet_wishart_bias(df, n1)
+    bias_y  = logdet_wishart_bias(df, n2)
+    # M7 (Structural) Biases
+    bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
+    bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
+    bias_2 = bias_y # seperator 2
+    bi_variate_mix2t_bias = 0.5*logdet_wishart_bias(df, n1) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n1+n2)
+    bi_variate_mix1t_bias = 0.5*logdet_wishart_bias(df, n0) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n0+n2)
+
+    if model == 'M7':
+        nume_bias = permutation_null_debias(config,partial(permuteation_debiased,term='nume'))['bias']
+        bias_m7_structural = bias_02 + bias_12 - bias_2
+        deno_bias = 0.5 * (bias_m7_structural - (bias_x0 + bias_x1 + bias_y))
+        return {'i': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'h': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
+    
+    elif model == 'M8':
+        deno_bias = 0.5*(logdet_wishart_bias(df, d)-(bias_x0 + bias_x1 + bias_y))
+        nume_bias = 0.5*(logdet_wishart_bias(df, n0 + n1) - (bias_x0 + bias_x1))
+        return {'k': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'j': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
+
+    
+

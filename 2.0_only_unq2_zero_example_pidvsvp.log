@@ -1,0 +1,128 @@
+
+======================================================================
+Experiment 1: snr = 0.5
+Using scalses: R=0.7, U=5.0, N=2.0, eps_y=14.213029068394043
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([150, 150])
+dim_m1: 50, dim_m2: 50, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0034 | I(T;M1): 0.0857
+M2 R² (VP): -0.0001 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.1099 | I(T;M1,M2): 2.9132
+
+Unique to M1 (VP): 0.1100 | Unique(T;M1\M2): 0.0857
+Unique to M2 (VP): 0.1065 | Unique(T;M2\M1): 0.0000
+Common (VP): -0.1066 | Redundant (PID): 0.0000
+Synergy (PID): 2.8274
+
+======================================================================
+Experiment 2: snr = 0.5 multivariate gaussian with different seeds
+Using scalses: R=0.7, U=5.0, N=2.0, eps_y=14.004650820436844
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([150, 150])
+dim_m1: 50, dim_m2: 50, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0036 | I(T;M1): 0.0904
+M2 R² (VP): -0.0001 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.1126 | I(T;M1,M2): 2.9894
+
+Unique to M1 (VP): 0.1127 | Unique(T;M1\M2): 0.0904
+Unique to M2 (VP): 0.1091 | Unique(T;M2\M1): 0.0000
+Common (VP): -0.1091 | Redundant (PID): 0.0000
+Synergy (PID): 2.8990
+
+======================================================================
+Experiment 3: snr = 0.9
+Using scalses: R=0.7, U=5.0, N=2.0, eps_y=7.896127260218913
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([150, 150])
+dim_m1: 50, dim_m2: 50, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0268 | I(T;M1): 0.6815
+M2 R² (VP): -0.0000 | I(T;M2): 0.0003
+Both M1 and M2 R² (VP): 0.2847 | I(T;M1,M2): 8.3786
+
+Unique to M1 (VP): 0.2847 | Unique(T;M1\M2): 0.6815
+Unique to M2 (VP): 0.2579 | Unique(T;M2\M1): 0.0002
+Common (VP): -0.2579 | Redundant (PID): 0.0000
+Synergy (PID): 7.6969
+
+======================================================================
+Experiment 4: snr = 0.9 multivariate gaussian with different seeds
+Using scalses: R=0.7, U=5.0, N=2.0, eps_y=7.780361566909358
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([150, 150])
+dim_m1: 50, dim_m2: 50, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0281 | I(T;M1): 0.7147
+M2 R² (VP): -0.0000 | I(T;M2): 0.0003
+Both M1 and M2 R² (VP): 0.2904 | I(T;M1,M2): 8.5790
+
+Unique to M1 (VP): 0.2904 | Unique(T;M1\M2): 0.7147
+Unique to M2 (VP): 0.2623 | Unique(T;M2\M1): 0.0002
+Common (VP): -0.2623 | Redundant (PID): 0.0000
+Synergy (PID): 7.8641
+
+======================================================================
+Experiment 5: snr = 3
+Using scalses: R=0.7, U=5.0, N=2.0, eps_y=2.368838178065674
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([150, 150])
+dim_m1: 50, dim_m2: 50, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.4357 | I(T;M1): 14.3055
+M2 R² (VP): 0.0003 | I(T;M2): 0.0083
+Both M1 and M2 R² (VP): 0.8042 | I(T;M1,M2): 40.7690
+
+Unique to M1 (VP): 0.8039 | Unique(T;M1\M2): 14.3014
+Unique to M2 (VP): 0.3685 | Unique(T;M2\M1): 0.0041
+Common (VP): -0.3682 | Redundant (PID): 0.0042
+Synergy (PID): 26.4593
+
+======================================================================
+Experiment 6: snr = 5 multivariate gaussian with different seeds
+Using scalses: R=0.7, U=5.0, N=2.0, eps_y=1.3717333709828639
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([150, 150])
+dim_m1: 50, dim_m2: 50, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.7190 | I(T;M1): 31.7342
+M2 R² (VP): 0.0010 | I(T;M2): 0.0274
+Both M1 and M2 R² (VP): 0.9144 | I(T;M1,M2): 61.4573
+
+Unique to M1 (VP): 0.9134 | Unique(T;M1\M2): 31.7136
+Unique to M2 (VP): 0.1954 | Unique(T;M2\M1): 0.0068
+Common (VP): -0.1944 | Redundant (PID): 0.0206
+Synergy (PID): 29.7163
+
+All experiments completed.

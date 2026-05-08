@@ -1,0 +1,251 @@
+
+======================================================================
+Experiment 1: snr = 0.5
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.07e-13
+Block 0: min eigenvalue = -9.95e-16 -> SINGULAR
+Block 0: min eigenvalue = -9.95e-16 -> SINGULAR
+Calculating bias correction terms...
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -7.66e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -7.66e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.25e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.25e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.14e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.14e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.12e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.12e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.23e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.23e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.59e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.59e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.36e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.36e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.92e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.92e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.56e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.56e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.12e-13
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.12e-13
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.21e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.21e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.19e-13
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.19e-13
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.93e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.93e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.86e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.86e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.77e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.77e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.22e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.22e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -8.73e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -8.73e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.07e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.07e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.43e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.43e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.50e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.50e-14
+
+Covariance matrix shape: torch.Size([130, 130])
+dim_m1: 40, dim_m2: 40, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0802 | I(T;M1): 1.9383
+M2 R² (VP): -0.0000 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.0995 | I(T;M1,M2): 2.5793
+
+Unique to M1 (VP): 0.0995 | Unique(T;M1\M2): 1.9382
+Unique to M2 (VP): 0.0193 | Unique(T;M2\M1): -0.0000
+Common (VP): -0.0193 | Redundant (PID): 0.0001
+Synergy (PID): 0.6411
+
+======================================================================
+Experiment 2: snr = 0.5 multivariate gaussian with different seeds
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([90, 90])
+dim_m1: 20, dim_m2: 20, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0368 | I(T;M1): 0.8506
+M2 R² (VP): -0.0000 | I(T;M2): -0.0000
+Both M1 and M2 R² (VP): 0.0438 | I(T;M1,M2): 1.0242
+
+Unique to M1 (VP): 0.0438 | Unique(T;M1\M2): 0.8506
+Unique to M2 (VP): 0.0070 | Unique(T;M2\M1): -0.0000
+Common (VP): -0.0070 | Redundant (PID): 0.0000
+Synergy (PID): 0.1736
+
+======================================================================
+Experiment 3: snr = 0.9
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.57e-14
+Block 0: min eigenvalue = -9.95e-16 -> SINGULAR
+Block 0: min eigenvalue = -9.95e-16 -> SINGULAR
+Calculating bias correction terms...
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.68e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.68e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.08e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.08e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.05e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.05e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.49e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.49e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.56e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.56e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.29e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.29e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.86e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.86e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.40e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.40e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.13e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.13e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.02e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.02e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.75e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.75e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.81e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.81e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.94e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -4.94e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.19e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.19e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.32e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.32e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.00e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -5.00e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.22e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.22e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.82e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.82e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.97e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.97e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.25e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -6.25e-14
+
+Covariance matrix shape: torch.Size([130, 130])
+dim_m1: 40, dim_m2: 40, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.1792 | I(T;M1): 4.4657
+M2 R² (VP): -0.0000 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.2220 | I(T;M1,M2): 5.9148
+
+Unique to M1 (VP): 0.2220 | Unique(T;M1\M2): 4.4655
+Unique to M2 (VP): 0.0428 | Unique(T;M2\M1): -0.0001
+Common (VP): -0.0428 | Redundant (PID): 0.0001
+Synergy (PID): 1.4493
+
+======================================================================
+Experiment 4: snr = 0.9 multivariate gaussian with different seeds
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([90, 90])
+dim_m1: 20, dim_m2: 20, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0819 | I(T;M1): 1.8335
+M2 R² (VP): -0.0000 | I(T;M2): -0.0000
+Both M1 and M2 R² (VP): 0.0974 | I(T;M1,M2): 2.2391
+
+Unique to M1 (VP): 0.0974 | Unique(T;M1\M2): 1.8335
+Unique to M2 (VP): 0.0155 | Unique(T;M2\M1): -0.0000
+Common (VP): -0.0155 | Redundant (PID): 0.0000
+Synergy (PID): 0.4056
+
+======================================================================
+Experiment 5: snr = 3
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.29e-14
+Block 0: min eigenvalue = -9.95e-16 -> SINGULAR
+Block 0: min eigenvalue = -9.95e-16 -> SINGULAR
+Calculating bias correction terms...
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.60e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.60e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -8.71e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -8.71e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.15e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.15e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.30e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.30e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.13e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.13e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.23e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.23e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.63e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.63e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.96e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.96e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.10e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.10e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.51e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.51e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.39e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.39e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.78e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.78e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.12e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.12e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.97e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.97e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.33e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.33e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.52e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -3.52e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.59e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -9.59e-15
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.97e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.97e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.66e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -1.66e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.12e-14
+Warning: Full covariance matrix is singular or ill-conditioned with min eigenvalue: -2.12e-14
+
+Covariance matrix shape: torch.Size([130, 130])
+dim_m1: 40, dim_m2: 40, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.3632 | I(T;M1): 13.7737
+M2 R² (VP): -0.0000 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.4491 | I(T;M1,M2): 19.5922
+
+Unique to M1 (VP): 0.4491 | Unique(T;M1\M2): 13.7734
+Unique to M2 (VP): 0.0859 | Unique(T;M2\M1): -0.0003
+Common (VP): -0.0859 | Redundant (PID): 0.0003
+Synergy (PID): 5.8188
+
+======================================================================
+Experiment 6: snr = 5 multivariate gaussian with different seeds
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([90, 90])
+dim_m1: 20, dim_m2: 20, dim_t: 50
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.1986 | I(T;M1): 7.2782
+M2 R² (VP): -0.0000 | I(T;M2): -0.0000
+Both M1 and M2 R² (VP): 0.2330 | I(T;M1,M2): 9.0800
+
+Unique to M1 (VP): 0.2331 | Unique(T;M1\M2): 7.2781
+Unique to M2 (VP): 0.0345 | Unique(T;M2\M1): -0.0001
+Common (VP): -0.0345 | Redundant (PID): 0.0001
+Synergy (PID): 1.8019
+
+All experiments completed.

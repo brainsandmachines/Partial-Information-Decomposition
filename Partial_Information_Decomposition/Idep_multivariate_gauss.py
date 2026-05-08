@@ -20,8 +20,7 @@ import sys
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
-from Partial_Information_Decomposition.bias_functions import logdet_wishart_bias
-from Partial_Information_Decomposition.Idep_Simulations.unique_m7_m8 import bias_func
+from Partial_Information_Decomposition.bias_functions import bias_func,logdet_wishart_bias
 
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
@@ -29,7 +28,7 @@ Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems
 
 torch.set_default_dtype(torch.float64)
 class Idep_multivariate_gauss:
-    def __init__(self, sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
+    def __init__(self, rng=None,sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
         """Initialize the Idep multivariate gaussian class
 
         input: M1,M2,T are torch tensors of shape (N,P)
@@ -38,7 +37,8 @@ class Idep_multivariate_gauss:
 
         """
         self.base_e = base_e  # Default to natural logarithm
-        
+        self.rng = rng
+
         self.M1 = sources[0] if sources is not None else None
         self.M2 = sources[1] if sources is not None else None
         self.T = targets[0] if targets is not None else None
@@ -48,7 +48,7 @@ class Idep_multivariate_gauss:
         self.dim_m1 = self.M1.shape[1] if self.M1 is not None else 0
         self.dim_m2 = self.M2.shape[1] if self.M2 is not None else 0
         self.dim_t = self.T.shape[1] if self.T is not None else 0
-
+        self.bias_correction = bias_correction
         self.I0 = torch.eye(self.dim_m1)
         self.I1 = torch.eye(self.dim_m2)
         self.I2 = torch.eye(self.dim_t)
@@ -85,19 +85,28 @@ class Idep_multivariate_gauss:
             r = (torch.eye(self.R.shape[0]) - self.R @ self.R.T).detach().cpu().numpy()
             block_singularity_check(np.array([p,q,r]))
             block_singularity_check(np.array([p.T,q.T,r.T]))
-        if bias_correction:
+        if self.bias_correction :
             print("Calculating bias correction terms...")
-            self.bm1 = logdet_wishart_bias(df, self.dim_m1) 
-            self.bm2 = logdet_wishart_bias(df, self.dim_m2)
-            self.bt = logdet_wishart_bias(df, self.dim_t)
-            
-            self.bq = logdet_wishart_bias(df, self.dim_t + self.dim_m1)
-            self.br = logdet_wishart_bias(df, self.dim_t + self.dim_m2)
-            self.bp = logdet_wishart_bias(df, self.dim_m1 + self.dim_m2)
-            self.ball = logdet_wishart_bias(df, self.dim_m1 + self.dim_m2 + self.dim_t)
-            
+            config_m8 = {
+                'model': 'M8',
+                'rng': self.rng,
+                'n0': self.dim_m1,
+                'n1': self.dim_m2,
+                'n2': self.dim_t,
+                'n_samples': self.N,
+                'X1': self.M1,
+                'X2': self.M2,
+                'T': self.T,
+                'device': self.M1.device if self.M1 is not None else 'cpu',
+                'n_perm': 20
+            }
+            config_m7 = config_m8.copy()
+            config_m7['model'] = 'M7'
+            self.m8_bias = bias_func(config_m8,'M8')
+            self.m7_bias = bias_func(config_m7,'M7')
         else: 
-            self.ball = self.b_tmi = self.bm1 = self.bm2 = self.bt = self.bq = self.br = self.bp = 0
+            self.m8_bias = {'j':0,'k':0} 
+            self.m7_bias = {'i':0,'h':0}
             
         self.I_dep_values = {}
         self.PID_values = {}
@@ -211,51 +220,41 @@ class Idep_multivariate_gauss:
         assert hasattr(self, "constraint_cov_dict"), "Run dependency_matrix(...) before compute_Idep(...)."
         
         self.q_logdet = torch.logdet(self.I2 - (self.Q.T @ self.Q))
-        self.q_correction = (self.bm1 + self.bt - self.bq)
-        self.i_m1_t_raw = -0.5*self.q_logdet 
-        self.i_m1_t = self.i_m1_t_raw + self.q_correction
+        self.i_m1_t = -0.5*self.q_logdet 
         
         self.r_logdet = torch.logdet(self.I2 - (self.R.T @ self.R))
-        self.r_correction = (self.bm2 + self.bt - self.br) 
-        self.i_m2_t_raw = -0.5*self.r_logdet
-        self.i_m2_t = self.i_m2_t_raw + self.r_correction
+        self.i_m2_t = -0.5*self.r_logdet
 
-        self.b_tmi = (self.bp + self.bt - self.ball)
         #M7:
         mat = self.constraint_cov_dict['c_model_7']
         block7 = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
         nume7 = torch.logdet(self.I1-(block7.T@block7)) 
         deno7 = torch.logdet(self.I2 - (self.Q.T @ self.Q)) + torch.logdet(self.I2 - (self.R.T @ self.R))  
-        m7_raw = 0.5*(nume7- deno7) + self.b_tmi
+        m7_raw = 0.5*(nume7- deno7) 
         
         #M8:
         mat = self.constraint_cov_dict['c_model_8']
         nume8 = torch.logdet(self.I1 - (self.P.T @ self.P))
         deno8 = torch.logdet(mat)
-        m8_raw = 0.5*(nume8-deno8) + self.b_tmi
+        m8_raw = 0.5*(nume8-deno8) 
 
         #Calculate unique 1
-        i = m7_raw  - self.i_m2_t_raw 
-        k = m8_raw  - self.i_m2_t_raw
-        d = b = self.i_m1_t_raw 
-        
+        i = m7_raw  - self.i_m2_t- self.m7_bias['i']
+        k = m8_raw  - self.i_m2_t- self.m8_bias['k']
+        d = b = self.i_m1_t
+     
 
-        bias_cmi_m1_given_m2 = self.bp + self.br - self.bm2 - self.ball
-        bias_cmi_m2_given_m1 = self.bp + self.bq - self.bm1 - self.ball
-
-        unique_1_raw = torch.min(torch.stack([i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
-        assert unique_1_raw == i or unique_1_raw == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={unique_1_raw}, i={i}, k={k}."
-        unique_1 = unique_1_raw - bias_cmi_m1_given_m2
+        unique_1 = torch.min(torch.stack([i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
+        assert unique_1 == i or unique_1 == k, f"Unique information for source 1 should be determined by either U7 or U8. Got unique_1={unique_1}, i={i}, k={k}."
         self.I_dep_values['unique_1'] = unique_1.item()
 
         #Calculate unique 2
-        h = m7_raw  - self.i_m1_t_raw
-        j = m8_raw  - self.i_m1_t_raw
-        f = c = self.i_m2_t_raw 
-        unique_2_raw = torch.min(torch.stack([h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
+        h = m7_raw  - self.i_m1_t- self.m7_bias['h']
+        j = m8_raw  - self.i_m1_t- self.m8_bias['j']
+        f = c = self.i_m2_t
+        unique_2 = torch.min(torch.stack([h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
 
-        assert unique_2_raw == h or unique_2_raw == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={unique_2_raw}, h={h}, j={j}."
-        unique_2 = unique_2_raw - bias_cmi_m2_given_m1
+        assert unique_2 == h or unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={unique_2}, h={h}, j={j}."
         self.I_dep_values['unique_2'] = unique_2.item()
         #Check for nan values
         assert not torch.isnan(unique_1), f"unique_0 = {unique_1} was not calculated properly."
@@ -269,9 +268,30 @@ class Idep_multivariate_gauss:
         output: a dictionary with the PID values
         keys: 'red', 'unq1', 'unq2', 'syn'"""
 
+
+
+        if self.bias_correction:
+            df = self.N - 1
+            d = self.dim_m1 + self.dim_m2 + self.dim_t
+            bias_x1 = logdet_wishart_bias(df, self.dim_m1)
+            bias_x2 = logdet_wishart_bias(df, self.dim_m2)
+            bias_t = logdet_wishart_bias(df, self.dim_t)
+            tri_mi_bias = 0.5*(logdet_wishart_bias(df, self.dim_m1 + self.dim_m2) - (bias_x1 + bias_x2)) - 0.5*(logdet_wishart_bias(df, d)-(bias_x1 + bias_x2 + bias_t))
+            bi_mi_bias_1 = 0.5*logdet_wishart_bias(df, self.dim_m2) + 0.5*logdet_wishart_bias(df, self.dim_t) - 0.5*logdet_wishart_bias(df, self.dim_m1 + self.dim_t)
+            bi_mi_bias_2 = 0.5*logdet_wishart_bias(df, self.dim_m2) + 0.5*logdet_wishart_bias(df, self.dim_t) - 0.5*logdet_wishart_bias(df, self.dim_m2 + self.dim_t)
+        else:
+            tri_mi_bias = 0
+            bi_mi_bias_1 = 0
+            bi_mi_bias_2 = 0
+        
         
         self.i_m1_m2_t = 0.5*torch.logdet((self.I1 - self.P.T @ self.P)) - 0.5*torch.logdet(self.constraint_cov_dict['c_model_8']) 
-        self.i_m1_m2_t += self.b_tmi
+        
+        #Bias correction for the mutual information terms (0 if bias_correction is False)
+        self.i_m1_m2_t -= tri_mi_bias
+        self.i_m1_t -= bi_mi_bias_1
+        self.i_m2_t -= bi_mi_bias_2
+        
         # Redundant information
         red0 = self.i_m1_t - unique_1
         red1 = self.i_m2_t - unique_2

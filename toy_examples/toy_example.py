@@ -186,24 +186,121 @@ def permutate_models(rng,features,suppression_strength):
 
     return X_M1, X_M2
 
-def unq2_zero(rng,n,p,noise_std):
+def unq2_zero(rng, n, p, noise_std):
+    """
+    Intended theoretical structure:
 
-    R_features = rng.standard_normal((n, p))
-    unq1_features = rng.standard_normal((n, p))
-    noise = noise_std * rng.standard_normal((n, p))
+        Y  = R + U + eps_y
+        X1 = R + U + N
+        X2 = R     + N
 
-    betas_R = rng.standard_normal((p, p))
-    signal_R = R_features @ betas_R
+    X2 has:
+        - redundancy through R
+        - no private signal source about Y
+        - synergistic/suppressor role through shared nuisance N
 
-    betas_unq1 = rng.standard_normal((p, p))
-    signal_unq1 = unq1_features @ betas_unq1
+    So we expect:
+        unq2 = 0
+        redundancy > 0
+        unq1 > 0
+        synergy > 0
+    under MMI-like Gaussian PID.
+    """
 
-    y = signal_R + signal_unq1 
-    X_M1 = signal_R + signal_unq1 + noise
-    X_M2 = signal_R + noise
+    R = rng.standard_normal((n, p))   # redundant signal
+    U = rng.standard_normal((n, p))   # unique-to-X1 signal
+    N = noise_std * rng.standard_normal((n, p))  # shared suppressor noise
 
+    eps_y = noise_std * rng.standard_normal((n, p))
+
+    u_scale = 5.0
+    r_scale = 0.7
+    noise_scale = 2.0
+
+
+    y = r_scale*R + u_scale*U + eps_y
+    X_M1 = r_scale*R + u_scale*U + noise_scale*N
+    X_M2 = r_scale*R + noise_scale*N
+
+    print(f"Using scalses: R={r_scale}, U={u_scale}, N={noise_scale}, eps_y={noise_std}")
     return X_M1, X_M2, y
 
+
+def unq2_zero_with_red_unq1_syn(rng, n, p, noise_std=0.9):
+    """
+    Continuous Gaussian-like example where theoretically:
+
+        unq2 = 0
+        redundancy > 0
+        unq1 > 0
+        synergy > 0
+
+    The output dimensions are 3p:
+        block 1: redundant information
+        block 2: unique information for X1
+        block 3: synergistic/suppressor information
+    """
+
+    # -------------------------
+    # 1. Redundant block
+    # -------------------------
+    print(f"Generating unq2=0 example with concatenation")
+    print('\n Function name: unq2_zero_with_red_unq1_syn')
+    R = rng.standard_normal((n, p))
+
+    noise_r_y = noise_std * rng.standard_normal((n, p))
+    noise_r_x1 = noise_std * rng.standard_normal((n, p))
+    noise_r_x2 = noise_std * rng.standard_normal((n, p))
+
+    y_red = R + noise_r_y
+
+    # X1 observes R
+    X1_red = R + noise_r_x1
+
+    # X2 is a degraded version of X1, not an independent new measurement of R
+    X2_red = X1_red + noise_r_x2
+
+    # -------------------------
+    # 2. Unique-to-X1 block
+    # -------------------------
+    U = rng.standard_normal((n, p))
+
+    noise_u_y = noise_std * rng.standard_normal((n, p))
+    noise_u_x1 = noise_std * rng.standard_normal((n, p))
+
+    y_unq1 = U 
+    X1_unq1 = U 
+
+    # X2 has no U signal
+    X2_unq1 = noise_std * rng.standard_normal((n, p))
+
+    # -------------------------
+    # 3. Synergy / suppressor block
+    # -------------------------
+    A = rng.standard_normal((n, p))
+    N = rng.standard_normal((n, p))
+
+    #noise_s_y = noise_std * rng.standard_normal((n, p))
+    #noise_s_x1 = noise_std * rng.standard_normal((n, p))
+    #noise_s_x2 = noise_std * rng.standard_normal((n, p))
+
+    y_syn = A 
+
+    # X1 contains signal + nuisance
+    X1_syn = A + N 
+
+    # X2 contains only the nuisance/suppressor variable
+    X2_syn = N 
+    # -------------------------
+    # Concatenate independent blocks
+    # -------------------------
+    y = np.hstack([y_red, y_unq1, y_syn])
+    y += noise_std * rng.standard_normal(y.shape)  # Add noise to the target
+    
+    X_M1 = np.hstack([X1_red, X1_unq1, X1_syn])
+    X_M2 = np.hstack([X2_red, X2_unq1, X2_syn])
+
+    return X_M1, X_M2, y
 
 def run_experiment(rng,suppresion_strength,mode, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False):
     """
@@ -245,6 +342,9 @@ def run_experiment(rng,suppresion_strength,mode, n=1024, p=100, mixing_dimension
         #X_M1 += noise_Xm1
     elif mode == 'only_unq2_zero':
         X_M1, X_M2, y_real = unq2_zero(rng, n, p, noise_std)
+
+    elif mode == 'unq2_zero_with_red_unq1_syn':
+        X_M1, X_M2, y_real = unq2_zero_with_red_unq1_syn(rng, n, p, noise_std)
     # else: 
     #     X_M1, X_M2 = half_permute(rng, signal, suppression_strength=0.3)
     # make sure joint covariance matrix is not singular

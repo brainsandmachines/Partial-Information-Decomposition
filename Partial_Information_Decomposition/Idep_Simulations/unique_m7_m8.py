@@ -20,7 +20,7 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import create_cov_matrix
 from Partial_Information_Decomposition.mi_functions import mi_wrapper,pid_components
-from Partial_Information_Decomposition.bias_functions import permuteation_debiased,unique_bias,permutation_null_debias,logdet_wishart_bias
+from Partial_Information_Decomposition.bias_functions import unique_bias,logdet_wishart_bias,bias_func
 
 def simulate_m7_m8_idep(
     data: list,
@@ -307,36 +307,7 @@ def simulate_m7_m8_idep(
 
 
     
-def bias_func(config,model):
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
-    n_samples = config['n_samples']
-    d = n0 + n1 + n2
-    df = n_samples - 1
 
-    bias_x0 = logdet_wishart_bias(df, n0)
-    bias_x1 = logdet_wishart_bias(df, n1)
-    bias_y  = logdet_wishart_bias(df, n2)
-    # M7 (Structural) Biases
-    bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
-    bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
-    bias_2 = bias_y # seperator 2
-    bi_variate_mix2t_bias = 0.5*logdet_wishart_bias(df, n1) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n1+n2)
-    bi_variate_mix1t_bias = 0.5*logdet_wishart_bias(df, n0) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n0+n2)
-
-    if model == 'M7':
-        nume_bias = permutation_null_debias(config,partial(permuteation_debiased,term='nume'))['bias']
-        bias_m7_structural = bias_02 + bias_12 - bias_2
-        deno_bias = 0.5 * (bias_m7_structural - (bias_x0 + bias_x1 + bias_y))
-        return {'i': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'h': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
-    
-    elif model == 'M8':
-        deno_bias = 0.5*(logdet_wishart_bias(df, d)-(bias_x0 + bias_x1 + bias_y))
-        nume_bias = 0.5*(logdet_wishart_bias(df, n0 + n1) - (bias_x0 + bias_x1))
-        return {'k': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'j': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
-
-    
 def sort_m7_m8_results(results_list):
     """ Helper: Sort results list by N and p values for  sperate by m7 and m8."""
     i_results_list = []
