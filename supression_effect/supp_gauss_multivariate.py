@@ -23,7 +23,7 @@ from Partial_Information_Decomposition.PID_util import standardize, singularity_
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
 
-log = open("cont_unq2_zero_with_red_unq1_syn_example_pidvsvp.log", "w")
+log = open("unq2_zero_with_red_unq1_syn_pidvsvp.log", "w")
 
 sys.stdout = Tee(sys.stdout, log)
 sys.stderr = Tee(sys.stderr, log)
@@ -291,12 +291,12 @@ def run_fixed_params_across_seeds(config: dict | None = None) -> tuple[dict, lis
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 10000000, 50
+    N, P = 10000000, 25
     rng_seed = 56
     snr = 0.5
     method = 'ridge_cv'
     mixing_dimension = None
-    mode = 'only_unq2_zero'
+    mode = 'unq2_zero_with_red_unq1_syn'
     suppresion_strength = 0.5
     print("\n" + "="*70)
     print(f"Running Test with N,P = {N,P} and mode = {mode}")

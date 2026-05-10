@@ -213,9 +213,9 @@ def unq2_zero(rng, n, p, noise_std):
 
     eps_y = noise_std * rng.standard_normal((n, p))
 
-    u_scale = 5.0
-    r_scale = 0.7
-    noise_scale = 2.0
+    u_scale = 1
+    r_scale = 1
+    noise_scale = 1
 
 
     y = r_scale*R + u_scale*U + eps_y

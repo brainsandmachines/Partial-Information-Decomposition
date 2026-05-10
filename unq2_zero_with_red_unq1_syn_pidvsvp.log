@@ -1,0 +1,123 @@
+
+======================================================================
+Running Test with N,P = (1000000, 50) and mode = unq2_zero_with_red_unq1_syn
+
+Experiment 1: snr = 0.5
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0023 | I(T;M1): 0.1851
+M2 R² (VP): -0.0002 | I(T;M2): 0.0000
+Both M1 and M2 R² (VP): 0.0030 | I(T;M1,M2): 0.2473
+
+Unique to M1 (VP): 0.0031 | Unique(T;M1\M2): 0.1851
+Unique to M2 (VP): 0.0007 | Unique(T;M2\M1): -0.0000
+Common (VP): -0.0008 | Redundant (PID): 0.0000
+Synergy (PID): 0.0621
+
+======================================================================
+Experiment 2: snr = 0.5 multivariate gaussian with different seeds
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0024 | I(T;M1): 0.1910
+M2 R² (VP): -0.0001 | I(T;M2): 0.0003
+Both M1 and M2 R² (VP): 0.0031 | I(T;M1,M2): 0.2545
+
+Unique to M1 (VP): 0.0032 | Unique(T;M1\M2): 0.1910
+Unique to M2 (VP): 0.0007 | Unique(T;M2\M1): 0.0002
+Common (VP): -0.0008 | Redundant (PID): 0.0000
+Synergy (PID): 0.0633
+
+======================================================================
+Experiment 3: snr = 0.9
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0078 | I(T;M1): 0.5985
+M2 R² (VP): -0.0001 | I(T;M2): 0.0014
+Both M1 and M2 R² (VP): 0.0103 | I(T;M1,M2): 0.7989
+
+Unique to M1 (VP): 0.0104 | Unique(T;M1\M2): 0.5984
+Unique to M2 (VP): 0.0025 | Unique(T;M2\M1): 0.0014
+Common (VP): -0.0026 | Redundant (PID): 0.0001
+Synergy (PID): 0.1991
+
+======================================================================
+Experiment 4: snr = 0.9 multivariate gaussian with different seeds
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0080 | I(T;M1): 0.6170
+M2 R² (VP): -0.0001 | I(T;M2): 0.0018
+Both M1 and M2 R² (VP): 0.0106 | I(T;M1,M2): 0.8224
+
+Unique to M1 (VP): 0.0107 | Unique(T;M1\M2): 0.6169
+Unique to M2 (VP): 0.0026 | Unique(T;M2\M1): 0.0017
+Common (VP): -0.0027 | Redundant (PID): 0.0001
+Synergy (PID): 0.2037
+
+======================================================================
+Experiment 5: snr = 3
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+======================================================================
+Comparison of Variance Partitioning and PID Results
+======================================================================
+Results:
+M1 R² (VP): 0.0796 | I(T;M1): 6.3738
+M2 R² (VP): 0.0021 | I(T;M2): 0.1676
+Both M1 and M2 R² (VP): 0.1047 | I(T;M1,M2): 8.5110
+
+Unique to M1 (VP): 0.1026 | Unique(T;M1\M2): 6.3708
+Unique to M2 (VP): 0.0251 | Unique(T;M2\M1): 0.1646
+Common (VP): -0.0230 | Redundant (PID): 0.0030
+Synergy (PID): 1.9726
+
+======================================================================
+Experiment 6: snr = 5 multivariate gaussian with different seeds
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
