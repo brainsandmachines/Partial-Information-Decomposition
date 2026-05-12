@@ -386,7 +386,6 @@ def run_experiment(rng,suppresion_strength,mode, n=1024, p=100, mixing_dimension
     #     assert np.isclose(total_variance, sum_of_components), \
     #         "Decomposed components do not sum to total variance!"
     
-    return decomp
 
 
 

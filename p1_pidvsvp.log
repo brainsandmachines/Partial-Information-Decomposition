@@ -1,0 +1,8 @@
+
+======================================================================
+Running Test with N,P = (1000000, 1) and mode = simple
+
+Experiment 1: snr = 0.5
+
+Covariance matrix shape: torch.Size([3, 3])
+dim_m1: 1, dim_m2: 1, dim_t: 1

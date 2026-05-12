@@ -1,3 +1,6 @@
+from xml.parsers.expat import model
+
+from sklearn.linear_model import LinearRegression
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,11 +22,15 @@ from utils import (
     seed_summary_to_table,
     save_csv_column_means
 )
-from Partial_Information_Decomposition.PID_util import standardize, singularity_report,vif_summary,std_scaling_summary
+
+from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import CCA_reduction
+
+
+
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
 
-log = open("unq2_zero_with_red_unq1_syn_pidvsvp.log", "w")
+log = open("p1_pidvsvp.log", "w")
 
 sys.stdout = Tee(sys.stdout, log)
 sys.stderr = Tee(sys.stderr, log)
@@ -39,8 +46,30 @@ def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
     std  = X.std(dim=0, unbiased=False, keepdim=True)
     return (X - mean) / (std + eps)
 
+from sklearn.model_selection import KFold
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import torch
 
-def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,mode='simple', snr=1.0,method='ridge_cv',mixing_dimension=None):
+def crossfit_residualize(Y_raw, X_raw, n_splits=5, seed=0):
+    """
+    Residualize Y_raw against X_raw using cross-fitted linear regression.
+    Returns residuals Y - E[Y|X] predicted out-of-fold.
+    """
+    Y_raw = np.asarray(Y_raw)
+    X_raw = np.asarray(X_raw)
+
+    residuals = np.zeros_like(Y_raw, dtype=np.float64)
+
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
+
+    for train_idx, test_idx in kf.split(X_raw):
+        model = LinearRegression().fit(X_raw[train_idx], Y_raw[train_idx])
+        pred = model.predict(X_raw[test_idx])
+        residuals[test_idx] = Y_raw[test_idx] - pred
+
+    return residuals
+def test_suppression(N=1000,P=1,suppression_strength=0.5,rng_seed=1,mode='simple', snr=1.0,method='ridge_cv',mixing_dimension=None):
     """Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds.
     Parameters
     ----------
@@ -70,10 +99,10 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,mode='simple',
     rng = np.random.default_rng(seed=rng_seed)
     rng_torch = torch.Generator().manual_seed(rng_seed)
     # --- generate data ---
-    vp_results , t_m_dict = run_experiment(rng,suppresion_strength,mode,N,P,mixing_dimension,snr,method) #Variance Partitioning and sources and target
+    vp_results , t_m_dict = run_experiment(rng,suppression_strength,mode,N,P,mixing_dimension,snr,method) #Variance Partitioning and sources and target
 
-    M1 = t_m_dict['X_M1']
-    M2 = t_m_dict['X_M2']
+    M1_raw = t_m_dict['X_M1']
+    M2_raw = t_m_dict['X_M2']
     T = t_m_dict['y']
     # vif_summary(np.array([M1,M2]))
     # vif_summary(np.hstack((M1,M2)))
@@ -82,9 +111,12 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,mode='simple',
     # std_scaling_summary(T)
     # --- compute PID ---
 
+    #cca_output = CCA_reduction(device=M1_raw.device, rv_list=[M1_raw,M2_raw], n_components=M1_raw.shape[1]//3)
+    #M1, M2 = cca_output['X0'], cca_output['X1']
+    #M1_resid = crossfit_residualize(M1_raw, M2_raw, n_splits=5, seed=rng_seed)
     #Change to tensors: 
-    M1 = torch.tensor(M1)
-    M2 = torch.tensor(M2)
+    M1 = torch.tensor(M1_raw)
+    M2 = torch.tensor(M2_raw)
     T = torch.tensor(T)
 
     # M1 = standardize(M1)
@@ -92,58 +124,14 @@ def test_suppresion(N=1000,P=1,suppresion_strength=0.5,rng_seed=1,mode='simple',
     # T = standardize(T)
     
     sources = [M1,M2]
+    
     targets = [T]
-    idep_class = Idep_multivariate_gauss(rng=rng_torch, sources=sources, targets=targets, bias_correction=True)
+    idep_class = Idep_multivariate_gauss(rng=rng_torch, sources=sources, targets=targets, 
+                                         bias_correction=False)
     pid , mi = idep_class.idep()
     return vp_results,pid,mi
 
-def check_supression_effect(vp_results,pid_results):
-    """Check for suppression effect in the results.
-    Parameters
-    ----------
-    vp_results : dict
-        Results from variance partitioning.
-    pid_results : dict
-        Results from Partial Information Decomposition.
 
-    Returns
-    -------
-    None
-    """
-    R_A = vp_results['R²_X1']
-    R_B = vp_results['R²_X2']
-    R_AB = vp_results['R²_X12']
-    unique_A = vp_results['unique_X1']
-    unique_B = vp_results['unique_X2']
-    common = vp_results['common']
-
-    unq0 = pid_results['unq0']
-    unq1 = pid_results['unq1']
-    red = pid_results['red']
-    syn = pid_results['syn']
-
-    if np.isclose(R_A,0) or R_A < 0 and unique_A > 0:
-        print("\nSuppression effect detected: M1 is a suppressor variable.❗❗❗")
-        # if not np.isclose(unq0,0,atol=1e-5):
-        #     print("PID fell to supression effect ❌")
-        # else: 
-        #     if syn > 0:
-        #         print("PID did not fall to supression effect and detected synergy ✅✅✅")
-        #     else:
-        #         print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
-            
-    elif np.isclose(R_B,0) or R_B < 0 and unique_B > 0:
-        print("\nSuppression effect detected: M2 is a suppressor variable.❗❗❗")
-        # if not np.isclose(unq1,0,atol=1e-5):
-        #     print("PID fell to supression effect ❌")
-        # else: 
-        #     if syn > 0:
-        #         print("PID did not fall to supression effect and detected synergy ✅✅✅")
-        #     else:
-        #         print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
-    else:
-        print("\nNo suppression effect detected for VP: One of the unique contributions is zero.")
-    return 
 
 
 def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
@@ -222,7 +210,6 @@ def compare_results(vp_results,pid_results,mi_results):
     print(f"Synergy (PID): {pid_results['syn']:.4f}")
 
     
-    #check_supression_effect(vp_results,pid_results)
 
 
 def get_seed_sweep_config() -> dict:
@@ -230,30 +217,31 @@ def get_seed_sweep_config() -> dict:
     return {
         "n_seeds": 100,
         "seed_start": 0,
-        "N": 3000,
-        "P": 100,
-        "suppresion_strength": 0.5,
+        "N": 500000,
+        "P": 50,
+        "suppression_strength": 0.5,
         "simple_example": False,
-        "snr": 5.0,
+        "snr": 5,
         "method": "ridge_cv",
-        "mixing_dimension": 50,
-        "jackknife": True,
-        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example",
+        'mode': 'only_unq2_zero',
+        "mixing_dimension": None,
+        "jackknife": False,
+        "results_dir": "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/only_unq2_zero",
         "results_prefix": "seed_summary",
         "all_runs_results_prefix": "seed_runs",
-        "progress_print_every": 2,
-        "test_name": "toyexample_supp_gauss_multivariate",
+        "progress_print_every": 10,
+        "test_name": "cca_toyexample_supp_gauss_multivariate",
     }
 
 
 def run_single_seed_fixed(seed: int, config: dict) -> dict:
     """Run one suppression experiment seed with all other parameters fixed."""
-    vp_results, pid_results, mi_results = test_suppresion(
+    vp_results, pid_results, mi_results = test_suppression(
         N=config["N"],
         P=config["P"],
-        suppresion_strength=config["suppresion_strength"],
+        suppression_strength=config["suppression_strength"],
         rng_seed=seed,
-        mode=config["simple_example"],
+        mode=config["mode"],
         snr=config["snr"],
         method=config["method"],
         mixing_dimension=config["mixing_dimension"],
@@ -291,47 +279,53 @@ def run_fixed_params_across_seeds(config: dict | None = None) -> tuple[dict, lis
 
 def main():
     """Main function to run the Gaussian simple example and compare results."""
-    N, P = 10000000, 25
+    N, P = 1000000, 1
     rng_seed = 56
     snr = 0.5
     method = 'ridge_cv'
     mixing_dimension = None
-    mode = 'unq2_zero_with_red_unq1_syn'
-    suppresion_strength = 0.5
+    mode = 'simple'
+    suppression_strength = 0.5
     print("\n" + "="*70)
     print(f"Running Test with N,P = {N,P} and mode = {mode}")
     print(f"\nExperiment 1: snr = {snr}")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
     #plot_pid_results(pid_results=pid_results, sub_title="Experiment 2")
     #plot_pid_results(mi_results=mi_results, sub_title="Experiment 2")
 
     print("\n" + "="*70)
     print(f"Experiment 2: snr = {snr} multivariate gaussian with different seeds")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed+2, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 0.9
     print(f"Experiment 3: snr = {snr}")
-    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     print(f"Experiment 4: snr = {snr} multivariate gaussian with different seeds")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+2, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed+2, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    compare_results(vp_results, pid_results, mi_results)
+
+    print("\n" + "="*70)
+    snr = 1.2
+    print(f"Experiment 5: snr = {snr} multivariate gaussian with different seeds")
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed+1, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 3
-    print(f"Experiment 5: snr = {snr}")
-    vp_results, pid_results, mi_results = test_suppresion(N, P, suppresion_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    print(f"Experiment 6: snr = {snr}")
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\n" + "="*70)
     snr = 5
-    print(f"Experiment 6: snr = {snr} multivariate gaussian with different seeds")
-    vp_results, pid_results, mi_results = test_suppresion(N, P,suppresion_strength ,rng_seed+1, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
+    print(f"Experiment 7: snr = {snr} multivariate gaussian with different seeds")
+    vp_results, pid_results, mi_results = test_suppression(N, P, suppression_strength, rng_seed+1, mode=mode, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results, mi_results)
 
     print("\nAll experiments completed.")
@@ -339,7 +333,7 @@ def main():
 if __name__ == "__main__":
     main()
     # For fixed-parameter seed analysis and saved mean/std across seeds, run:
-    #run_fixed_params_across_seeds()
-    csv_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/seed_runs_toyexample_supp_gauss_multivariate.csv'
-    means_save_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/seed_summary_toyexample_supp_gauss_multivariate.csv'
-    #save_csv_column_means(csv_path=csv_path, output_csv_path=means_save_path)
+    # run_fixed_params_across_seeds()
+    # csv_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/only_unq2_zero/seed_runs_toyexample_supp_gauss_multivariate.csv'
+    # means_save_path = '/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/only_unq2_zero/seed_summary_toyexample_supp_gauss_multivariate.csv'
+    # save_csv_column_means(csv_path=csv_path, output_csv_path=means_save_path)

@@ -1,8 +1,5 @@
 
-======================================================================
-Running Test with N,P = (1000000, 50) and mode = unq2_zero_with_red_unq1_syn
-
-Experiment 1: snr = 0.5
+Running seed 0 (1/100)...
 Generating unq2=0 example with concatenation
 
  Function name: unq2_zero_with_red_unq1_syn
@@ -11,21 +8,7 @@ Calculating bias correction terms...
 Covariance matrix shape: torch.Size([450, 450])
 dim_m1: 150, dim_m2: 150, dim_t: 150
 
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): 0.0023 | I(T;M1): 0.1851
-M2 R² (VP): -0.0002 | I(T;M2): 0.0000
-Both M1 and M2 R² (VP): 0.0030 | I(T;M1,M2): 0.2473
-
-Unique to M1 (VP): 0.0031 | Unique(T;M1\M2): 0.1851
-Unique to M2 (VP): 0.0007 | Unique(T;M2\M1): -0.0000
-Common (VP): -0.0008 | Redundant (PID): 0.0000
-Synergy (PID): 0.0621
-
-======================================================================
-Experiment 2: snr = 0.5 multivariate gaussian with different seeds
+Running seed 1 (2/100)...
 Generating unq2=0 example with concatenation
 
  Function name: unq2_zero_with_red_unq1_syn
@@ -34,21 +17,7 @@ Calculating bias correction terms...
 Covariance matrix shape: torch.Size([450, 450])
 dim_m1: 150, dim_m2: 150, dim_t: 150
 
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): 0.0024 | I(T;M1): 0.1910
-M2 R² (VP): -0.0001 | I(T;M2): 0.0003
-Both M1 and M2 R² (VP): 0.0031 | I(T;M1,M2): 0.2545
-
-Unique to M1 (VP): 0.0032 | Unique(T;M1\M2): 0.1910
-Unique to M2 (VP): 0.0007 | Unique(T;M2\M1): 0.0002
-Common (VP): -0.0008 | Redundant (PID): 0.0000
-Synergy (PID): 0.0633
-
-======================================================================
-Experiment 3: snr = 0.9
+Running seed 2 (3/100)...
 Generating unq2=0 example with concatenation
 
  Function name: unq2_zero_with_red_unq1_syn
@@ -57,21 +26,7 @@ Calculating bias correction terms...
 Covariance matrix shape: torch.Size([450, 450])
 dim_m1: 150, dim_m2: 150, dim_t: 150
 
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): 0.0078 | I(T;M1): 0.5985
-M2 R² (VP): -0.0001 | I(T;M2): 0.0014
-Both M1 and M2 R² (VP): 0.0103 | I(T;M1,M2): 0.7989
-
-Unique to M1 (VP): 0.0104 | Unique(T;M1\M2): 0.5984
-Unique to M2 (VP): 0.0025 | Unique(T;M2\M1): 0.0014
-Common (VP): -0.0026 | Redundant (PID): 0.0001
-Synergy (PID): 0.1991
-
-======================================================================
-Experiment 4: snr = 0.9 multivariate gaussian with different seeds
+Running seed 3 (4/100)...
 Generating unq2=0 example with concatenation
 
  Function name: unq2_zero_with_red_unq1_syn
@@ -80,21 +35,7 @@ Calculating bias correction terms...
 Covariance matrix shape: torch.Size([450, 450])
 dim_m1: 150, dim_m2: 150, dim_t: 150
 
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): 0.0080 | I(T;M1): 0.6170
-M2 R² (VP): -0.0001 | I(T;M2): 0.0018
-Both M1 and M2 R² (VP): 0.0106 | I(T;M1,M2): 0.8224
-
-Unique to M1 (VP): 0.0107 | Unique(T;M1\M2): 0.6169
-Unique to M2 (VP): 0.0026 | Unique(T;M2\M1): 0.0017
-Common (VP): -0.0027 | Redundant (PID): 0.0001
-Synergy (PID): 0.2037
-
-======================================================================
-Experiment 5: snr = 3
+Running seed 4 (5/100)...
 Generating unq2=0 example with concatenation
 
  Function name: unq2_zero_with_red_unq1_syn
@@ -103,21 +44,1078 @@ Calculating bias correction terms...
 Covariance matrix shape: torch.Size([450, 450])
 dim_m1: 150, dim_m2: 150, dim_t: 150
 
-======================================================================
-Comparison of Variance Partitioning and PID Results
-======================================================================
-Results:
-M1 R² (VP): 0.0796 | I(T;M1): 6.3738
-M2 R² (VP): 0.0021 | I(T;M2): 0.1676
-Both M1 and M2 R² (VP): 0.1047 | I(T;M1,M2): 8.5110
-
-Unique to M1 (VP): 0.1026 | Unique(T;M1\M2): 6.3708
-Unique to M2 (VP): 0.0251 | Unique(T;M2\M1): 0.1646
-Common (VP): -0.0230 | Redundant (PID): 0.0030
-Synergy (PID): 1.9726
-
-======================================================================
-Experiment 6: snr = 5 multivariate gaussian with different seeds
+Running seed 5 (6/100)...
 Generating unq2=0 example with concatenation
 
  Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 6 (7/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 7 (8/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 8 (9/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 9 (10/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 10 runs:
+
+======================================================================
+CA + PID component summary across 10 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007343, std=0.000370
+CA_R²_X2: mean=-0.001493, std=0.000010
+CA_R²_X12: mean=0.008803, std=0.000471
+CA_unique_X1: mean=0.010296, std=0.000473
+CA_unique_X2: mean=0.001460, std=0.000105
+CA_common: mean=-0.002953, std=0.000107
+CA_unexplained: mean=0.991197, std=0.000471
+PID_red: mean=0.000987, std=0.000042
+PID_unq1: mean=0.666724, std=0.028052
+PID_unq2: mean=0.000387, std=0.000757
+PID_syn: mean=0.221791, std=0.008207
+I(M1;T): mean=0.667711, std=0.028090
+I(M2;T): mean=0.001374, std=0.000759
+I(M1,M2;T): mean=0.889889, std=0.035777
+
+Running seed 10 (11/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 11 (12/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 12 (13/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 13 (14/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 14 (15/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 15 (16/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 16 (17/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 17 (18/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 18 (19/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 19 (20/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 20 runs:
+
+======================================================================
+CA + PID component summary across 20 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007427, std=0.000305
+CA_R²_X2: mean=-0.001489, std=0.000011
+CA_R²_X12: mean=0.008920, std=0.000391
+CA_unique_X1: mean=0.010409, std=0.000393
+CA_unique_X2: mean=0.001493, std=0.000090
+CA_common: mean=-0.002982, std=0.000091
+CA_unexplained: mean=0.991080, std=0.000391
+PID_red: mean=0.001003, std=0.000037
+PID_unq1: mean=0.673117, std=0.023069
+PID_unq2: mean=0.000719, std=0.000848
+PID_syn: mean=0.223981, std=0.006985
+I(M1;T): mean=0.674119, std=0.023101
+I(M2;T): mean=0.001722, std=0.000857
+I(M1,M2;T): mean=0.898820, std=0.029739
+
+Running seed 20 (21/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 21 (22/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 22 (23/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 23 (24/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 24 (25/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 25 (26/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 26 (27/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 27 (28/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 28 (29/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 29 (30/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 30 runs:
+
+======================================================================
+CA + PID component summary across 30 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007467, std=0.000366
+CA_R²_X2: mean=-0.001487, std=0.000013
+CA_R²_X12: mean=0.008968, std=0.000479
+CA_unique_X1: mean=0.010455, std=0.000476
+CA_unique_X2: mean=0.001501, std=0.000116
+CA_common: mean=-0.002988, std=0.000113
+CA_unexplained: mean=0.991032, std=0.000479
+PID_red: mean=0.001010, std=0.000046
+PID_unq1: mean=0.676147, std=0.027846
+PID_unq2: mean=0.000843, std=0.000938
+PID_syn: mean=0.224434, std=0.008676
+I(M1;T): mean=0.677157, std=0.027889
+I(M2;T): mean=0.001852, std=0.000957
+I(M1,M2;T): mean=0.902433, std=0.036482
+
+Running seed 30 (31/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 31 (32/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 32 (33/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 33 (34/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 34 (35/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 35 (36/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 36 (37/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 37 (38/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 38 (39/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 39 (40/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 40 runs:
+
+======================================================================
+CA + PID component summary across 40 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007422, std=0.000331
+CA_R²_X2: mean=-0.001487, std=0.000013
+CA_R²_X12: mean=0.008909, std=0.000433
+CA_unique_X1: mean=0.010396, std=0.000430
+CA_unique_X2: mean=0.001487, std=0.000106
+CA_common: mean=-0.002974, std=0.000103
+CA_unexplained: mean=0.991091, std=0.000433
+PID_red: mean=0.001006, std=0.000041
+PID_unq1: mean=0.672775, std=0.025145
+PID_unq2: mean=0.000847, std=0.000948
+PID_syn: mean=0.223333, std=0.007906
+I(M1;T): mean=0.673781, std=0.025183
+I(M2;T): mean=0.001853, std=0.000965
+I(M1,M2;T): mean=0.897961, std=0.032985
+
+Running seed 40 (41/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 41 (42/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 42 (43/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 43 (44/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 44 (45/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 45 (46/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 46 (47/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 47 (48/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 48 (49/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 49 (50/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 50 runs:
+
+======================================================================
+CA + PID component summary across 50 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007448, std=0.000321
+CA_R²_X2: mean=-0.001487, std=0.000012
+CA_R²_X12: mean=0.008945, std=0.000420
+CA_unique_X1: mean=0.010432, std=0.000419
+CA_unique_X2: mean=0.001497, std=0.000104
+CA_common: mean=-0.002984, std=0.000101
+CA_unexplained: mean=0.991055, std=0.000420
+PID_red: mean=0.001009, std=0.000040
+PID_unq1: mean=0.674700, std=0.024372
+PID_unq2: mean=0.000873, std=0.000881
+PID_syn: mean=0.224105, std=0.007777
+I(M1;T): mean=0.675709, std=0.024408
+I(M2;T): mean=0.001882, std=0.000895
+I(M1,M2;T): mean=0.900687, std=0.032047
+
+Running seed 50 (51/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 51 (52/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 52 (53/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 53 (54/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 54 (55/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 55 (56/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 56 (57/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 57 (58/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 58 (59/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 59 (60/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 60 runs:
+
+======================================================================
+CA + PID component summary across 60 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007427, std=0.000312
+CA_R²_X2: mean=-0.001487, std=0.000012
+CA_R²_X12: mean=0.008921, std=0.000410
+CA_unique_X1: mean=0.010408, std=0.000408
+CA_unique_X2: mean=0.001494, std=0.000102
+CA_common: mean=-0.002981, std=0.000099
+CA_unexplained: mean=0.991079, std=0.000410
+PID_red: mean=0.001006, std=0.000038
+PID_unq1: mean=0.673159, std=0.023738
+PID_unq2: mean=0.000884, std=0.000891
+PID_syn: mean=0.223870, std=0.007644
+I(M1;T): mean=0.674165, std=0.023773
+I(M2;T): mean=0.001890, std=0.000903
+I(M1,M2;T): mean=0.898920, std=0.031237
+
+Running seed 60 (61/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 61 (62/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 62 (63/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 63 (64/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 64 (65/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 65 (66/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 66 (67/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 67 (68/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 68 (69/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 69 (70/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 70 runs:
+
+======================================================================
+CA + PID component summary across 70 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007433, std=0.000296
+CA_R²_X2: mean=-0.001487, std=0.000012
+CA_R²_X12: mean=0.008929, std=0.000389
+CA_unique_X1: mean=0.010416, std=0.000387
+CA_unique_X2: mean=0.001496, std=0.000097
+CA_common: mean=-0.002983, std=0.000095
+CA_unexplained: mean=0.991071, std=0.000389
+PID_red: mean=0.001008, std=0.000037
+PID_unq1: mean=0.673584, std=0.022491
+PID_unq2: mean=0.000897, std=0.000918
+PID_syn: mean=0.224017, std=0.007268
+I(M1;T): mean=0.674592, std=0.022526
+I(M2;T): mean=0.001905, std=0.000932
+I(M1,M2;T): mean=0.899506, std=0.029617
+
+Running seed 70 (71/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 71 (72/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 72 (73/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 73 (74/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 74 (75/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 75 (76/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 76 (77/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 77 (78/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 78 (79/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 79 (80/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 80 runs:
+
+======================================================================
+CA + PID component summary across 80 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007439, std=0.000284
+CA_R²_X2: mean=-0.001486, std=0.000013
+CA_R²_X12: mean=0.008937, std=0.000374
+CA_unique_X1: mean=0.010423, std=0.000371
+CA_unique_X2: mean=0.001498, std=0.000094
+CA_common: mean=-0.002984, std=0.000091
+CA_unexplained: mean=0.991063, std=0.000374
+PID_red: mean=0.001009, std=0.000036
+PID_unq1: mean=0.674045, std=0.021600
+PID_unq2: mean=0.000908, std=0.000945
+PID_syn: mean=0.224108, std=0.007021
+I(M1;T): mean=0.675054, std=0.021633
+I(M2;T): mean=0.001917, std=0.000960
+I(M1,M2;T): mean=0.900070, std=0.028477
+
+Running seed 80 (81/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 81 (82/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 82 (83/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 83 (84/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 84 (85/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 85 (86/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 86 (87/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 87 (88/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 88 (89/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 89 (90/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 90 runs:
+
+======================================================================
+CA + PID component summary across 90 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007432, std=0.000280
+CA_R²_X2: mean=-0.001486, std=0.000012
+CA_R²_X12: mean=0.008925, std=0.000367
+CA_unique_X1: mean=0.010412, std=0.000365
+CA_unique_X2: mean=0.001494, std=0.000093
+CA_common: mean=-0.002980, std=0.000090
+CA_unexplained: mean=0.991075, std=0.000367
+PID_red: mean=0.001010, std=0.000036
+PID_unq1: mean=0.673472, std=0.021239
+PID_unq2: mean=0.000926, std=0.000917
+PID_syn: mean=0.223792, std=0.006932
+I(M1;T): mean=0.674482, std=0.021272
+I(M2;T): mean=0.001936, std=0.000932
+I(M1,M2;T): mean=0.899200, std=0.027997
+
+Running seed 90 (91/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 91 (92/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 92 (93/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 93 (94/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 94 (95/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 95 (96/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 96 (97/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 97 (98/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 98 (99/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Running seed 99 (100/100)...
+Generating unq2=0 example with concatenation
+
+ Function name: unq2_zero_with_red_unq1_syn
+Calculating bias correction terms...
+
+Covariance matrix shape: torch.Size([450, 450])
+dim_m1: 150, dim_m2: 150, dim_t: 150
+
+Intermediate summary after 100 runs:
+
+======================================================================
+CA + PID component summary across 100 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007433, std=0.000270
+CA_R²_X2: mean=-0.001487, std=0.000013
+CA_R²_X12: mean=0.008926, std=0.000355
+CA_unique_X1: mean=0.010414, std=0.000353
+CA_unique_X2: mean=0.001493, std=0.000091
+CA_common: mean=-0.002980, std=0.000089
+CA_unexplained: mean=0.991074, std=0.000355
+PID_red: mean=0.001009, std=0.000035
+PID_unq1: mean=0.673590, std=0.020494
+PID_unq2: mean=0.000838, std=0.000928
+PID_syn: mean=0.223815, std=0.006818
+I(M1;T): mean=0.674599, std=0.020526
+I(M2;T): mean=0.001847, std=0.000942
+I(M1,M2;T): mean=0.899252, std=0.027067
+
+======================================================================
+CA + PID component summary across 100 seeds (start=0)
+======================================================================
+CA_R²_X1: mean=0.007433, std=0.000270
+CA_R²_X2: mean=-0.001487, std=0.000013
+CA_R²_X12: mean=0.008926, std=0.000355
+CA_unique_X1: mean=0.010414, std=0.000353
+CA_unique_X2: mean=0.001493, std=0.000091
+CA_common: mean=-0.002980, std=0.000089
+CA_unexplained: mean=0.991074, std=0.000355
+PID_red: mean=0.001009, std=0.000035
+PID_unq1: mean=0.673590, std=0.020494
+PID_unq2: mean=0.000838, std=0.000928
+PID_syn: mean=0.223815, std=0.006818
+I(M1;T): mean=0.674599, std=0.020526
+I(M2;T): mean=0.001847, std=0.000942
+I(M1,M2;T): mean=0.899252, std=0.027067
+
+Saved all seed run results to: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/only_unq2_zero/seed_runs_snr=0.95_toyexample_supp_gauss_multivariate.csv
+Saved summary to: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Toy_Example/only_unq2_zero/seed_summary_snr=0.95_toyexample_supp_gauss_multivariate.csv

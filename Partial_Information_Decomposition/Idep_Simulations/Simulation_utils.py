@@ -12,7 +12,7 @@ from mi_functions import safe_logdet
 from mi_functions import pid_components
 from PID_util import *
 import pandas as pd
-
+from sklearn.cross_decomposition import CCA
 
 
 def mean_std_csv_results(results_dict):
@@ -714,3 +714,31 @@ def plot_pid_trajectory_vs_p_over_N(
     plt.close(fig)
 
     return traj
+
+
+def CCA_reduction(device, rv_list: list,n_components: int = None):
+    """Will implement Canonical Correlation Analysis. For feature reduction.  
+    Input:
+        config: dict with keys 'n0', 'n1', 'n2' and 'device'
+        rv_list: list of 3 tensors [X0, X1, X2] with shapes (n_samples, n0), (n_samples, n1), (n_samples, n2)
+        n_components: int
+            Number of canonical components to compute
+
+    Output:
+        Dictionary with feature reducted RVs"""
+    
+    if n_components is None: 
+        raise ValueError("n_components must be specified for CCA.")
+    
+    X0, X1 = rv_list[0], rv_list[1]
+    X2 = rv_list[2] if len(rv_list) > 2 else None
+    cca_pairwise = CCA(n_components=n_components)
+
+    x0,x1 = cca_pairwise.fit_transform(X0, X1)
+    x0 = torch.from_numpy(x0).to(device)
+    x1 = torch.from_numpy(x1).to(device)
+
+    return {
+        'X0': x0,
+        'X1': x1,}
+    
