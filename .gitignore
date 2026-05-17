@@ -15,3 +15,4 @@ trained_models/
 **/test_runs/
 **/simulation_results/
 Partial_Information_Decomposition/Idep_Simulations/figures/
+file_ignore/

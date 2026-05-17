@@ -959,3 +959,28 @@ def oas_cov_torch(S: torch.Tensor, N: int) -> torch.Tensor:
     # Apply shrinkage
     S_shrunk = (1.0 - alpha) * S + alpha * T
     return S_shrunk
+
+
+def residual_rvs(rv_list:list,predictor_index=0):
+    """Given a list of random variables (Torch.Tensors),
+    returns a list where we predict the second rv using the first rv and return the residuls. 
+    
+    input: 
+        list of  two random variables [rv1, rv2]
+    
+    output:
+        [rv1,residual of rv2 after regressing out rv1]"""
+
+    
+    if len(rv_list) != 2:
+        raise ValueError("This function is designed for exactly two random variables.")
+    
+    target_index = 1 - predictor_index
+    predictor = rv_list[predictor_index]
+    target = rv_list[target_index]
+
+    _,model_fit = compute_ridge_cv_r2(predictor, target)
+
+    target_pred = model_fit.predict(predictor)
+    residual = target - target_pred
+    return [predictor, residual]

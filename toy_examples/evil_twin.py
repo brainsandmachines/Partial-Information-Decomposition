@@ -1,89 +1,17 @@
-# import torch
-# import numpy as np
-
-
-
-
-
-
-
-
-
-
-
-# def evil_twin_example(rng,n,p):
-#     """
-#     Create an "evil twin" example where X and Y are identical copies of S, but with some noise.
-#     This should yield a high unique information for both X and Y, and zero shared information.
-#     """
-#     #Twin sonic (Unique for both)
-#     R_so = rng.standard_normal((n, p))
-#     R_so *= (0.5 / p) ** 0.5 #Var(R_so) = 0.5
-
-#     N = rng.standard_normal((n, p))
-#     N *= (2.5 / p) ** 0.5 #Var(N) = 2.5
-
-#     N_t = rng.standard_normal((n, p))
-
-#     U1_so = rng.standard_normal((n, p))
-#     U1_so *= (2.5 / p) ** 0.5 #Var(U1_so) = 2.5
-
-#     U2_so = rng.standard_normal((n, p))
-#     U2_so *= (0.5 / p) ** 0.5 #Var(U2_so) = 0.5
-
-#     X1_so = R_so + N + U1_so
-#     X2_so = R_so + N + U2_so
-
-#     T_so = R_so + U1_so + U2_so + N_t
-
-
-
-#     # Twin Shadow (No unique for X2)
-#     R_sh = rng.standard_normal((n, p))
-#     R_sh *= (1 / p) ** 0.5 #Var(R_sh) = 1
-    
-#     N_sh = rng.standard_normal((n, p))
-#     N_sh *= (2 / p) ** 0.5 #Var(N_sh) = 2
-#     E1_sh = rng.standard_normal((n, p))
-#     E1_sh *= (0.5 / p) ** 0.5
-
-#     E2_sh = rng.standard_normal((n, p))
-#     E2_sh *= (0.5 / p) ** 0.5
-
-#     U1_sh = rng.standard_normal((n, p))
-#     U1_sh *= (2 / p) ** 0.5 #Var(U1_sh) = 2
-
-#     N_t_sh = rng.standard_normal((n, p))
-#     E_t = rng.standard_normal((n, p))
-#     E_t *= (0.5 / p) ** 0.5
-
-#     X1_sh = R_sh + N_sh + U1_sh + E1_sh
-#     X2_sh = R_sh + N_sh + E2_sh
-#     T_sh = R_sh + U1_sh + N_t_sh +E_t
-
-#     return {'sonic': (X1_so, X2_so, T_so), 'shadow': (X1_sh, X2_sh, T_sh)}
-
-
-# def main():
-#     rng = np.random.default_rng(0)
-#     n = 10000
-#     p = 10
-#     data = evil_twin_example(rng, n, p)
-    
-
 
 import sys
-
 import torch
 from pathlib import Path
 
-
+from functools import partial
 
 root = Path(__file__).resolve().parents[1]
-sys.path.append(str(root))  
+sys.path.append(str(root))
+from gpid import tilde_pid
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.PID_util import residual_rvs,create_cov_matrix
 from utils import Tee
-log = open("Evil_Twin_pidvsvp.log", "w")
+log = open("rs_rv_Evil_Twin_pidv.log", "w")
 
 sys.stdout = Tee(sys.stdout, log)
 sys.stderr = Tee(sys.stderr, log)
@@ -221,7 +149,7 @@ def evil_twin_example_torch(generator, n, p, device="cpu", dtype=torch.float64):
         "shadow": (X1_sh, X2_sh, T_sh),
     }
 
-def evil_twin_idep(rng,data):
+def evil_twin_idep(rng,data,on_rvs:callable=None):
 
     data_sonic = data["sonic"]
     data_shadow = data["shadow"]
@@ -230,6 +158,13 @@ def evil_twin_idep(rng,data):
     target_sonic = [data_sonic[2]]       # T_so
     sources_shadow = list(data_shadow[0:2])  # (X1_sh, X2_sh)
     target_shadow = [data_shadow[2]]     # T_sh
+
+    if on_rvs is not None:
+        print("\nApplying on_rvs transformation to sources...")
+        sources_sonic = on_rvs(sources_sonic)
+
+        sources_shadow = on_rvs(sources_shadow)
+
 
     idep_sonic = Idep_multivariate_gauss(rng,sources_sonic, target_sonic,bias_correction=False)
     pid_so,mi_so = idep_sonic.idep()
@@ -240,12 +175,53 @@ def evil_twin_idep(rng,data):
         "sonic": {"pid": pid_so, "mi": mi_so},
         "shadow": {"pid": pid_sh, "mi": mi_sh},
     }
+
+
+def evil_twin_tilde_pid(data):
+    """Compute pid using BROJA definiton and calculation from Venkateh et al. 2023.
+    
+    My code assumes [predictor1, predictor2, target] ordering in data["sonic"] and data["shadow"].
+    gpid assumes [target, predictor1, predictor2] ordering, so we need to rearrange the data accordingly.
+    """
+    data_sonic = data["sonic"]
+    data_shadow = data["shadow"]
+    
+    data_sonic_reordered = [data_sonic[2], data_sonic[0], data_sonic[1]]  # [T_so, X1_so, X2_so]
+    data_shadow_reordered = [data_shadow[2], data_shadow[0], data_shadow[1]]  # [T_sh, X1_sh, X2_sh]
+
+    dict_cov_sonic = create_cov_matrix(data_sonic_reordered)
+    dict_cov_shadow = create_cov_matrix(data_shadow_reordered)
+
+    cov_sonic = dict_cov_sonic["full_cov"]
+    cov_shadow = dict_cov_shadow["full_cov"]
+
+    cov_sonic = cov_sonic.cpu().numpy()
+    cov_shadow = cov_shadow.cpu().numpy()
+
+    dm_sonic,dx_sonic,dy_soinc=  data_sonic_reordered[0].shape[1], data_sonic_reordered[1].shape[1], data_sonic_reordered[2].shape[1]
+    dm_shadow,dx_shadow,dy_shadow=  data_shadow_reordered[0].shape[1], data_shadow_reordered[1].shape[1], data_shadow_reordered[2].shape[1]
+
+    # (imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si)
+    output_so = tilde_pid.exact_gauss_tilde_pid(cov_sonic,dm_sonic,dx_sonic,dy_soinc) 
+    output_sh = tilde_pid.exact_gauss_tilde_pid(cov_shadow,dm_shadow,dx_shadow,dy_shadow)
+
+    pid_so = {'red': output_so[7], 'unq1': output_so[7], 'unq2': output_so[6], 'syn': output_so[8]}
+    pid_sh = {'red': output_sh[7], 'unq1': output_sh[7], 'unq2': output_sh[6], 'syn': output_sh[8]}
+
+    mi_so = {'I(M1;T)': output_so[0], 'I(M2;T)': output_so[1], 'I(M1,M2;T)': output_so[2]}
+    mi_sh = {'I(M1;T)': output_sh[0], 'I(M2;T)': output_sh[1], 'I(M1,M2;T)': output_sh[2]}
+
+    return {
+        "sonic": {"pid": pid_so, "mi": mi_so},
+        "shadow": {"pid": pid_sh, "mi": mi_sh},
+    }
+
 torch.set_default_dtype(torch.float64)
 
 g = torch.Generator().manual_seed(0)
 
-n = 10000000
-p = 5
+n = 100000000
+p = 20
 
 data = evil_twin_example_torch(g, n, p)
 
@@ -256,8 +232,10 @@ result = check_evil_twin_covariances_torch(
 )
 
 
-
-idep_results = evil_twin_idep(g,data)
+res_rv = None #partial(residual_rvs, target_index=1) #rv2 is the predictor 
+#idep_results = evil_twin_idep(g,data,on_rvs=residual_rvs)
+gpid_results = evil_twin_tilde_pid(data)
+pid_results = gpid_results
 
 print("\n" + "="*60)
 print("PARTIAL INFORMATION DECOMPOSITION (PID) RESULTS".center(60))
@@ -265,8 +243,8 @@ print("="*60)
 
 for name in ["Sonic", "Shadow"]:
     key = name.lower()
-    pid = idep_results[key]["pid"]
-    mi = idep_results[key]["mi"]
+    pid = pid_results[key]["pid"]
+    mi = pid_results[key]["mi"]
     
     print(f"\n{name}:")
     print(f"  PID Decomposition:")
@@ -283,10 +261,10 @@ print("\n" + "="*60)
 print("COMPARISON: SONIC vs SHADOW".center(60))
 print("="*60)
 
-sonic_pid = idep_results["sonic"]["pid"]
-shadow_pid = idep_results["shadow"]["pid"]
-sonic_mi = idep_results["sonic"]["mi"]
-shadow_mi = idep_results["shadow"]["mi"]
+sonic_pid = pid_results["sonic"]["pid"]
+shadow_pid = pid_results["shadow"]["pid"]
+sonic_mi = pid_results["sonic"]["mi"]
+shadow_mi = pid_results["shadow"]["mi"]
 
 print("\nPID Decomposition Differences:")
 print(f"  Redundancy (Red):     {sonic_pid['red']:.4f} - {shadow_pid['red']:.4f} = {sonic_pid['red'] - shadow_pid['red']:.4f}")
