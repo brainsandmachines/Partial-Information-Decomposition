@@ -10,9 +10,12 @@ sys.path.append(str(root))
 from PID_calc import pid_calc
 from Idep_Simulations.simulation_wrapper import make_random_true_cov
 from Idep_Simulations.Simulation_utils import already_exists_in_csv, make_pre_config, sample_data_from_cov, flatten_pid_results,append_row_to_csv
+from utils import Tee
 
+log = open("Simulation_IDepVSBroja.log", "w")
 
-
+sys.stdout = Tee(sys.stdout, log)
+sys.stderr = Tee(sys.stderr, log)
 
 def pid_simulation(config,rng,cov,pid_ver):
     """Run PID simulation with know ground truth PID values from the covariance matrix
@@ -26,7 +29,8 @@ def pid_simulation(config,rng,cov,pid_ver):
     tri_mi_sample, bi_mi_1_sample, bi_mi_2_sample = [], [], []
 
     for i in range(n_trials):
-        print(f"Trial {i+1}/{n_trials}", end="\r")
+        if (i+1) % max(1, n_trials//10) == 0:
+            print(f"Trial {i+1}/{n_trials}", end="\r")
         # Build true covariance exactly the same way
 
         # Sample data
@@ -157,9 +161,9 @@ def main(config,single=True,multi=False,exp_name=None):
         m8_true_cov, m7_true_cov = make_random_true_cov(config,rng=rng)
         
         for pid_ver in config['pid_ver']:
-            print(f"\nRunning PID simulation for {pid_ver}...")
+            #print(f"\nRunning PID simulation for {pid_ver}...")
             pid_results = pid_simulation(config,rng, m8_true_cov,pid_ver)
-            print(f"Finished PID simulation for {pid_ver}.")
+            #print(f"Finished PID simulation for {pid_ver}.")
 
     elif multi:
         output_csv = trials_simulation(config,title=exp_name)

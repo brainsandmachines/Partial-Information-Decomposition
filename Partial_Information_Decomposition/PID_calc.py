@@ -50,8 +50,8 @@ def pid_idep_wrapper(config,sources=None,target=None,covariance=None,rng=None,on
         mi: dict, containing the mutual information values (I(X1;T), I(X2;T), I(X1,X2;T))
     """
 
-    text = "Idep PID calculation with covariance provided" if covariance is not None else "Idep PID calculation without covariance, using sample covariance"
-    print(f"\n{text}...")
+    #text = "Idep PID calculation with covariance provided" if covariance is not None else "Idep PID calculation without covariance, using sample covariance"
+    #print(f"\n{text}...")
     bias_corr = config['bias_correction'] if covariance is None else False
     idep = Idep_multivariate_gauss(config,rng,sources,target,bias_correction=bias_corr,cov_matrix=covariance)
     pid,mi = idep.idep()
@@ -84,7 +84,7 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
         cov = covariance
         N = config['n_samples']
         bias_corr = False
-    print(f"\n Covariance matrix (shape {cov.shape}):")
+    #print(f"\n Covariance matrix (shape {cov.shape}):")
 
     cov = cov.cpu().numpy() # Convert to numpy array for BROJA implementation
     

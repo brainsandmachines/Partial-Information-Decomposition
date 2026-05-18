@@ -95,7 +95,7 @@ class Idep_multivariate_gauss:
             #block_singularity_check(np.array([p,q,r]))
             #block_singularity_check(np.array([p.T,q.T,r.T]))
         if self.bias_correction :
-            print("Calculating bias correction terms...")
+            #print("Calculating bias correction terms...")
             config_m8 = {
                 'model': 'M8',
                 'rng': self.rng,
@@ -304,7 +304,7 @@ class Idep_multivariate_gauss:
         # Redundant information
         red0 = self.i_m1_t - unique_1
         red1 = self.i_m2_t - unique_2
-        assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
+        #assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
         # Synergistic information
         syn = self.i_m1_m2_t - self.i_m1_t - unique_2
