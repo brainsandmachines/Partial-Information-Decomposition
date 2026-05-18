@@ -10,7 +10,7 @@ from functools import partial
 # Import all existing utilities from the user's module
 
 from Simulation_utils import *
-from wrapper_M7_M8_models import simulation
+from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import simulation
 from Simulation_utils import *
 from logdet_m7_m8 import  sort_m7_m8_results
 import sys

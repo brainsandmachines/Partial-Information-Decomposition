@@ -7,7 +7,7 @@ from unique_m7_m8 import *
 from Simulation_utils import *
 from resampling_wrapper import bias_resampling
 from bootstrap import _estimate_fitted_model_cov
-from wrapper_M7_M8_models import *
+from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import *
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))

@@ -13,7 +13,7 @@ from Simulation_utils import (
     plot_pid_trajectory_vs_p_over_N,
     _build_pid_rows_from_node,
 )
-from wrapper_M7_M8_models import simulation
+from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import simulation
 import sys
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]

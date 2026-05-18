@@ -1,7 +1,7 @@
 import torch
 from pathlib import Path
 import sys
-from Partial_Information_Decomposition.Idep_Simulations.wrapper_M7_M8_models import make_random_true_cov,create_m7_cov
+from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import make_random_true_cov,create_m7_cov
 from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import build_m7_terms
 from mi_functions import calcualte_mi
 from functools import partial
@@ -41,9 +41,9 @@ def logdet_wishart_bias(df: int, d: int) -> float:
 
 
 def permuteation_debiased(config,term = 'nume'):
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     device = config['device']
     X1,X2,T = config['X1_perm'],config['X2_perm'],config['T_perm']
     
@@ -51,7 +51,7 @@ def permuteation_debiased(config,term = 'nume'):
 
     if config['model'] == 'M7':
         M7_cov = create_m7_cov(config,Z['full_cov'],whitening_normalize=True) #Also Whiten Normalize
-        M7_cov_dict = create_cov_matrix(Sigma=M7_cov,dims = [n0, n1, n2],device=device)
+        M7_cov_dict = create_cov_matrix(Sigma=M7_cov,dims = [dx1, dx2, dt],device=device)
         m7_dict = build_m7_terms(config,M7_cov_dict,whiten='True') # Because of one row above we can assume it's already whitened
         mi_terms = calcualte_mi(config,m7_dict)
         value = mi_terms[term]
@@ -78,9 +78,9 @@ def permutation_null_debias(config,func):
 
     X1,X2,T = config['X1'],config['X2'],config['T']
     n = config['n_samples']
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     device = config['device']
     n_perm = config['n_perm']
     rng = config['rng']
@@ -148,22 +148,22 @@ def unique_bias(config,functions_dict:dict = None):
 
 
 def bias_func(config,model):
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     n_samples = config['n_samples']
-    d = n0 + n1 + n2
+    d = dx1 + dx2 + dt
     df = n_samples - 1
 
-    bias_x0 = logdet_wishart_bias(df, n0)
-    bias_x1 = logdet_wishart_bias(df, n1)
-    bias_y  = logdet_wishart_bias(df, n2)
+    bias_x0 = logdet_wishart_bias(df, dx1)
+    bias_x1 = logdet_wishart_bias(df, dx2)
+    bias_y  = logdet_wishart_bias(df, dt)
     # M7 (Structural) Biases
-    bias_02 = logdet_wishart_bias(df, n0 + n2) # Clique 0
-    bias_12 = logdet_wishart_bias(df, n1 + n2) # Clique 1
+    bias_02 = logdet_wishart_bias(df, dx1 + dt) # Clique 0
+    bias_12 = logdet_wishart_bias(df, dx2 + dt) # Clique 1
     bias_2 = bias_y # seperator 2
-    bi_variate_mix2t_bias = 0.5*logdet_wishart_bias(df, n1) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n1+n2)
-    bi_variate_mix1t_bias = 0.5*logdet_wishart_bias(df, n0) + 0.5*logdet_wishart_bias(df, n2) - 0.5*logdet_wishart_bias(df, n0+n2)
+    bi_variate_mix2t_bias = 0.5*logdet_wishart_bias(df, dx2) + 0.5*logdet_wishart_bias(df, dt) - 0.5*logdet_wishart_bias(df, dx2+dt)
+    bi_variate_mix1t_bias = 0.5*logdet_wishart_bias(df, dx1) + 0.5*logdet_wishart_bias(df, dt) - 0.5*logdet_wishart_bias(df, dx1+dt)
 
     if model == 'M7':
         nume_bias = permutation_null_debias(config,partial(permuteation_debiased,term='nume'))['bias']
@@ -173,7 +173,7 @@ def bias_func(config,model):
     
     elif model == 'M8':
         deno_bias = 0.5*(logdet_wishart_bias(df, d)-(bias_x0 + bias_x1 + bias_y))
-        nume_bias = 0.5*(logdet_wishart_bias(df, n0 + n1) - (bias_x0 + bias_x1))
+        nume_bias = 0.5*(logdet_wishart_bias(df, dx1 + dx2) - (bias_x0 + bias_x1))
         return {'k': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'j': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
 
     

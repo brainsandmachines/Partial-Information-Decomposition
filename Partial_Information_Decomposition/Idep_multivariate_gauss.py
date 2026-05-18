@@ -10,7 +10,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.covariance import LedoitWolf
 
 if __name__ != "__main__":
-    from .PID_util import create_cov_matrix,whiten_block,block_singularity_check
+    from Partial_Information_Decomposition.PID_util import create_cov_matrix,whiten_block,block_singularity_check
 else:
     from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report
 from typing import Optional
@@ -28,38 +28,47 @@ Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems
 
 torch.set_default_dtype(torch.float64)
 class Idep_multivariate_gauss:
-    def __init__(self, rng=None,sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
+    def __init__(self, config,rng=None,sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
         """Initialize the Idep multivariate gaussian class
 
         input: M1,M2,T are torch tensors of shape (N,P)
         N is the number of observations
         P is the number of variables in each observation
+        config is a dictionary containing the configuration for the PID calculation, including:
+            must contain: 
+                dx1: dimension of source 1
+                dx2: dimension of source 2
+                dt: dimension of target
+                n_samples: number of samples 
 
         """
         self.base_e = base_e  # Default to natural logarithm
         self.rng = rng
+        assert (sources is not None) or (cov_matrix is not None), "Either sources or cov_matrix must be provided."
+        assert (sources is None) or (cov_matrix is None), "Only one of sources or cov_matrix should be provided, not both."
+        if sources and targets is not None:
+            self.X1 = sources[0] 
+            self.X2 = sources[1] 
+            self.T = targets[0] 
 
-        self.M1 = sources[0] if sources is not None else None
-        self.M2 = sources[1] if sources is not None else None
-        self.T = targets[0] if targets is not None else None
+
         self.cov_dict = None
-        self.N = self.M1.shape[0] if self.M1 is not None else None
-        df = self.N - 1  if self.M1 is not None else None
-        self.dim_m1 = self.M1.shape[1] if self.M1 is not None else 0
-        self.dim_m2 = self.M2.shape[1] if self.M2 is not None else 0
-        self.dim_t = self.T.shape[1] if self.T is not None else 0
+        self.N = config['n_samples']
+        self.dim_x1 = config['dx1']
+        self.dim_x2 = config.get('dx2') 
+        self.dim_t = config.get('dt')
         self.bias_correction = bias_correction
-        self.I0 = torch.eye(self.dim_m1)
-        self.I1 = torch.eye(self.dim_m2)
+        self.I0 = torch.eye(self.dim_x1)
+        self.I1 = torch.eye(self.dim_x2)
         self.I2 = torch.eye(self.dim_t)
 
-        if self.M1 is not None and self.M2 is not None and self.T is not None:
-            self.cov_dict = create_cov_matrix(rvs=[self.M1,self.M2,self.T])
+        if sources and targets is not None:
+            self.cov_dict = create_cov_matrix(rvs=[self.X1,self.X2,self.T])
             self.cov_matrix = self.cov_dict['full_cov']
             #assert_full_rank(self.cov_matrix)
         elif cov_matrix is not None:
             self.cov_matrix = cov_matrix
-
+            self.cov_dict = create_cov_matrix(Sigma=cov_matrix, dims = [self.dim_x1,self.dim_x2,self.dim_t])
         if self.cov_dict is not None:
             self.sigma00 = self.cov_dict['cov_x1']
             self.sigma11 = self.cov_dict['cov_x2']
@@ -74,30 +83,30 @@ class Idep_multivariate_gauss:
             self.R = whiten_block(self.sigma11, self.sigma12, self.sigma22)
 
 
-            assert self.P.shape == (self.dim_m1,self.dim_m2), f"Covariance matrix dimensions {self.P.shape} do not match the provided source dimensions: {self.dim_m1,self.dim_m2}."
-            assert self.Q.shape == (self.dim_m1,self.dim_t), f"Covariance matrix dimensions {self.Q.shape} do not match the provided source and target dimensions: {self.dim_m1,self.dim_t}."
-            assert self.R.shape == (self.dim_m2,self.dim_t), f"Covariance matrix dimensions {self.R.shape} do not match the provided source and target dimensions: {self.dim_m2,self.dim_t}."
-            assert self.dim_m1 + self.dim_m2 + self.dim_t == self.cov_matrix.shape[0], f"Covariance matrix dimensions {self.cov_matrix.shape} do not match the provided source and target dimensions: {self.dim_m1 + self.dim_m2 + self.dim_t}."
+            assert self.P.shape == (self.dim_x1,self.dim_x2), f"Covariance matrix dimensions {self.P.shape} do not match the provided source dimensions: {self.dim_x1,self.dim_x2}."
+            assert self.Q.shape == (self.dim_x1,self.dim_t), f"Covariance matrix dimensions {self.Q.shape} do not match the provided source and target dimensions: {self.dim_x1,self.dim_t}."
+            assert self.R.shape == (self.dim_x2,self.dim_t), f"Covariance matrix dimensions {self.R.shape} do not match the provided source and target dimensions: {self.dim_x2,self.dim_t}."
+            assert self.dim_x1 + self.dim_x2 + self.dim_t == self.cov_matrix.shape[0], f"Covariance matrix dimensions {self.cov_matrix.shape} do not match the provided source and target dimensions: {self.dim_x1 + self.dim_x2 + self.dim_t}."
             
             # Singularity check for P,Q and R blocks
             p = (torch.eye(self.P.shape[0]) - self.P @ self.P.T).detach().cpu().numpy()
             q = (torch.eye(self.Q.shape[0]) - self.Q @ self.Q.T).detach().cpu().numpy()
             r = (torch.eye(self.R.shape[0]) - self.R @ self.R.T).detach().cpu().numpy()
-            block_singularity_check(np.array([p,q,r]))
-            block_singularity_check(np.array([p.T,q.T,r.T]))
+            #block_singularity_check(np.array([p,q,r]))
+            #block_singularity_check(np.array([p.T,q.T,r.T]))
         if self.bias_correction :
             print("Calculating bias correction terms...")
             config_m8 = {
                 'model': 'M8',
                 'rng': self.rng,
-                'n0': self.dim_m1,
-                'n1': self.dim_m2,
-                'n2': self.dim_t,
+                'dx1': self.dim_x1,
+                'dx2': self.dim_x2,
+                'dt': self.dim_t,
                 'n_samples': self.N,
-                'X1': self.M1,
-                'X2': self.M2,
+                'X1': self.X1,
+                'X2': self.X2,
                 'T': self.T,
-                'device': self.M1.device if self.M1 is not None else 'cpu',
+                'device': self.X1.device if self.X1 is not None else 'cpu',
                 'n_perm': 20
             }
             config_m7 = config_m8.copy()
@@ -133,16 +142,16 @@ class Idep_multivariate_gauss:
         M = torch.block_diag(self.I0, self.I1, self.I2)
         
         if block1 is not None:
-            M[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] = block1
-            M[self.dim_m1:self.dim_m1 + self.dim_m2, :self.dim_m1] = block1.T
+            M[:self.dim_x1, self.dim_x1:self.dim_x1 + self.dim_x2] = block1
+            M[self.dim_x1:self.dim_x1 + self.dim_x2, :self.dim_x1] = block1.T
         if block2 is not None:
-            M[:self.dim_m1, self.dim_m1 + self.dim_m2:] = block2
-            M[self.dim_m1 + self.dim_m2:, :self.dim_m1] = block2.T
+            M[:self.dim_x1, self.dim_x1 + self.dim_x2:] = block2
+            M[self.dim_x1 + self.dim_x2:, :self.dim_x1] = block2.T
         if block3 is not None:
-            M[self.dim_m1:self.dim_m1 + self.dim_m2, self.dim_m1 + self.dim_m2:] = block3
-            M[self.dim_m1 + self.dim_m2:, self.dim_m1:self.dim_m1 + self.dim_m2] = block3.T
+            M[self.dim_x1:self.dim_x1 + self.dim_x2, self.dim_x1 + self.dim_x2:] = block3
+            M[self.dim_x1 + self.dim_x2:, self.dim_x1:self.dim_x1 + self.dim_x2] = block3.T
 
-        assert M.shape == (self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t), f"Created matrix shape {M.shape} does not match expected shape {(self.dim_m1 + self.dim_m2 + self.dim_t, self.dim_m1 + self.dim_m2 + self.dim_t)}."
+        assert M.shape == (self.dim_x1 + self.dim_x2 + self.dim_t, self.dim_x1 + self.dim_x2 + self.dim_t), f"Created matrix shape {M.shape} does not match expected shape {(self.dim_x1 + self.dim_x2 + self.dim_t, self.dim_x1 + self.dim_x2 + self.dim_t)}."
         #assert_full_rank(M)
         return M
 
@@ -172,7 +181,7 @@ class Idep_multivariate_gauss:
 
         self.constraint_cov_dict = {}
         print(f"\nCovariance matrix shape: {cov_matrix.shape}")
-        print(f"dim_m1: {self.dim_m1}, dim_m2: {self.dim_m2}, dim_t: {self.dim_t}")
+        print(f"dim_m1: {self.dim_x1}, dim_m2: {self.dim_x2}, dim_t: {self.dim_t}")
 
 
 
@@ -227,7 +236,7 @@ class Idep_multivariate_gauss:
 
         #M7:
         mat = self.constraint_cov_dict['c_model_7']
-        block7 = mat[:self.dim_m1, self.dim_m1:self.dim_m1 + self.dim_m2] #Q@R.T
+        block7 = mat[:self.dim_x1, self.dim_x1:self.dim_x1 + self.dim_x2] #Q@R.T
         nume7 = torch.logdet(self.I1-(block7.T@block7)) 
         deno7 = torch.logdet(self.I2 - (self.Q.T @ self.Q)) + torch.logdet(self.I2 - (self.R.T @ self.R))  
         m7_raw = 0.5*(nume7- deno7) 
@@ -272,13 +281,13 @@ class Idep_multivariate_gauss:
 
         if self.bias_correction:
             df = self.N - 1
-            d = self.dim_m1 + self.dim_m2 + self.dim_t
-            bias_x1 = logdet_wishart_bias(df, self.dim_m1)
-            bias_x2 = logdet_wishart_bias(df, self.dim_m2)
+            d = self.dim_x1 + self.dim_x2 + self.dim_t
+            bias_x1 = logdet_wishart_bias(df, self.dim_x1)
+            bias_x2 = logdet_wishart_bias(df, self.dim_x2)
             bias_t = logdet_wishart_bias(df, self.dim_t)
-            tri_mi_bias = 0.5*(logdet_wishart_bias(df, self.dim_m1 + self.dim_m2) - (bias_x1 + bias_x2)) - 0.5*(logdet_wishart_bias(df, d)-(bias_x1 + bias_x2 + bias_t))
-            bi_mi_bias_1 = 0.5*logdet_wishart_bias(df, self.dim_m2) + 0.5*logdet_wishart_bias(df, self.dim_t) - 0.5*logdet_wishart_bias(df, self.dim_m1 + self.dim_t)
-            bi_mi_bias_2 = 0.5*logdet_wishart_bias(df, self.dim_m2) + 0.5*logdet_wishart_bias(df, self.dim_t) - 0.5*logdet_wishart_bias(df, self.dim_m2 + self.dim_t)
+            tri_mi_bias = 0.5*(logdet_wishart_bias(df, self.dim_x1 + self.dim_x2) - (bias_x1 + bias_x2)) - 0.5*(logdet_wishart_bias(df, d)-(bias_x1 + bias_x2 + bias_t))
+            bi_mi_bias_1 = 0.5*logdet_wishart_bias(df, self.dim_x2) + 0.5*logdet_wishart_bias(df, self.dim_t) - 0.5*logdet_wishart_bias(df, self.dim_x1 + self.dim_t)
+            bi_mi_bias_2 = 0.5*logdet_wishart_bias(df, self.dim_x2) + 0.5*logdet_wishart_bias(df, self.dim_t) - 0.5*logdet_wishart_bias(df, self.dim_x2 + self.dim_t)
         else:
             tri_mi_bias = 0
             bi_mi_bias_1 = 0
@@ -323,11 +332,11 @@ class Idep_multivariate_gauss:
         self.dependency_matrix(constraints=[
             'c_model_1','c_model_2','c_model_3','c_model_4',
             'c_model_5','c_model_6','c_model_7','c_model_8'
-        ],cov_matrix=cov_matrix)
+        ],cov_matrix=self.cov_matrix)
 
         idep_values = self.compute_Idep()
         pid = self.pid_values(idep_values['unique_1'], idep_values['unique_2'])
-        mi = {'I(M1;T)': self.i_m1_t.item(), 'I(M2;T)': self.i_m2_t.item(), 'I(M1,M2;T)': self.i_m1_m2_t.item()}
+        mi = {'I(X1;T)': self.i_m1_t.item(), 'I(X2;T)': self.i_m2_t.item(), 'I(X1,X2;T)': self.i_m1_m2_t.item()}
         return pid , mi
     
     
@@ -381,7 +390,7 @@ def run_one(n0, n1, n2, p, q, r):
 
     # You must set these because when cov_matrix is given, your code currently
     # doesn't populate P,Q,R and dims (unless you refactor __init__)
-    obj.dim_m1, obj.dim_m2, obj.dim_t = n0, n1, n2
+    obj.dim_x1, obj.dim_x2, obj.dim_t = n0, n1, n2
     obj.I0 = torch.eye(n0)
     obj.I1 = torch.eye(n1)
     obj.I2 = torch.eye(n2)

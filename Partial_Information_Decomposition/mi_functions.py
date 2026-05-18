@@ -103,23 +103,23 @@ def np_safe_logdet(A, eps=1e-8):
 def calcualte_mi(config,sigma_dict,term='full'):
     """This function calculates the tri-variate mutual information using the covariance 
     matrices and the formula MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)"""
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     device = config['device']
 
     Q = sigma_dict['Q']
     R = sigma_dict['R']
     P = sigma_dict['P']
     sigma = sigma_dict['Sigma']
-    nume_raw = 0.5*safe_logdet((torch.eye(n1, device=device) - (P.T @ P)))
-    deno_q = torch.eye(n2, device=device)-(Q.T @ Q)
-    deno_r = torch.eye(n2, device=device)-(R.T @ R)
+    nume_raw = 0.5*safe_logdet((torch.eye(dx2, device=device) - (P.T @ P)))
+    deno_q = torch.eye(dt, device=device)-(Q.T @ Q)
+    deno_r = torch.eye(dt, device=device)-(R.T @ R)
     deno_raw = 0.5*safe_logdet(sigma)
 
     mi_tri = (nume_raw - deno_raw).item()
-    mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.T @ Q)))
-    mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.T @ R)))
+    mi_bi_1 = -0.5 * (safe_logdet(torch.eye(dt, device=device) - (Q.T @ Q)))
+    mi_bi_2 = -0.5 * (safe_logdet(torch.eye(dt, device=device) - (R.T @ R)))
     all_terms_dict = {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2,'nume': nume_raw,'deno': deno_raw}
     if term == 'full':
         return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}

@@ -2,7 +2,7 @@ import torch
 import numpy as np 
 from sklearn.covariance import LedoitWolf,ShrunkCovariance,OAS
 from Idep_Simulations.Simulation_utils import *
-from wrapper_M7_M8_models import create_m7_cov, make_random_true_cov
+from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import create_m7_cov, make_random_true_cov
 import torch
 from typing import Dict, Union
 from functools import partial 

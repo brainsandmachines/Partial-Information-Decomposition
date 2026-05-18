@@ -4,7 +4,7 @@ import sys
 import os
 from pathlib import Path
 from Simulation_utils import *
-from wrapper_M7_M8_models import simulation
+from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import simulation
 import yaml
 from functools import partial
 from resampling_wrapper import bias_resampling

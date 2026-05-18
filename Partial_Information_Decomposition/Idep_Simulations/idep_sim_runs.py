@@ -6,7 +6,7 @@ import sys
 import os
 from unique_m7_m8 import run, simulation_wrapper
 from lr_Idep import create_cov_lr
-from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import on_covariance, plot_nodes_as_alpha 
+from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import plot_nodes_as_alpha 
 from functools import partial
     
 

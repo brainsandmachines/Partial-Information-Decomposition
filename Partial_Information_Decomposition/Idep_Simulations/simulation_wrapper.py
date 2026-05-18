@@ -9,11 +9,9 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import whiten_block, create_cov_matrix
-from mi_functions import calcualte_mi, safe_logdet
-
+from mi_functions import calcualte_mi
 # Import optimization module from same directory
 from Idep_Simulations.optimize_only_unq1_zero import make_only_unq1_zero_cov
-
 
 
 def _build_whitened_blocks_from_cov(S, n0, n1, n2):
@@ -57,9 +55,9 @@ def make_random_true_cov(
     """
     q_scale = float(config["q_scale"])
     r_scale = float(config["r_scale"])
-    n0 = config["n0"]
-    n1 = config["n1"]
-    n2 = config["n2"]
+    n0 = config["dx1"]
+    n1 = config["dx2"]
+    n2 = config["dt"]
     device = config["device"]
 
     mode = config.get("mode", "exact_m7")       # "exact_m7", "m8_side", "m7_side", "only_unq1_zero"
@@ -196,28 +194,7 @@ def make_random_true_cov(
 #     return true_cov_m8, true_cov_m7
 
 
-def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
-    "Takes covariance of M8 and creates M7 out of M8"
 
-    cov_m8_dict = create_cov_matrix(Sigma=cov_m8, dims=[config['n0'], config['n1'], config['n2']])
-    diag0 = torch.eye(config['n0'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_x1"]
-    diag1 = torch.eye(config['n1'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_x2"]
-    diag2 = torch.eye(config['n2'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_xt"]
-    if whitening_normalize: 
-        Q = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_xt"], cov_m8_dict["cov_xt"])
-        R = whiten_block(cov_m8_dict["cov_x2"], cov_m8_dict["cross_x2_xt"], cov_m8_dict["cov_xt"])
-        P = Q @ R.T
-
-    else:
-        Q = cov_m8_dict["cross_x1_xt"]
-        R = cov_m8_dict["cross_x2_xt"]
-        P = Q @ torch.linalg.inv(cov_m8_dict["cov_xt"]) @ R.T
-
-    #Construct M7 covariance 
-    row1 = torch.cat([diag0, P, Q], dim=1)
-    row2 = torch.cat([P.T, diag1, R], dim=1)
-    row3 = torch.cat([Q.T, R.T, diag2], dim=1)
-    return torch.cat([row1, row2, row3], dim=0)
 
 def simulation(config,functions_dict:dict,seed=None):
     """
@@ -231,10 +208,15 @@ def simulation(config,functions_dict:dict,seed=None):
     s_simulation_func = functions_dict["s_simulation"]
     bias_correction_func = functions_dict["bias_correction"]
     corrected_statistic_func = functions_dict["corrected_statistic"]
-
+    pid_ver = config.get("pid_ver", "idep")
     m8_true_cov, m7_true_cov = make_random_true_cov(config, rng=rng)
 
-    data = [m8_true_cov, m7_true_cov]
+    if pid_ver == 'idep':
+        data = [m8_true_cov, m7_true_cov]
+    elif pid_ver == 'tilde':
+        data = [m8_true_cov]
+
+
     sim_config = config.copy()
     sim_config['bias_correction_func'] = bias_correction_func
     statistic = s_simulation_func(data, sim_config, rng)
@@ -290,20 +272,44 @@ def simulation(config,functions_dict:dict,seed=None):
 
 def create_cov_m8(config, P, Q, R):
     "Helper to create M8 covariance from P,Q,R blocks for logging purposes"
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     ver = config.get("ver",'raw') #Raw means the regular M8 covraince
 
     if ver == 'red':
         Q = P@R
-        assert Q.shape == (n0,n2),"Shape mismatch for Q in red version"
+        assert Q.shape == (dx1,dt),"Shape mismatch for Q in red version"
 
     if ver == 'only_unq1_zero':
         # In this version we don't use the P,Q,R from the random construction, but rather the ones optimized for unique_1=0. So we just build the M8 covariance directly from those optimized blocks.
         P, Q, R = make_only_unq1_zero_cov(config)
-    row1_m8 = torch.cat([torch.eye(n0, device=config['device']), P, Q], dim=1)
-    row2_m8 = torch.cat([P.T, torch.eye(n1, device=config['device']), R], dim=1)
-    row3_m8 = torch.cat([Q.T, R.T, torch.eye(n2, device=config['device'])], dim=1)   
+    row1_m8 = torch.cat([torch.eye(dx1, device=config['device']), P, Q], dim=1)
+    row2_m8 = torch.cat([P.T, torch.eye(dx2, device=config['device']), R], dim=1)
+    row3_m8 = torch.cat([Q.T, R.T, torch.eye(dt, device=config['device'])], dim=1)   
     m8_true_cov = torch.cat([row1_m8, row2_m8, row3_m8], dim=0)
     return  m8_true_cov
+
+
+def create_m7_cov(config:dict,cov_m8,whitening_normalize:bool = True):
+    "Takes covariance of M8 and creates M7 out of M8"
+
+    cov_m8_dict = create_cov_matrix(Sigma=cov_m8, dims=[config['dx1'], config['dx2'], config['dt']])
+    diag0 = torch.eye(config['dx1'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_x1"]
+    diag1 = torch.eye(config['dx2'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_x2"]
+    diag2 = torch.eye(config['dt'],device=config['device']) if whitening_normalize else cov_m8_dict["cov_xt"]
+    if whitening_normalize: 
+        Q = whiten_block(cov_m8_dict["cov_x1"], cov_m8_dict["cross_x1_xt"], cov_m8_dict["cov_xt"])
+        R = whiten_block(cov_m8_dict["cov_x2"], cov_m8_dict["cross_x2_xt"], cov_m8_dict["cov_xt"])
+        P = Q @ R.T
+
+    else:
+        Q = cov_m8_dict["cross_x1_xt"]
+        R = cov_m8_dict["cross_x2_xt"]
+        P = Q @ torch.linalg.inv(cov_m8_dict["cov_xt"]) @ R.T
+
+    #Construct M7 covariance 
+    row1 = torch.cat([diag0, P, Q], dim=1)
+    row2 = torch.cat([P.T, diag1, R], dim=1)
+    row3 = torch.cat([Q.T, R.T, diag2], dim=1)
+    return torch.cat([row1, row2, row3], dim=0)

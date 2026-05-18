@@ -5,7 +5,7 @@ from scipy.special import digamma
 from pathlib import Path
 import sys
 import os
-
+import re
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from mi_functions import safe_logdet
@@ -33,12 +33,15 @@ def m7_m8_mean_std_csv_results(results_dict):
     return mean_results, std_results
 
 
-def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
+def N_P_variation_simulation(config,simulation_func=None,mean_std_func=m7_m8_mean_std_csv_results):
     """ Helper: Run simulations across different N and p values 
     and then create a heatamp of the results. """
+
+    assert 'simulation_func' in config or simulation_func is not None, "Expected a simulation function to be provided either in the config or as an argument."
+    
     N_values = config['N_values']
-    p_values = config['p_values']
-    simulation_func = config['simulation_func']
+    p_values = config['P_values']
+    simulation_func = config['simulation_func'] if 'simulation_func' in config else simulation_func
     all_results = []
     len_N = len(N_values)
     len_P = len(p_values)
@@ -47,10 +50,10 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
         for p in p_values:
             print(f"\nRunning simulation for N={N}, p={p} ({i}/{len_N*len_P})")
             config['n_samples'] = N
-            config['n0'] = p[0]
-            config['n1'] = p[1]
-            config['n2'] = p[2]
-            results_dict = simulation_func(config)
+            config['dx1'] = p[0]
+            config['dx2'] = p[1]
+            config['dt'] = p[2]
+            results_dict = simulation_func(config=config)
             mean_results, std_results = mean_std_func(results_dict)
             row = {
             "N": N,
@@ -59,7 +62,6 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
 
             for key in mean_results.keys():
                 row[f"{key}_mean"] = mean_results[key]
-                row[f"{key}_std"] = std_results[key]
                 row[f"{key}_ground_truth"] = results_dict[key]['ground_truth']
                 row[f"{key}_emp_bias"] = results_dict[key]['emp_bias']
                 row[f"{key}_after_corr_bias"] = results_dict[key]['after_corr_bias']
@@ -82,16 +84,178 @@ def N_P_variation_simulation(config,mean_std_func=m7_m8_mean_std_csv_results):
 
     return all_results
 
+def to_python_scalar(value):
+    """
+    Convert torch/numpy scalar values into normal Python scalars.
+    """
 
+    if isinstance(value, torch.Tensor):
+        value = value.detach().cpu()
+
+        if value.numel() == 1:
+            return value.item()
+
+        return value.numpy().tolist()
+
+    if isinstance(value, np.generic):
+        return value.item()
+
+    if isinstance(value, np.ndarray):
+        if value.size == 1:
+            return value.item()
+
+        return value.tolist()
+
+    return value
+def flatten_pid_results(pid_results):
+    """
+    Flatten nested PID result dictionaries.
+
+    Example input:
+        {
+            "red": {
+                "mean": tensor(0.1),
+                "std": tensor(0.02),
+                "ground_truth": np.float64(0.08)
+            },
+            "unq1": {
+                "mean": tensor(0.3)
+            }
+        }
+
+    Output:
+        {
+            "red_mean": 0.1,
+            "red_std": 0.02,
+            "red_ground_truth": 0.08,
+            "unq1_mean": 0.3
+        }
+    """
+
+    flat = {}
+
+    for key, value in pid_results.items():
+
+        # Nested dictionary case:
+        # red -> {"mean": ..., "std": ..., ...}
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                flat[f"{key}_{sub_key}"] = to_python_scalar(sub_value)
+
+        # Flat scalar case:
+        # red_mean -> 0.1
+        else:
+            flat[key] = to_python_scalar(value)
+
+    return flat
+
+def safe_filename(name):
+    """
+    Return the filename exactly as given.
+    No characters are removed or replaced.
+    """
+
+    return str(name)
+
+
+def get_pid_ver_csv_path(output_folder, pid_ver, csv_title="pid_results"):
+    """
+    Return the CSV path for a specific pid_ver.
+
+    Example:
+        output_folder = "simulation_results"
+        csv_title = "evil_twin_simulation"
+        pid_ver = "Idep"
+
+    Returns:
+        simulation_results/evil_twin_simulation_Idep.csv
+    """
+
+    output_folder = Path(output_folder)
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    csv_title_safe = safe_filename(csv_title)
+    pid_ver_safe = safe_filename(pid_ver)
+
+    return output_folder / f"{csv_title_safe}_{pid_ver_safe}.csv"
+
+
+def append_row_to_csv(row, output_folder, csv_title="pid_results"):
+    """
+    Append one row to the CSV file corresponding to row["pid_ver"].
+
+    Saves each pid_ver in a separate CSV.
+
+    Example:
+        output_folder/evil_twin_simulation_Idep.csv
+        output_folder/evil_twin_simulation_MMI_PID.csv
+    """
+
+    if "pid_ver" not in row:
+        raise ValueError("row must contain a 'pid_ver' key.")
+
+    output_csv = get_pid_ver_csv_path(
+        output_folder=output_folder,
+        pid_ver=row["pid_ver"],
+        csv_title=csv_title,
+    )
+
+    df_row = pd.DataFrame([row])
+
+    write_header = not output_csv.exists()
+
+    df_row.to_csv(
+        output_csv,
+        mode="a",
+        header=write_header,
+        index=False,
+    )
+
+    return output_csv
+
+
+def already_exists_in_csv(output_folder, N, p, pid_ver, seed, csv_title="pid_results"):
+    """
+    Check whether this exact simulation setting already exists
+    in the CSV file specific to pid_ver.
+    """
+
+    output_csv = get_pid_ver_csv_path(
+        output_folder=output_folder,
+        pid_ver=pid_ver,
+        csv_title=csv_title,
+    )
+
+    if not output_csv.exists():
+        return False
+
+    df = pd.read_csv(output_csv)
+
+    required_cols = ["N", "dx1", "dx2", "dt", "pid_ver", "seed"]
+
+    for col in required_cols:
+        if col not in df.columns:
+            return False
+
+    mask = (
+        (df["N"] == N) &
+        (df["dx1"] == p[0]) &
+        (df["dx2"] == p[1]) &
+        (df["dt"] == p[2]) &
+        (df["pid_ver"] == pid_ver) &
+        (df["seed"] == seed)
+    )
+
+    return mask.any()
 
 def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) -> np.ndarray:
     """
     Sample multivariate Gaussian data from the specified covariance.
     and return it's covariance matrix. This is a helper function for the m7_whiten bias simulation.
     """
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     d = true_cov.shape[0]
     n_samples = config['n_samples']
 
@@ -100,10 +264,10 @@ def sample_data_from_cov(config,true_cov:torch.tensor,rng: np.random.Generator) 
     dist = torch.distributions.MultivariateNormal(mean, true_cov)
     data = dist.sample((n_samples,))
     
-    X0 = data[:, :n0]
-    X1 = data[:, n0:n0+n1]
-    X2 = data[:, n0+n1:n0+n1+n2]
-    rv_list = [X0, X1, X2]
+    X1 = data[:, :dx1]
+    X2 = data[:, dx1:dx1+dx2]
+    T = data[:, dx1+dx2:dx1+dx2+dt]
+    rv_list = [X1, X2, T]
     sample_cov = torch.cov(data.T, correction=1) # Unbiased estimator with N-1 in the denominator    
     return sample_cov,rv_list # Unbiased estimator with N-1 in the denominator
 
@@ -166,9 +330,9 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
             whiten_ver = String that tells to whiten
             True = Assume the covariance is already whitened and just use the cross-covariance blocks as P,Q,R
             False = Don't whiten and use the original covariance blocks as P,Q,R '''
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
 
     device = config.get('device', 'cpu')
     if whiten == 'False':
@@ -179,17 +343,17 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
     elif whiten == 'whiten_ver':
         Q = para_whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
         R = para_whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
-        cov_tt = torch.eye(n2,device=device)
+        cov_tt = torch.eye(dt,device=device)
     elif whiten== 'True': #If everything is already whitened
         Q = cov_dict['cross_x1_xt']
         R = cov_dict['cross_x2_xt']
         cov_tt = cov_dict['cov_xt'] #IDentity matrix
-        assert torch.allclose(cov_tt, torch.eye(n2, device=device).to(dtype=cov_tt.dtype)), "Expected cov_x2 to be identity when whiten is True."
+        assert torch.allclose(cov_tt, torch.eye(dt, device=device).to(dtype=cov_tt.dtype)), "Expected cov_x2 to be identity when whiten is True."
     
     if not para:
-        cov_11 = torch.eye(n0, device=device) if whiten != 'False' else cov_dict['cov_x1']
-        cov_22 = torch.eye(n1, device=device) if whiten != 'False' else cov_dict['cov_x2']
-        cov_tt = torch.eye(n2, device=device) if whiten != 'False' else cov_dict['cov_xt']
+        cov_11 = torch.eye(dx1, device=device) if whiten != 'False' else cov_dict['cov_x1']
+        cov_22 = torch.eye(dx2, device=device) if whiten != 'False' else cov_dict['cov_x2']
+        cov_tt = torch.eye(dt, device=device) if whiten != 'False' else cov_dict['cov_xt']
 
 
         tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
@@ -203,9 +367,9 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
     else:
         assert len(cov_dict['full_cov'].shape) == 3, "Expected full_cov to have shape (B, d, d) for parallel M7 construction."
         batch_size = cov_dict['cov_x1'].shape[0]
-        cov_11 = torch.eye(n0, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x1']
-        cov_22 = torch.eye(n1, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x2']
-        cov_tt = torch.eye(n2, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_xt']
+        cov_11 = torch.eye(dx1, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x1']
+        cov_22 = torch.eye(dx2, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x2']
+        cov_tt = torch.eye(dt, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_xt']
 
 
         tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
@@ -742,3 +906,23 @@ def CCA_reduction(device, rv_list: list,n_components: int = None):
         'X0': x0,
         'X1': x1,}
     
+def make_pre_config(exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config, unk_cfg, de_config=None):
+    if de_config is None:
+        de_config = {}
+    
+    if exp == "MI=0":
+        config = {**MI_config, **mi0_config, **n_p_config}
+    elif exp == "M7_MI>0":
+        config = {**MI_config, **above0__M7_mi_config, **n_p_config}
+    elif exp == "M8_MI>0":
+        config = {**MI_config, **above0__M8_mi_config, **n_p_config}
+    elif exp == "unknown":
+        config = {**MI_config, **unk_cfg, **n_p_config}
+    else:
+        config = {**MI_config, **n_p_config}
+    
+    # Merge DE config if ver is only_unq1_zero
+    if config.get("ver") == "only_unq1_zero" and de_config:
+        config.update(de_config)
+    
+    return config
