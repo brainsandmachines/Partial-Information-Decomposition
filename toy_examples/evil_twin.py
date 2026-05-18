@@ -11,7 +11,7 @@ from gpid import tilde_pid
 from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import residual_rvs,create_cov_matrix
 from utils import Tee
-log = open("rs_rv_Evil_Twin_pidv.log", "w")
+log = open("tilde_Evil_Twin_pidv.log", "w")
 
 sys.stdout = Tee(sys.stdout, log)
 sys.stderr = Tee(sys.stderr, log)
@@ -165,7 +165,6 @@ def evil_twin_idep(rng,data,on_rvs:callable=None):
 
         sources_shadow = on_rvs(sources_shadow)
 
-
     idep_sonic = Idep_multivariate_gauss(rng,sources_sonic, target_sonic,bias_correction=False)
     pid_so,mi_so = idep_sonic.idep()
     idep_shadow = Idep_multivariate_gauss(rng,sources_shadow, target_shadow,bias_correction=False)
@@ -194,7 +193,8 @@ def evil_twin_tilde_pid(data):
 
     cov_sonic = dict_cov_sonic["full_cov"]
     cov_shadow = dict_cov_shadow["full_cov"]
-
+    print(f"\n Covariance matrix for Sonic (shape {cov_sonic.shape}):")
+    
     cov_sonic = cov_sonic.cpu().numpy()
     cov_shadow = cov_shadow.cpu().numpy()
 
@@ -202,8 +202,8 @@ def evil_twin_tilde_pid(data):
     dm_shadow,dx_shadow,dy_shadow=  data_shadow_reordered[0].shape[1], data_shadow_reordered[1].shape[1], data_shadow_reordered[2].shape[1]
 
     # (imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si)
-    output_so = tilde_pid.exact_gauss_tilde_pid(cov_sonic,dm_sonic,dx_sonic,dy_soinc) 
-    output_sh = tilde_pid.exact_gauss_tilde_pid(cov_shadow,dm_shadow,dx_shadow,dy_shadow)
+    output_so = tilde_pid.exact_gauss_tilde_pid(cov_sonic,dm_sonic,dx_sonic,dy_soinc,unbiased=True,sample_size=data_sonic_reordered[0].shape[0]) 
+    output_sh = tilde_pid.exact_gauss_tilde_pid(cov_shadow,dm_shadow,dx_shadow,dy_shadow,unbiased=True,sample_size=data_shadow_reordered[0].shape[0])
 
     pid_so = {'red': output_so[7], 'unq1': output_so[7], 'unq2': output_so[6], 'syn': output_so[8]}
     pid_sh = {'red': output_sh[7], 'unq1': output_sh[7], 'unq2': output_sh[6], 'syn': output_sh[8]}
@@ -220,8 +220,8 @@ torch.set_default_dtype(torch.float64)
 
 g = torch.Generator().manual_seed(0)
 
-n = 100000000
-p = 20
+n = 1000
+p = 300 #dim for each rv
 
 data = evil_twin_example_torch(g, n, p)
 
