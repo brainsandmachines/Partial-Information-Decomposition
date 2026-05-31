@@ -86,6 +86,9 @@ def load_idep_rows(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
 
+    if {row["case"] for row in rows} == {"InputCov"}:
+        return normalize_rows(rows)
+
     # Sonic and Shadow have the same observable covariance. Keep one row per
     # PID definition after checking the two cases agree numerically.
     by_definition: dict[str, dict[str, dict[str, str]]] = {}
@@ -264,8 +267,10 @@ def main() -> int:
             [
                 sys.executable,
                 str(SCRIPT_DIR / "Idep_R.py"),
-                "--p",
-                "1",
+                "--matrix-csv",
+                str(matrix_csv),
+                "--sizes",
+                "1,1,1",
                 "--output",
                 str(idep_csv),
                 "--idep-url",
@@ -291,6 +296,8 @@ def main() -> int:
                 "1,1,1",
                 "--output",
                 str(tilde_csv),
+                "--case",
+                "InputCov",
             ],
             "Tilde_PID.py",
             args.verbose,
@@ -307,6 +314,8 @@ def main() -> int:
                 "1,1,1",
                 "--output",
                 str(delta_csv),
+                "--case",
+                "InputCov",
             ],
             "Delta_PID.py",
             args.verbose,

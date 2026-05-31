@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import shutil
 import subprocess
 import sys
@@ -17,8 +18,9 @@ DEFAULT_OUTPUT = "evil_twin_idep_results.csv"
 
 R_CODE = r'''
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 5) {
-  stop("Expected: p output_csv idep_url local_idep_file verbose", call. = FALSE)
+if (length(args) != 7) {
+  stop("Expected: p output_csv idep_url local_idep_file verbose matrix_csv sizes_csv",
+       call. = FALSE)
 }
 
 p <- as.integer(args[[1]])
@@ -26,6 +28,8 @@ output_csv <- args[[2]]
 idep_url <- args[[3]]
 local_idep_file <- args[[4]]
 verbose <- args[[5]] == "1"
+matrix_csv <- args[[6]]
+sizes_csv <- args[[7]]
 
 if (is.na(p) || p < 1L) {
   stop("p must be a positive integer.", call. = FALSE)
@@ -124,20 +128,38 @@ run_case <- function(case_name, sigma, sizes) {
 
 load_idep_gauss(idep_url, local_idep_file)
 
-sizes <- c(p, p, p)
-rows <- rbind(
-  run_case("Sonic", make_sonic_sigma(p), sizes),
-  run_case("Shadow", make_shadow_sigma(p), sizes)
-)
+if (nzchar(matrix_csv)) {
+  sizes <- as.integer(strsplit(sizes_csv, ",", fixed = TRUE)[[1]])
+  sigma <- as.matrix(read.csv(matrix_csv, header = FALSE, check.names = FALSE))
+  rows <- run_case("InputCov", sigma, sizes)
+} else {
+  sizes <- c(p, p, p)
+  rows <- rbind(
+    run_case("Sonic", make_sonic_sigma(p), sizes),
+    run_case("Shadow", make_shadow_sigma(p), sizes)
+  )
+}
 
 write.csv(rows, output_csv, row.names = FALSE)
 cat("Wrote ", output_csv, "\n", sep = "")
 '''
 
 
+def parse_sizes(value: str) -> tuple[int, int, int]:
+    try:
+        sizes = tuple(int(part.strip()) for part in value.split(","))
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("--sizes must look like 1,1,1") from exc
+    if len(sizes) != 3 or any(size <= 0 for size in sizes):
+        raise argparse.ArgumentTypeError("--sizes must contain three positive integers")
+    return sizes
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the Idep evil-twin example.")
+    parser = argparse.ArgumentParser(description="Run Idep/MMI on a covariance CSV or on the built-in evil-twin example.")
     parser.add_argument("--p", type=int, default=1, help="Dimension of each block.")
+    parser.add_argument("--matrix-csv", type=Path, help="No-header covariance/correlation CSV ordered as source1,source2,target.")
+    parser.add_argument("--sizes", type=parse_sizes, help="Comma-separated source1,source2,target dimensions.")
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="CSV output path.")
     parser.add_argument("--idep-url", default=DEFAULT_IDEP_URL, help="IdepGauss.R URL.")
     parser.add_argument("--local-idep", default="IdepGauss.R", help="Local IdepGauss.R fallback.")
@@ -145,6 +167,38 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--verbose", action="store_true", help="Print R PID objects.")
     parser.add_argument("--keep-r-driver", action="store_true", help="Keep the temporary R script.")
     return parser.parse_args()
+
+
+def csv_shape(path: Path) -> tuple[int, int]:
+    rows = 0
+    columns = None
+    with path.open(newline="", encoding="utf-8") as handle:
+        for row_number, row in enumerate(csv.reader(handle), start=1):
+            if not row or all(cell.strip() == "" for cell in row):
+                continue
+            if columns is None:
+                columns = len(row)
+            elif len(row) != columns:
+                raise ValueError(f"{path} is ragged at row {row_number}")
+            for cell in row:
+                float(cell)
+            rows += 1
+    if rows == 0 or columns is None:
+        raise ValueError(f"{path} is empty")
+    return rows, columns
+
+
+def validate_matrix_args(args: argparse.Namespace) -> None:
+    if args.matrix_csv is None and args.sizes is None:
+        return
+    if args.matrix_csv is None or args.sizes is None:
+        raise ValueError("--matrix-csv and --sizes must be supplied together")
+    if not args.matrix_csv.exists():
+        raise FileNotFoundError(f"matrix CSV does not exist: {args.matrix_csv}")
+    total = sum(args.sizes)
+    shape = csv_shape(args.matrix_csv)
+    if shape != (total, total):
+        raise ValueError(f"matrix shape must be {(total, total)}, got {shape}: {args.matrix_csv}")
 
 
 def find_rscript(value: str | None) -> str:
@@ -177,8 +231,9 @@ def main() -> int:
         return 2
 
     try:
+        validate_matrix_args(args)
         rscript = find_rscript(args.rscript)
-    except FileNotFoundError as exc:
+    except (FileNotFoundError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
@@ -201,6 +256,8 @@ def main() -> int:
                 args.idep_url,
                 str(local_idep),
                 "1" if args.verbose else "0",
+                "" if args.matrix_csv is None else str(args.matrix_csv.expanduser().resolve()),
+                "" if args.sizes is None else ",".join(map(str, args.sizes)),
             ],
             check=False,
         )

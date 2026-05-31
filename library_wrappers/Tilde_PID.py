@@ -46,6 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--matrix-csv", type=Path, default=DEFAULT_MATRIX_CSV)
     parser.add_argument("--sizes", type=parse_sizes, default=(1, 1, 1))
     parser.add_argument("--output", type=Path, default=Path(DEFAULT_OUTPUT))
+    parser.add_argument("--case", default="InputCov")
     parser.add_argument("--sample-size", type=int, help="Optional sample size for unbiased correction.")
     return parser.parse_args()
 
@@ -66,10 +67,10 @@ def source_source_target_to_target_source_source(matrix: np.ndarray, sizes: tupl
     return matrix[np.ix_(order, order)]
 
 
-def result_row(values: tuple[float, ...]) -> dict[str, object]:
+def result_row(values: tuple[float, ...], case: str) -> dict[str, object]:
     imx, imy, imxy, _union_info, _obj, uix, uiy, ri, si = values[:9]
     return {
-        "case": "EvilTwin",
+        "case": case,
         "pid_definition": "Tilde",
         "unique_source1": uix,
         "unique_source2": uiy,
@@ -104,7 +105,7 @@ def main() -> int:
             unbiased=args.sample_size is not None,
             sample_size=args.sample_size,
         )
-        write_row(result_row(values), args.output.expanduser())
+        write_row(result_row(values, args.case), args.output.expanduser())
         print(f"Wrote {args.output}")
         return 0
     except (OSError, ValueError) as exc:

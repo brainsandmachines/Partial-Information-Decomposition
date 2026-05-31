@@ -3,10 +3,10 @@ This folder contains simple Python wrappers around external PID code.
 Files:
 
 - IG_R.py: calls JWKay/PID/IGFuns.R and returns IG PID values as JSON.
-- Idep_R.py: calls JWKay/PID/IdepGauss.R for the Sonic/Shadow evil-twin example.
+- Idep_R.py: calls JWKay/PID/IdepGauss.R and returns Idep/MMI rows.
 - Tilde_PID.py: calls gpid's exact Gaussian tilde PID definition.
 - Delta_PID.py: calls gpid's approximate Gaussian delta PID definition.
-- check_evil_twin_all.py: runs both wrappers and writes one combined CSV table.
+- check_evil_twin_all.py: runs all wrappers on the same covariance CSV and writes one combined table.
 - evil_twin_whitened_correlation_1_1_1.csv: input matrix for the IG evil-twin check.
 - evil_twin_check_outputs/: generated results from check_evil_twin_all.py.
 
