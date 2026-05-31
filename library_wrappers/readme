@@ -1,0 +1,3 @@
+This is a folder where I want to utilize code of other's on github. 
+Codex creates a wrapper for each code. It is needed because sometimes the code is in R and 
+we need a wrapper in order to run it i python.

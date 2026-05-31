@@ -125,6 +125,61 @@ def calcualte_mi(config,sigma_dict,term='full'):
         return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
     else:
         return {term: all_terms_dict[term]}
+    
+def calculate_mi_raw(device,sigma,dims):
+    """This function calculates the tri-variate or bi-variate
+    mutual information using the covariance matrices without any whitening - in raw mode (:
+    
+    Input: 
+        device: torch.device - the device on which to perform the calculations
+        sigma: torch.Tensor - the covariance matrix of the joint distribution of the sources and target, in the order [X1,X2,T]
+        dims = list - the dimensions of the random variables\
+        tri_variate: bool - whether to calculate tri-variate mutual information (True) or bi-variate mutual information (False)
+
+
+    Output: Mutual Iformation value (float)"""
+
+
+    sigma_dict = create_cov_matrix(Sigma=sigma, dims=dims, device=device)
+
+    cov_x12 = sigma_dict['joint_x1_x2']
+    cov_t = sigma_dict['cov_t']
+
+    #log∣ΣX1​X2​​∣
+    logdet_x12 = 0.5 * safe_logdet(cov_x12)
+    #log∣ΣT∣
+    logdet_t = 0.5 * safe_logdet(cov_t)
+    #log∣ΣT​X1​X2​​∣
+    logdet_joint = 0.5 * safe_logdet(sigma)
+    mi_tri = logdet_x12 + logdet_t - logdet_joint
+
+    #bi-X1T:
+    cov_x1 = sigma_dict['cov_x1']
+    cov_x1_t = sigma_dict['joint_x1_t']
+    logdet_x1 = 0.5 * safe_logdet(cov_x1)
+    logdet_x1_t = 0.5 * safe_logdet(cov_x1_t)
+    mi_bi_1 = logdet_x1 + logdet_t - logdet_x1_t
+
+    #bi-X2T:
+    cov_x2 = sigma_dict['cov_x2']
+    cov_x2_t = sigma_dict['joint_x2_t']
+    logdet_x2 = 0.5 * safe_logdet(cov_x2)
+    logdet_x2_t = 0.5 * safe_logdet(cov_x2_t)
+
+    mi_bi_2 = logdet_x2 + logdet_t - logdet_x2_t
+
+    return {'tri_mi':mi_tri.item(),'bi_mi_1': mi_bi_1.item(),'bi_mi_2': mi_bi_2.item()}
+
+
+
+
+    
+
+    
+    
+
+    
+    
 
 def para_calcualte_mi(config,sigma_dict,term='full',assumed_whitened = True):
     """This function calculates the tri-variate mutual information using the for 
@@ -170,7 +225,7 @@ def calculate_mi_lr(config,sigma_dict):
             using: create_con_matrix function in PID_util.py
 
             
-    output: dict - contains the mutual information and the numerator and denominator of the calculation"""
+    output: dict - contains the mutual information"""
 
     n0 = config['n0']
     n1 = config['n1']
@@ -178,17 +233,18 @@ def calculate_mi_lr(config,sigma_dict):
     device = config['device']
 
     joint_cov_x1_x2 = sigma_dict['joint_x1_x2']
-    # Solve the linear system instead of explicitly inverting cov_xt
-    solve_x1 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x1_xt'].T)
-    solve_x2 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x2_xt'].T)
+    # Solve the linear system instead of explicitly inverting cov_t
+    solve_x1 = torch.linalg.solve(sigma_dict['cov_t'], sigma_dict['cross_x1_t'].T)
+    solve_x2 = torch.linalg.solve(sigma_dict['cov_t'], sigma_dict['cross_x2_t'].T)
 
     # Calculate conditional covariances
-    cov_x1_given_t = (sigma_dict['cov_x1'] - sigma_dict['cross_x1_xt'] @ solve_x1).to(device)
-    cov_x2_given_t = (sigma_dict['cov_x2'] - sigma_dict['cross_x2_xt'] @ solve_x2).to(device)
+    cov_x1_given_t = (sigma_dict['cov_x1'] - sigma_dict['cross_x1_t'] @ solve_x1).to(device)
+    cov_x2_given_t = (sigma_dict['cov_x2'] - sigma_dict['cross_x2_t'] @ solve_x2).to(device)
 
     mi_tri = 0.5 * (safe_logdet(joint_cov_x1_x2) - safe_logdet(cov_x1_given_t) - safe_logdet(cov_x2_given_t))
     mi_bi_1 = 0.5 * (safe_logdet(sigma_dict['cov_x1']) - safe_logdet(cov_x1_given_t))
     mi_bi_2 = 0.5 * (safe_logdet(sigma_dict['cov_x2']) - safe_logdet(cov_x2_given_t))
+
     return {'mi_tri':mi_tri.item(),'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': safe_logdet(joint_cov_x1_x2).item(),'deno_1': safe_logdet(cov_x1_given_t).item(),'deno_2': safe_logdet(cov_x2_given_t).item()}
 
 

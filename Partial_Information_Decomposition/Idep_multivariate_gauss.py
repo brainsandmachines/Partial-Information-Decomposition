@@ -72,10 +72,10 @@ class Idep_multivariate_gauss:
         if self.cov_dict is not None:
             self.sigma00 = self.cov_dict['cov_x1']
             self.sigma11 = self.cov_dict['cov_x2']
-            self.sigma22 = self.cov_dict['cov_xt']
+            self.sigma22 = self.cov_dict['cov_t']
             self.sigma01 = self.cov_dict['cross_x1_x2']
-            self.sigma02 = self.cov_dict['cross_x1_xt']
-            self.sigma12 = self.cov_dict['cross_x2_xt']
+            self.sigma02 = self.cov_dict['cross_x1_t']
+            self.sigma12 = self.cov_dict['cross_x2_t']
 
 
             self.P = whiten_block(self.sigma00, self.sigma01, self.sigma11)
@@ -180,8 +180,8 @@ class Idep_multivariate_gauss:
         assert np.all([constraint in possible_inputs for constraint in constraints]), f"Constraint {constraints} not recognized. Available constraints: {possible_inputs}" 
 
         self.constraint_cov_dict = {}
-        print(f"\nCovariance matrix shape: {cov_matrix.shape}")
-        print(f"dim_m1: {self.dim_x1}, dim_m2: {self.dim_x2}, dim_t: {self.dim_t}")
+        #print(f"\nCovariance matrix shape: {cov_matrix.shape}")
+        #print(f"dim_m1: {self.dim_x1}, dim_m2: {self.dim_x2}, dim_t: {self.dim_t}")
 
 
 
@@ -336,7 +336,7 @@ class Idep_multivariate_gauss:
 
         idep_values = self.compute_Idep()
         pid = self.pid_values(idep_values['unique_1'], idep_values['unique_2'])
-        mi = {'I(X1;T)': self.i_m1_t.item(), 'I(X2;T)': self.i_m2_t.item(), 'I(X1,X2;T)': self.i_m1_m2_t.item()}
+        mi = {'bi_mi_1': self.i_m1_t.item(), 'bi_mi_2': self.i_m2_t.item(), 'tri_mi': self.i_m1_m2_t.item()}
         return pid , mi
     
     

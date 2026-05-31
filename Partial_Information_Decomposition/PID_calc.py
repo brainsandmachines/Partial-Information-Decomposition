@@ -6,7 +6,7 @@ import sys
 from PID_util import create_cov_matrix
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from gpid import tilde_pid
+from gpid import tilde_pid,estimate
 
 
 
@@ -26,6 +26,9 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
 
     elif method == "tilde":
         pid, mi = pid_tilde_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
+    
+    elif method == "delta":
+        pid, mi = delta_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
     else:
         raise ValueError("Unsupported method specified")
 
@@ -90,6 +93,42 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
     
     output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N) 
     pid = {'red': output[7], 'unq1': output[7], 'unq2': output[6], 'syn': output[8]}
-    mi = {'I(X1;T)': output[0], 'I(X2;T)': output[1], 'I(X1,X2;T)': output[2]}
+    mi = {'tri_mi': output[2], 'bi_mi_1': output[0], 'bi_mi_2': output[1]}
 
+    return pid, mi
+
+
+def delta_wrapper(config,sources,target,covariance,rng,on_rvs):
+    """This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023
+    Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation and then calls the PID calculation function.
+    and calculates the PID using BROJA definition and calculation from Venkateh et al. 2023.
+    
+    Inputs: 
+        config: dict, configuration dictionary containing parameters for PID calculation
+        sources: list of torch tensors, the source variables
+        target: list of torch tensors, the target variable
+        covariance: torch tensor, the covariance matrix
+        rng: torch random generator, for reproducibility
+        on_rvs: callable, a function to apply on the random variables (sources and targets) before PID calculation, if not None. This can be used to apply transformations to the random"""
+
+    dm , dx, dy = config['dt'] , config['dx1'] , config['dx2']
+
+
+    if covariance is None:
+        data = [target[0], sources[0], sources[1]]  # [T, X1, X2]
+        dict_cov = create_cov_matrix(data)
+        cov = dict_cov["full_cov"]
+        N = data[0].shape[0]  # Sample size
+        bias_corr = True if config['bias_correction'] else False
+    else:
+        cov = covariance
+        N = config['n_samples']
+        bias_corr = False
+    #print(f"\n Covariance matrix (shape {cov.shape}):")
+
+    cov = cov.cpu().numpy() # Convert to numpy array for Delta implementation
+    
+    output = estimate.approx_pid_from_cov(cov,dm,dx,dy,verbose=True) 
+    pid = {'red': output[7], 'unq1': output[7], 'unq2': output[6], 'syn': output[8]}
+    mi = {'tri_mi': output[2], 'bi_mi_1': output[0], 'bi_mi_2': output[1]}
     return pid, mi

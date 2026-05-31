@@ -288,18 +288,18 @@ def build_m8_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
 
     if whiten == 'False':
         P = cov_dict['cross_x1_x2']
-        Q = cov_dict['cross_x1_xt']
-        R = cov_dict['cross_x2_xt']
+        Q = cov_dict['cross_x1_t']
+        R = cov_dict['cross_x2_t']
         
     elif whiten == 'whiten_ver':
         P = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_x2'], cov_dict['cov_x2'])
-        Q = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
-        R = whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
+        Q = whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_t'], cov_dict['cov_t'])
+        R = whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_t'], cov_dict['cov_t'])
 
     elif whiten == 'True': #If everything is already whitened 
         P = cov_dict['cross_x1_x2']
-        Q = cov_dict['cross_x1_xt']
-        R = cov_dict['cross_x2_xt']
+        Q = cov_dict['cross_x1_t']
+        R = cov_dict['cross_x2_t']
 
     if not para:
         row1_m8 = torch.cat([torch.eye(n0, device=device), P, Q], dim=1)
@@ -336,24 +336,24 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
 
     device = config.get('device', 'cpu')
     if whiten == 'False':
-        Q = cov_dict['cross_x1_xt']
-        R = cov_dict['cross_x2_xt']
-        cov_tt = cov_dict['cov_xt'] 
+        Q = cov_dict['cross_x1_t']
+        R = cov_dict['cross_x2_t']
+        cov_tt = cov_dict['cov_t'] 
 
     elif whiten == 'whiten_ver':
-        Q = para_whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_xt'], cov_dict['cov_xt'])
-        R = para_whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_xt'], cov_dict['cov_xt'])
+        Q = para_whiten_block(cov_dict['cov_x1'], cov_dict['cross_x1_t'], cov_dict['cov_t'])
+        R = para_whiten_block(cov_dict['cov_x2'], cov_dict['cross_x2_t'], cov_dict['cov_t'])
         cov_tt = torch.eye(dt,device=device)
     elif whiten== 'True': #If everything is already whitened
-        Q = cov_dict['cross_x1_xt']
-        R = cov_dict['cross_x2_xt']
-        cov_tt = cov_dict['cov_xt'] #IDentity matrix
+        Q = cov_dict['cross_x1_t']
+        R = cov_dict['cross_x2_t']
+        cov_tt = cov_dict['cov_t'] #IDentity matrix
         assert torch.allclose(cov_tt, torch.eye(dt, device=device).to(dtype=cov_tt.dtype)), "Expected cov_x2 to be identity when whiten is True."
     
     if not para:
         cov_11 = torch.eye(dx1, device=device) if whiten != 'False' else cov_dict['cov_x1']
         cov_22 = torch.eye(dx2, device=device) if whiten != 'False' else cov_dict['cov_x2']
-        cov_tt = torch.eye(dt, device=device) if whiten != 'False' else cov_dict['cov_xt']
+        cov_tt = torch.eye(dt, device=device) if whiten != 'False' else cov_dict['cov_t']
 
 
         tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)
@@ -369,7 +369,7 @@ def build_m7_terms(config, cov_dict,whiten:bool='whiten_ver',para=False):
         batch_size = cov_dict['cov_x1'].shape[0]
         cov_11 = torch.eye(dx1, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x1']
         cov_22 = torch.eye(dx2, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_x2']
-        cov_tt = torch.eye(dt, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_xt']
+        cov_tt = torch.eye(dt, device=device).repeat(batch_size, 1, 1) if whiten != 'False' else cov_dict['cov_t']
 
 
         tt_inv = torch.linalg.inv(cov_tt).to(dtype=Q.dtype,device=device)

@@ -136,21 +136,63 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
 
     if (rvs and len(rvs) == 3) or (dims and len(dims) == 3):
         #Cross-Covariances:
-        cov_dict['cross_x2_xt'] = Sigma[x1_dim:dx1_dx2, dx1_dx2:d_all]#ΣX2,XT
+        cov_dict['cross_x2_t'] = Sigma[x1_dim:dx1_dx2, dx1_dx2:d_all]#ΣX2,XT
         cov_dict['cross_x2t_x1'] = Sigma[x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
-        cov_dict['cross_x1_xt'] = Sigma[0:x1_dim, dx1_dx2:d_all] #ΣX1,XT
+        cov_dict['cross_x1_t'] = Sigma[0:x1_dim, dx1_dx2:d_all] #ΣX1,XT
 
         #Auto-Covariances:
-        cov_dict['joint_x2_xt'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
-        cov_dict['cov_xt'] = Sigma[dx1_dx2:d_all, dx1_dx2:d_all] #ΣXT
+        cov_dict['joint_x2_t'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
+        cov_dict['cov_t'] = Sigma[dx1_dx2:d_all, dx1_dx2:d_all] #ΣXT
 
         ##ΣX1,XT:
-        a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_xt']),dim=1,)
-        b = torch.cat((cov_dict['cross_x1_xt'].T, cov_dict['cov_xt']),dim=1)
-        cov_dict['joint_x1_xt'] = torch.cat((a,b),dim=0)
+        a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_t']),dim=1,)
+        b = torch.cat((cov_dict['cross_x1_t'].T, cov_dict['cov_t']),dim=1)
+        cov_dict['joint_x1_t'] = torch.cat((a,b),dim=0)
 
 
     return cov_dict
+
+
+def reorder_cov_blocks(
+    Sigma: torch.Tensor,
+    dims: dict[str, int],
+    old_order: list[str],
+    new_order: list[str],
+) -> torch.Tensor:
+    """
+    Reorder covariance matrix blocks according to variable names.
+
+    Example:
+        Sigma is ordered as [X1, X2, T]
+        reorder to [T, X1, X2]
+
+        Sigma_new = reorder_cov_blocks(
+            Sigma,
+            dims={'X1': d1, 'X2': d2, 'T': dt},
+            old_order=['X1', 'X2', 'T'],
+            new_order=['T', 'X1', 'X2']
+        )
+    """
+
+    assert set(old_order) == set(new_order), "old_order and new_order must contain the same variables"
+
+    start = {}
+    current = 0
+    for var in old_order:
+        start[var] = current
+        current += dims[var]
+
+    indices = []
+    for var in new_order:
+        s = start[var]
+        e = s + dims[var]
+        indices.append(torch.arange(s, e, device=Sigma.device))
+
+    new_idx = torch.cat(indices)
+
+    return Sigma[new_idx][:, new_idx]
+
+
 
 def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
     """This function will create the covariance matrix for the three variables M1,M2,T
