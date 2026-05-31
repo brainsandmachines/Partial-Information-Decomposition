@@ -1,3 +1,15 @@
-This is a folder where I want to utilize code of other's on github. 
-Codex creates a wrapper for each code. It is needed because sometimes the code is in R and 
-we need a wrapper in order to run it i python.
+This folder contains simple Python wrappers around external PID code.
+
+Files:
+
+- IG_R.py: calls JWKay/PID/IGFuns.R and returns IG PID values as JSON.
+- Idep_R.py: calls JWKay/PID/IdepGauss.R for the Sonic/Shadow evil-twin example.
+- Tilde_PID.py: calls gpid's exact Gaussian tilde PID definition.
+- Delta_PID.py: calls gpid's approximate Gaussian delta PID definition.
+- check_evil_twin_all.py: runs both wrappers and writes one combined CSV table.
+- evil_twin_whitened_correlation_1_1_1.csv: input matrix for the IG evil-twin check.
+- evil_twin_check_outputs/: generated results from check_evil_twin_all.py.
+
+Typical command:
+
+python library_wrappers/check_evil_twin_all.py
