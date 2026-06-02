@@ -6,6 +6,8 @@ Files:
 - Idep_R.py: calls JWKay/PID/IdepGauss.R and returns Idep/MMI rows.
 - Tilde_PID.py: calls gpid's exact Gaussian tilde PID definition.
 - Delta_PID.py: calls gpid's approximate Gaussian delta PID definition.
+- Thin_PID.py: calls warrenzha/flow-pid's exact Gaussian Thin-PID definition.
+- Flow_PID.py: calls warrenzha/flow-pid's normalizing-flow PID estimator on raw samples.
 - check_evil_twin_all.py: runs all wrappers on the same covariance CSV and writes one combined table.
 - evil_twin_whitened_correlation_1_1_1.csv: input matrix for the IG evil-twin check.
 - evil_twin_check_outputs/: generated results from check_evil_twin_all.py.
@@ -13,3 +15,16 @@ Files:
 Typical command:
 
 python library_wrappers/check_evil_twin_all.py
+
+Each individual wrapper can also be run with no arguments to execute and print
+the shared simple Gaussian self-check. For Flow_PID.py, run it from the PID_env
+environment.
+
+Simple Gaussian examples:
+
+python library_wrappers/Delta_PID.py --example simple-gaussian --output /tmp/delta_simple.csv
+python library_wrappers/Tilde_PID.py --example simple-gaussian --output /tmp/tilde_simple.csv
+python library_wrappers/Thin_PID.py --example simple-gaussian --output /tmp/thin_simple.csv
+python library_wrappers/Flow_PID.py --example simple-gaussian --n-flows 1 --n-epochs 1 --batch-size 8 --output /tmp/flow_simple.csv
+python library_wrappers/IG_R.py --example simple-gaussian --output /tmp/ig_simple.json
+python library_wrappers/Idep_R.py --example simple-gaussian --output /tmp/idep_simple.csv
