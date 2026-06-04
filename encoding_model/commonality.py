@@ -26,8 +26,8 @@ def _score_only(score_result):
 
 
 def commonality_analysis(
-    features_A,
-    features_B,
+    features_X1,
+    features_X2,
     target,
     method="standard",
     alphas=None,
@@ -38,8 +38,8 @@ def commonality_analysis(
     Decompose predictive power into unique, common, and unexplained components.
 
     Args:
-        features_A (np.ndarray): First feature matrix, reported as X1.
-        features_B (np.ndarray): Second feature matrix, reported as X2.
+        features_X1 (np.ndarray): First feature matrix, reported as X1.
+        features_X2 (np.ndarray): Second feature matrix, reported as X2.
         target (np.ndarray): Target variable or target matrix.
         method (str): One of 'standard', 'ols_cv', 'ridge_cv', or 'lasso_cv'.
         alphas (array-like, optional): Ridge alpha values for method='ridge_cv'.
@@ -69,8 +69,8 @@ def commonality_analysis(
             f"Unknown method: {method}. Use 'standard', 'ols_cv', 'ridge_cv', or 'lasso_cv'."
         )
 
-    r2_X1 = _score_only(compute_r2_fn(features_A, target))
-    r2_X2 = _score_only(compute_r2_fn(features_B, target))
+    r2_X1 = _score_only(compute_r2_fn(features_X1, target))
+    r2_X2 = _score_only(compute_r2_fn(features_X2, target))
     r2_X12 = _score_only(compute_r2_fn(features_AB, target))
 
     scale = 1.0

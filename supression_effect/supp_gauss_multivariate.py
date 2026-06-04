@@ -25,7 +25,7 @@ from utils import (
     save_csv_column_means
 )
 
-from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import CCA_reduction
+from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import CCA_reduction
 
 
 

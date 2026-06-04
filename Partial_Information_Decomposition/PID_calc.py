@@ -4,9 +4,10 @@ from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_
 from pathlib import Path
 import sys
 from PID_util import create_cov_matrix
+from external.gpid.src.gpid import estimate
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from gpid import tilde_pid,estimate
+from external.gpid.src.gpid import tilde_pid
 
 
 

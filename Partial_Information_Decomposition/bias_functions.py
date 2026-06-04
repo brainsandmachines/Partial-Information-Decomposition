@@ -1,15 +1,15 @@
 import torch
 from pathlib import Path
 import sys
-from Partial_Information_Decomposition.Idep_Simulations.simulation_wrapper import make_random_true_cov,create_m7_cov
-from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import build_m7_terms
+
 from mi_functions import calcualte_mi
 from functools import partial
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import create_cov_matrix
-
+from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import make_random_true_cov,create_m7_cov
+from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import build_m7_terms
 
 
 

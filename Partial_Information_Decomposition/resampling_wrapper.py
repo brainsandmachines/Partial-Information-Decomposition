@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 import time
 import sys
 from pathlib import Path
-from Idep_Simulations.Simulation_utils import on_covariance
+from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import on_covariance
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.jackknife import *

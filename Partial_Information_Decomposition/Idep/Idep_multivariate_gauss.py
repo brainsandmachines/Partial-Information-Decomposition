@@ -4,23 +4,22 @@ from scipy.special import digamma
 from networkx import constraint
 import torch
 import numpy as np
-import matplotlib.pyplot as plt 
-from torch.distributions import Normal
-from sklearn.linear_model import LinearRegression
-from sklearn.covariance import LedoitWolf
-
-if __name__ != "__main__":
-    from Partial_Information_Decomposition.PID_util import create_cov_matrix,whiten_block,block_singularity_check
-else:
-    from PID_util import create_cov_matrix, cond_cov, standardize, assert_full_rank,singularity_report
 from typing import Optional
+# if __name__ != "__main__":
+#     from Partial_Information_Decomposition.PID_util import create_cov_matrix,whiten_block,block_singularity_check
+# else:
+#     from PID_util import create_cov_matrix
+# from typing import Optional
 
 
 import sys
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
-from Partial_Information_Decomposition.bias_functions import bias_func,logdet_wishart_bias
+from bias_functions import bias_func,logdet_wishart_bias
+from PID_util import create_cov_matrix,whiten_block,block_singularity_check
+
+
 
 """This files implement the Idep univariate source and target method for univariate gaussian variables as described in:
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
