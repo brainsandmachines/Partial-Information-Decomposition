@@ -8,7 +8,8 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
 from examples.toy_example import run_all_methods,run_experiment,commonality_analysis
-from Partial_Information_Decomposition.Idep_univariabe_gauss import Idep_univariate_gauss
+from Partial_Information_Decomposition.Idep.Idep_univariabe_gauss import Idep_univariate_gauss
+from Partial_Information_Decomposition.PID_util import compare_results
 from utils import Tee
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
@@ -85,19 +86,16 @@ def check_supression_effect(vp_results,pid_results):
     -------
     None
     """
-    R_A = vp_results['R²_A']
-    R_B = vp_results['R²_B']
-    R_AB = vp_results['R²_AB']
-    unique_A = vp_results['unique_A']
-    unique_B = vp_results['unique_B']
-    common = vp_results['common']
+    R_X1 = vp_results['R²_X1']
+    R_X2 = vp_results['R²_X2']
+    unique_X1 = vp_results['unique_X1']
+    unique_X2 = vp_results['unique_X2']
 
     unq0 = pid_results['unq0']
     unq1 = pid_results['unq1']
-    red = pid_results['red']
     syn = pid_results['syn']
 
-    if np.isclose(R_A,0) or R_A < 0 and unique_A > 0:
+    if np.isclose(R_X1,0) or R_X1 < 0 and unique_X1 > 0:
         print("\nSuppression effect detected: M1 is a suppressor variable.❗❗❗")
         if not np.isclose(unq0,0,atol=1e-5):
             print("PID fell to supression effect ❌")
@@ -107,7 +105,7 @@ def check_supression_effect(vp_results,pid_results):
             else:
                 print("PID did not fall to supression effect ✅ (No synergy detected) ❌")
             
-    elif np.isclose(R_B,0) or R_B < 0 and unique_B > 0:
+    elif np.isclose(R_X2,0) or R_X2 < 0 and unique_X2 > 0:
         print("\nSuppression effect detected: M2 is a suppressor variable.❗❗❗")
         if not np.isclose(unq1,0,atol=1e-5):
             print("PID fell to supression effect ❌")
@@ -119,38 +117,6 @@ def check_supression_effect(vp_results,pid_results):
     else:
         print("\nNo suppression effect detected: One of the unique contributions is zero.")
     return 
-
-
-def compare_results(vp_results,pid_results):
-    """Compare Variance Partitioning and Partial Information Decomposition results.
-    Parameters
-    ----------
-    vp_results : dict
-        Results from variance partitioning.
-    pid_results : dict
-        Results from Partial Information Decomposition.
-
-    Returns
-    -------
-    None
-    """
-    print("\n" + "="*70)
-    print("Comparison of Variance Partitioning and PID Results")
-    print("="*70)
-    print("Results:")
-    print(f"M1 R² (VP): {vp_results['R²_A']:.4f} | I(T;M1): {pid_results['unq0'] + pid_results['red'] :.4f}")
-    print(f"M2 R² (VP): {vp_results['R²_B']:.4f} | I(T;M2): {pid_results['unq1'] + pid_results['red'] :.4f}")
-    print(f"Both M1 and M2 R² (VP): {vp_results['R²_AB']:.4f} | I(T;M1,M2): {pid_results['unq0'] + pid_results['unq1'] + pid_results['red'] + pid_results['syn']:.4f}")
-    print(f"\nUnique to M1 (VP): {vp_results['unique_A']:.4f} | Unique(T;M1\\M2): {pid_results['unq0']:.4f}")
-    print(f"Unique to M2 (VP): {vp_results['unique_B']:.4f} | Unique(T;M2\\M1): {pid_results['unq1']:.4f}")
-    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
-    print(f"Synergy (PID): {pid_results['syn']:.4f}")
-
-    
-    check_supression_effect(vp_results,pid_results)
-        
-
-
 
 
 def main():
@@ -167,31 +133,37 @@ def main():
     print(f"Experiment 1: snr = {snr}")
     vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
+    check_supression_effect(vp_results, pid_results)
 
     print("\n" + "="*70)
     print(f"Experiment 2: snr = {snr} univariate gaussian with different seeds")
     vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=True, snr=snr, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
+    check_supression_effect(vp_results, pid_results)
 
     print("\n" + "="*70)
     print("Experiment 3: snr = 10")
     vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=10, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
+    check_supression_effect(vp_results, pid_results)
 
     print("\n" + "="*70)
     print("Experiment 4: snr = 10 univariate gaussian with different seeds")
     vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=True, snr=10, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
+    check_supression_effect(vp_results, pid_results)
 
     print("\n" + "="*70)
     print("Experiment 5: snr = 100")
     vp_results, pid_results = gauss_simple_example(N, P, rng_seed, noise_seed, simple_example=True, snr=100, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
+    check_supression_effect(vp_results, pid_results)
 
     print("\n" + "="*70)
     print("Experiment 6: snr = 100 univariate gaussian with different seeds")
     vp_results, pid_results = gauss_simple_example(N, P, rng_seed+1, noise_seed+1, simple_example=True, snr=100, method=method, mixing_dimension=mixing_dimension)
     compare_results(vp_results, pid_results)
+    check_supression_effect(vp_results, pid_results)
 
     print("\nAll experiments completed.")
 

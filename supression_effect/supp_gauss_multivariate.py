@@ -10,8 +10,10 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
-from toy_examples.toy_example import run_all_methods,run_experiment,commonality_analysis
-from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from encoding_model.commonality import commonality_analysis
+from toy_examples.toy_example import run_experiment
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.PID_util import compare_results
 from utils import (
     Tee,
     extract_all_components,
@@ -35,16 +37,6 @@ log = open("p1_pidvsvp.log", "w")
 sys.stdout = Tee(sys.stdout, log)
 sys.stderr = Tee(sys.stderr, log)
 
-
-def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
-    """
-    Standardize columns of X to zero mean and unit variance.
-
-    X shape: (N, P)
-    """
-    mean = X.mean(dim=0, keepdim=True)
-    std  = X.std(dim=0, unbiased=False, keepdim=True)
-    return (X - mean) / (std + eps)
 
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression
@@ -119,10 +111,6 @@ def test_suppression(N=1000,P=1,suppression_strength=0.5,rng_seed=1,mode='simple
     M2 = torch.tensor(M2_raw)
     T = torch.tensor(T)
 
-    # M1 = standardize(M1)
-    # M2 = standardize(M2) 
-    # T = standardize(T)
-    
     sources = [M1,M2]
     
     targets = [T]
@@ -180,36 +168,6 @@ def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
     plt.grid(True, alpha=0.3, linestyle='--', linewidth=0.5, axis='y')
     plt.tight_layout()
     plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/figures_/{title}_{sub_title}.pdf", transparent=True)
-
-
-def compare_results(vp_results,pid_results,mi_results):
-    """Compare Variance Partitioning and Partial Information Decomposition results.
-    Parameters
-    ----------
-    vp_results : dict
-        Results from variance partitioning.
-    pid_results : dict
-        Results from Partial Information Decomposition.
-    mi_results : dict
-        Mutual information results from PID.
-
-    Returns
-    -------
-    None
-    """
-    print("\n" + "="*70)
-    print("Comparison of Variance Partitioning and PID Results")
-    print("="*70)
-    print("Results:")
-    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_results['I(M1;T)']:.4f}")
-    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_results['I(M2;T)']:.4f}")
-    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_results['I(M1,M2;T)']:.4f}")
-    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq1']:.4f}")
-    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq2']:.4f}")
-    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
-    print(f"Synergy (PID): {pid_results['syn']:.4f}")
-
-    
 
 
 def get_seed_sweep_config() -> dict:

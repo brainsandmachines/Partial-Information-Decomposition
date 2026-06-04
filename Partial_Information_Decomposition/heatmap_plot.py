@@ -4,6 +4,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+try:
+    from Partial_Information_Decomposition.output_utils import safe_filename
+except ImportError:
+    from output_utils import safe_filename
+
 
 PLOT_COMPONENTS = {
     # PID components
@@ -91,15 +96,6 @@ STAT_SUFFIXES = {
     "var": ["var", "variance"],
     "mse": ["mse", "mean_squared_error"],
 }
-
-
-def safe_filename(name):
-    """
-    Return the filename exactly as given.
-    Nothing is deleted or replaced.
-    """
-
-    return str(name)
 
 
 def title_case_words(value):

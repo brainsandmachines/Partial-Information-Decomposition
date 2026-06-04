@@ -9,6 +9,11 @@ import os
 import sys
 from pathlib import Path
 
+try:
+    from .wrapper_utils import parse_sizes
+except ImportError:  # pragma: no cover - script-style import fallback
+    from wrapper_utils import parse_sizes
+
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 
@@ -32,13 +37,6 @@ PID_COLUMNS = [
     "joint_mutual_information",
     "interaction_information",
 ]
-
-
-def parse_sizes(value: str) -> tuple[int, int, int]:
-    sizes = tuple(int(part.strip()) for part in value.split(","))
-    if len(sizes) != 3 or any(size <= 0 for size in sizes):
-        raise argparse.ArgumentTypeError("--sizes must look like 1,1,1")
-    return sizes
 
 
 def parse_args() -> argparse.Namespace:

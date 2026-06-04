@@ -4,12 +4,15 @@
 from __future__ import annotations
 
 import argparse
-import csv
-import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+try:
+    from .wrapper_utils import csv_shape, find_rscript, parse_sizes
+except ImportError:  # pragma: no cover - script-style import fallback
+    from wrapper_utils import csv_shape, find_rscript, parse_sizes
 
 
 DEFAULT_IDEP_URL = "https://raw.githubusercontent.com/JWKay/PID/main/IdepGauss.R"
@@ -145,16 +148,6 @@ cat("Wrote ", output_csv, "\n", sep = "")
 '''
 
 
-def parse_sizes(value: str) -> tuple[int, int, int]:
-    try:
-        sizes = tuple(int(part.strip()) for part in value.split(","))
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError("--sizes must look like 1,1,1") from exc
-    if len(sizes) != 3 or any(size <= 0 for size in sizes):
-        raise argparse.ArgumentTypeError("--sizes must contain three positive integers")
-    return sizes
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run Idep/MMI on a covariance CSV or on the built-in evil-twin example.")
     parser.add_argument("--p", type=int, default=1, help="Dimension of each block.")
@@ -169,25 +162,6 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def csv_shape(path: Path) -> tuple[int, int]:
-    rows = 0
-    columns = None
-    with path.open(newline="", encoding="utf-8") as handle:
-        for row_number, row in enumerate(csv.reader(handle), start=1):
-            if not row or all(cell.strip() == "" for cell in row):
-                continue
-            if columns is None:
-                columns = len(row)
-            elif len(row) != columns:
-                raise ValueError(f"{path} is ragged at row {row_number}")
-            for cell in row:
-                float(cell)
-            rows += 1
-    if rows == 0 or columns is None:
-        raise ValueError(f"{path} is empty")
-    return rows, columns
-
-
 def validate_matrix_args(args: argparse.Namespace) -> None:
     if args.matrix_csv is None and args.sizes is None:
         return
@@ -199,22 +173,6 @@ def validate_matrix_args(args: argparse.Namespace) -> None:
     shape = csv_shape(args.matrix_csv)
     if shape != (total, total):
         raise ValueError(f"matrix shape must be {(total, total)}, got {shape}: {args.matrix_csv}")
-
-
-def find_rscript(value: str | None) -> str:
-    if value:
-        path = Path(value).expanduser()
-        if path.exists():
-            return str(path.resolve())
-        found = shutil.which(value)
-        if found:
-            return found
-        raise FileNotFoundError(f"Rscript was not found: {value}")
-
-    found = shutil.which("Rscript")
-    if not found:
-        raise FileNotFoundError("Rscript was not found on PATH. Pass --rscript.")
-    return found
 
 
 def absolute_path(value: str) -> Path:

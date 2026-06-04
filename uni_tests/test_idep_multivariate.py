@@ -6,28 +6,7 @@ import sys
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
-from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
-
-
-
-
-@pytest.fixture(scope="module")
-def dims():
-    return dict(d_m1=3, d_m2=4, d_t=3)
-
-
-
-@pytest.fixture #It marks the function random_data() as a data provider.
-def random_data(dims):
-    """Fixture to provide random tensors for testing."""
-    N = 100
-    d_t = dims['d_t']
-    d_m1 = dims['d_m1']
-    d_m2 = dims['d_m2']
-    T = torch.randn(N, d_t)
-    M1 = torch.randn(N, d_m1)
-    M2 = torch.randn(N, d_m2)
-    return T, M1, M2
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 
 def test_init_idep(random_data):
     """

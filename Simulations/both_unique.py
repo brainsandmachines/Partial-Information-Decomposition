@@ -6,15 +6,12 @@ import sys
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
-from toy_examples.toy_example import commonality_analysis
-from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from encoding_model.commonality import commonality_analysis
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
 from utils import (
     extract_all_components,
-    print_seed_summary,
-    run_multi_seed_experiment,
-    get_seed_runs_csv_path,
-    save_seed_summary_csv,
+    run_configured_multiseed,
     create_test_histograms_with_kde,
     save_seed_summary_table_image,
 )
@@ -166,15 +163,10 @@ def run_single_seed(seed: int, config: dict) -> dict:
 
 def main():
     config = get_run_config()
-    summary, seed_rows = run_multi_seed_experiment(
+    run_configured_multiseed(
         config,
         per_seed_runner=run_single_seed,
     )
-    print_seed_summary(summary, n_seeds=config["n_seeds"], seed_start=config["seed_start"])
-    all_runs_path = get_seed_runs_csv_path(config)
-    summary_path = save_seed_summary_csv(summary, config)
-    print(f"\nSaved all seed run results to: {all_runs_path}")
-    print(f"Saved summary to: {summary_path}")
 
 if __name__ == "__main__":
     #main()
@@ -184,4 +176,4 @@ if __name__ == "__main__":
 
     summary_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Equal_Unique_10snr/seed_summary_10snrboth_unique.csv"
     save_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/simulation_results/Equal_Unique_10snr/10snrboth_unique_seed_summary_table.png"
-    save_seed_summary_table_image(summary_path,image_path=save_path) 
+    save_seed_summary_table_image(summary_path,image_path=save_path)

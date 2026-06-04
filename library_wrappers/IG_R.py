@@ -4,14 +4,17 @@
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+try:
+    from .wrapper_utils import csv_shape, find_rscript, parse_sizes
+except ImportError:  # pragma: no cover - script-style import fallback
+    from wrapper_utils import csv_shape, find_rscript, parse_sizes
 
 
 EVIL_TWIN = {
@@ -141,16 +144,6 @@ writeLines(paste0("{", paste(fields, collapse = ","), "}"), arg("--output"))
 '''
 
 
-def parse_sizes(value: str) -> tuple[int, int, int]:
-    try:
-        sizes = tuple(int(part.strip()) for part in value.split(","))
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError("--sizes must look like 1,1,1") from exc
-    if len(sizes) != 3 or any(size <= 0 for size in sizes):
-        raise argparse.ArgumentTypeError("--sizes must contain three positive integers")
-    return sizes
-
-
 def parse_correlation(value: str) -> float:
     try:
         number = float(value)
@@ -253,35 +246,6 @@ def find_ig_source(args: argparse.Namespace) -> Path:
 
     searched = "\n  ".join(str(path) for path in ig_source_candidates(args.pid_repo))
     raise FileNotFoundError(f"Could not find IGFuns.R. Searched:\n  {searched}")
-
-
-def find_rscript(value: str) -> str:
-    path = Path(value).expanduser()
-    if path.exists():
-        return str(path.resolve())
-    found = shutil.which(value)
-    if found:
-        return found
-    raise FileNotFoundError(f"Rscript was not found: {value}")
-
-
-def csv_shape(path: Path) -> tuple[int, int]:
-    rows = 0
-    columns = None
-    with path.open(newline="", encoding="utf-8") as handle:
-        for row_number, row in enumerate(csv.reader(handle), start=1):
-            if not row or all(cell.strip() == "" for cell in row):
-                continue
-            if columns is None:
-                columns = len(row)
-            elif len(row) != columns:
-                raise ValueError(f"{path} is ragged at row {row_number}")
-            for cell in row:
-                float(cell)
-            rows += 1
-    if rows == 0 or columns is None:
-        raise ValueError(f"{path} is empty")
-    return rows, columns
 
 
 def require_shape(path: Path, expected: tuple[int, int], label: str) -> None:

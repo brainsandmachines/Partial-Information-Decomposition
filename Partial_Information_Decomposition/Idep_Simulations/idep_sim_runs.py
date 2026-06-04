@@ -6,7 +6,7 @@ import sys
 import os
 from unique_m7_m8 import run, simulation_wrapper
 from lr_Idep import create_cov_lr
-from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import plot_nodes_as_alpha 
+from Partial_Information_Decomposition.Idep_Simulations.Simulation_utils import make_pre_config, plot_nodes_as_alpha
 from functools import partial
     
 
@@ -25,30 +25,6 @@ def load_config_parts(yaml_file):
         cfg["Unknown_Mutual_Information_Simulation"].copy(),
         cfg.get("DE_config", {}).copy()  # Load DE_config if present
     )
-
-
-def make_pre_config(exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config, unk_cfg, de_config=None):
-    if de_config is None:
-        de_config = {}
-    
-    if exp == "MI=0":
-        config = {**MI_config, **mi0_config, **n_p_config}
-    elif exp == "M7_MI>0":
-        config = {**MI_config, **above0__M7_mi_config, **n_p_config}
-    elif exp == "M8_MI>0":
-        config = {**MI_config, **above0__M8_mi_config, **n_p_config}
-    elif exp == "unknown":
-        config = {**MI_config, **unk_cfg, **n_p_config}
-    else:
-        config = {**MI_config, **n_p_config}
-    
-    # Merge DE config if ver is only_unq1_zero
-    if config.get("ver") == "only_unq1_zero" and de_config:
-        config.update(de_config)
-    
-    return config
-
-
 def shrinkage_simulation(exp_list, shrinkage_list, alpha_list, yaml_file, folder_path, plot_heat_map):
     print("Running M7 and M8 shrinkage simulation...")
     main_func = partial(simulation_wrapper, intermediate_func=on_covariance)

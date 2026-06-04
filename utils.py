@@ -67,6 +67,14 @@ def create_permuation(list_to_permute):
     return permute_type(list_to_permute) 
 
 
+def standardize_np(X, eps: float = 1e-12):
+    """Column-standardize a NumPy-compatible array."""
+    X = np.asarray(X)
+    mean = np.mean(X, axis=0, keepdims=True)
+    std = np.std(X, axis=0, ddof=0, keepdims=True)
+    return (X - mean) / (std + eps)
+
+
 
 class Tee:
     def __init__(self, *files):
@@ -579,7 +587,32 @@ def run_multi_seed_experiment(
             print_seed_summary(running_summary, completed_target_runs, seed_start)
 
     return summarize_seed_results(all_component_results), seed_rows
-            
+
+
+def run_configured_multiseed(
+    config: dict,
+    per_seed_runner: Callable[[int, dict], dict],
+) -> tuple[dict, list[dict], Path, Path]:
+    """
+    Run a configured multi-seed experiment and handle the standard reporting.
+    """
+
+    summary, seed_rows = run_multi_seed_experiment(
+        config,
+        per_seed_runner=per_seed_runner,
+    )
+    print_seed_summary(
+        summary,
+        n_seeds=config["n_seeds"],
+        seed_start=config["seed_start"],
+    )
+    all_runs_path = get_seed_runs_csv_path(config)
+    summary_path = save_seed_summary_csv(summary, config)
+    print(f"\nSaved all seed run results to: {all_runs_path}")
+    print(f"Saved summary to: {summary_path}")
+    return summary, seed_rows, all_runs_path, summary_path
+
+
 def create_distribution_plot(
     data: list[float],
     title: str,

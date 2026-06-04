@@ -1,10 +1,7 @@
 # Ignore Python cache files
 __pycache__/
 *.pyc
-gpid/
 source_conwell_code/
-external/mayas_project/*
-!/external/mayas_project/.git
 figures_/
 trained_models/
 **/fmri_dicts/
@@ -18,3 +15,4 @@ Partial_Information_Decomposition/Idep_Simulations/figures/
 file_ignore/
 PID/
 library_wrappers/evil_twin_check_outputs/
+Codex_opreations/

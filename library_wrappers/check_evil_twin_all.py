@@ -7,10 +7,14 @@ import argparse
 import csv
 import html
 import json
-import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+try:
+    from .wrapper_utils import find_rscript
+except ImportError:  # pragma: no cover - script-style import fallback
+    from wrapper_utils import find_rscript
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -39,16 +43,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rscript", default="Rscript")
     parser.add_argument("--verbose", action="store_true")
     return parser.parse_args()
-
-
-def find_rscript(value: str) -> str:
-    path = Path(value).expanduser()
-    if path.exists():
-        return str(path.resolve())
-    found = shutil.which(value)
-    if found:
-        return found
-    raise RuntimeError(f"Could not find Rscript: {value}")
 
 
 def run(command: list[str], label: str, verbose: bool) -> None:

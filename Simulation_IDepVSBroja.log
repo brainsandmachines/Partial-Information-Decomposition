@@ -1,47 +1,0 @@
-Running PID simulations with PID version: ['delta', 'tilde', 'idep']
-Running PID simulations with PID version: ['delta', 'tilde', 'idep']
-
-Running simulation for N=200, p=[10, 10, 10] (1/18)
-
-Running PID simulation for delta...
-/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/gpid/src/gpid/estimate.py:64: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
-  result = prob.solve(solver='SCS', verbose=verbose,
-/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/gpid/src/gpid/estimate.py:70: UserWarning: Inaccurate solution
-  warnings.warn('Inaccurate solution')
-Trial 50/500Trial 100/500Trial 150/500Trial 200/500Trial 250/500Trial 300/500Trial 350/500Failure:interrupted
-Traceback (most recent call last):
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/pid_simulations.py", line 183, in <module>
-    output = main(pre_config,single=False,multi=True,exp_name=exp)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/pid_simulations.py", line 168, in main
-    output_csv = trials_simulation(config,title=exp_name)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/pid_simulations.py", line 128, in trials_simulation
-    pid_results = pid_simulation(config=config,rng=rng, cov=m8_true_cov, pid_ver=pid_ver)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/pid_simulations.py", line 40, in pid_simulation
-    pid,mi = pid_calc(config,sources=rv_raw[:2],target=rv_raw[2:],rng=rng,method=pid_ver) #Calculate PID for the sampled data
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/PID_calc.py", line 31, in pid_calc
-    pid, mi = delta_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Partial_Information_Decomposition/PID_calc.py", line 131, in delta_wrapper
-    output = estimate.approx_pid_from_cov(cov,dm,dx,dy) 
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/gpid/src/gpid/estimate.py", line 211, in approx_pid_from_cov
-    return approx_pid(*params, verbose=verbose, ret_t_sigt=ret_t_sigt)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/gpid/src/gpid/estimate.py", line 186, in approx_pid
-    t, sigt = heuristic_channel(dx, dy, hx, hy, sigx, sigy, sigm,
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/gpid/src/gpid/estimate.py", line 64, in heuristic_channel
-    result = prob.solve(solver='SCS', verbose=verbose,
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/cvxpy/problems/problem.py", line 650, in solve
-    return solve_func(self, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/cvxpy/problems/problem.py", line 1247, in _solve
-    self.unpack_results(solution, solving_chain, inverse_data)
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/site-packages/cvxpy/problems/problem.py", line 1552, in unpack_results
-    raise error.SolverError(
-cvxpy.error.SolverError: Solver 'SCS' failed. Try another solver, or solve with verbose=True for more information.

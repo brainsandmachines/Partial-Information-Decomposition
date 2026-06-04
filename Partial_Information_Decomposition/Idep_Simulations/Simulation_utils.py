@@ -14,6 +14,11 @@ from PID_util import *
 import pandas as pd
 from sklearn.cross_decomposition import CCA
 
+try:
+    from Partial_Information_Decomposition.output_utils import safe_filename
+except ImportError:
+    from output_utils import safe_filename
+
 
 def mean_std_csv_results(results_dict):
     """ Helper: Compute mean results across seeds """
@@ -148,15 +153,6 @@ def flatten_pid_results(pid_results):
             flat[key] = to_python_scalar(value)
 
     return flat
-
-def safe_filename(name):
-    """
-    Return the filename exactly as given.
-    No characters are removed or replaced.
-    """
-
-    return str(name)
-
 
 def get_pid_ver_csv_path(output_folder, pid_ver, csv_title="pid_results"):
     """

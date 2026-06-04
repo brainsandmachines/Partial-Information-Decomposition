@@ -1,6 +1,6 @@
 import torch 
 import numpy as np
-from Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from pathlib import Path
 import sys
 from PID_util import create_cov_matrix

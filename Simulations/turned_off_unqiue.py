@@ -14,16 +14,14 @@ import matplotlib.pyplot as plt
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from Commonality_Analysis.CA import commonality_analysis
-from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
 from utils import (
     create_test_histograms_with_kde,
     extract_all_components,
-    print_seed_summary,
-    run_multi_seed_experiment,
-    get_seed_runs_csv_path,
-    save_seed_summary_csv,
+    run_configured_multiseed,
     save_seed_summary_table_image,
+    standardize_np,
 )
 
 
@@ -85,22 +83,11 @@ def feature_creation(rng,r_str,u1_str,u2_str,unique_method = 'orthogonal', n=102
 
     return X_M1, X_M2, y_real
 
-def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
-    """
-    Standardize columns of X to zero mean and unit variance.
-
-    X shape: (N, P)
-    """
-    mean = np.mean(X, axis=0, keepdims=True)
-    std  = np.std(X, axis=0, ddof=0, keepdims=True)
-    return (X - mean) / (std + 1e-12)
-
-
 def test(rng, r_str, u1_str, u2_str, n=1024, p=100, snr=10.0, method='standard'):
     M1, M2, y_real = feature_creation(rng,r_str,u1_str,u2_str, n=n, p=p, snr=snr, method=method)
-    M1 = standardize(M1)
-    M2 = standardize(M2)
-    y_real = standardize(y_real)
+    M1 = standardize_np(M1)
+    M2 = standardize_np(M2)
+    y_real = standardize_np(y_real)
     CA = commonality_analysis(M1, M2, y_real, method=method)
     ca_results = CA.ca(M1, M2, y_real, method=method)
     betas_dict = extract_betas(ca_results)
@@ -153,9 +140,9 @@ def run_single_seed(seed: int, config: dict) -> dict:
 def test_regularization_term(seed: int, config: dict):
     rng = np.random.default_rng(seed=seed)
     M1, M2, y_real = feature_creation(rng,config["r_str"],config["u1_str"],config["u2_str"], n=config["n"], p=config["p"], snr=config["snr"], method=config["method"])
-    M1 = standardize(M1)
-    M2 = standardize(M2)
-    y_real = standardize(y_real)
+    M1 = standardize_np(M1)
+    M2 = standardize_np(M2)
+    y_real = standardize_np(y_real)
 
     #Commonality analysis with RidgeCV regularization
     CA = commonality_analysis(M1, M2, y_real, method=config["method"])
@@ -303,15 +290,10 @@ def plot_keys_vs_alpha(
 def main():
     config = get_run_config()
 
-    summary, seed_rows = run_multi_seed_experiment(
+    run_configured_multiseed(
         config,
-        per_seed_runner=run_single_seed,
+        per_seed_runner=lambda seed, run_config: run_single_seed(seed, run_config)[0],
     )
-    print_seed_summary(summary, n_seeds=config["n_seeds"], seed_start=config["seed_start"])
-    all_runs_path = get_seed_runs_csv_path(config)
-    summary_path = save_seed_summary_csv(summary, config)
-    print(f"\nSaved all seed run results to: {all_runs_path}")
-    print(f"Saved summary to: {summary_path}")
 
 if __name__ == "__main__":
     #main()

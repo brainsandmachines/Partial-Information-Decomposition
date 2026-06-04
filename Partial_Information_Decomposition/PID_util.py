@@ -1,24 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.discriminant_analysis import StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.utils.validation import check_array, check_is_fitted
-from sklearn.metrics import r2_score
 from itertools import chain, combinations
 from typing import List, Tuple, Union
 import torch
 from torch.linalg import inv, slogdet
-from sklearn.covariance import MinCovDet
-import statsmodels
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-from sklearn.covariance import LedoitWolf
 import os
 from matplotlib.colors import LogNorm
-from sklearn.linear_model import RidgeCV, LinearRegression
 
 
 def LinearRegression_fit(X,y):
+    from sklearn.linear_model import LinearRegression
+
     model = LinearRegression()
     if X.device != 'cpu':
         X = X.cpu().numpy()
@@ -51,6 +43,8 @@ def compute_ridge_cv_r2(X, y, alphas=None):
     
     # RidgeCV with leave-one-out CV (efficient GCV approximation)
     # cv=None means use efficient LOO via GCV
+    from sklearn.linear_model import RidgeCV
+
     ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
     
     if X.device != 'cpu':
@@ -82,6 +76,8 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     """
     Fit Ledoit-Wolf on X (N,פ) and return covariance as torch.Tensor on same device/dtype.
     """
+    from sklearn.covariance import LedoitWolf
+
     X_np = X.detach().cpu().numpy()
     lw = LedoitWolf(assume_centered=assume_centered).fit(X_np)
     Sigma = torch.from_numpy(lw.covariance_).to(device=X.device, dtype=X.dtype)
@@ -412,10 +408,17 @@ def assert_full_rank(X: torch.Tensor,jitter=0) -> None:
 
 def correlation_matrix(X):
     """Compute the correlation matrix of the columns of X."""
+    X = np.asarray(X)
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.shape[1] == 1:
+        return np.array([[1.0]])
+
     X_centered = X - np.mean(X, axis=0)
     cov_matrix = np.cov(X_centered, rowvar=False)
     stddev = np.sqrt(np.diag(cov_matrix))
-    corr_matrix = cov_matrix / np.outer(stddev, stddev)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        corr_matrix = cov_matrix / np.outer(stddev, stddev)
     return corr_matrix
 
 def block_singularity_check(X, tol=1e-10):
@@ -439,8 +442,11 @@ def block_singularity_check(X, tol=1e-10):
     min_eig = float(eigvals.min())
     return min_eig, min_eig <= tol
 
-def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
+def singularity_report(X_M1, X_M2, y_real, tol=1e-10, return_printing_required=False):
     """Return min eigenvalue and singularity flag for blocks and combinations."""
+    if np.asarray(y_real).ndim == 1:
+        y_real = np.asarray(y_real).reshape(-1, 1)
+
     blocks = {
         "M1": X_M1,
         "M2": X_M2,
@@ -453,7 +459,7 @@ def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
     report = {}
     printing_required = False
     for name, block in blocks.items():
-        min_eig, is_singular = block_singularity_check(block, tol)
+        min_eig, is_singular = block_singularity_check(correlation_matrix(block), tol)
         report[name] = {"min_eigval": min_eig, "is_singular": is_singular}
         if is_singular:
             printing_required = True
@@ -462,7 +468,9 @@ def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
         for name, info in report.items():
             status = "SINGULAR" if info["is_singular"] else "OK"
             print(f"Block {name}: min eigenvalue = {info['min_eigval']:.2e} -> {status}")
-    return report,printing_required
+    if return_printing_required:
+        return report, printing_required
+    return report
 
 def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
     def cross_correlation(X, Y):
@@ -500,6 +508,9 @@ def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
 
 
 def vif_summary(X):
+    from sklearn.discriminant_analysis import StandardScaler
+    from statsmodels.stats.outliers_influence import variance_inflation_factor
+
     if len(X.shape) == 2:
           X = np.expand_dims(X, axis=0)
     max_vif_list = []
@@ -555,7 +566,14 @@ def eigvenvalue_summary(X):
     print("Max eigenvalue:", np.max(eigvals))
     print("Eigenvalue ratio (max/min):", np.max(eigvals)/np.min(eigvals))
 
-def compare_results(vp_results,pid_results,mi_results):
+def _get_first(mapping, *keys):
+    for key in keys:
+        if key in mapping:
+            return mapping[key]
+    raise KeyError(f"None of these keys were found: {keys}")
+
+
+def compare_results(vp_results,pid_results,mi_results=None):
     """Compare Variance Partitioning and Partial Information Decomposition results.
     Parameters
     ----------
@@ -563,30 +581,43 @@ def compare_results(vp_results,pid_results,mi_results):
         Results from variance partitioning.
     pid_results : dict
         Results from Partial Information Decomposition.
-    mi_results : dict
-        Mutual information results from PID.
+    mi_results : dict, optional
+        Mutual information results from PID. If omitted, MI totals are inferred
+        from PID components.
 
     Returns
     -------
     None
     """
+    unique_x1 = _get_first(pid_results, "unq0", "unq1")
+    if "unq0" in pid_results:
+        unique_x2 = pid_results["unq1"]
+    else:
+        unique_x2 = _get_first(pid_results, "unq2", "unq1")
+    red = _get_first(pid_results, "red")
+    syn = _get_first(pid_results, "syn")
+
+    if mi_results is None:
+        mi_x1 = unique_x1 + red
+        mi_x2 = unique_x2 + red
+        mi_x12 = unique_x1 + unique_x2 + red + syn
+    else:
+        mi_x1 = _get_first(mi_results, "I(M1;T)", "I(M0;T)")
+        mi_x2 = _get_first(mi_results, "I(M2;T)", "I(M1;T)")
+        mi_x12 = _get_first(mi_results, "I(M1,M2;T)", "I(M0,M1;T)")
+
     print("\n" + "="*70)
     print("Comparison of Variance Partitioning and PID Results")
     print("="*70)
     print("Results:")
-    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_results['I(M1;T)']:.4f}")
-    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_results['I(M2;T)']:.4f}")
-    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_results['I(M1,M2;T)']:.4f}")
-    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq1']:.4f}")
-    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq2']:.4f}")
-    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
-    print(f"Synergy (PID): {pid_results['syn']:.4f}")
+    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_x1:.4f}")
+    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_x2:.4f}")
+    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_x12:.4f}")
+    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {unique_x1:.4f}")
+    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {unique_x2:.4f}")
+    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {red:.4f}")
+    print(f"Synergy (PID): {syn:.4f}")
 
-
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 
 
 def plot_mi_heatmap(
@@ -629,6 +660,8 @@ def plot_mi_heatmap(
     cmap : str
         Matplotlib colormap name.
     """
+    import pandas as pd
+
     df = pd.read_csv(csv_path)
 
     # Remove possible unnamed index columns
@@ -736,6 +769,8 @@ def plot_all_mi_heatmaps(
     mi_sample_no_bias_mean, mi_sample_no_bias_std,
     mi_sample_with_bias_mean, mi_sample_with_bias_std
     """
+
+    import pandas as pd
 
     df = pd.read_csv(csv_path)
 
@@ -873,6 +908,7 @@ def plot_all_mi_heatmaps(
 
 
 def plot_block_heatmap(csv_path, save_path=None):
+    import pandas as pd
 
     df = pd.read_csv(csv_path)
     df = df.loc[:, ~df.columns.str.contains("^Unnamed")]

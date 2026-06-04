@@ -5,11 +5,11 @@ import sys
 from pathlib import Path
 
 from encoding_model.suppression_core import create_predictions
-from utils import extract_all_components, get_seed_runs_csv_path, print_seed_summary, run_multi_seed_experiment, save_seed_summary_csv
+from utils import extract_all_components, run_configured_multiseed
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from Commonality_Analysis.CA import commonality_analysis
-from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from supression_effect.Suppresed_Encoder import (load_model_and_fmri,prepare_inputs,load_model_and_fmri)
 from Partial_Information_Decomposition.PID_util import compare_results
 
@@ -105,15 +105,10 @@ def run_single_seed(seed:int, config:dict,features: torch.Tensor,fmri_dict:dict)
 def main():
     config = get_run_config()
     features, fmri_dict = load_model_and_fmri(config)
-    summary, seed_rows = run_multi_seed_experiment(
+    run_configured_multiseed(
         config,
         per_seed_runner=lambda seed, config: run_single_seed(seed, config, features, fmri_dict),
     )
-    print_seed_summary(summary, n_seeds=config["n_seeds"], seed_start=config["seed_start"])
-    all_runs_path = get_seed_runs_csv_path(config)
-    summary_path = save_seed_summary_csv(summary, config)
-    print(f"\nSaved all seed run results to: {all_runs_path}")
-    print(f"Saved summary to: {summary_path}")
 
 
 if __name__ == "__main__":
