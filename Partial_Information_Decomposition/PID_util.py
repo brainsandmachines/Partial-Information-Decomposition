@@ -619,6 +619,79 @@ def compare_results(vp_results,pid_results,mi_results=None):
     print(f"Synergy (PID): {syn:.4f}")
 
 
+def pid_comparison_table(results: dict, decimals: int = 4, print_table: bool = True):
+    """Print and return a compact table comparing PID and MI outputs."""
+    columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)"]
+    rows = []
+    for method, value in results.items():
+        pid, mi = value if isinstance(value, (tuple, list)) else (value["pid"], value["mi"])
+        rows.append({
+            "method": method,
+            "Red": pid.get("red"),
+            "Unq1": _get_first(pid, "unq1", "unq0"),
+            "Unq2": _get_first(pid, "unq2", "unq1"),
+            "Syn": pid.get("syn"),
+            "I(X1;T)": _get_first(mi, "bi_mi_1", "I(M1;T)", "I(M0;T)"),
+            "I(X2;T)": _get_first(mi, "bi_mi_2", "I(M2;T)", "I(M1;T)"),
+            "I(X1,X2;T)": _get_first(mi, "tri_mi", "I(M1,M2;T)", "I(M0,M1;T)"),
+        })
+
+    if print_table:
+        display = [{k: (f"{v:.{decimals}f}" if isinstance(v, (int, float, np.number)) else str(v)) for k, v in row.items()} for row in rows]
+        widths = {col: max(len(col), *(len(row[col]) for row in display)) for col in columns}
+        line = " | ".join("-" * widths[col] for col in columns)
+        print("\nPID method comparison")
+        print(" | ".join(col.ljust(widths[col]) for col in columns))
+        print(line)
+        for row in display:
+            print(" | ".join(row[col].rjust(widths[col]) if col != "method" else row[col].ljust(widths[col]) for col in columns))
+    return rows
+
+
+def save_pid_comparison_table(results: dict, save_path: str, decimals: int = 4, title: str = "PID Method Comparison", config: dict = None):
+    """Save the PID comparison table as a clean matplotlib image."""
+    rows = pid_comparison_table(results, decimals=decimals, print_table=False)
+    columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)"]
+    cfg = config.get("parameters", config) if config else {}
+    legend_items = {
+        "n": cfg.get("n"),
+        "dx1": cfg.get("dx1", cfg.get("p")),
+        "dx2": cfg.get("dx2", cfg.get("p")),
+        "dt": cfg.get("dt", cfg.get("p")),
+        "seed": cfg.get("seed"),
+        "bias_correction": cfg.get("bias_correction"),
+    }
+    legend = " | ".join(f"{key}={value}" for key, value in legend_items.items() if value is not None)
+    cell_text = [
+        [f"{row[col]:.{decimals}f}" if isinstance(row[col], (int, float, np.number)) else row[col] for col in columns]
+        for row in rows
+    ]
+
+    fig_height = max(2.1, 0.42 * len(rows) + (1.55 if legend else 1.0))
+    fig, ax = plt.subplots(figsize=(10, fig_height))
+    ax.axis("off")
+    ax.set_position([0.03, 0.05, 0.94, 0.70 if legend else 0.82])
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=0.96)
+    if legend:
+        fig.text(0.5, 0.875, legend, ha="center", va="center", fontsize=9, color="#4b5563")
+    table = ax.table(cellText=cell_text, colLabels=columns, loc="center", cellLoc="center")
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.35)
+
+    for (row, _), cell in table.get_celld().items():
+        cell.set_edgecolor("#d1d5db")
+        if row == 0:
+            cell.set_facecolor("#111827")
+            cell.set_text_props(color="white", weight="bold")
+        else:
+            cell.set_facecolor("#f9fafb" if row % 2 else "white")
+
+    fig.savefig(save_path, bbox_inches="tight", dpi=200)
+    plt.close(fig)
+    return save_path
+
+
 
 def plot_mi_heatmap(
     csv_path,

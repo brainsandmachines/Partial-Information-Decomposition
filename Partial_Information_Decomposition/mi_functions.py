@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import yaml
 import sys
 from pathlib import Path
-
+from Partial_Information_Decomposition.PID_util import *
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from PID_util import *
+
 
 
 
@@ -168,7 +168,7 @@ def calculate_mi_raw(device,sigma,dims):
 
     mi_bi_2 = logdet_x2 + logdet_t - logdet_x2_t
 
-    return {'tri_mi':mi_tri.item(),'bi_mi_1': mi_bi_1.item(),'bi_mi_2': mi_bi_2.item()}
+    return {'tri_mi':mi_tri.item(),'bi_mi_1_t': mi_bi_1.item(),'bi_mi_2_t': mi_bi_2.item()}
 
 
 

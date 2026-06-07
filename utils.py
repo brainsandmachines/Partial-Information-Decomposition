@@ -858,3 +858,21 @@ def create_test_histograms_with_kde(
         saved_paths.append(plot_path)
 
     return saved_paths
+
+
+def get_config(config_path: Path | str) -> dict:
+    config_path = Path(config_path)
+    if not config_path.exists():
+        raise FileNotFoundError(f"Config file not found: {config_path}")
+    with open(config_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+    
+
+def _to_numpy_samples(data):
+    """Convert torch/numpy samples to the numpy format expected by flow-pid."""
+    if isinstance(data, torch.Tensor):
+        data = data.detach().cpu().numpy()
+    data = np.asarray(data)
+    if data.ndim == 1:
+        data = data.reshape(-1, 1)
+    return data

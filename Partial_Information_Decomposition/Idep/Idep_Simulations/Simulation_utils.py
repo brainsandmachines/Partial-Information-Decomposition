@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import os
 import re
-root = Path(__file__).resolve().parents[1]
+root = Path(__file__).resolve().parents[2]
 sys.path.append(str(root))
 from mi_functions import safe_logdet
 from mi_functions import pid_components

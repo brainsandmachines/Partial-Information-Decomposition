@@ -2,12 +2,12 @@ import torch
 from pathlib import Path
 import sys
 
-from mi_functions import calcualte_mi
+from Partial_Information_Decomposition.mi_functions import calcualte_mi
 from functools import partial
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from PID_util import create_cov_matrix
+from Partial_Information_Decomposition.PID_util import create_cov_matrix
 from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import make_random_true_cov,create_m7_cov
 from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import build_m7_terms
 
@@ -37,6 +37,40 @@ def logdet_wishart_bias(df: int, d: int) -> float:
     bias = torch.sum(term) + d * torch.log(torch.tensor(2.0 / df, dtype=torch.float64))
 
     return bias.item()
+
+def mi_wishahrt_bias(dims:list, n_samples:int):
+    """Calculate the bias for mutual information estimation between two Gaussian variables with given dimensions and sample size
+    """
+    df = n_samples - 1
+    if len(dims) == 2:
+        d1, d2 = dims
+
+        bias_x0 = logdet_wishart_bias(df, d1)
+        bias_x1 = logdet_wishart_bias(df, d2)
+        bias_x0x1 = logdet_wishart_bias(df, d1 + d2)
+
+        bias_mi = bias_x0 + bias_x1 - bias_x0x1
+        return bias_mi
+    
+    if len(dims) == 3:
+        d1, d2, d3 = dims
+
+        bias_x0 = logdet_wishart_bias(df, d1)
+        bias_x1 = logdet_wishart_bias(df, d2)
+        bias_x2 = logdet_wishart_bias(df, d3)
+        bias_x0x1 = logdet_wishart_bias(df, d1 + d2)
+        bias_x0x2 = logdet_wishart_bias(df, d1 + d3)
+        bias_x1x2 = logdet_wishart_bias(df, d2 + d3)
+        bias_x0x1x2 = logdet_wishart_bias(df, d1 + d2 + d3)
+
+        bias_mi_1_t = bias_x0 + bias_x1 - bias_x0x1
+        bias_mi_2_t = bias_x0 + bias_x2 - bias_x0x2
+        bias_mi_12 = bias_x1 + bias_x2 - bias_x1x2
+        bias_tri_mi = bias_x0 + bias_x1 + bias_x2 - bias_x0x1 - bias_x0x2 - bias_x1x2 + bias_x0x1x2
+
+        return {'bias_mi_1_t':bias_mi_1_t,'bias_mi_2_t':bias_mi_2_t,'bias_mi_12':bias_mi_12,'bias_tri_mi':bias_tri_mi}
+
+    
 
 
 

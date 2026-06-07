@@ -8,8 +8,8 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from PID_util import whiten_block, create_cov_matrix
-from mi_functions import calcualte_mi
+from Partial_Information_Decomposition.PID_util import whiten_block, create_cov_matrix
+from Partial_Information_Decomposition.mi_functions import calcualte_mi
 # Import optimization module from same directory
 
 

@@ -1,13 +1,20 @@
 import torch 
 import numpy as np
-from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from pathlib import Path
 import sys
-from PID_util import create_cov_matrix
-from external.gpid.src.gpid import estimate
+import os
+import tempfile
 root = Path(__file__).resolve().parents[1]
-sys.path.append(str(root))
+if str(root) not in sys.path:
+    sys.path.append(str(root))
+library_wrappers_root = root / "library_wrappers"
+if str(library_wrappers_root) not in sys.path:
+    sys.path.append(str(library_wrappers_root))
+from Partial_Information_Decomposition.PID_util import create_cov_matrix
+from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
+from library_wrappers.Flow_PID import load_flow_pid
+from library_wrappers.Thin_PID import load_exact_gauss_thin_pid
 
 
 
@@ -30,6 +37,9 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
     
     elif method == "delta":
         pid, mi = delta_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
+    
+    elif method in ("flow", "flow_pid"):
+        pid, mi = flow_pid_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
     else:
         raise ValueError("Unsupported method specified")
 
@@ -56,6 +66,8 @@ def pid_idep_wrapper(config,sources=None,target=None,covariance=None,rng=None,on
 
     #text = "Idep PID calculation with covariance provided" if covariance is not None else "Idep PID calculation without covariance, using sample covariance"
     #print(f"\n{text}...")
+    from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
+
     bias_corr = config['bias_correction'] if covariance is None else False
     idep = Idep_multivariate_gauss(config,rng,sources,target,bias_correction=bias_corr,cov_matrix=covariance)
     pid,mi = idep.idep()
@@ -93,8 +105,9 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
     cov = cov.cpu().numpy() # Convert to numpy array for BROJA implementation
     
     output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N) 
-    pid = {'red': output[7], 'unq1': output[7], 'unq2': output[6], 'syn': output[8]}
-    mi = {'tri_mi': output[2], 'bi_mi_1': output[0], 'bi_mi_2': output[1]}
+    imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
+    pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si}
+    mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
 
     return pid, mi
 
@@ -130,6 +143,67 @@ def delta_wrapper(config,sources,target,covariance,rng,on_rvs):
     cov = cov.cpu().numpy() # Convert to numpy array for Delta implementation
     
     output = estimate.approx_pid_from_cov(cov,dm,dx,dy,verbose=True) 
-    pid = {'red': output[7], 'unq1': output[7], 'unq2': output[6], 'syn': output[8]}
-    mi = {'tri_mi': output[2], 'bi_mi_1': output[0], 'bi_mi_2': output[1]}
+    imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
+    pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si}
+    mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
+    return pid, mi
+
+
+def _to_numpy_samples(data):
+    """Convert torch/numpy samples to the numpy format expected by flow-pid."""
+    if isinstance(data, torch.Tensor):
+        data = data.detach().cpu().numpy()
+    data = np.asarray(data)
+    if data.ndim == 1:
+        data = data.reshape(-1, 1)
+    return data
+
+
+
+
+
+def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None):
+    """Wrapper for flow-pid.
+
+    Raw samples are sent to flow_pid. If covariance is provided, use Thin-PID
+    because flow_pid is a trained sample-based estimator.
+    """
+
+    dm , dx, dy = config['dt'] , config['dx1'] , config['dx2']
+
+    bias_correction = config['bias_correction'] if covariance is None else False
+
+    if covariance is not None:
+        cov = covariance.cpu().numpy() if isinstance(covariance, torch.Tensor) else np.asarray(covariance)
+        thin_pid = load_exact_gauss_thin_pid()
+        output = thin_pid(cov,dm,dx,dy,unbiased=bias_correction,sample_size=None)
+    else:
+        m = _to_numpy_samples(target[0])
+        x = _to_numpy_samples(sources[0])
+        y = _to_numpy_samples(sources[1])
+
+        flow_pid = load_flow_pid()
+        original_cwd = Path.cwd()
+        with tempfile.TemporaryDirectory(prefix="flow_pid_training_") as temp_dir:
+            try:
+                os.chdir(temp_dir)
+                output = flow_pid(
+                    m,
+                    x,
+                    y,
+                    n_flows=config.get('n_flows', 3),
+                    n_epochs=config.get('n_epochs', 250),
+                    batch_size=config.get('batch_size', 64),
+                    lr=config.get('lr', 2e-4),
+                    encoder=None,
+                    verbose=config.get('verbose', False),
+                    ret_t_sigt=False,
+                    device=config.get('device', 'cpu'),
+                )
+            finally:
+                os.chdir(original_cwd)
+
+    imx, imy, imxy, _, _, uix, uiy, ri, si = output[:9]
+    pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si}
+    mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
     return pid, mi

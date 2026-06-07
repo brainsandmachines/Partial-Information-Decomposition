@@ -9,44 +9,7 @@ from Partial_Information_Decomposition.PID_util import diagnostic_plots
 from encoding_model.suppression_core import permutate_models
 
 
-def unq2_zero(rng, n, p, noise_std):
-    """
-    Intended theoretical structure:
 
-        Y  = R + U + eps_y
-        X1 = R + U + N
-        X2 = R     + N
-
-    X2 has:
-        - redundancy through R
-        - no private signal source about Y
-        - synergistic/suppressor role through shared nuisance N
-
-    So we expect:
-        unq2 = 0
-        redundancy > 0
-        unq1 > 0
-        synergy > 0
-    under MMI-like Gaussian PID.
-    """
-
-    R = rng.standard_normal((n, p))   # redundant signal
-    U = rng.standard_normal((n, p))   # unique-to-X1 signal
-    N = noise_std * rng.standard_normal((n, p))  # shared suppressor noise
-
-    eps_y = noise_std * rng.standard_normal((n, p))
-
-    u_scale = 1
-    r_scale = 1
-    noise_scale = 1
-
-
-    y = r_scale*R + u_scale*U + eps_y
-    X_M1 = r_scale*R + u_scale*U + noise_scale*N
-    X_M2 = r_scale*R + noise_scale*N
-
-    print(f"Using scalses: R={r_scale}, U={u_scale}, N={noise_scale}, eps_y={noise_std}")
-    return X_M1, X_M2, y
 
 
 def unq2_zero_with_red_unq1_syn(rng, n, p, noise_std=0.9):

@@ -1,2 +1,0 @@
-case,pid_definition,unique_source1,unique_source2,redundancy,synergy,I_source1_target,I_source2_target,joint_mutual_information,union_information,optimization_objective,interaction_information
-SimpleGaussian,Thin,0.40127696790001993,3.128386438788766e-12,0.39120428246055816,0.15517000755926047,0.792481250360578,0.3912042824636865,0.9476512579229669,0.7924812503637064,0.7924812503637064,-0.2360342749012977
