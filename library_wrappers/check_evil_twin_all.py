@@ -12,15 +12,14 @@ import sys
 from pathlib import Path
 
 try:
-    from .wrapper_utils import find_rscript
+    from .wrapper_utils import find_pid_repo, find_rscript
 except ImportError:  # pragma: no cover - script-style import fallback
-    from wrapper_utils import find_rscript
+    from wrapper_utils import find_pid_repo, find_rscript
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
 DEFAULT_MATRIX_CSV = SCRIPT_DIR / "evil_twin_whitened_correlation_1_1_1.csv"
-DEFAULT_PID_REPO = REPO_ROOT / "PID"
 DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "evil_twin_check_outputs"
 
 PID_COLUMNS = [
@@ -38,7 +37,7 @@ PID_COLUMNS = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run all library-wrapper evil-twin checks.")
     parser.add_argument("--matrix-csv", type=Path, default=DEFAULT_MATRIX_CSV)
-    parser.add_argument("--pid-repo", type=Path, default=DEFAULT_PID_REPO)
+    parser.add_argument("--pid-repo", type=Path)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--rscript", default="Rscript")
     parser.add_argument("--verbose", action="store_true")
@@ -214,10 +213,10 @@ def print_table(rows: list[dict[str, str]]) -> None:
 def main() -> int:
     args = parse_args()
     matrix_csv = args.matrix_csv.expanduser().resolve()
-    pid_repo = args.pid_repo.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve()
 
     try:
+        pid_repo = find_pid_repo(args.pid_repo)
         rscript = find_rscript(args.rscript)
         require_file(matrix_csv, "matrix CSV")
         require_file(pid_repo / "IGFuns.R", "IGFuns.R")

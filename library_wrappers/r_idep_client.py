@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 try:
-    from .wrapper_utils import find_rscript
+    from .wrapper_utils import find_pid_file, find_rscript
 except ImportError:  # pragma: no cover - script-style import fallback
-    from wrapper_utils import find_rscript
+    from wrapper_utils import find_pid_file, find_rscript
 
 
 DEFAULT_IDEP_URL = "https://raw.githubusercontent.com/JWKay/PID/main/IdepGauss.R"
@@ -36,22 +36,26 @@ idep_url <- args[[4]]
 local_idep <- args[[5]]
 
 load_idep_gauss <- function(url, local_file) {
-  tmp <- tempfile("IdepGauss_", fileext = ".R")
-  loaded <- tryCatch({
-    message("Downloading and sourcing ", url)
-    download.file(url, destfile = tmp, mode = "wb", quiet = TRUE)
-    source(tmp, local = globalenv())
-    TRUE
-  }, error = function(e) {
-    warning("Could not load IdepGauss.R from URL: ", conditionMessage(e),
-            call. = FALSE)
-    FALSE
-  })
+  loaded <- FALSE
 
-  if (!loaded && nzchar(local_file) && file.exists(local_file)) {
-    message("Falling back to local ", local_file)
+  if (nzchar(local_file) && file.exists(local_file)) {
+    message("Sourcing local ", local_file)
     source(local_file, local = globalenv())
     loaded <- TRUE
+  }
+
+  if (!loaded) {
+    tmp <- tempfile("IdepGauss_", fileext = ".R")
+    loaded <- tryCatch({
+      message("Downloading and sourcing ", url)
+      download.file(url, destfile = tmp, mode = "wb", quiet = TRUE)
+      source(tmp, local = globalenv())
+      TRUE
+    }, error = function(e) {
+      warning("Could not load IdepGauss.R from URL: ", conditionMessage(e),
+              call. = FALSE)
+      FALSE
+    })
   }
 
   if (!loaded || !exists("idepGM", mode = "function", envir = globalenv())) {
@@ -160,7 +164,7 @@ def run_idep_from_covariance(
         raise ValueError("sum(sizes) must match the covariance dimension.")
 
     rscript_path = find_rscript(None if rscript is None else str(rscript))
-    local_idep_path = "" if local_idep is None else str(Path(local_idep).resolve())
+    local_idep_path = _resolve_local_idep(local_idep)
 
     if keep_temp:
         temp_dir_obj = None
@@ -227,3 +231,21 @@ def run_idep_for_cases(
 
 def atoms_as_ordered_values(values: Mapping[str, float]) -> list[float]:
     return [float(values[atom]) for atom in ATOMS]
+
+
+def _resolve_local_idep(local_idep: str | Path | None) -> str:
+    if local_idep is None:
+        try:
+            return str(find_pid_file("IdepGauss.R"))
+        except FileNotFoundError:
+            return ""
+
+    path = Path(local_idep).expanduser()
+    if path.exists():
+        return str(path.resolve())
+    if str(local_idep) == "IdepGauss.R":
+        try:
+            return str(find_pid_file("IdepGauss.R"))
+        except FileNotFoundError:
+            return str(path.resolve())
+    return str(path.resolve())

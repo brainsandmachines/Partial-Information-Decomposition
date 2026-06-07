@@ -7,7 +7,7 @@ from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils im
 from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import simulation
 import yaml
 from functools import partial
-from resampling_wrapper import bias_resampling
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.resampling_wrapper import bias_resampling
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_util import *

@@ -27,7 +27,8 @@ Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems
 
 torch.set_default_dtype(torch.float64)
 class Idep_multivariate_gauss:
-    def __init__(self, config,rng=None,sources: Optional[list] = None, targets:Optional[list] = None,cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
+    def __init__(self, config,rng=None,sources: Optional[list] = None, targets:Optional[list] = None,
+                 cov_matrix: Optional[torch.tensor]=None,base_e: bool =True,bias_correction: bool = False):
         """Initialize the Idep multivariate gaussian class
 
         input: M1,M2,T are torch tensors of shape (N,P)
@@ -121,14 +122,6 @@ class Idep_multivariate_gauss:
 
 
             
-        
-
-    def log_base(self,x:Optional[torch.Tensor]) -> torch.Tensor:
-        if self.base_e:
-            return torch.log(x)
-        LN2 = torch.log(torch.tensor(2.0, dtype=torch.float64))
-        return torch.log(x) / LN2
-    
 
     def create_model_M(self,block1:Optional[torch.tensor]=None,block2:Optional[torch.tensor]=None,block3:Optional[torch.tensor]=None) -> torch.tensor:
         """This function will create the dependency matrix for the given blocks
@@ -151,7 +144,6 @@ class Idep_multivariate_gauss:
             M[self.dim_x1 + self.dim_x2:, self.dim_x1:self.dim_x1 + self.dim_x2] = block3.T
 
         assert M.shape == (self.dim_x1 + self.dim_x2 + self.dim_t, self.dim_x1 + self.dim_x2 + self.dim_t), f"Created matrix shape {M.shape} does not match expected shape {(self.dim_x1 + self.dim_x2 + self.dim_t, self.dim_x1 + self.dim_x2 + self.dim_t)}."
-        #assert_full_rank(M)
         return M
 
 
@@ -179,10 +171,6 @@ class Idep_multivariate_gauss:
         assert np.all([constraint in possible_inputs for constraint in constraints]), f"Constraint {constraints} not recognized. Available constraints: {possible_inputs}" 
 
         self.constraint_cov_dict = {}
-        #print(f"\nCovariance matrix shape: {cov_matrix.shape}")
-        #print(f"dim_m1: {self.dim_x1}, dim_m2: {self.dim_x2}, dim_t: {self.dim_t}")
-
-
 
         
         if 'c_model_1' in constraints:
@@ -249,7 +237,7 @@ class Idep_multivariate_gauss:
         #Calculate unique 1
         i = m7_raw  - self.i_m2_t- self.m7_bias['i']
         k = m8_raw  - self.i_m2_t- self.m8_bias['k']
-        d = b = self.i_m1_t
+
      
 
         unique_1 = torch.min(torch.stack([i,k])) #James proved that b,d are not relavnt therefore it's just a sanity check
@@ -259,7 +247,7 @@ class Idep_multivariate_gauss:
         #Calculate unique 2
         h = m7_raw  - self.i_m1_t- self.m7_bias['h']
         j = m8_raw  - self.i_m1_t- self.m8_bias['j']
-        f = c = self.i_m2_t
+
         unique_2 = torch.min(torch.stack([h,j])) #James proved that c,f are not relavnt therefore it's just a sanity check
 
         assert unique_2 == h or unique_2 == j, f"Unique information for source 2 should be determined by either U7 or U8. Got unique_2={unique_2}, h={h}, j={j}."
@@ -277,7 +265,7 @@ class Idep_multivariate_gauss:
         keys: 'red', 'unq1', 'unq2', 'syn'"""
 
 
-
+        #Calculate Bias correctio for mutual information 
         if self.bias_correction:
             df = self.N - 1
             d = self.dim_x1 + self.dim_x2 + self.dim_t
@@ -303,8 +291,9 @@ class Idep_multivariate_gauss:
         # Redundant information
         red0 = self.i_m1_t - unique_1
         red1 = self.i_m2_t - unique_2
-        #assert abs(red0 - red1) < 1e-8, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
+        assert abs(red0 - red1) < 1e-5, f"Redundant information from both sources not equal. red0: {red0}, red1: {red1}"
         red = red0
+
         # Synergistic information
         syn = self.i_m1_m2_t - self.i_m1_t - unique_2
         assert not torch.isnan(red), f"Redundant={red} information not calculated properly."
@@ -322,9 +311,13 @@ class Idep_multivariate_gauss:
 
         input: cov_matrix is a torch tensor of shape (d,d) in case you want to provide a different covariance matrix
 
-        output: a dictionary with the PID values
+        output: 
+            Dictionary with PID values 
+            Dictionary withe MI values
 
-        keys: 'red', 'unq1', 'unq2', 'syn'"""
+        keys: 
+         PID dict - 'red', 'unq1', 'unq2', 'syn'
+         MI dict - 'bi_mi_1', 'bi_mi_2', 'tri_mi'"""
 
         self.cov_matrix = self.cov_matrix if cov_matrix is None else cov_matrix
 

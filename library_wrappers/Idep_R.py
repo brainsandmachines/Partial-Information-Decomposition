@@ -10,9 +10,9 @@ import tempfile
 from pathlib import Path
 
 try:
-    from .wrapper_utils import csv_shape, find_rscript, parse_sizes
+    from .wrapper_utils import csv_shape, find_pid_file, find_rscript, parse_sizes
 except ImportError:  # pragma: no cover - script-style import fallback
-    from wrapper_utils import csv_shape, find_rscript, parse_sizes
+    from wrapper_utils import csv_shape, find_pid_file, find_rscript, parse_sizes
 
 
 DEFAULT_IDEP_URL = "https://raw.githubusercontent.com/JWKay/PID/main/IdepGauss.R"
@@ -155,7 +155,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sizes", type=parse_sizes, help="Comma-separated source1,source2,target dimensions.")
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="CSV output path.")
     parser.add_argument("--idep-url", default=DEFAULT_IDEP_URL, help="IdepGauss.R URL.")
-    parser.add_argument("--local-idep", default="IdepGauss.R", help="Local IdepGauss.R fallback.")
+    parser.add_argument("--local-idep", type=Path, help="Local IdepGauss.R fallback.")
     parser.add_argument("--rscript", help="Path to Rscript. Defaults to PATH lookup.")
     parser.add_argument("--verbose", action="store_true", help="Print R PID objects.")
     parser.add_argument("--keep-r-driver", action="store_true", help="Keep the temporary R script.")
@@ -182,6 +182,20 @@ def absolute_path(value: str) -> Path:
     return path
 
 
+def resolve_local_idep(value: Path | None) -> Path:
+    if value is not None:
+        path = value.expanduser()
+        if not path.is_absolute():
+            path = Path.cwd() / path
+        if path.exists():
+            return path.resolve()
+        if value.name == "IdepGauss.R":
+            return find_pid_file("IdepGauss.R")
+        raise FileNotFoundError(f"IdepGauss.R does not exist: {path}")
+
+    return find_pid_file("IdepGauss.R")
+
+
 def main() -> int:
     args = parse_args()
     if args.p < 1:
@@ -197,7 +211,11 @@ def main() -> int:
 
     output = absolute_path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    local_idep = absolute_path(args.local_idep)
+    try:
+        local_idep = resolve_local_idep(args.local_idep)
+    except FileNotFoundError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
     driver_path: Path | None = None
     try:

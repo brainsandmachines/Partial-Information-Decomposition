@@ -12,9 +12,9 @@ import tempfile
 from pathlib import Path
 
 try:
-    from .wrapper_utils import csv_shape, find_rscript, parse_sizes
+    from .wrapper_utils import csv_shape, find_pid_file, find_rscript, parse_sizes, pid_file_candidates
 except ImportError:  # pragma: no cover - script-style import fallback
-    from wrapper_utils import csv_shape, find_rscript, parse_sizes
+    from wrapper_utils import csv_shape, find_pid_file, find_rscript, parse_sizes, pid_file_candidates
 
 
 EVIL_TWIN = {
@@ -213,24 +213,7 @@ def set_evil_twin_inputs(args: argparse.Namespace) -> None:
 
 
 def ig_source_candidates(pid_repo: Path | None) -> list[Path]:
-    here = Path(__file__).resolve().parent
-    cwd = Path.cwd().resolve()
-    candidates = []
-    if pid_repo:
-        candidates.append(pid_repo.expanduser() / "IGFuns.R")
-    if os.environ.get("PID_REPO"):
-        candidates.append(Path(os.environ["PID_REPO"]).expanduser() / "IGFuns.R")
-    candidates.extend(
-        [
-            here / "IGFuns.R",
-            here / "PID" / "IGFuns.R",
-            here.parent / "PID" / "IGFuns.R",
-            cwd / "IGFuns.R",
-            cwd / "PID" / "IGFuns.R",
-            cwd.parent / "PID" / "IGFuns.R",
-        ]
-    )
-    return candidates
+    return pid_file_candidates("IGFuns.R", pid_repo)
 
 
 def find_ig_source(args: argparse.Namespace) -> Path:
@@ -240,9 +223,10 @@ def find_ig_source(args: argparse.Namespace) -> Path:
             return source.resolve()
         raise FileNotFoundError(f"IGFuns.R does not exist: {source}")
 
-    for source in ig_source_candidates(args.pid_repo):
-        if source.exists():
-            return source.resolve()
+    try:
+        return find_pid_file("IGFuns.R", args.pid_repo)
+    except FileNotFoundError:
+        pass
 
     searched = "\n  ".join(str(path) for path in ig_source_candidates(args.pid_repo))
     raise FileNotFoundError(f"Could not find IGFuns.R. Searched:\n  {searched}")

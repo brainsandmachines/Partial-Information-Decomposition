@@ -6,22 +6,20 @@ from __future__ import annotations
 import argparse
 import csv
 import os
-import sys
 from pathlib import Path
 
 try:
-    from .wrapper_utils import parse_sizes
+    from .wrapper_utils import add_gpid_src_to_path, parse_sizes
 except ImportError:  # pragma: no cover - script-style import fallback
-    from wrapper_utils import parse_sizes
+    from wrapper_utils import add_gpid_src_to_path, parse_sizes
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT / "gpid" / "src"))
+GPID_SRC = add_gpid_src_to_path()
 
 import numpy as np
-from external.gpid.src.gpid import estimate
+from gpid import estimate
 
 
 DEFAULT_MATRIX_CSV = Path(__file__).resolve().parent / "evil_twin_whitened_correlation_1_1_1.csv"

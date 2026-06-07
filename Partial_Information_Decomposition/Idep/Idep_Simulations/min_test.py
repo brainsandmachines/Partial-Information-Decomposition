@@ -5,8 +5,8 @@ import os
 import matplotlib.pyplot as plt
 from Partial_Information_Decomposition.Idep.Idep_Simulations.unique_m7_m8 import *
 from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import *
-from resampling_wrapper import bias_resampling
-from bootstrap import _estimate_fitted_model_cov
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.resampling_wrapper import bias_resampling
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.bootstrap import _estimate_fitted_model_cov
 from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import *
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]

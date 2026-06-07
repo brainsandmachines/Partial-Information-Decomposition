@@ -11,8 +11,8 @@ from pathlib import Path
 from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import on_covariance
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from Partial_Information_Decomposition.jackknife import *
-from Partial_Information_Decomposition.bootstrap import *
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.jackknife import *
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.bootstrap import *
 
 
 
