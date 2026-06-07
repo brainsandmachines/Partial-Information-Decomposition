@@ -9,6 +9,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from wrapper_utils import BASE_PID_COLUMNS, SIMPLE_GAUSSIAN_SIZES, print_pid_result, write_simple_gaussian_covariance
+
 try:
     from .wrapper_utils import csv_shape, find_pid_file, find_rscript, parse_sizes
 except ImportError:  # pragma: no cover - script-style import fallback
@@ -149,7 +151,11 @@ cat("Wrote ", output_csv, "\n", sep = "")
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run Idep/MMI on a covariance CSV or on the built-in evil-twin example.")
+    parser = argparse.ArgumentParser(
+        description="Run Idep/MMI on a covariance CSV or on the built-in examples.",
+        epilog="Example: python library_wrappers/Idep_R.py --example simple-gaussian --output /tmp/idep_simple.csv",
+    )
+    parser.add_argument("--example", choices=("simple-gaussian",), help="Run a small built-in Gaussian example.")
     parser.add_argument("--p", type=int, default=1, help="Dimension of each block.")
     parser.add_argument("--matrix-csv", type=Path, help="No-header covariance/correlation CSV ordered as source1,source2,target.")
     parser.add_argument("--sizes", type=parse_sizes, help="Comma-separated source1,source2,target dimensions.")
@@ -160,6 +166,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--verbose", action="store_true", help="Print R PID objects.")
     parser.add_argument("--keep-r-driver", action="store_true", help="Keep the temporary R script.")
     return parser.parse_args()
+
+
+def csv_shape(path: Path) -> tuple[int, int]:
+    rows = 0
+    columns = None
+    with path.open(newline="", encoding="utf-8") as handle:
+        for row_number, row in enumerate(csv.reader(handle), start=1):
+            if not row or all(cell.strip() == "" for cell in row):
+                continue
+            if columns is None:
+                columns = len(row)
+            elif len(row) != columns:
+                raise ValueError(f"{path} is ragged at row {row_number}")
+            for cell in row:
+                float(cell)
+            rows += 1
+    if rows == 0 or columns is None:
+        raise ValueError(f"{path} is empty")
+    return rows, columns
 
 
 def validate_matrix_args(args: argparse.Namespace) -> None:
@@ -182,34 +207,26 @@ def absolute_path(value: str) -> Path:
     return path
 
 
-def resolve_local_idep(value: Path | None) -> Path:
-    if value is not None:
-        path = value.expanduser()
-        if not path.is_absolute():
-            path = Path.cwd() / path
-        if path.exists():
-            return path.resolve()
-        if value.name == "IdepGauss.R":
-            return find_pid_file("IdepGauss.R")
-        raise FileNotFoundError(f"IdepGauss.R does not exist: {path}")
-
-    return find_pid_file("IdepGauss.R")
-
-
 def main() -> int:
-    args = parse_args()
+    args = simple_example_args() if len(sys.argv) == 1 else parse_args()
     if args.p < 1:
         print("error: --p must be a positive integer", file=sys.stderr)
         return 2
 
     try:
+        temp_dir: tempfile.TemporaryDirectory[str] | None = None
+        if args.example == "simple-gaussian":
+            temp_dir = tempfile.TemporaryDirectory(prefix="idep_simple_gaussian_")
+            apply_simple_gaussian_example(args, Path(temp_dir.name) / "simple_gaussian_covariance_1_1_1.csv")
         validate_matrix_args(args)
         rscript = find_rscript(args.rscript)
     except (FileNotFoundError, ValueError) as exc:
+        if "temp_dir" in locals() and temp_dir is not None:
+            temp_dir.cleanup()
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    output = absolute_path(args.output)
+    output = absolute_path(args.output) if args.output is not None else Path(temp_dir.name) / "simple_gaussian_idep_results.csv"
     output.parent.mkdir(parents=True, exist_ok=True)
     try:
         local_idep = resolve_local_idep(args.local_idep)
@@ -237,8 +254,12 @@ def main() -> int:
             ],
             check=False,
         )
+        if completed.returncode == 0 and args.output is None:
+            print_idep_rows(output)
         return completed.returncode
     finally:
+        if "temp_dir" in locals() and temp_dir is not None:
+            temp_dir.cleanup()
         if driver_path and args.keep_r_driver:
             print(f"Kept temporary R driver: {driver_path}")
         elif driver_path:

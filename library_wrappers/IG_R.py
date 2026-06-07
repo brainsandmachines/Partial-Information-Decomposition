@@ -11,6 +11,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from wrapper_utils import SIMPLE_GAUSSIAN_CASE, SIMPLE_GAUSSIAN_SIZES, write_simple_gaussian_covariance
+
 try:
     from .wrapper_utils import csv_shape, find_pid_file, find_rscript, parse_sizes, pid_file_candidates
 except ImportError:  # pragma: no cover - script-style import fallback
@@ -156,10 +158,11 @@ def parse_correlation(value: str) -> float:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run JWKay/PID IGFuns.R. With no arguments, runs the evil-twin example."
+        description="Run JWKay/PID IGFuns.R. With no arguments, runs the simple Gaussian example.",
+        epilog="Example: python library_wrappers/IG_R.py --example simple-gaussian --output /tmp/ig_simple.json",
     )
     parser.add_argument("--mode", choices=("univariate", "covariance", "pqr"))
-    parser.add_argument("--example", choices=("evil-twin",))
+    parser.add_argument("--example", choices=("evil-twin", "simple-gaussian"))
     parser.add_argument("--r-source", type=Path, help="Path to IGFuns.R.")
     parser.add_argument("--pid-repo", type=Path, help="Path to a local JWKay/PID clone.")
     parser.add_argument("--rscript", default=os.environ.get("RSCRIPT", "Rscript"))
@@ -174,6 +177,27 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--q-csv", type=Path)
     parser.add_argument("--r-csv", type=Path)
     return parser.parse_args()
+
+
+def simple_example_args() -> argparse.Namespace:
+    """Small debug example: run IG on the shared 1D Gaussian covariance."""
+    return argparse.Namespace(
+        mode=None,
+        example="simple-gaussian",
+        r_source=None,
+        pid_repo=None,
+        rscript=os.environ.get("RSCRIPT", "Rscript"),
+        output=None,
+        plot=None,
+        p=None,
+        q=None,
+        r=None,
+        sizes=None,
+        matrix_csv=None,
+        p_csv=None,
+        q_csv=None,
+        r_csv=None,
+    )
 
 
 def apply_example_defaults(args: argparse.Namespace) -> None:
@@ -194,9 +218,7 @@ def apply_example_defaults(args: argparse.Namespace) -> None:
             set_evil_twin_inputs(args)
         return
 
-    args.example = "evil-twin"
-    args.output = args.output or Path("evil_twin_result.json")
-    set_evil_twin_inputs(args)
+    args.example = "simple-gaussian"
 
 
 def set_evil_twin_inputs(args: argparse.Namespace) -> None:
@@ -210,6 +232,19 @@ def set_evil_twin_inputs(args: argparse.Namespace) -> None:
     args.p = EVIL_TWIN["p"]
     args.q = EVIL_TWIN["q"]
     args.r = EVIL_TWIN["r"]
+
+
+def set_simple_gaussian_inputs(args: argparse.Namespace, matrix_csv: Path) -> None:
+    if any(
+        value is not None
+        for value in (args.mode, args.p, args.q, args.r, args.sizes, args.matrix_csv, args.p_csv, args.q_csv, args.r_csv)
+    ):
+        raise ValueError("--example simple-gaussian cannot be combined with manual IG inputs")
+    write_simple_gaussian_covariance(matrix_csv)
+    args.mode = "covariance"
+    args.sizes = SIMPLE_GAUSSIAN_SIZES
+    args.matrix_csv = matrix_csv
+    args.output = args.output or Path("simple_gaussian_ig_result.json")
 
 
 def ig_source_candidates(pid_repo: Path | None) -> list[Path]:
@@ -382,14 +417,19 @@ def print_result(result: dict) -> None:
 
 def main() -> int:
     try:
-        args = parse_args()
-        apply_example_defaults(args)
-        args.r_source = find_ig_source(args)
-        validate_inputs(args)
-        print(f"Using R source: {args.r_source}", file=sys.stderr)
-        result = add_standard_table(run_r(args))
-        write_result(result, args.output)
-        print_result(result)
+        with tempfile.TemporaryDirectory(prefix="ig_simple_gaussian_") as temp_dir:
+            args = simple_example_args() if len(sys.argv) == 1 else parse_args()
+            apply_example_defaults(args)
+            if args.example == "simple-gaussian":
+                set_simple_gaussian_inputs(args, Path(temp_dir) / "simple_gaussian_covariance_1_1_1.csv")
+            args.r_source = find_ig_source(args)
+            validate_inputs(args)
+            print(f"Using R source: {args.r_source}", file=sys.stderr)
+            result = add_standard_table(run_r(args))
+            if args.example == "simple-gaussian":
+                result["standard_pid_table"][0]["case"] = SIMPLE_GAUSSIAN_CASE
+            write_result(result, args.output)
+            print_result(result)
         return 0
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)

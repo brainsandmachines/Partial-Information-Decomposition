@@ -1,0 +1,2 @@
+case,pid_definition,unique_source1,unique_source2,redundancy,synergy,I_source1_target,I_source2_target,joint_mutual_information,interaction_information
+SimpleGaussian,Delta,0.40127696789689143,0.0,0.3912042824636867,0.15517006030607555,0.7924812503605781,0.3912042824636867,0.9476513106666538,-0.23603422215761116

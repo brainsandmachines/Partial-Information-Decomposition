@@ -1,9 +1,0 @@
-[submodule "external/flow-pid"]
-	path = external/flow-pid
-	url = https://github.com/warrenzha/flow-pid.git
-[submodule "external/gpid"]
-	path = external/gpid
-	url = https://github.com/praveenv253/gpid.git
-[submodule "external/PID"]
-	path = external/PID
-	url = https://github.com/JWKay/PID.git

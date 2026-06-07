@@ -30,6 +30,8 @@ PID_COLUMNS = [
     "I_source1_target",
     "I_source2_target",
     "joint_mutual_information",
+    "union_information",
+    "optimization_objective",
     "interaction_information",
 ]
 
@@ -116,7 +118,10 @@ def normalize_rows(rows: list[dict]) -> list[dict[str, str]]:
         normalized.append(
             {
                 "pid_definition": str(row["pid_definition"]),
-                **{column: f"{float(row[column]):.8f}" for column in PID_COLUMNS},
+                **{
+                    column: f"{float(row[column]):.8f}" if row.get(column) not in (None, "") else ""
+                    for column in PID_COLUMNS
+                },
             }
         )
     return normalized
@@ -140,10 +145,12 @@ def write_svg(rows: list[dict[str, str]], path: Path) -> None:
         "I_source1_target": "I(S1;T)",
         "I_source2_target": "I(S2;T)",
         "joint_mutual_information": "I(S1,S2;T)",
+        "union_information": "Union",
+        "optimization_objective": "Obj",
         "interaction_information": "II",
     }
     columns = ["pid_definition", *PID_COLUMNS]
-    widths = [120, 95, 95, 90, 90, 110, 110, 135, 105]
+    widths = [120, 95, 95, 90, 90, 110, 110, 135, 90, 90, 105]
     row_height = 38
     margin = 24
     title_height = 58
@@ -227,6 +234,7 @@ def main() -> int:
         ig_plot = output_dir / "ig_evil_twin_covariance.png"
         idep_csv = output_dir / "idep_evil_twin.csv"
         tilde_csv = output_dir / "tilde_evil_twin.csv"
+        thin_csv = output_dir / "thin_evil_twin.csv"
         delta_csv = output_dir / "delta_evil_twin.csv"
         combined_csv = output_dir / "combined_pid_table.csv"
         combined_svg = output_dir / "combined_pid_table.svg"
@@ -296,6 +304,24 @@ def main() -> int:
             args.verbose,
         )
         rows.extend(load_single_row_csv(tilde_csv))
+
+        run(
+            [
+                sys.executable,
+                str(SCRIPT_DIR / "Thin_PID.py"),
+                "--matrix-csv",
+                str(matrix_csv),
+                "--sizes",
+                "1,1,1",
+                "--output",
+                str(thin_csv),
+                "--case",
+                "InputCov",
+            ],
+            "Thin_PID.py",
+            args.verbose,
+        )
+        rows.extend(load_single_row_csv(thin_csv))
 
         run(
             [
