@@ -1,4 +1,4 @@
-from both_unique import feature_creation, test_both_unique
+from Simulations.Encoder_simulation.both_unique import feature_creation, test_both_unique
 import numpy as np
 import torch
 import sys

@@ -1,0 +1,2 @@
+case,pid_definition,unique_source1,unique_source2,redundancy,synergy,I_source1_target,I_source2_target,joint_mutual_information,interaction_information
+InputCov,Tilde,0.278719911220809,0.0,0.047318437069037655,0.056924477021658204,0.3260383482898467,0.047318437069037635,0.3829628253115049,0.009606039952620549

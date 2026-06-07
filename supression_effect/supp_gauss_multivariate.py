@@ -11,7 +11,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
 from encoding_model.commonality import commonality_analysis
-from toy_examples.toy_example import run_experiment
+from Simulations.Theoretical_Examples.toy_example import run_experiment
 from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
 from utils import (
