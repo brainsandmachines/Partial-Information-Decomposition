@@ -22,7 +22,7 @@ from wrapper_utils import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FLOW_PID_ROOT = REPO_ROOT / "external" / "flow-pid"
+FLOW_PID_ROOT = REPO_ROOT / "external" / "flow_pid"
 DEFAULT_MATRIX_CSV = Path(__file__).resolve().parent / "evil_twin_whitened_correlation_1_1_1.csv"
 DEFAULT_OUTPUT = "thin_evil_twin.csv"
 SIMPLE_OUTPUT = "thin_simple_gaussian.csv"
@@ -113,7 +113,7 @@ def main() -> int:
             include_union_objective=True,
             verbose_history=args.verbose,
             read_message=True,
-            call_message="Calling external/flow-pid/pid/thin_pid.py: exact_gauss_thin_pid",
+            call_message="Calling external/flow_pid/pid/thin_pid.py: exact_gauss_thin_pid",
             written_message="Wrote Thin-PID result to {output}",
         )
 

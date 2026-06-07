@@ -6,9 +6,10 @@
 
 parameters: 
   description: "A theoretical example where the second source has zero unique information about the target. The first source has some unique information, and there is also some redundant and synergistic information."
-  n: 1000000
-  p: 10 #The same feature dimension for all varaibles
+  n: 10000
+  p: 20 #The same feature dimension for all varaibles
   noise_std: 1.0
-  seed: 56
+  seed: 32
   bias_correction: True
   results_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/RVs_Story/results_rvs"
+  n_epochs: 20

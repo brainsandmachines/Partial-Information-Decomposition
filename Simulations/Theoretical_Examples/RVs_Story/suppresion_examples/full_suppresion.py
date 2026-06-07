@@ -60,5 +60,5 @@ if __name__ == "__main__":
     
     config_dict = config['parameters']
     results = main_func(config_dict, full_suppresion)
-    save_pid_comparison_table(results,f"{config['results_dir']}/full_suppresion.png",config=config)
+    save_pid_comparison_table(results,f"{config_dict['results_dir']}/full_suppresion.png",config=config)
     

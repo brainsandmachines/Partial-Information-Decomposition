@@ -28,7 +28,7 @@ from wrapper_utils import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FLOW_PID_ROOT = REPO_ROOT / "external" / "flow-pid"
+FLOW_PID_ROOT = REPO_ROOT / "external" / "flow_pid"
 DEFAULT_OUTPUT = "flow_pid_result.csv"
 SIMPLE_OUTPUT = "flow_simple_gaussian.csv"
 
@@ -202,7 +202,7 @@ def main() -> int:
         m, x, y = load_input_arrays(args)
 
         print(f"Loaded samples: M{m.shape}, X{x.shape}, Y{y.shape}")
-        print("Calling external/flow-pid/pid/flow_pid.py: flow_pid")
+        print("Calling external/flow_pid/pid/flow_pid.py: flow_pid")
         flow_pid = load_flow_pid()
         original_cwd = Path.cwd()
         with tempfile.TemporaryDirectory(prefix="flow_pid_training_") as temp_dir:

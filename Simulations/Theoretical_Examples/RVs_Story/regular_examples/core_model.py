@@ -36,9 +36,10 @@ def true_mi_pid(sources, target, covariance=None):
     mi_bi_1 = calculated_mi['bi_mi_1_t'] - bias_dict['bias_mi_1_t']
     mi_bi_2 = calculated_mi['bi_mi_2_t'] - bias_dict['bias_mi_2_t']
 
-    unq2 = 0
-    red = mi_bi_2
-    unq1 = mi_bi_1 - red
+    unq1 = mi_tri - ((mi_bi_1 + mi_bi_2)/2)
+    unq2 = unq1
+    red = mi_bi_1 - unq1
+    
     syn = 0
     pid = {'red': red, 'unq1': unq1, 'unq2': unq2, 'syn': syn}
     mi = {'tri_mi': mi_tri, 'bi_mi_1': mi_bi_1, 'bi_mi_2': mi_bi_2}

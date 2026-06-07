@@ -4,17 +4,19 @@ from pathlib import Path
 import sys
 import os
 import tempfile
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 root = Path(__file__).resolve().parents[1]
 if str(root) not in sys.path:
     sys.path.append(str(root))
-library_wrappers_root = root / "library_wrappers"
-if str(library_wrappers_root) not in sys.path:
-    sys.path.append(str(library_wrappers_root))
+flow_pid_root = root / "external" / "flow_pid"
+if str(flow_pid_root) not in sys.path:
+    sys.path.insert(0, str(flow_pid_root))
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
 from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
-from library_wrappers.Flow_PID import load_flow_pid
-from library_wrappers.Thin_PID import load_exact_gauss_thin_pid
+from external.flow_pid.pid.flow_pid import flow_pid
+from external.flow_pid.pid.thin_pid import exact_gauss_thin_pid
 
 
 
@@ -159,9 +161,6 @@ def _to_numpy_samples(data):
     return data
 
 
-
-
-
 def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None):
     """Wrapper for flow-pid.
 
@@ -175,14 +174,23 @@ def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tenso
 
     if covariance is not None:
         cov = covariance.cpu().numpy() if isinstance(covariance, torch.Tensor) else np.asarray(covariance)
-        thin_pid = load_exact_gauss_thin_pid()
-        output = thin_pid(cov,dm,dx,dy,unbiased=bias_correction,sample_size=None)
+        expected_shape = (dm + dx + dy, dm + dx + dy)
+        if cov.shape != expected_shape:
+            raise ValueError(f"Flow/Thin covariance must have shape {expected_shape}, got {cov.shape}")
+        # Thin-PID expects covariance blocks in [target, source1, source2] order.
+        output = exact_gauss_thin_pid(cov,dm,dx,dy,unbiased=bias_correction,sample_size=None)
     else:
         m = _to_numpy_samples(target[0])
         x = _to_numpy_samples(sources[0])
         y = _to_numpy_samples(sources[1])
+        if len({m.shape[0], x.shape[0], y.shape[0]}) != 1:
+            raise ValueError(f"Flow-PID sample counts must match, got T={m.shape[0]}, X1={x.shape[0]}, X2={y.shape[0]}")
+        if (m.shape[1], x.shape[1], y.shape[1]) != (dm, dx, dy):
+            raise ValueError(
+                f"Flow-PID dimensions must be (dt, dx1, dx2)=({dm}, {dx}, {dy}), "
+                f"got ({m.shape[1]}, {x.shape[1]}, {y.shape[1]})"
+            )
 
-        flow_pid = load_flow_pid()
         original_cwd = Path.cwd()
         with tempfile.TemporaryDirectory(prefix="flow_pid_training_") as temp_dir:
             try:

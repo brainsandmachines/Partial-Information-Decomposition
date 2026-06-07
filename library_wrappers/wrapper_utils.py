@@ -52,6 +52,17 @@ SIMPLE_GAUSSIAN_COVARIANCE = np.array(
 SIMPLE_GAUSSIAN_CASE = "SimpleGaussian"
 
 
+def add_gpid_src_to_path(repo_root: Path | None = None) -> Path:
+    """Put external/gpid/src on sys.path for script-style wrapper imports."""
+    repo_root = Path(__file__).resolve().parents[1] if repo_root is None else Path(repo_root)
+    gpid_src = repo_root / "external" / "gpid" / "src"
+    if not gpid_src.exists():
+        raise ImportError(f"gpid source directory not found at {gpid_src}")
+    if str(gpid_src) not in sys.path:
+        sys.path.insert(0, str(gpid_src))
+    return gpid_src
+
+
 def parse_sizes(value: str) -> tuple[int, int, int]:
     """Parse source1,source2,target dimensions and reject invalid values."""
     try:

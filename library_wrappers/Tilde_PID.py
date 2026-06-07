@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from pathlib import Path
 
 try:
@@ -24,6 +25,7 @@ from wrapper_utils import BASE_PID_COLUMNS, covariance_example_context, parse_si
 
 DEFAULT_MATRIX_CSV = Path(__file__).resolve().parent / "evil_twin_whitened_correlation_1_1_1.csv"
 DEFAULT_OUTPUT = "tilde_evil_twin.csv"
+SIMPLE_OUTPUT = "tilde_simple_gaussian.csv"
 
 PID_COLUMNS = [
     "unique_source1",
