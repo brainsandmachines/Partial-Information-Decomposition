@@ -144,7 +144,7 @@ def delta_wrapper(config,sources,target,covariance,rng,on_rvs):
 
     cov = cov.cpu().numpy() # Convert to numpy array for Delta implementation
     
-    output = estimate.approx_pid_from_cov(cov,dm,dx,dy,verbose=True) 
+    output = estimate.approx_pid_from_cov(cov,dm,dx,dy,verbose=False) 
     imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
     pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si}
     mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}

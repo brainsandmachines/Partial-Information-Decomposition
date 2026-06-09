@@ -14,6 +14,7 @@ Generated from AST, so signatures and line numbers reflect the current code. Des
 - `Partial_Information_Decomposition/Idep/Idep_Simulations/`: Simulation, covariance, shrinkage, and analysis helpers for Idep experiments.
 - `Partial_Information_Decomposition/Idep/non_parametric_bias_corr/`: Bootstrap, jackknife, and resampling utilities for non-parametric bias correction.
 - `Simulations/Encoder_simulation/`: Encoder-based simulation scripts for unique/shared information examples.
+- `Simulations/Theoretical_Examples/Theoretical_Covariance/`: Theoretical Gaussian covariance construction, sampling, and block-order utilities.
 - `Simulations/Theoretical_Examples/RVs_Story/`: Random-variable story examples and Flow-PID grid-search tooling.
 - `Simulations/Theoretical_Examples/RVs_Story/regular_examples/`: Regular theoretical examples, including equal-unique source examples.
 - `Simulations/Theoretical_Examples/RVs_Story/suppresion_examples/`: Suppression/suppressor-variable theoretical examples.
@@ -481,6 +482,30 @@ File description: Python module for turned off unqiue-related project logic.
 | `test_u2str` (line 195) | `seed: int, config: dict, final_ratio: float` | `results` | No docstring; infer behavior from name/signature before reuse. |
 | `plot_keys_vs_alpha` (line 226) | `csv_path: Union[str, Path], keys: Sequence[str], *, x_col: str='alpha', sort_alpha: bool=False, logx: bool=False, figsize: tuple[float, float]=(8, 4.5), marker: Optional[str]=None, save_path: Optional[Union[str, Path]]=None` | Annotated: `None` | Plot selected columns (keys) vs x_col from a CSV file. |
 | `main` (line 290) | `No inputs.` | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
+
+## Simulations/Theoretical_Examples/Theoretical_Covariance
+
+Theoretical Gaussian covariance construction, sampling, and block-order utilities.
+
+### `Simulations/Theoretical_Examples/Theoretical_Covariance/cov.py`
+
+File description: Python module for constructing and reordering theoretical covariance matrices.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `make_random_true_cov` (line 13) | `config: dict, rng: torch.Generator \| None=None` | Annotated: `np.ndarray` | Construct a generic positive-definite Gaussian covariance in block order [X0, X1, Y]. |
+| `sample_from_cov` (line 70) | `true_cov: torch.Tensor, n_samples: int, rng: torch.Generator` | Annotated: `torch.Tensor` | Sample from a Gaussian distribution with the given covariance. |
+| `change_covariance_order` (line 85) | `cov: torch.Tensor, new_order: list[int], dims: list[int]` | Annotated: `torch.Tensor` | Reorder a three-block covariance matrix by block indices, expand each block according to dims, and assert that full, auto-, and cross-covariance blocks match the expected positional `create_cov_matrix` output. |
+
+### `Simulations/Theoretical_Examples/Theoretical_Covariance/sample_simulation.py`
+
+File description: Sample theoretical covariance PID simulations and result-table rendering.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `load_config` (line 27) | `config_path: str \| Path=DEFAULT_CONFIG_PATH` | Annotated: `dict` | Load configuration from YAML file. |
+| `csv_save` (line 31) | `config: dict, experiment_name: str, method: str, theoretical_values: tuple, sampled_values: dict` | Annotated: `Path` | Save one CSV per method under output_dir/experiment_name, with the theoretical PID/MI row first and one subsequent row per sampled trial. |
+| `simulation` (line 68) | `config: dict, methods: list, experiment_name: str \| None=None` | Annotated: `dict` | Generate a covariance matrix, calculate theoretical PID values, sample trials, save method CSVs, and summarize mean, bias, variance, and MSE; raises `FileExistsError` when `config['output_dir']/experiment_name` already exists to avoid overwriting experiments. |
 
 ## Simulations/Theoretical_Examples/RVs_Story
 

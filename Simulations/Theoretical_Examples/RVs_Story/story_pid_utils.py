@@ -87,7 +87,7 @@ def run_pid_story(
 
     Inputs:
         config: dict, simulation and PID configuration values.
-        function_to_run: Callable, generator accepting (rng, n, p, noise_std).
+        function_to_run: Callable, generator accepting (rng, n_samples, p, noise_std).
         truth_func: Callable | None, optional function producing a "True Values" row.
         methods: tuple[str, ...], PID methods passed to pid_calc.
 
@@ -98,7 +98,7 @@ def run_pid_story(
 
     run_config = dict(config)
     rng = np.random.default_rng(run_config["seed"])
-    x1, x2, t = function_to_run(rng, run_config["n"], run_config["p"], run_config["noise_std"])
+    x1, x2, t = function_to_run(rng, run_config["n_samples"], run_config["p"], run_config["noise_std"])
     sources = [torch.from_numpy(x1), torch.from_numpy(x2)]
     target = [torch.from_numpy(t)]
     run_config.update({"dx1": x1.shape[1], "dx2": x2.shape[1], "dt": t.shape[1]})
