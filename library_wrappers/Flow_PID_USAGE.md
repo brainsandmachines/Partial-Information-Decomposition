@@ -1,6 +1,6 @@
 # Flow-PID Wrapper Usage
 
-This wrapper calls `flow_pid` from `external/flow_pid/pid/flow_pid.py` without modifying the upstream `flow-pid` code.
+This wrapper calls `flow_pid` from `external/flow-pid/pid/flow_pid.py` without modifying the upstream `flow-pid` code.
 
 ## Input
 
@@ -46,4 +46,4 @@ python library_wrappers/Flow_PID.py --m-csv target.csv --x-csv source1.csv --y-c
 
 ## Dependencies
 
-This wrapper requires the Flow-PID training dependencies, including PyTorch and `normflows`. The `normflows` package is listed in `external/flow_pid/requirements.txt`.
+This wrapper requires the Flow-PID training dependencies, including PyTorch and `normflows`. The `normflows` package is listed in `external/flow-pid/requirements.txt`.

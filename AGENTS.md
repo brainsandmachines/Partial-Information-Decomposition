@@ -2,3 +2,4 @@
 
 1. You are not allowed to make changes to other files that are not specefied without asking for permissions. If you want to make a change explain what is the change why would change it and then ask for permission. That includes adding or removing stuff.  
 
+2. On every function you create you should make a description of the funciton what inputs it expects and their types and what it will output.  

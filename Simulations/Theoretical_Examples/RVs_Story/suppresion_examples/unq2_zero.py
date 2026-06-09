@@ -1,66 +1,41 @@
-import torch
-import sys
+"""Suppression example where source 2 has zero unique information."""
+
 from pathlib import Path
-import yaml
+import sys
+
 import numpy as np
-from core_model import main_func
-root = Path(__file__).resolve().parents[3]
-sys.path.append(str(root))  
 
-from Partial_Information_Decomposition.PID_calc import pid_calc
-from Partial_Information_Decomposition.PID_util import create_cov_matrix,pid_comparison_table,save_pid_comparison_table
-from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
-from Partial_Information_Decomposition.bias_functions import mi_wishahrt_bias
+STORY_ROOT = Path(__file__).resolve().parents[1]
+if str(STORY_ROOT) not in sys.path:
+    sys.path.append(str(STORY_ROOT))
 
+from story_pid_utils import load_story_config, save_single_example, truth_pid_suppression
 
 
 def unq2_zero(rng, n, p, noise_std):
+    """Generate an example with zero source-2 unique information.
+
+    Inputs:
+        rng: np.random.Generator, random number generator.
+        n: int, number of samples.
+        p: int, dimension of each random variable.
+        noise_std: float, standard deviation multiplier for noise terms.
+
+    Outputs:
+        tuple[np.ndarray, np.ndarray, np.ndarray], arrays (X1, X2, T) with shape (n, p).
     """
-    Intended theoretical structure:
+    redundant = rng.standard_normal((n, p))
+    unique_x1 = rng.standard_normal((n, p))
+    shared_noise = noise_std * rng.standard_normal((n, p))
+    target_noise = noise_std * rng.standard_normal((n, p))
 
-        Y  = R + U + eps_y
-        X1 = R + U + N
-        X2 = R     + N
-
-    X2 has:
-        - redundancy through R
-        - no private signal source about Y
-        - synergistic/suppressor role through shared nuisance N
-
-    So we expect:
-        unq2 = 0
-        redundancy > 0
-        unq1 > 0
-        synergy > 0
-    under MMI-like Gaussian PID.
-    """
-
-    R = rng.standard_normal((n, p))   # redundant signal
-    U = rng.standard_normal((n, p))   # unique-to-X1 signal
-    N = noise_std * rng.standard_normal((n, p))  # shared suppressor noise
-
-    eps_y = noise_std * rng.standard_normal((n, p))
-
-    y = R + U + eps_y
-    X_M1 = R + U + N
-    X_M2 = R + N
-
-    return X_M1, X_M2, y
-
-
-
-
+    target = redundant + unique_x1 + target_noise
+    x1 = redundant + unique_x1 + shared_noise
+    x2 = redundant + shared_noise
+    return x1, x2, target
 
 
 if __name__ == "__main__":
+    config = load_story_config()
+    save_single_example(config, unq2_zero, "unq2_zero.png", truth_func=truth_pid_suppression)
     
-    config_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/rv_config.yaml"
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
-    
-    config_dict = config['parameters']
-    results = main_func(config_dict, unq2_zero)
-    save_pid_comparison_table(results,save_path=f"{config_dict['results_dir']}/unq2_zero.png",config=config)
-
-    
-

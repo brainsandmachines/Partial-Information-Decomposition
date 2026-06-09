@@ -9,14 +9,14 @@ os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 root = Path(__file__).resolve().parents[1]
 if str(root) not in sys.path:
     sys.path.append(str(root))
-flow_pid_root = root / "external" / "flow_pid"
-if str(flow_pid_root) not in sys.path:
-    sys.path.insert(0, str(flow_pid_root))
+wrapper_root = root / "library_wrappers"
+if str(wrapper_root) not in sys.path:
+    sys.path.insert(0, str(wrapper_root))
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
 from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
-from external.flow_pid.pid.flow_pid import flow_pid
-from external.flow_pid.pid.thin_pid import exact_gauss_thin_pid
+from Flow_PID import load_flow_pid
+from Thin_PID import load_exact_gauss_thin_pid
 
 
 
@@ -131,7 +131,7 @@ def delta_wrapper(config,sources,target,covariance,rng,on_rvs):
 
 
     if covariance is None:
-        data = [target[0], sources[0], sources[1]]  # [T, X1, X2]
+        data = [target[0], sources[0], sources[1]]  # Code Assumes - [T, X1, X2]
         dict_cov = create_cov_matrix(data)
         cov = dict_cov["full_cov"]
         N = data[0].shape[0]  # Sample size
@@ -173,6 +173,7 @@ def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tenso
     bias_correction = config['bias_correction'] if covariance is None else False
 
     if covariance is not None:
+        exact_gauss_thin_pid = load_exact_gauss_thin_pid()
         cov = covariance.cpu().numpy() if isinstance(covariance, torch.Tensor) else np.asarray(covariance)
         expected_shape = (dm + dx + dy, dm + dx + dy)
         if cov.shape != expected_shape:
@@ -180,6 +181,7 @@ def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tenso
         # Thin-PID expects covariance blocks in [target, source1, source2] order.
         output = exact_gauss_thin_pid(cov,dm,dx,dy,unbiased=bias_correction,sample_size=None)
     else:
+        flow_pid = load_flow_pid()
         m = _to_numpy_samples(target[0])
         x = _to_numpy_samples(sources[0])
         y = _to_numpy_samples(sources[1])

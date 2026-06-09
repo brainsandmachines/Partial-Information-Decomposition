@@ -1,64 +1,40 @@
-import torch
-import sys
+"""Full suppression Gaussian RV example."""
+
 from pathlib import Path
-import yaml
+import sys
+
 import numpy as np
-from core_model import main_func
-root = Path(__file__).resolve().parents[3]
-sys.path.append(str(root))  
 
-from Partial_Information_Decomposition.PID_calc import pid_calc
-from Partial_Information_Decomposition.PID_util import create_cov_matrix,pid_comparison_table,save_pid_comparison_table
-from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
-from Partial_Information_Decomposition.bias_functions import mi_wishahrt_bias
+STORY_ROOT = Path(__file__).resolve().parents[1]
+if str(STORY_ROOT) not in sys.path:
+    sys.path.append(str(STORY_ROOT))
 
+from story_pid_utils import load_story_config, save_single_example, truth_pid_suppression
 
 
 def full_suppresion(rng, n, p, noise_std):
+    """Generate the full suppression example.
+
+    Inputs:
+        rng: np.random.Generator, random number generator.
+        n: int, number of samples.
+        p: int, dimension of each random variable.
+        noise_std: float, standard deviation multiplier for noise terms.
+
+    Outputs:
+        tuple[np.ndarray, np.ndarray, np.ndarray], arrays (X1, X2, T) with shape (n, p).
     """
-    Intended theoretical structure:
-
-        Y 
-        X1 = Y + N
-        X2 =  N
-
-    X2 has:
-        - no private signal source about Y
-        - synergistic/suppressor role through shared nuisance N
-
-    So we expect:
-        unq2 = 0
-        redundancy = 0
-        unq1 > 0
-        synergy > 0
-    under MMI-like Gaussian PID.
-    """
-
-
-    
-    N_t = noise_std * rng.standard_normal((n, p))  # shared suppressor noise
-    N_x1 = noise_std * rng.standard_normal((n, p))  # noise for x1
-    N_shared = noise_std * rng.standard_normal((n, p))  # shared noise for x1 and x2
-
-
+    n_t = noise_std * rng.standard_normal((n, p))
+    n_x1 = noise_std * rng.standard_normal((n, p))
+    n_shared = noise_std * rng.standard_normal((n, p))
     target = rng.standard_normal((n, p))
 
-    t = target + N_t
-    X_1 = t + N_x1 + N_shared
-    X_2 = N_shared
-
-    return X_1, X_2, t
-
-
+    t = target + n_t
+    x1 = t + n_x1 + n_shared
+    x2 = n_shared
+    return x1, x2, t
 
 
 if __name__ == "__main__":
-    
-    config_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/rv_config.yaml"
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
-    
-    config_dict = config['parameters']
-    results = main_func(config_dict, full_suppresion)
-    save_pid_comparison_table(results,f"{config_dict['results_dir']}/full_suppresion.png",config=config)
-    
+    config = load_story_config()
+    save_single_example(config, full_suppresion, "full_suppresion.png", truth_func=truth_pid_suppression)

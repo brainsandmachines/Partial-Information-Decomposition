@@ -1,6 +1,6 @@
 # Thin-PID Wrapper Usage
 
-This wrapper calls `exact_gauss_thin_pid` from `external/flow_pid/pid/thin_pid.py` without modifying the upstream `flow-pid` code.
+This wrapper calls `exact_gauss_thin_pid` from `external/flow-pid/pid/thin_pid.py` without modifying the upstream `flow-pid` code.
 
 ## Input
 
