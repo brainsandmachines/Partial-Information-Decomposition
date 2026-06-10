@@ -126,7 +126,7 @@ def calcualte_mi(config,sigma_dict,term='full'):
     else:
         return {term: all_terms_dict[term]}
     
-def calculate_mi_raw(device,sigma,dims):
+def calculate_mi_raw(device:torch.device,sigma:torch.Tensor,dims:list):
     """This function calculates the tri-variate or bi-variate
     mutual information using the covariance matrices without any whitening - in raw mode (:
     

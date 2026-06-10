@@ -65,4 +65,4 @@ def equal_unique2(rng, n, p, noise_std, snr=1):
 
 if __name__ == "__main__":
     config = load_story_config()
-    save_single_example(config, equal_unique2, "equal_unique2_zeroRed_structure.png", truth_func=truth_pid_equal_unique)
+    save_single_example(config, equal_unique, "p=1_equal_unique_zeroRed_structure.png", truth_func=truth_pid_equal_unique)

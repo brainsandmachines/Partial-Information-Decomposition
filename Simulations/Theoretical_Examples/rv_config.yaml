@@ -6,10 +6,10 @@
 
 parameters: 
   description: "A theoretical example where the second source has zero unique information about the target. The first source has some unique information, and there is also some redundant and synergistic information."
-  n_samples: 10000
+  n_samples: 700
   p: 1 #The same feature dimension for all varaibles
   noise_std: 1.0
-  seed: 56
+  seed: 32
   bias_correction: True
   results_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/RVs_Story/results_rvs" #For RVs simulations
   n_epochs: 10
@@ -20,12 +20,12 @@ parameters:
 
 
 covariance:
-  p_scale: 0.5
-  q_scale: 0.3
+  p_scale: 0.3
+  q_scale: 0.5
   r_scale: 0
-  dx1: 100
-  dx2: 100
-  dt: 50
-  n_trials: 50
-  methods: ['flow', 'tilde', 'delta']
-  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Theoretical_Covariance/results_covariance"
+  dx1: 30
+  dx2: 30
+  dt: 20
+  n_trials: 5
+  methods: ['flow','tilde', 'delta']
+  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance"

@@ -180,7 +180,7 @@ def make_direct_true_cov_from_config(
 
     return Sigma
 
-def sample_from_cov(true_cov: torch.Tensor, n_samples: int, rng: torch.Generator) -> torch.Tensor:
+def sample_from_cov(config,true_cov: torch.Tensor, n_samples: int, rng: torch.Generator) -> torch.Tensor:
     """
     Sample from a Gaussian distribution with the given covariance.
 
@@ -202,8 +202,12 @@ def sample_from_cov(true_cov: torch.Tensor, n_samples: int, rng: torch.Generator
 
     sample_cov = torch.cov(samples.T, correction=1)
 
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
+    rvs = [samples[:, :dx1], samples[:, dx1:dx1+dx2], samples[:, dx1+dx2:dx1+dx2+dt]]
     
-    return sample_cov,samples
+    return sample_cov,rvs
 
 def change_covariance_order(cov: torch.Tensor, new_order: list[int],dims:list[int]) -> torch.Tensor:
     """

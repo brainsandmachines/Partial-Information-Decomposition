@@ -114,14 +114,16 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
         if trial % max(1, n_trials // 10) == 0:
             print(f"Trial {trial}/{n_trials} ({(trial / n_trials) * 100:.1f}%)")
         # Sample from the covariance and calculate PID for the samples
-        sampled_cov, _ = sample_from_cov(true_cov, config['n_samples'], rng)
+        sampled_cov, rvs = sample_from_cov(config,true_cov, config['n_samples'], rng)
         reordered_sampled_cov = change_covariance_order(sampled_cov, new_order=[2,0,1], dims=dims)
+        sources = [rvs[0], rvs[1]]
+        target = [rvs[2]]
         for method in methods:
             if method in reorederd_methods:
                 cov = reordered_sampled_cov
             else:
                 cov = sampled_cov
-            pid_results,mi_results = pid_calc(config,rng=rng,covariance = cov, method=method)
+            pid_results,mi_results = pid_calc(config,sources=sources,target=target, method=method)
 
             results = {**pid_results, **mi_results}
 
@@ -169,7 +171,8 @@ if __name__ == "__main__":
     config = {**config_params, **config_cov}
     methods = config.get("methods", ["flow", "tilde", "delta", "idep"])
 
-    exp_name = f'dx1=dx2=100_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
+    exp_name = f'Tilde-Debiased_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
+    #exp_name = 'testt'
     results = simulation(config, methods, experiment_name=exp_name)
     
     save_sample_simulation_results_table(
