@@ -171,7 +171,7 @@ if __name__ == "__main__":
     config = {**config_params, **config_cov}
     methods = config.get("methods", ["flow", "tilde", "delta", "idep"])
 
-    exp_name = f'Tilde-Debiased_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
+    exp_name = f'Allcorr>0_Tilde&Delta-Debiased_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
     #exp_name = 'testt'
     results = simulation(config, methods, experiment_name=exp_name)
     

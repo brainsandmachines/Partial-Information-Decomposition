@@ -114,7 +114,7 @@ def run_pid_story(
         print(f"True MI values: {true_values[1]}")
         results["True Values"] = true_values
 
-    for method in methods:
+    for method in config['methods']:
         results[method.title() if method != "flow" else "Flow"] = pid_calc(
             run_config,
             sources,

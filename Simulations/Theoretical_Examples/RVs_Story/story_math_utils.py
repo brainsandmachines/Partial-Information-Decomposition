@@ -12,7 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
-from Partial_Information_Decomposition.bias_functions import mi_wishahrt_bias
+from Partial_Information_Decomposition.bias_functions import mi_wishart_bias
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
 
 
@@ -32,4 +32,4 @@ def calculate_story_mi_values(sources: list[torch.Tensor], target: list[torch.Te
     t = target[0]
     dims = [x1.shape[1], x2.shape[1], t.shape[1]]
     cov = create_cov_matrix(rvs=[x1, x2, t], dims=dims, device=x1.device)["full_cov"]
-    return calculate_mi_raw(device=x1.device, sigma=cov, dims=dims), mi_wishahrt_bias(dims, x1.shape[0])
+    return calculate_mi_raw(device=x1.device, sigma=cov, dims=dims), mi_wishart_bias(dims, x1.shape[0])

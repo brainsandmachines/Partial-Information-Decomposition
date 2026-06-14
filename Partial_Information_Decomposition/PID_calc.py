@@ -17,7 +17,7 @@ from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
 from Flow_PID import load_flow_pid
 from Thin_PID import load_exact_gauss_thin_pid
-from Partial_Information_Decomposition.bias_functions import mi_wishahrt_bias
+from Partial_Information_Decomposition.bias_functions import  mi_wishart_bias
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
 
 
@@ -149,23 +149,23 @@ def delta_wrapper(config,sources,target,covariance,rng,on_rvs):
     output = estimate.approx_pid_from_cov(cov,dm,dx,dy,verbose=False) 
     imx, imy, imxy, def_y_minus_x, def_x_minus_y, uix, uiy, ri, si = output[:9]
 
-    # if sources and target is not None:
-    #     cov_reg = create_cov_matrix(rvs=[sources[0], sources[1], target[0]],device=covariance.device,dims=[dx, dy, dm])['full_cov']
-    #     mi_dict = calculate_mi_raw(device=config.get('device', 'cpu'),sigma=cov_reg,dims=[dx, dy, dm])
-    #     bias = mi_wishahrt_bias(dims=[dx, dy, dm], n_samples=N)
+    if sources and target is not None:
+        cov_reg = create_cov_matrix(rvs=[sources[0], sources[1], target[0]],device=config.get('device', 'cpu'),dims=[dx, dy, dm])['full_cov']
+        mi_dict = calculate_mi_raw(device=config.get('device', 'cpu'),sigma=cov_reg,dims=[dx, dy, dm])
+        bias = mi_wishart_bias(dims=[dx, dy, dm], n_samples=N)
 
-    #     mi_x1_t = mi_dict['bi_mi_1_t'] - bias['bias_mi_1_t']
-    #     mi_x2_t = mi_dict['bi_mi_2_t'] - bias['bias_mi_2_t']
-    #     mi_x1x2_t = mi_dict['tri_mi'] - bias['bias_tri_mi']
+        mi_x1_t = mi_dict['bi_mi_1_t'] - bias['bias_mi_1_t']
+        mi_x2_t = mi_dict['bi_mi_2_t'] - bias['bias_mi_2_t']
+        mi_x1x2_t = mi_dict['tri_mi'] - bias['bias_tri_mi']
 
-    #     imx = mi_x1_t / np.log(2)
-    #     imy = mi_x2_t / np.log(2)
-    #     imxy = mi_x1x2_t / np.log(2)
+        imx = mi_x1_t / np.log(2)
+        imy = mi_x2_t / np.log(2)
+        imxy = mi_x1x2_t / np.log(2)
 
-    #     ri = min(mi_x1_t - def_x_minus_y, mi_x2_t - def_y_minus_x)
-    #     uix = mi_x1_t - ri
-    #     uiy = mi_x2_t - ri
-    #     si = mi_x1x2_t - uix - uiy - ri
+        ri = min(imx - def_x_minus_y, imy - def_y_minus_x)
+        uix = imx - ri
+        uiy = imy - ri
+        si = imxy - uix - uiy - ri
 
     pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si}
     mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
