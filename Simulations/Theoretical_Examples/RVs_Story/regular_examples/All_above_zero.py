@@ -17,8 +17,8 @@ def all_above_zero_weighted(
     n,
     p,
     noise_std,
-    unique1_weight=3.0,
-    unique2_weight=3.0,
+    unique1_weight=5.0,
+    unique2_weight=5.0,
     redundant_weight=1.0,
     shared_noise_weight=1.0,
 ):
@@ -69,5 +69,9 @@ def all_above_zero_weighted(
 
 
 if __name__ == "__main__":
-    config = load_story_config()
-    save_single_example(config, all_above_zero_weighted, "weighted_p=10_all_above_zero.png", truth_func=None)
+    p_s = [10,20,30,50,100,150,200,500]
+    for p in p_s:
+        config = load_story_config()
+        config["parameters"]["p"] = p
+        print(f"Running all_above_zero_weighted with p={p}...")
+        save_single_example(config, all_above_zero_weighted, f"weighted_unique_informality=5_p={p}_all_above_zero.png", truth_func=None)

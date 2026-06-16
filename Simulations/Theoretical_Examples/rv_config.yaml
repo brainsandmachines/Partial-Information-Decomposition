@@ -6,8 +6,8 @@
 
 parameters: 
   description: "A theoretical example where the second source has zero unique information about the target. The first source has some unique information, and there is also some redundant and synergistic information."
-  n_samples: 100000000
-  p: 10 #The same feature dimension for all varaibles
+  n_samples: 10000000
+  p: 50 #The same feature dimension for all varaibles
   noise_std: 1.0
   seed: 42
   bias_correction: True
@@ -17,7 +17,7 @@ parameters:
   n_flows: 4
   bits: True
   device: "cpu"
-  methods: ['tilde', 'delta', 'idep']
+  methods: ['tilde', 'delta']
 
 
 covariance:

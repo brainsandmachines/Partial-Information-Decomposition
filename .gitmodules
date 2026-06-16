@@ -10,3 +10,6 @@
 [submodule "external/mayas_project"]
 	path = external/mayas_project
 	url = https://github.com/brainsandmachines/Mayas-Project.git
+[submodule "external/DeepDive"]
+	path = external/DeepDive
+	url = https://github.com/ColinConwell/DeepDive.git
