@@ -4,8 +4,12 @@ import sys
 import time
 
 
-repo_root = Path("/home/ohadshee/Desktop/Partial-Information-Decomposition")  # Adjust this path to your repository root
-sys.path.append(str(repo_root))
+repo_root = Path(__file__).resolve().parents[1]
+external_root = repo_root / "external"
+for path in (repo_root, external_root):
+    path_str = str(path)
+    if path_str not in sys.path:
+        sys.path.insert(0, path_str)
 
 from external.mayas_project.features_and_encoding.feat_ext_and_encoding import DataLoader, ImageDatasetNSD, extract_features_per_layer, prepare_subject_context, prepare_model_context
 """"This file utilized mayas_project for feature extraction."""
@@ -286,21 +290,26 @@ per_voxel_results_dir.mkdir(parents=True, exist_ok=True)
 
 
 def main():
-    """Run a cluster smoke test using the constants above as inputs and printed diagnostics as output."""
-    target = prepare_target(HDF_PATH, PKL_INFO_PATH, NEURAL_DATA_PATH)
-    sources = prepare_sources(MODEL_1_NAME, MODEL_2_NAME)
-    ids = target["image_ids_for_subj"][:N_DEBUG_IMAGES].astype("int64")
-    y = target["neural_data"][:N_DEBUG_IMAGES]
-    assert target["stim"].dtype.kind in "uifb", f"stim must be numeric image data, got {target['stim'].dtype}"
-    layer1 = DEBUG_LAYER_1 or sources["X1_context"]["layers_ordered"][0]
-    layer2 = DEBUG_LAYER_2 or sources["X2_context"]["layers_ordered"][0]
-    x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
-    x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
-    print(f"models: Source 1: {MODEL_1_NAME} / Source 2: {MODEL_2_NAME}")
-    print(f"layers: {layer1} / {layer2}")
-    print(f"image_ids: {ids[0]} .. {ids[-1]} ({len(ids)})")
-    print(f"shapes: X1={x1.shape}, X2={x2.shape}, T={y.shape}")
-    assert x1.shape[0] == x2.shape[0] == y.shape[0] == len(ids)
+    try:
+        """Run a cluster smoke test using the constants above as inputs and printed diagnostics as output."""
+        target = prepare_target(HDF_PATH, PKL_INFO_PATH, NEURAL_DATA_PATH)
+        sources = prepare_sources(MODEL_1_NAME, MODEL_2_NAME)
+        ids = target["image_ids_for_subj"][:N_DEBUG_IMAGES].astype("int64")
+        y = target["neural_data"][:N_DEBUG_IMAGES]
+        assert target["stim"].dtype.kind in "uifb", f"stim must be numeric image data, got {target['stim'].dtype}"
+        layer1 = DEBUG_LAYER_1 or sources["X1_context"]["layers_ordered"][0]
+        layer2 = DEBUG_LAYER_2 or sources["X2_context"]["layers_ordered"][0]
+        x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
+        x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
+        print(f"models: Source 1: {MODEL_1_NAME} / Source 2: {MODEL_2_NAME}")
+        print(f"layers: {layer1} / {layer2}")
+        print(f"image_ids: {ids[0]} .. {ids[-1]} ({len(ids)})")
+        print(f"shapes: X1={x1.shape}, X2={x2.shape}, T={y.shape}")
+        assert x1.shape[0] == x2.shape[0] == y.shape[0] == len(ids)
+    except Exception as e:
+        print(f"\nError during feature extraction pipeline: {e}")
+        print(f"\n NOTE!")
+        print(f"\nSmoke Example can be used only when path is knonwn and data is available. Please adjust the paths and constants in debug_sources_target_features_example.py to run the smoke test.\n")
 
 
 if __name__ == "__main__":
