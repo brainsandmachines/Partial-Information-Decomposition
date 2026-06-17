@@ -227,7 +227,7 @@ def features_pipeline(model1,model2,subj_id,hdf_path:Path,pkl_info_path:Path,neu
                                     neural_data_path=neural_data_path)
 
     
-    # NSD batch
+    #NSD batch
     subj_imgs = target_context["image_ids_for_subj"]
     stim = target_context["stim"]
 

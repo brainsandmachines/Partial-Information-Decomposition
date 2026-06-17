@@ -106,6 +106,14 @@ File description: Placeholder module for future feature manipulation helpers.
 
 No functions or methods defined in this file.
 
+### `pipeline/debug_sources_target_features_example.py`
+
+File description: Minimal cluster smoke test for source/target feature extraction.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `main` | Top-level path, model, layer, and debug-size constants | Printed diagnostics and assertion side effects | Run a minimal cluster smoke test for source/target feature extraction. |
+
 ## Partial_Information_Decomposition
 
 PID calculation, mutual information helpers, bias correction, plotting, and PID-specific utilities.
