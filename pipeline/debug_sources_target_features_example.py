@@ -1,7 +1,14 @@
 from pathlib import Path
+import sys
 
 from sources_target_features import feature_extraction, prepare_sources, prepare_target
-
+# Import DeepDive modules
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+print(f"Project root directory: {PROJECT_ROOT}")
+deepdive_path = PROJECT_ROOT / 'third_party' / 'DeepDive' / 'deepdive'
+for path in [deepdive_path, PROJECT_ROOT / 'model_opts']:
+    if str(path) not in sys.path:
+        sys.path.append(str(path))
 
 HDF_PATH = Path("PATH_TO_NSD_STIM_HDF5")
 PKL_INFO_PATH = Path("PATH_TO_NSD_INFO_PKL")
@@ -13,6 +20,24 @@ DEBUG_LAYER_2 = None
 N_DEBUG_IMAGES = 8
 BATCH_SIZE_PROCESS = 4
 BATCH_SIZE_DATALOADER = 4
+
+subject_name = "subj01"
+betas_general_roi = "OTC"
+
+# --- Paths and Directories ---
+# NSD data paths
+NSD_ROOT = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata")   # Should be modified when running on cluster or locally
+HDF_PATH = NSD_ROOT / "nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5"
+PKL_INFO_PATH = NSD_ROOT / "nsddata/experiments/nsd/nsd_stim_info_merged.pkl"
+
+# Path to neural data
+NEURAL_DATA_PATH = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim")
+NEURAL_DATA_PATH = NEURAL_DATA_PATH / f"{subject_name}_{betas_general_roi}_betas_per_stimulus.zarr"
+
+# Directory to save per-voxel results
+per_voxel_results_dir = PROJECT_ROOT / "results/encoding/per_voxel_results"
+per_voxel_results_dir.mkdir(parents=True, exist_ok=True)
+
 
 
 def main():

@@ -1,0 +1,6 @@
+
+Conda Environment:
+pid_env
+
+How to ask for a qos sinteractive:
+sinteractive --gpu 1  --qos golan-neuro --part rtx6000
