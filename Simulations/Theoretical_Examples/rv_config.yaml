@@ -16,7 +16,7 @@ parameters:
   batch_size: 128
   n_flows: 4
   bits: True
-  device: "cpu"
+  device: "cuda"
   methods: ['tilde', 'delta']
 
 

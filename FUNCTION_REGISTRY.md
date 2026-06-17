@@ -21,6 +21,7 @@ Generated from AST, so signatures and line numbers reflect the current code. Des
 - `Simulations/evil_twin/`: Evil-twin covariance examples and related checks.
 - `data/`: Data-specific loading/parsing scripts.
 - `encoding_model/`: Encoding model, commonality analysis, regression, and prediction pipeline utilities.
+- `pipeline/`: Real-data source/target feature extraction helpers for assembling neural target data and model-source features.
 - `library_wrappers/`: CLI and Python wrappers around external PID/R implementations.
 - `source_conwell_code/`: Source Conwell analysis scripts kept inside the project tree.
 - `source_conwell_code/pressures/`: Source Conwell analysis scripts kept inside the project tree.
@@ -80,6 +81,30 @@ File description: General utility functions shared by analysis and simulation sc
 | `create_test_histograms_with_kde._compute_xlim` (line 801) | `arrays: list[np.ndarray]` | Annotated: `tuple[float, float] \| None` | No docstring; infer behavior from name/signature before reuse. |
 | `get_config` (line 863) | `config_path: Path \| str` | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
 | `_to_numpy_samples` (line 871) | `data` | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
+
+## Pipeline
+
+Real-data source/target feature extraction helpers for assembling neural target data and model-source features.
+
+### `pipeline/sources_target_features.py`
+
+File description: Builds X1/X2 model feature sources and target neural-data context for the real-data PID pipeline.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `prepare_sources` | `model_1: str, model_2: str` | `dict[str, dict]` | Load model contexts for the two source models and return them under `X1_context` and `X2_context`. |
+| `prepare_target` | `hdf_path: Path, pkl_info_path: Path, neural_data_path: Path` | `dict` | Delegate target/neural-data context loading to `prepare_subject_context`. |
+| `make_nsd_dataloader` | `model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int` | `DataLoader` | Create a DataLoader for an ordered subset of NSD image IDs using the model-specific image transforms. |
+| `batching` | `model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int` | `np.ndarray` | Build a batch-specific ordered NSD DataLoader and extract features for one model layer. |
+| `extract_NSD_model_transform` | `model, stim_dataset, subj_image_ids` | `DataLoader` | Compatibility wrapper that creates a full-subject NSD DataLoader in subject image order. |
+| `feature_extraction` | `layer_name: str, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128` | `np.ndarray` | Extract raw features for one model/layer over ordered subject image IDs, preserving row order. |
+| `features_pipeline` | `model1, model2, subj_id, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path` | `dict` | Build source contexts, target context, extract X1/X2 features, and return both contexts. |
+
+### `pipeline/feature_manipulations.py`
+
+File description: Placeholder module for future feature manipulation helpers.
+
+No functions or methods defined in this file.
 
 ## Partial_Information_Decomposition
 
