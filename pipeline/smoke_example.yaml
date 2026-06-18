@@ -20,7 +20,10 @@ target:
   target_name: "subj01"
   betas_roi: "OTC"
 
-images: 
-  N_DEBUG_IMAGES:8
-  BATCH_SIZE_PROCESS:4
-  BATCH_SIZE_DATALOADER:4
+
+images:
+  N_DEBUG_IMAGES: 50
+  BATCH_SIZE_PROCESS: 4
+  BATCH_SIZE_DATALOADER: 4
+
+

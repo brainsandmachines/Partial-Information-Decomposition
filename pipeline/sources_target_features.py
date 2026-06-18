@@ -302,8 +302,8 @@ def main():
         ids = target["image_ids_for_subj"][:N_DEBUG_IMAGES].astype("int64")
         y = target["neural_data"][:N_DEBUG_IMAGES]
         assert target["stim"].dtype.kind in "uifb", f"stim must be numeric image data, got {target['stim'].dtype}"
-        layer1 = DEBUG_LAYER_1 or sources["X1_context"]["layers_ordered"][0]
-        layer2 = DEBUG_LAYER_2 or sources["X2_context"]["layers_ordered"][0]
+        layer1 = DEBUG_LAYER_1 if DEBUG_LAYER_1 is None else sources["X1_context"]["layers_ordered"][0]
+        layer2 = DEBUG_LAYER_2 if DEBUG_LAYER_2 is None else sources["X2_context"]["layers_ordered"][0]
         x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
         x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
         print(f"models: Source 1: {MODEL_1_NAME} / Source 2: {MODEL_2_NAME}")

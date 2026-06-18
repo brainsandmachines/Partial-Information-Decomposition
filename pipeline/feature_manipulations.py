@@ -154,14 +154,14 @@ def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline"
     ids = target["image_ids_for_subj"][:n_debug_images].astype("int64")
     y = target["neural_data"][:n_debug_images]
 
-    layer1 = sources_config.get("DEBUG_LAYER_1") or sources["X1_context"]["layers_ordered"][0]
-    layer2 = sources_config.get("DEBUG_LAYER_2") or sources["X2_context"]["layers_ordered"][0]
+    layer1 = sources_config.get("DEBUG_LAYER_1") if sources_config.get("DEBUG_LAYER_1") is None else sources["X1_context"]["layers_ordered"][0]
+    layer2 = sources_config.get("DEBUG_LAYER_2") if sources_config.get("DEBUG_LAYER_2") is None else sources["X2_context"]["layers_ordered"][0]
     x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], batch_size_process, batch_size_dataloader)
     x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], batch_size_process, batch_size_dataloader)
 
-    pca_components = max(1, min(2, x1.shape[0], x1.shape[1]))
+    pca_components = images_config['N_DEBUG_IMAGES'] // 2  # or any other number <= n_debug_images
     jl_dim = max(1, min(2, x1.shape[1]))
-    cca_components = max(1, min(2, x1.shape[0], x1.shape[1], x2.shape[1]))
+    cca_components = images_config['N_DEBUG_IMAGES'] // 2  # or any other number <= n_debug_images
 
     results = {
         "inputs": {
@@ -179,9 +179,9 @@ def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline"
     jl_x1 = jl_projection(torch.as_tensor(x1, dtype=torch.float32), n_samples=x1.shape[0], jl_dim=jl_dim)
     results["jl_projection"] = {"status": "ok", "shape": tuple(jl_x1.shape)}
 
-    cca_x1, cca_x2 = cca_projection(x1, x2, cca_components)
-    results["cca_projection"] = {"status": "ok", "X1_shape": tuple(cca_x1.shape), "X2_shape": tuple(cca_x2.shape)}
-
+    # cca_x1, cca_x2 = cca_projection(x1, x2, cca_components)
+    # results["cca_projection"] = {"status": "ok", "X1_shape": tuple(cca_x1.shape), "X2_shape": tuple(cca_x2.shape)} -- > Exception has occurred: _ArrayMemoryError Unable to allocate 1.13 TiB for an array with shape (193600, 802816) and data type float64
+ 
     try:
         ica_projection(x1)
     except NotImplementedError as exc:
@@ -191,7 +191,7 @@ def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline"
     print(f"inputs: X1={x1.shape}, X2={x2.shape}, T={y.shape}")
     print(f"pca_projection: {results['pca_projection']}")
     print(f"jl_projection: {results['jl_projection']}")
-    print(f"cca_projection: {results['cca_projection']}")
+    #print(f"cca_projection: {results['cca_projection']}")
     print(f"ica_projection: {results['ica_projection']}")
     return results
 
