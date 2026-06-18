@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 import sys
 import time
-
+import yaml 
 
 repo_root = Path(__file__).resolve().parents[1]
 external_root = repo_root / "external"
@@ -259,28 +259,33 @@ for path in [deepdive_path, PROJECT_ROOT / 'model_opts']:
     if str(path) not in sys.path:
         sys.path.append(str(path))
 
-HDF_PATH = Path("PATH_TO_NSD_STIM_HDF5")
-PKL_INFO_PATH = Path("PATH_TO_NSD_INFO_PKL")
-NEURAL_DATA_PATH = Path("PATH_TO_NEURAL_DATA")
-MODEL_1_NAME = "alexnet_random"
-MODEL_2_NAME = "resnet18_random"
-DEBUG_LAYER_1 = None
-DEBUG_LAYER_2 = None
-N_DEBUG_IMAGES = 8
-BATCH_SIZE_PROCESS = 4
-BATCH_SIZE_DATALOADER = 4
 
-subject_name = "subj01"
-betas_general_roi = "OTC"
+
+with open("pipeline/smoke_example.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+
+
+
+MODEL_1_NAME = config["sources"]["source1_name"]
+MODEL_2_NAME = config["sources"]["source2_name"]
+DEBUG_LAYER_1 = config["sources"]["DEBUG_LAYER_1"]
+DEBUG_LAYER_2 = config["sources"]["DEBUG_LAYER_2"]
+N_DEBUG_IMAGES = config["images"]["N_DEBUG_IMAGES"]
+BATCH_SIZE_PROCESS = config["images"]["BATCH_SIZE_PROCESS"]
+BATCH_SIZE_DATALOADER = config["images"]["BATCH_SIZE_DATALOADER"]
+
+subject_name = config["target"]["target_name"]
+betas_general_roi = config["target"]["betas_roi"]
 
 # --- Paths and Directories ---
 # NSD data paths
-NSD_ROOT = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata")   # Should be modified when running on cluster or locally
-HDF_PATH = NSD_ROOT / "nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5"
-PKL_INFO_PATH = NSD_ROOT / "nsddata/experiments/nsd/nsd_stim_info_merged.pkl"
+NSD_ROOT = Path(config["paths"]["NSD_ROOT"])   # Should be modified when running on cluster or locally
+HDF_PATH = NSD_ROOT / Path(config["paths"]["HDF_PATH"])
+PKL_INFO_PATH = NSD_ROOT / Path(config["paths"]["PKL_INFO_PATH"])
 
 # Path to neural data
-NEURAL_DATA_PATH = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim")
+NEURAL_DATA_PATH = Path(config["paths"]["NEURAL_DATA_PATH"])
 NEURAL_DATA_PATH = NEURAL_DATA_PATH / f"{subject_name}_{betas_general_roi}_betas_per_stimulus.zarr"
 
 # Directory to save per-voxel results
