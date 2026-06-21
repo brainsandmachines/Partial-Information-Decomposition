@@ -30,7 +30,7 @@ def run_voxel_experiment(config: dict[str, Any]) -> dict[str, Any]:
     functions = _pipeline_functions_from_config(config["functions"])
     choose_layer_kwargs = dict(config.get("choose_layer_kwargs", {}))
     if config["functions"].get("choose_layer") == "voxel_best_layer":
-        choose_layer_kwargs.setdefault("voxel_index", config["target_kwargs"]["voxel_index"])
+        choose_layer_kwargs = {'voxel_index': config["target_kwargs"]["voxel_index"],'X1_path_to_results': config["choose_layer_kwargs"]["X1_path_to_results"],'X2_path_to_results': config["choose_layer_kwargs"]["X2_path_to_results"]}
     pipeline = PIDPipeline(functions)
     return pipeline.run(
         target_kwargs=dict(config.get("target_kwargs", {})),
@@ -277,7 +277,6 @@ def print_pid_mi_adapter(pid_results: dict[str, Any], context: dict[str, Any], *
     from pipeline.pipeline_phases.report_results import print_pid_mi
 
     return print_pid_mi(pid_results["pid"], pid_results["mi"])
-
 
 def _pipeline_functions_from_config(function_config: dict[str, Any]) -> PIDPipelineFunctions:
     """Resolve configured function names into PIDPipelineFunctions.

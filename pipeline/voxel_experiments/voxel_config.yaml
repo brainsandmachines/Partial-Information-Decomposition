@@ -1,7 +1,7 @@
 functions:
   target_extraction: nsd_voxel_target
   sources_extraction: nsd_sources
-  choose_layer: specific_layer_index
+  choose_layer: voxel_best_layer
   feature_extraction: nsd_feature_extraction
   preprocess: null
   feature_manipulation: pca_each_source
@@ -14,30 +14,33 @@ target_kwargs:
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
   pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
   neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
-  n_images: 200
+  n_images: 8000
 
 sources_kwargs:
-  model_name_1: alexnet_random
-  model_name_2: resnet18_random
+  model_name_1: dino_resnet50_selfsupervised
+  model_name_2: ResNet50-SimCLR_selfsupervised
+
 
 choose_layer_kwargs:
   X1_index: 0
+  X1_path_to_results: "/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_dino_resnet50_selfsupervised_best_layer_per_voxel.csv"
+  X2_path_to_results: "/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_ResNet50-SimCLR_selfsupervised_best_layer_per_voxel.csv"
   X2_index: 0
 
 feature_extraction_kwargs:
-  batch_size_process: 4
-  batch_size_dataloader: 4
+  batch_size_process: 100
+  batch_size_dataloader: 100
 
 preprocess_kwargs: {}
 
 feature_manipulation_kwargs:
-  n_components: 20
+  n_components: 100
 
 pid_kwargs:
   method: tilde
   rng_seed: 56
   config:
-    device: cpu
+    device: 'cuda'
     bias_correction: True
 
 report_kwargs: {}
