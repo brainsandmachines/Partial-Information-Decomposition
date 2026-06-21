@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from pathlib import Path
 import sys
+import yaml
 
 
 repo_root = Path(__file__).resolve().parents[1]
@@ -123,7 +124,6 @@ def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline"
     Output:
         - results: dict, mapping each reduction name to its status and output shape, with printed diagnostics.
     """
-    import yaml
 
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
@@ -199,3 +199,8 @@ def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline"
 if __name__ == "__main__":
     config_arg = Path(sys.argv[1]) if len(sys.argv) > 1 else repo_root / "pipeline" / "smoke_example.yaml"
     run_feature_reduction_smoke(config_arg)
+
+
+
+
+

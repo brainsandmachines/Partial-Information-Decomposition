@@ -32,7 +32,6 @@ def commonality_analysis(
     method="standard",
     alphas=None,
     scale_by_target_variance=False,
-    **_ignored_kwargs,
 ):
     """
     Decompose predictive power into unique, common, and unexplained components.
