@@ -11,7 +11,6 @@ if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
-from pipeline.pipeline_phases.sources_target_features import prepare_target_for_voxel
 
 PipelineFunction = Callable[..., Any]
 
@@ -29,11 +28,14 @@ def run_voxel_experiment(config: dict[str, Any]) -> dict[str, Any]:
 
     _validate_config(config)
     functions = _pipeline_functions_from_config(config["functions"])
+    choose_layer_kwargs = dict(config.get("choose_layer_kwargs", {}))
+    if config["functions"].get("choose_layer") == "voxel_best_layer":
+        choose_layer_kwargs.setdefault("voxel_index", config["target_kwargs"]["voxel_index"])
     pipeline = PIDPipeline(functions)
     return pipeline.run(
         target_kwargs=dict(config.get("target_kwargs", {})),
         sources_kwargs=dict(config.get("sources_kwargs", {})),
-        choose_layer_kwargs=dict(config.get("choose_layer_kwargs", {})),
+        choose_layer_kwargs=choose_layer_kwargs,
         feature_extraction_kwargs=dict(config.get("feature_extraction_kwargs", {})),
         preprocess_kwargs=dict(config.get("preprocess_kwargs", {})),
         feature_manipulation_kwargs=dict(config.get("feature_manipulation_kwargs", {})),
@@ -68,6 +70,7 @@ def nsd_voxel_target(
         raise ValueError("target_kwargs['voxel_index'] must be an int for run_voxel_experiment.")
 
 
+    from pipeline.pipeline_phases.sources_target_features import prepare_target_for_voxel
 
     target_context = prepare_target_for_voxel(
         voxel_index=int(voxel_index),
@@ -120,6 +123,39 @@ def specific_layer_index(
 
     del sources
     return {"X1": int(X1_index), "X2": int(X2_index)}
+
+
+def voxel_best_layer_for_sources(
+    sources: dict[str, dict[str, Any]],
+    voxel_index: int,
+    X1_path_to_results: str | Path,
+    X2_path_to_results: str | Path,
+) -> dict[str, int]:
+    """Select each source model's best layer for one voxel index.
+
+    Inputs:
+        sources: dict, source contexts under "X1" and "X2".
+        voxel_index: int, selected voxel index used for both best-layer CSV lookups.
+        X1_path_to_results: str or Path, CSV path for source X1 with columns
+            "voxel_index" and "best_layer_index".
+        X2_path_to_results: str or Path, CSV path for source X2 with columns
+            "voxel_index" and "best_layer_index".
+
+    Output:
+        selected_layers: dict, best layer indexes under "X1" and "X2".
+    """
+
+    del sources
+    from pipeline.pipeline_phases.choosing_layer import voxel_best_layer
+
+    selected_layers = {
+        "X1": voxel_best_layer(voxel_index=int(voxel_index), path_to_results=str(X1_path_to_results)),
+        "X2": voxel_best_layer(voxel_index=int(voxel_index), path_to_results=str(X2_path_to_results)),
+    }
+    missing_sources = [source_name for source_name, result in selected_layers.items() if result["l"] is None]
+    if missing_sources:
+        raise ValueError(f"Could not find best layer for sources: {missing_sources}")
+    return {source_name: int(result["l"]) for source_name, result in selected_layers.items()}
 
 
 def nsd_feature_extraction(
@@ -340,6 +376,7 @@ PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     "nsd_voxel_target": nsd_voxel_target,
     "nsd_sources": nsd_sources,
     "specific_layer_index": specific_layer_index,
+    "voxel_best_layer": voxel_best_layer_for_sources,
     "nsd_feature_extraction": nsd_feature_extraction,
     "pca_each_source": pca_each_source,
     "pid_calc": pid_calc_adapter,

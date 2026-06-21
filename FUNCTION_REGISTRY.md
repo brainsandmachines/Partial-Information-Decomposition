@@ -132,16 +132,17 @@ File description: Builds X1/X2 model feature sources and target neural-data cont
 | `features_pipeline (line 217)` | model1, model2, subj_id, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Main function to run the feature extraction pipeline. |
 | `main (line 322)` | No inputs | No explicit return; likely `None` / side effects. | Run a cluster smoke test using constants from `smoke_example.yaml`. |
 
-### `pipeline/voxel_experiment.py`
+### `pipeline/voxel_experiments/voxel_experiment.py`
 
 File description: Config-driven voxel experiment assembler that resolves pipeline step names, arranges kwargs, and runs `PIDPipeline`.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `run_voxel_experiment (line 18)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Resolve configured pipeline step names, build `PIDPipelineFunctions`, pass kwargs sections into `PIDPipeline.run`, and return the full pipeline context. |
+| `run_voxel_experiment (line 19)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Resolve configured pipeline step names, build `PIDPipelineFunctions`, pass kwargs sections into `PIDPipeline.run`, inject `target_kwargs.voxel_index` for `voxel_best_layer` when needed, and return the full pipeline context. |
 | `nsd_voxel_target (line 44)` | voxel_index: int, subj_id: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, n_images: int \| None=None | Annotated: `dict[str, Any]` | Load one voxel target using the NSD target helper, optionally trim samples, and expose neural responses under `target`. |
 | `nsd_sources (line 87)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Load two source model contexts and expose them under `X1` and `X2` for `PIDPipeline`. |
 | `specific_layer_index (line 105)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Return configured layer indexes for X1 and X2. |
+| `voxel_best_layer_for_sources (line 128)` | sources: dict[str, dict[str, Any]], voxel_index: int, X1_path_to_results: str \| Path, X2_path_to_results: str \| Path | Annotated: `dict[str, int]` | Reuse `voxel_best_layer` to select the best layer index for X1 and X2 from separate per-model CSV files for one voxel. |
 | `nsd_feature_extraction (line 125)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `Any` | Call the existing NSD feature extraction helper for one source and selected layer. |
 | `pca_each_source (line 158)` | source_1: Any, source_2: Any, n_components: int | Annotated: `tuple[Any, Any]` | Apply the existing PCA projection helper separately to X1 and X2. |
 | `pid_calc_adapter (line 179)` | target: Any, source_1: Any, source_2: Any, method: str, config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | Annotated: `dict[str, Any]` | Lazily import `pid_calc`, coerce T/X1/X2 to 2D tensors, fill PID dimensions, and return `pid`, `mi`, and `method`. |

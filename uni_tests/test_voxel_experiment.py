@@ -258,6 +258,40 @@ def test_optional_steps_can_be_none(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result["report_output"] is None
 
 
+def test_voxel_best_layer_can_choose_layers_from_config_csvs(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Check voxel_best_layer config lookup selects one best layer per source.
+
+    Inputs:
+        monkeypatch: pytest.MonkeyPatch, patch helper for dummy registry names.
+        tmp_path: Path, temporary directory for tiny best-layer CSV files.
+
+    Output:
+        None. Assertions validate config-driven best-layer selection.
+    """
+
+    register_dummy_functions(monkeypatch)
+    x1_path = tmp_path / "x1_best_layers.csv"
+    x2_path = tmp_path / "x2_best_layers.csv"
+    x1_path.write_text("voxel_index,best_layer_index\n5,3\n", encoding="utf-8")
+    x2_path.write_text("voxel_index,best_layer_index\n5,4\n", encoding="utf-8")
+
+    config = base_config()
+    config["functions"]["choose_layer"] = "voxel_best_layer"
+    config["choose_layer_kwargs"] = {
+        "X1_path_to_results": str(x1_path),
+        "X2_path_to_results": str(x2_path),
+    }
+
+    result = voxel_experiment.run_voxel_experiment(config)
+
+    assert result["selected_layers"] == {"X1": 3, "X2": 4}
+    assert result["raw_features"]["X1"] == [[216.0], [217.0]]
+    assert result["raw_features"]["X2"] == [[418.0], [419.0]]
+
+
 def test_run_voxel_experiment_rejects_missing_voxel(monkeypatch: pytest.MonkeyPatch) -> None:
     """Check that voxel_index=None is invalid for the voxel runner.
 
