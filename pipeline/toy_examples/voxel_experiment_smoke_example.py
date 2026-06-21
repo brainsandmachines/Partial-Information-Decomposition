@@ -7,11 +7,11 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from pipeline.voxel_experiment import PIPELINE_STEP_FUNCTIONS, run_voxel_experiment
+    from pipeline.voxel_experiments.voxel_experiment import PIPELINE_STEP_FUNCTIONS, run_voxel_experiment
 except ModuleNotFoundError:
     repo_root = Path(__file__).resolve().parents[2]
     sys.path.insert(0, str(repo_root))
-    from pipeline.voxel_experiment import PIPELINE_STEP_FUNCTIONS, run_voxel_experiment
+    from pipeline.voxel_experiments.voxel_experiment import PIPELINE_STEP_FUNCTIONS, run_voxel_experiment
 
 
 def smoke_voxel_target(voxel_index: int, subj_id: str, n_images: int = 3) -> dict[str, Any]:

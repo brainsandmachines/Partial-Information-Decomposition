@@ -286,7 +286,7 @@ for path in [deepdive_path, PROJECT_ROOT / 'model_opts']:
 
 
 
-with open("pipeline/smoke_example.yaml", "r") as f:
+with open("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/toy_examples/smoke_example.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 

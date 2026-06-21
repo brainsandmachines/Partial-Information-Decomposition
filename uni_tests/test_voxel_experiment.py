@@ -15,7 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 
-import pipeline.voxel_experiment as voxel_experiment
+import pipeline.voxel_experiments.voxel_experiment as voxel_experiment
 
 
 def dummy_target(voxel_index: int, target_offset: float = 0.0) -> dict[str, Any]:
