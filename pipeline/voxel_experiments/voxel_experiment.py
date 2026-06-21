@@ -11,6 +11,7 @@ if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
+from pipeline.pipeline_phases.sources_target_features import prepare_target_for_voxel
 
 PipelineFunction = Callable[..., Any]
 
@@ -67,7 +68,6 @@ def nsd_voxel_target(
         raise ValueError("target_kwargs['voxel_index'] must be an int for run_voxel_experiment.")
 
 
-    from pipeline.pipeline_phases.sources_target_features import prepare_target_for_voxel
 
     target_context = prepare_target_for_voxel(
         voxel_index=int(voxel_index),
