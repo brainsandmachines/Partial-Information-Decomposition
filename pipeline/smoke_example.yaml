@@ -26,4 +26,8 @@ images:
   BATCH_SIZE_PROCESS: 4
   BATCH_SIZE_DATALOADER: 4
 
+functions:
+  layer_func_name: "random_layer_selection"
+  manipulation_func_name: "pca_projection"
+
 

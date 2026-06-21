@@ -9,7 +9,7 @@ Generated from AST, so signatures and line numbers reflect the current code. Des
 ## Folder Overview
 
 - repository root: Repository-level package markers and broad utilities.
-- `pipeline/`: Real-data source/target feature extraction helpers for assembling neural target data and model-source features.
+- `pipeline/`: Real-data source/target feature extraction helpers, layer utilities, and agnostic PID comparison runners.
 - `Partial_Information_Decomposition/`: PID calculation, mutual information helpers, bias correction, plotting, and PID-specific utilities.
 - `Partial_Information_Decomposition/Idep/`: Idep PID estimators and Gaussian implementation classes.
 - `Partial_Information_Decomposition/Idep/Idep_Simulations/`: Simulation, covariance, shrinkage, and analysis helpers for Idep experiments.
@@ -86,7 +86,18 @@ File description: General utility functions shared by analysis and simulation sc
 
 ## pipeline
 
-Real-data source/target feature extraction helpers for assembling neural target data and model-source features.
+Real-data source/target feature extraction helpers, layer utilities, and agnostic PID comparison runners.
+
+### `pipeline/pid_pipeline.py`
+
+File description: Strict orchestrator for one PID pipeline run from user-selected target/source/layer/extraction/PID/report functions.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `PIDPipelineFunctions class (line 10)` | class | class | Dataclass storing user-selected functions for target extraction, sources extraction, layer choice, feature extraction, optional preprocessing, optional feature manipulation, PID calculation, and optional reporting. |
+| `PIDPipeline class (line 42)` | class | class | Strict PID pipeline orchestrator that connects the user-provided functions without choosing methods or adapting signatures. |
+| `PIDPipeline.__init__ (line 45)` | self, functions: PIDPipelineFunctions | None | Validate that required pipeline functions are callable and optional functions are callable or None, then store the selected functions. |
+| `PIDPipeline.run (line 85)` | self, *, target_kwargs: dict[str, Any] \| None=None, sources_kwargs: dict[str, Any] \| None=None, choose_layer_kwargs: dict[str, Any] \| None=None, feature_extraction_kwargs: dict[str, Any] \| None=None, preprocess_kwargs: dict[str, Any] \| None=None, feature_manipulation_kwargs: dict[str, Any] \| None=None, pid_kwargs: dict[str, Any] \| None=None, report_kwargs: dict[str, Any] \| None=None | Annotated: `dict[str, Any]` | Run target extraction, source extraction, layer choice, feature extraction, optional preprocessing, optional feature manipulation, PID calculation, and optional reporting; returns the full run context. |
 
 ### `pipeline/feature_manipulations.py`
 
@@ -94,20 +105,68 @@ File description: Placeholder module for future feature manipulation helpers.
 
 No functions or methods defined in this file.
 
+### `pipeline/choosing_layer.py`
+
+File description: Helpers for selecting model layers globally, by index, or voxel-wise from saved encoding results.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `random_layer_selection (line 14)` | n_layers | `layer_idx` | Choose a random layer index from the available layers. |
+| `specific_index_layer_selection (line 28)` | layer_names, index | `layer_names[index]` | Choose a specific layer index from the available layers. |
+| `best_layer (line 48)` | layer_names | No explicit return; currently placeholder. | Choose the most predictive layer for a given source on a given subject. |
+| `voxel_best_layer (line 54)` | voxel_index: int=None, index_layer: int=None, path_to_results: str=None | Annotated: `dict` | Choose the best model layer for one voxel, or a representative voxel for one layer, using a CSV with `voxel_index` and `best_layer_index` columns. Returns `{'v': voxel_index, 'l': best_layer_index}` or `{'v': None, 'l': None}` when lookup fails. |
+
 ### `pipeline/sources_target_features.py`
 
 File description: Builds X1/X2 model feature sources and target neural-data context for the real-data PID pipeline.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `prepare_sources (line 22)` | model_1: str, model_2: str | Annotated: `dict[str, dict]` | Prepare sources for feature extraction. |
-| `prepare_target (line 46)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
-| `make_nsd_dataloader (line 68)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
-| `batching (line 91)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
-| `extract_NSD_model_transform (line 122)` | model, stim_dataset, subj_image_ids | call `make_nsd_dataloader(...)` | Create a full-subject NSD DataLoader using a model's image transforms. |
-| `feature_extraction (line 141)` | layer_name: str, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
-| `features_pipeline (line 192)` | model1, model2, subj_id, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Main function to run the feature extraction pipeline. |
-| `main (line 292)` | No inputs | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
+| `prepare_sources (line 22)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict]` | Prepare source model contexts for feature extraction under `X1_context` and `X2_context`. |
+| `prepare_target (line 43)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
+| `prepare_target_for_voxel (line 65)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target context for one voxel by selecting one neural response column. |
+| `make_nsd_dataloader (line 91)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
+| `batching (line 114)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
+| `extract_NSD_model_transform (line 145)` | model, stim_dataset, subj_image_ids | call `make_nsd_dataloader(...)` | Create a full-subject NSD DataLoader using a model's image transforms. |
+| `feature_extraction (line 164)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
+| `features_pipeline (line 217)` | model1, model2, subj_id, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Main function to run the feature extraction pipeline. |
+| `main (line 322)` | No inputs | No explicit return; likely `None` / side effects. | Run a cluster smoke test using constants from `smoke_example.yaml`. |
+
+### `pipeline/voxel_experiment.py`
+
+File description: Config-driven voxel experiment assembler that resolves pipeline step names, arranges kwargs, and runs `PIDPipeline`.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `run_voxel_experiment (line 18)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Resolve configured pipeline step names, build `PIDPipelineFunctions`, pass kwargs sections into `PIDPipeline.run`, and return the full pipeline context. |
+| `nsd_voxel_target (line 44)` | voxel_index: int, subj_id: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, n_images: int \| None=None | Annotated: `dict[str, Any]` | Load one voxel target using the NSD target helper, optionally trim samples, and expose neural responses under `target`. |
+| `nsd_sources (line 87)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Load two source model contexts and expose them under `X1` and `X2` for `PIDPipeline`. |
+| `specific_layer_index (line 105)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Return configured layer indexes for X1 and X2. |
+| `nsd_feature_extraction (line 125)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `Any` | Call the existing NSD feature extraction helper for one source and selected layer. |
+| `pca_each_source (line 158)` | source_1: Any, source_2: Any, n_components: int | Annotated: `tuple[Any, Any]` | Apply the existing PCA projection helper separately to X1 and X2. |
+| `pid_calc_adapter (line 179)` | target: Any, source_1: Any, source_2: Any, method: str, config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | Annotated: `dict[str, Any]` | Lazily import `pid_calc`, coerce T/X1/X2 to 2D tensors, fill PID dimensions, and return `pid`, `mi`, and `method`. |
+| `print_pid_mi_adapter (line 228)` | pid_results: dict[str, Any], context: dict[str, Any], **report_kwargs: Any | Annotated: `Any` | Call the existing PID/MI print helper on `pid_calc_adapter` output. |
+| `_pipeline_functions_from_config (line 246)` | function_config: dict[str, Any] | Annotated: `PIDPipelineFunctions` | Resolve configured function names into the dataclass consumed by `PIDPipeline`. |
+| `_resolve_function (line 268)` | function_config: dict[str, Any], step_name: str, required: bool | Annotated: `PipelineFunction \| None` | Resolve one configured function name from the local step registry. |
+| `_validate_config (line 291)` | config: dict[str, Any] | Annotated: `None` | Validate required config sections and enforce integer voxel indexes. |
+| `_as_2d_tensor (line 318)` | value: Any | Annotated: `Any` | Convert 1D or 2D sample arrays to 2D torch tensors for `pid_calc`. |
+
+### `pipeline/toy_examples/voxel_experiment_smoke_example.py`
+
+File description: No-data smoke example for debugging the config-driven voxel experiment runner.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `smoke_voxel_target (line 17)` | voxel_index: int, subj_id: str, n_images: int=3 | Annotated: `dict[str, Any]` | Create a tiny fake voxel target context with `target`, `voxel_index`, `subj_id`, and image IDs. |
+| `smoke_sources (line 38)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Create fake X1/X2 model contexts with two layers and fixed features. |
+| `smoke_choose_layer (line 69)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Return configured fake layer indexes for X1 and X2. |
+| `smoke_feature_extraction (line 85)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], feature_shift: float=0.0 | Annotated: `list[list[float]]` | Read fake source features for the selected layer and align them to target sample count. |
+| `smoke_feature_manipulation (line 111)` | source_1: list[list[float]], source_2: list[list[float]], keep_columns: int=1 | Annotated: `tuple[list[list[float]], list[list[float]]]` | Keep the first columns from both fake source matrices. |
+| `smoke_pid_calculation (line 133)` | target: list[list[float]], source_1: list[list[float]], source_2: list[list[float]], method: str='smoke_pid' | Annotated: `dict[str, Any]` | Return deterministic PID-like and MI-like smoke outputs. |
+| `smoke_report (line 167)` | pid_results: dict[str, Any], context: dict[str, Any] | Annotated: `str` | Print a compact smoke report. |
+| `register_smoke_functions (line 188)` | No inputs | Annotated: `None` | Register smoke functions into `PIPELINE_STEP_FUNCTIONS` for this example run. |
+| `smoke_config (line 211)` | No inputs | Annotated: `dict[str, Any]` | Build a YAML-shaped config dictionary for `run_voxel_experiment`. |
+| `main (line 242)` | No inputs | Annotated: `dict[str, Any]` | Register smoke functions and run the voxel experiment smoke config. |
 
 ## Partial_Information_Decomposition
 

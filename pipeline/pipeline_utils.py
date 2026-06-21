@@ -1,0 +1,350 @@
+"""Utility helpers used by the thin PID pipeline orchestrator."""
+
+from __future__ import annotations
+
+from inspect import signature
+from typing import Any, Callable
+import numpy as np
+
+
+def choose_random_sources(sources_list: list[str], size: int = 2, replace: bool = False) -> np.ndarray:
+    """Randomly select a source from the list of available sources.
+    
+    Inputs:
+        sources_list: list[str], available model or source names.
+        size: int, number of sources to select.
+        replace: bool, whether to sample with replacement.
+
+    Output:
+        selected_sources: np.ndarray, randomly selected source names.
+    """
+
+    selected_sources = np.random.choice(sources_list, size=size, replace=replace)
+    return selected_sources
+
+
+
+
+
+
+def prepare_sources_step(
+    prepare_sources: Callable[..., Any] | None,
+    model_1: str | None,
+    model_2: str | None,
+    source_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> Any:
+    """Prepare source contexts when a source-preparation function is provided.
+
+    Inputs:
+        prepare_sources: callable or None, function that prepares source contexts.
+        model_1: str or None, first source model name.
+        model_2: str or None, second source model name.
+        source_kwargs: dict, extra keyword inputs for prepare_sources.
+        context: dict, current pipeline context.
+
+    Output:
+        sources: any, source contexts returned by prepare_sources or existing context value.
+    """
+
+    if prepare_sources is None:
+        return context.get("sources")
+    if model_1 is None or model_2 is None:
+        raise ValueError("model_1 and model_2 are required when prepare_sources is provided.")
+    return prepare_sources(model_1, model_2, **source_kwargs)
+
+
+def prepare_target_step(
+    prepare_target: Callable[..., Any] | None,
+    target_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> Any:
+    """Prepare target context when a target-preparation function is provided.
+
+    Inputs:
+        prepare_target: callable or None, function that prepares the target context.
+        target_kwargs: dict, keyword inputs for prepare_target.
+        context: dict, current pipeline context.
+
+    Output:
+        target_context: any, target context returned by prepare_target or existing context value.
+    """
+
+    if prepare_target is None:
+        return context.get("target_context")
+    return prepare_target(**target_kwargs)
+
+
+def target_data_step(target_data: Any, context: dict[str, Any]) -> Any:
+    """Choose the target samples for PID.
+
+    Inputs:
+        target_data: any, explicit target samples passed to the pipeline.
+        context: dict, current pipeline context containing optional target_context.
+
+    Output:
+        target: any, explicit target_data or neural_data from target_context.
+    """
+
+    if target_data is not None:
+        return target_data
+    target_context = context.get("target_context")
+    if isinstance(target_context, dict) and "neural_data" in target_context:
+        return target_context["neural_data"]
+    return None
+
+
+def choose_layers_step(
+    choose_layer: Callable[..., Any] | None,
+    layer_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> dict[str, Any]:
+    """Choose one layer for each source when a layer-selection function is provided.
+
+    Inputs:
+        choose_layer: callable or None, layer-selection function.
+        layer_kwargs: dict, layer-selection options shared or split by X1 and X2.
+        context: dict, current pipeline context containing sources.
+
+    Output:
+        selected_layers: dict, selected layer names or indexes for X1 and X2.
+    """
+
+    existing_layers = context.get("selected_layers")
+    if existing_layers is not None:
+        return dict(existing_layers)
+    if choose_layer is None:
+        return {}
+
+    sources = context.get("sources") or {}
+    return {
+        "X1": choose_one_layer(choose_layer, source_context(sources, "X1"), source_step_kwargs(layer_kwargs, "X1")),
+        "X2": choose_one_layer(choose_layer, source_context(sources, "X2"), source_step_kwargs(layer_kwargs, "X2")),
+    }
+
+
+def extract_or_use_features_step(
+    extract_features: Callable[..., Any] | None,
+    source_1_features: Any,
+    source_2_features: Any,
+    feature_extraction_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> dict[str, Any]:
+    """Extract source features or use precomputed source features.
+
+    Inputs:
+        extract_features: callable or None, feature extraction function.
+        source_1_features: any, precomputed X1 features or None.
+        source_2_features: any, precomputed X2 features or None.
+        feature_extraction_kwargs: dict, keyword inputs for extract_features.
+        context: dict, current pipeline context.
+
+    Output:
+        features: dict, source features under X1 and X2.
+    """
+
+    features = dict(context.get("features") or {})
+    if source_1_features is not None:
+        features["X1"] = source_1_features
+    if source_2_features is not None:
+        features["X2"] = source_2_features
+
+    if extract_features is None:
+        return features
+
+    sources = context.get("sources") or {}
+    target_context = context.get("target_context") or {}
+    selected_layers = context.get("selected_layers") or {}
+    extraction_context = {
+        "subj_image_ids": target_context.get("image_ids_for_subj") if isinstance(target_context, dict) else None,
+        "stim_dataset": target_context.get("stim") if isinstance(target_context, dict) else None,
+        **feature_extraction_kwargs,
+    }
+
+    if "X1" not in features:
+        features["X1"] = extract_features(
+            selected_layers.get("X1"),
+            source_context(sources, "X1"),
+            **source_step_kwargs(extraction_context, "X1"),
+        )
+    if "X2" not in features:
+        features["X2"] = extract_features(
+            selected_layers.get("X2"),
+            source_context(sources, "X2"),
+            **source_step_kwargs(extraction_context, "X2"),
+        )
+    return features
+
+
+def manipulate_features_step(
+    manipulate_features: Callable[..., Any] | None,
+    feature_manipulation_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> dict[str, Any]:
+    """Apply an optional feature-manipulation function to source features.
+
+    Inputs:
+        manipulate_features: callable or None, feature manipulation function.
+        feature_manipulation_kwargs: dict, keyword inputs for manipulate_features.
+        context: dict, current pipeline context containing features.
+
+    Output:
+        features: dict, original or manipulated source features under X1 and X2.
+    """
+
+    features = dict(context.get("features") or {})
+    if manipulate_features is None:
+        return features
+    if "X1" in features:
+        features["X1"] = manipulate_features(
+            features["X1"],
+            **source_step_kwargs(feature_manipulation_kwargs, "X1"),
+        )
+    if "X2" in features:
+        features["X2"] = manipulate_features(
+            features["X2"],
+            **source_step_kwargs(feature_manipulation_kwargs, "X2"),
+        )
+    return features
+
+
+def calculate_pid_step(
+    calculate_pid: Callable[..., Any] | None,
+    pid_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> Any:
+    """Calculate PID when a PID function is provided.
+
+    Inputs:
+        calculate_pid: callable or None, PID calculation function.
+        pid_kwargs: dict, keyword inputs for calculate_pid.
+        context: dict, current pipeline context containing target_data and features.
+
+    Output:
+        pid_results: any, output returned by calculate_pid or existing context value.
+    """
+
+    if calculate_pid is None:
+        return context.get("pid_results")
+    target_data = context.get("target_data")
+    features = context.get("features") or {}
+    if target_data is None:
+        raise ValueError("target_data is required before calculate_pid can run.")
+    if "X1" not in features or "X2" not in features:
+        raise ValueError("features['X1'] and features['X2'] are required before calculate_pid can run.")
+    return call_pid_function(calculate_pid, target_data, features["X1"], features["X2"], pid_kwargs)
+
+
+def report_results_step(
+    report: Callable[..., Any] | None,
+    report_kwargs: dict[str, Any],
+    context: dict[str, Any],
+) -> Any:
+    """Report PID results when a reporting function is provided.
+
+    Inputs:
+        report: callable or None, result reporting function.
+        report_kwargs: dict, keyword inputs for report.
+        context: dict, current pipeline context containing pid_results.
+
+    Output:
+        report_output: any, output returned by report or existing report output.
+    """
+
+    if report is None:
+        return context.get("report_output")
+    return report(context.get("pid_results"), context=context, **report_kwargs)
+
+
+def source_context(sources: Any, source_name: str) -> Any:
+    """Read one source context from the sources object.
+
+    Inputs:
+        sources: any, source contexts returned by prepare_sources.
+        source_name: str, source key, either X1 or X2.
+
+    Output:
+        source_context: any, matching source context or None.
+    """
+
+    if not isinstance(sources, dict):
+        return None
+    return sources.get(f"{source_name}_context", sources.get(source_name))
+
+
+def source_step_kwargs(kwargs: dict[str, Any], source_name: str) -> dict[str, Any]:
+    """Merge shared and source-specific keyword arguments for one source step.
+
+    Inputs:
+        kwargs: dict, shared keyword arguments with optional X1 or X2 nested dicts.
+        source_name: str, source key, either X1 or X2.
+
+    Output:
+        merged_kwargs: dict, keyword arguments for the requested source.
+    """
+
+    source_specific = kwargs.get(source_name, {})
+    shared = {key: value for key, value in kwargs.items() if key not in ("X1", "X2")}
+    if isinstance(source_specific, dict):
+        shared.update(source_specific)
+    return shared
+
+
+def choose_one_layer(layer_func: Callable[..., Any], source_context_value: Any, layer_kwargs: dict[str, Any]) -> Any:
+    """Choose one layer by adapting to the common layer-selection helper signatures.
+
+    Inputs:
+        layer_func: callable, layer-selection function.
+        source_context_value: any, source context containing optional layers_ordered.
+        layer_kwargs: dict, keyword inputs for the layer-selection function.
+
+    Output:
+        selected_layer: any, chosen layer name or index.
+    """
+
+    layer_names = []
+    if isinstance(source_context_value, dict):
+        layer_names = source_context_value.get("layers_ordered", [])
+
+    params = signature(layer_func).parameters
+    if "layer_names" in params:
+        selected = layer_func(layer_names=layer_names, **layer_kwargs)
+    elif "n_layers" in params:
+        selected = layer_func(n_layers=len(layer_names), **layer_kwargs)
+    else:
+        selected = layer_func(layer_names, **layer_kwargs)
+
+    if hasattr(selected, "__index__") and layer_names:
+        return layer_names[int(selected)]
+    return selected
+
+
+def call_pid_function(
+    pid_func: Callable[..., Any],
+    target_data: Any,
+    source_1_features: Any,
+    source_2_features: Any,
+    pid_kwargs: dict[str, Any],
+) -> Any:
+    """Call a PID function using either local or existing PID_calc-style arguments.
+
+    Inputs:
+        pid_func: callable, PID calculation function.
+        target_data: any, target samples T.
+        source_1_features: any, first source features X1.
+        source_2_features: any, second source features X2.
+        pid_kwargs: dict, keyword inputs for the PID function.
+
+    Output:
+        pid_results: any, output returned by the PID function.
+    """
+
+    params = signature(pid_func).parameters
+    if "sources" in params and "target" in params:
+        return pid_func(sources=[source_1_features, source_2_features], target=[target_data], **pid_kwargs)
+    if "source_1" in params and "source_2" in params:
+        return pid_func(target=target_data, source_1=source_1_features, source_2=source_2_features, **pid_kwargs)
+    return pid_func(target_data, source_1_features, source_2_features, **pid_kwargs)
+
+
+

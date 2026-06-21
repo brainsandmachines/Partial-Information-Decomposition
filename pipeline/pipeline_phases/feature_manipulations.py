@@ -18,7 +18,22 @@ for path in (repo_root, external_root):
  n_project function or PCA or ICA etc..."""
 
 
+def choose_manipulation_function(manip_func_name:str):
+    MANIP_FUNC_NAME = ['pca_projection', 'jl_projection', 'ica_projection', 'cca_projection']
 
+    if manip_func_name not in MANIP_FUNC_NAME:
+        raise ValueError(f"Invalid manipulation function name: {manip_func_name}. Must be one of {MANIP_FUNC_NAME}.")
+    else:
+        if manip_func_name == 'pca_projection':
+            return pca_projection
+        elif manip_func_name == 'jl_projection':
+            return jl_projection
+        elif manip_func_name == 'ica_projection':
+            return ica_projection
+        elif manip_func_name == 'cca_projection':
+            return cca_projection
+        
+        
 def pca_projection(features, n_components):
     """Apply PCA projection to reduce dimensionality of features.
     Input: 
@@ -129,7 +144,7 @@ def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline"
         config = yaml.safe_load(f)
 
     try:
-        from pipeline.sources_target_features import prepare_sources, prepare_target, feature_extraction
+        from pipeline.pipeline_phases.sources_target_features import prepare_sources, prepare_target, feature_extraction
     except Exception as exc:
         raise RuntimeError(
             "Could not import sources_target_features. Check the h5py/numpy environment and the source smoke config."

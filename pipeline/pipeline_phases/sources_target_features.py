@@ -19,25 +19,22 @@ from external.mayas_project.features_and_encoding.feat_ext_and_encoding import D
 
 
 
-def prepare_sources(model_1:str,model_2:str) -> dict[str, dict]:
+def prepare_sources(model_name_1:str,model_name_2:str) -> dict[str, dict]:
     """Prepare sources for feature extraction.
-    
-    loads the model contexts for the two models and prepares them for feature extraction.
-    
-    
+
+    Inputs:
+        model_name_1: str, name of the first model/source.
+        model_name_2: str, name of the second model/source.
+
     Output:
-        per_model_context = {
-        "model_name": model_name,
-        "model": model,
-        "image_transforms": image_transforms,
-        "layers_ordered": layers_ordered
-    }"""
+        sources: dict, model contexts under "X1_context" and "X2_context".
+    """
 
 
     # Prepare model context
-    model_1 = prepare_model_context(model_1)
+    model_1 = prepare_model_context(model_name_1)
 
-    model_2 = prepare_model_context(model_2)
+    model_2 = prepare_model_context(model_name_2)
 
     return {'X1_context': model_1, 'X2_context': model_2}
 
@@ -63,6 +60,32 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> di
 
     """
     return prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
+
+
+def prepare_target_for_voxel(voxel_index:int, subj_id:str, hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> dict:
+    """Prepare target for feature extraction for a specific voxel. 
+    Inputs:
+        voxel_index: index of the voxel to prepare the target for
+        subj_id: subject ID
+        hdf_path: path to hdf file containing neural data
+        pkl_info_path: path to pkl file containing info about the neural data
+        neural_data_path: path to the directory containing the neural data
+        
+    Outputs:
+        per_subject_context = {
+        "neural_data": neural_data, ----> For a given voxel, the neural data will be a 1D array of shape (n_images,) containing the responses of that voxel to each image.
+        "stim": stim, ------->     Images presented to the subject during the experiment
+        "hdf_file": hdf_file,
+        "image_ids_for_subj": image_ids_for_subj,
+        "shared1000_subj": shared1000_subj,
+        "n_projections": n_projections,
+        "kf": kf
+        }"""
+    
+    subject_context = prepare_target(hdf_path,pkl_info_path,neural_data_path)
+    neural_data = subject_context["neural_data"][:, voxel_index]
+
+    return {**subject_context, "neural_data": neural_data}
 
 
 def make_nsd_dataloader(model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int) -> DataLoader:
@@ -138,12 +161,13 @@ def extract_NSD_model_transform(model,stim_dataset,subj_image_ids):
 
 
 
-def feature_extraction(layer_name: str, model_context: dict, subj_image_ids: np.ndarray,
+def feature_extraction(layer_index: int, model_context: dict, subj_image_ids: np.ndarray,
                        stim_dataset, batch_size_process: int, batch_size_dataloader: int = 128) -> np.ndarray:
     """Extract features from the models and the neural data.
     
     Inputs:
         layer_name: str, name of the layer to extract features from.
+        layer_index: int, index of the layer to extract features from.
         model_context: dict, context for a model, containing the model and its image transforms.
         subj_image_ids: np.ndarray, ordered image IDs for this subject.
         stim_dataset: h5py.Dataset-like object, dataset containing stimulus images.
@@ -158,6 +182,7 @@ def feature_extraction(layer_name: str, model_context: dict, subj_image_ids: np.
         # --- Get model-level context ---
     model_name = model_context["model_name"]
     layers_ordered = model_context["layers_ordered"]
+    layer_name = layers_ordered[layer_index]
 
     # --- Check if layer name is valid ---
     print("\n" + "="*50)
@@ -302,8 +327,8 @@ def main():
         ids = target["image_ids_for_subj"][:N_DEBUG_IMAGES].astype("int64")
         y = target["neural_data"][:N_DEBUG_IMAGES]
         assert target["stim"].dtype.kind in "uifb", f"stim must be numeric image data, got {target['stim'].dtype}"
-        layer1 = DEBUG_LAYER_1 if DEBUG_LAYER_1 is None else sources["X1_context"]["layers_ordered"][0]
-        layer2 = DEBUG_LAYER_2 if DEBUG_LAYER_2 is None else sources["X2_context"]["layers_ordered"][0]
+        layer1 = 0
+        layer2 = 0
         x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
         x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
         print(f"models: Source 1: {MODEL_1_NAME} / Source 2: {MODEL_2_NAME}")
