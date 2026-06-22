@@ -4,6 +4,7 @@ import torch
 import numpy as np
 import yaml
 import sys
+import unicodedata
 from pathlib import Path
 
 """"A file with functions help to choose the layer to each source"""
@@ -186,10 +187,16 @@ def _normalize_csv_value(value) -> str:
         value: any, CSV or config value to compare.
 
     Output:
-        normalized_value: str, stripped string value.
+        normalized_value: str, stripped string value with invisible format
+            characters removed.
     """
 
-    return str(value).strip()
+    text = unicodedata.normalize("NFKC", str(value))
+    return "".join(
+        character
+        for character in text.strip()
+        if unicodedata.category(character) != "Cf"
+    )
 
     
 

@@ -252,7 +252,11 @@ def overall_best_layer_for_sources(
         model_name = _model_name_for_source(sources, source_name)
         result = overall_best_layer(model_name=model_name, path_to_results=str(path_to_results))
         if result["l"] is None:
-            raise ValueError(f"No overall best layer found for model '{model_name}' in {path_to_results}.")
+            available_names = _overall_best_layer_model_names(path_to_results)
+            raise ValueError(
+                f"No overall best layer found for model {model_name!r} in {path_to_results}. "
+                f"First available model names: {available_names[:10]!r}"
+            )
         selected_layers[source_name] = int(result["l"])
     return selected_layers
 
@@ -460,6 +464,27 @@ def _model_name_for_source(sources: dict[str, dict[str, Any]], source_name: str)
     if not isinstance(context, dict) or "model_name" not in context:
         raise ValueError(f"Source {source_name} must contain a model_name for overall best-layer lookup.")
     return str(context["model_name"])
+
+
+def _overall_best_layer_model_names(path_to_results: str | Path) -> list[str]:
+    """Read model names from an overall best-layer CSV for diagnostics.
+
+    Inputs:
+        path_to_results: str or Path, CSV path with a "model_name" column.
+
+    Output:
+        model_names: list[str], model names read from the file, or an empty
+            list if the file cannot be read.
+    """
+
+    import csv
+
+    try:
+        with Path(path_to_results).open("r", newline="") as csv_file:
+            reader = csv.DictReader(csv_file)
+            return [row.get("model_name", "") for row in reader]
+    except Exception:
+        return []
 
 
 COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
