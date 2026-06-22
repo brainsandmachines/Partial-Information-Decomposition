@@ -220,6 +220,37 @@ def test_run_otc_experiment_can_choose_overall_best_layers(
     assert result["selected_layers"] == {"X1": 3, "X2": 4}
 
 
+def test_run_otc_experiment_overall_best_strips_model_names(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Check overall-best lookup tolerates whitespace around model names.
+
+    Inputs:
+        monkeypatch: pytest.MonkeyPatch, patch helper for dummy registry names.
+        tmp_path: Path, temporary directory for a tiny overall-best CSV file.
+
+    Output:
+        None. Assertions validate normalized model-name lookup.
+    """
+
+    register_dummy_functions(monkeypatch)
+    csv_path = tmp_path / "overall_best_with_spaces.csv"
+    csv_path.write_text(
+        "model_name,best_layer_name,best_layer_index,mean_cv_corr,test_corr\n"
+        " M1 ,b,3,0.1,0.2\n"
+        " M2 ,h,4,0.3,0.4\n",
+        encoding="utf-8",
+    )
+    config = base_config()
+    config["functions"]["choose_layer"] = "overall_best_layer"
+    config["choose_layer_kwargs"] = {"path_to_results": str(csv_path)}
+
+    result = otc_experiment.run_otc_experiment(config)
+
+    assert result["selected_layers"] == {"X1": 3, "X2": 4}
+
+
 def test_run_otc_experiment_can_choose_random_layers(monkeypatch: pytest.MonkeyPatch) -> None:
     """Check OTC random layer selection picks valid indexes for both sources.
 

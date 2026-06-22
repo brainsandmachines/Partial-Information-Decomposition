@@ -115,8 +115,9 @@ File description: Helpers for selecting model layers globally, by index, or voxe
 | `random_layer_selection (line 30)` | n_layers | `layer_idx` | Choose a random layer index from the available layers. |
 | `specific_index_layer_selection (line 44)` | layer_names, index | `layer_names[index]` | Choose a specific layer value from the available layer list by index. |
 | `voxel_best_layer (line 65)` | voxel_index: int=None, index_layer: int=None, path_to_results: str=None | Annotated: `dict` | Choose the best model layer for one voxel, or a representative voxel for one layer, using a CSV with `voxel_index` and `best_layer_index` columns. |
-| `overall_best_layer (line 126)` | model_name: str, path_to_results: str | Annotated: `dict` | Choose the overall best layer index for one model from an OTC CSV with `model_name` and `best_layer_index`. |
-| `_read_csv_rows (line 161)` | path_to_results: str | Annotated: `tuple[list[dict[str, str]], set[str]]` | Read CSV rows and columns for layer-selection helpers without importing pandas. |
+| `overall_best_layer (line 126)` | model_name: str, path_to_results: str | Annotated: `dict` | Choose the overall best layer index for one model from an OTC CSV with `model_name` and `best_layer_index`, stripping CSV/model-name whitespace before comparison. |
+| `_read_csv_rows (line 165)` | path_to_results: str | Annotated: `tuple[list[dict[str, str]], set[str]]` | Read CSV rows and columns for layer-selection helpers without importing pandas. |
+| `_normalize_csv_value (line 180)` | value | Annotated: `str` | Normalize CSV/config values to stripped strings for exact lookup comparisons. |
 
 ### `pipeline/pipeline_utils.py`
 

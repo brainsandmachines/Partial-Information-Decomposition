@@ -145,7 +145,11 @@ def overall_best_layer(model_name: str, path_to_results: str) -> dict:
             print(f"Missing required columns in results CSV: {sorted(missing_columns)}")
             return {'model_name': model_name, 'l': None}
 
-        model_rows = [row for row in rows if row['model_name'] == model_name]
+        normalized_model_name = _normalize_csv_value(model_name)
+        model_rows = [
+            row for row in rows
+            if _normalize_csv_value(row['model_name']) == normalized_model_name
+        ]
         if not model_rows:
             print(f"No overall best layer found for model {model_name}")
             return {'model_name': model_name, 'l': None}
@@ -173,6 +177,19 @@ def _read_csv_rows(path_to_results: str) -> tuple[list[dict[str, str]], set[str]
         rows = list(reader)
         columns = set(reader.fieldnames or [])
     return rows, columns
+
+    
+def _normalize_csv_value(value) -> str:
+    """Normalize CSV values before exact lookup comparisons.
+
+    Inputs:
+        value: any, CSV or config value to compare.
+
+    Output:
+        normalized_value: str, stripped string value.
+    """
+
+    return str(value).strip()
 
     
 
