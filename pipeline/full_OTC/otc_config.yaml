@@ -16,11 +16,11 @@ target_kwargs:
   n_images: 8000
 
 sources_kwargs:
-  model_name_1: dino_resnet50_selfsupervised
+  model_name_1: levit_128_classification
   model_name_2: ResNet50-SimCLR_selfsupervised
 
 choose_layer_kwargs:
-  path_to_results: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
+  path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
 
 feature_extraction_kwargs:
   batch_size_process: 100
@@ -29,13 +29,13 @@ feature_extraction_kwargs:
 preprocess_kwargs: {}
 
 feature_manipulation_kwargs:
-  n_components: 100
+  n_components: 200
 
 pid_kwargs:
   method: tilde
   rng_seed: 56
   config:
     device: cuda
-    bias_correction: true
+    bias_correction: True
 
 report_kwargs: {}
