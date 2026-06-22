@@ -16,6 +16,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 
 import pipeline.voxel_experiments.voxel_experiment as voxel_experiment
+from pipeline.pipeline_utils import pid_calc_adapter
 
 
 def dummy_target(voxel_index: int, target_offset: float = 0.0) -> dict[str, Any]:
@@ -357,7 +358,7 @@ def test_pid_calc_adapter_uses_lazy_import_and_returns_pid_mi(monkeypatch: pytes
     fake_module.pid_calc = fake_pid_calc
     monkeypatch.setitem(sys.modules, "Partial_Information_Decomposition.PID_calc", fake_module)
 
-    result = voxel_experiment.pid_calc_adapter(
+    result = pid_calc_adapter(
         target=[1.0, 2.0],
         source_1=[[3.0], [4.0]],
         source_2=[[5.0], [6.0]],

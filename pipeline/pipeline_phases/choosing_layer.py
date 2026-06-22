@@ -5,13 +5,12 @@ import numpy as np
 import yaml
 import sys
 from pathlib import Path
-import pandas as pd
 
 """"A file with functions help to choose the layer to each source"""
 
 
 def choose_layer_function(layer_func_name:str):
-    LAYER_FUNC_NAME = ['random_layer_selection', 'specific_index_layer_selection', 'voxel_best_layer']
+    LAYER_FUNC_NAME = ['random_layer_selection', 'specific_index_layer_selection', 'voxel_best_layer', 'overall_best_layer']
 
 
     if layer_func_name not in LAYER_FUNC_NAME:
@@ -24,6 +23,8 @@ def choose_layer_function(layer_func_name:str):
             return specific_index_layer_selection
         elif layer_func_name == 'voxel_best_layer':
             return voxel_best_layer
+        elif layer_func_name == 'overall_best_layer':
+            return overall_best_layer
         
     
 def random_layer_selection(n_layers):
@@ -84,42 +85,94 @@ def voxel_best_layer(voxel_index: int = None, index_layer: int = None, path_to_r
         return {'v': None, 'l': None}
 
     try:
-        df = pd.read_csv(path_to_results)
+        rows, columns = _read_csv_rows(path_to_results)
         required_columns = {'voxel_index', 'best_layer_index'}
-        missing_columns = required_columns.difference(df.columns)
+        missing_columns = required_columns.difference(columns)
         if missing_columns:
             print(f"Missing required columns in results CSV: {sorted(missing_columns)}")
             return {'v': None, 'l': None}
 
         if voxel_index is not None:
-            voxel_row = df[df['voxel_index'] == voxel_index]
-            if voxel_row.empty:
+            voxel_rows = [row for row in rows if int(row['voxel_index']) == int(voxel_index)]
+            if not voxel_rows:
                 print(f"No results found for voxel index {voxel_index}")
                 return {'v': None, 'l': None}
-            index_layer = voxel_row['best_layer_index'].iloc[0]
+            index_layer = voxel_rows[0]['best_layer_index']
 
         elif index_layer is not None:
-            layer_row = df[df['best_layer_index'] == index_layer]
-            if layer_row.empty:
+            layer_rows = [row for row in rows if int(row['best_layer_index']) == int(index_layer)]
+            if not layer_rows:
                 print(f"No results found for layer index {index_layer}")
                 return {'v': None, 'l': None}
-            voxel_index = layer_row['voxel_index'].iloc[0]
+            voxel_index = layer_rows[0]['voxel_index']
 
         else:
             print("No voxel index or layer index provided. Choosing random layer.")
-            unique_layers = df['best_layer_index'].dropna().unique()
+            unique_layers = sorted({row['best_layer_index'] for row in rows if row.get('best_layer_index') not in (None, '')})
             if len(unique_layers) == 0:
                 print("No layer indexes found in results CSV.")
                 return {'v': None, 'l': None}
             index_layer = np.random.choice(unique_layers)
-            layer_row = df[df['best_layer_index'] == index_layer]
-            voxel_index = layer_row['voxel_index'].iloc[0]
+            layer_rows = [row for row in rows if row['best_layer_index'] == str(index_layer)]
+            voxel_index = layer_rows[0]['voxel_index']
 
     except Exception as e:
         print(f"Error loading best layer selection results: {e}")
         return {'v': None, 'l': None}
 
     return {'v': int(voxel_index), 'l': int(index_layer)}
+
+    
+def overall_best_layer(model_name: str, path_to_results: str) -> dict:
+    """Choose the overall best layer index for one model from an OTC CSV.
+
+    Inputs:
+        model_name: str, source model name to look up in the CSV.
+        path_to_results: str, path to a CSV file with columns 'model_name' and
+            'best_layer_index'.
+
+    Output:
+        best_layer: dict, contains 'model_name' and 'l' with the selected layer
+            index. Missing or failed lookups return {'model_name': model_name,
+            'l': None}.
+    """
+
+    try:
+        rows, columns = _read_csv_rows(path_to_results)
+        required_columns = {'model_name', 'best_layer_index'}
+        missing_columns = required_columns.difference(columns)
+        if missing_columns:
+            print(f"Missing required columns in results CSV: {sorted(missing_columns)}")
+            return {'model_name': model_name, 'l': None}
+
+        model_rows = [row for row in rows if row['model_name'] == model_name]
+        if not model_rows:
+            print(f"No overall best layer found for model {model_name}")
+            return {'model_name': model_name, 'l': None}
+        index_layer = model_rows[0]['best_layer_index']
+
+    except Exception as e:
+        print(f"Error loading overall best layer results: {e}")
+        return {'model_name': model_name, 'l': None}
+
+    return {'model_name': model_name, 'l': int(index_layer)}
+
+    
+def _read_csv_rows(path_to_results: str) -> tuple[list[dict[str, str]], set[str]]:
+    """Read CSV rows and column names for layer-selection helpers.
+
+    Inputs:
+        path_to_results: str, path to a CSV file.
+
+    Output:
+        rows_and_columns: tuple, list of row dictionaries and set of column names.
+    """
+
+    with open(path_to_results, "r", newline="") as csv_file:
+        reader = csv.DictReader(csv_file)
+        rows = list(reader)
+        columns = set(reader.fieldnames or [])
+    return rows, columns
 
     
 
