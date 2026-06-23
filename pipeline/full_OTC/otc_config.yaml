@@ -13,7 +13,7 @@ target_kwargs:
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
   pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
   neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
-  n_images: 8000
+  n_images: 1000
 
 sources_kwargs:
   model_name_1: levit_128_classification
@@ -29,7 +29,10 @@ feature_extraction_kwargs:
 preprocess_kwargs: {}
 
 feature_manipulation_kwargs:
-  n_components: 200
+  n_components_source_1: 130
+  n_components_source_2: 120
+  n_components_target: 100
+
 
 pid_kwargs:
   method: tilde

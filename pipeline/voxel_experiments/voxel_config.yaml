@@ -36,7 +36,7 @@ preprocess_kwargs: {}
 feature_manipulation_kwargs:
   n_components_source_1: 100
   n_components_source_2: 100
-  n_components_target: 100
+  n_components_target: 1
 
 pid_kwargs:
   method: tilde

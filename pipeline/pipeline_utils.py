@@ -307,12 +307,25 @@ def pca_each_source(target: Any, source_1: Any, source_2: Any, n_components_sour
         reduced_sources: tuple, PCA-reduced source_1 and source_2.
     """
 
+    if n_components_source_1 is not None:
+        prj_source1 = pca_projection(source_1, n_components=int(n_components_source_1))
+    else:
+        prj_source1 = source_1
 
+    if n_components_source_2 is not None:
+        prj_source2 = pca_projection(source_2, n_components=int(n_components_source_2))
+    else:
+        prj_source2 = source_2
+
+    if n_components_target is not None:
+        prj_target = pca_projection(target, n_components=int(n_components_target))
+    else:
+        prj_target = target
 
     return (
-        pca_projection(source_1, n_components=int(n_components_source_1)),
-        pca_projection(source_2, n_components=int(n_components_source_2)),
-        pca_projection(target, n_components=int(n_components_target))
+        prj_source1,
+        prj_source2,
+        prj_target
     )
 
 
