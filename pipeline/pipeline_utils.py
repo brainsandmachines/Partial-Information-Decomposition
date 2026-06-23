@@ -9,7 +9,7 @@ import numpy as np
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
-
+from pipeline.pipeline_phases.feature_manipulations import pca_projection
 PipelineFunction = Callable[..., Any]
 
 
@@ -294,10 +294,11 @@ def nsd_feature_extraction(
     )
 
 
-def pca_each_source(source_1: Any, source_2: Any, n_components: int) -> tuple[Any, Any]:
+def pca_each_source(target: Any, source_1: Any, source_2: Any, n_components_source_1: int, n_components_source_2: int,n_components_target: int) -> tuple[Any, Any]:
     """Apply PCA separately to source_1 and source_2.
 
     Inputs:
+        target: any, target feature matrix.
         source_1: any, first source feature matrix.
         source_2: any, second source feature matrix.
         n_components: int, number of PCA components to keep for each source.
@@ -306,11 +307,12 @@ def pca_each_source(source_1: Any, source_2: Any, n_components: int) -> tuple[An
         reduced_sources: tuple, PCA-reduced source_1 and source_2.
     """
 
-    from pipeline.pipeline_phases.feature_manipulations import pca_projection
+
 
     return (
-        pca_projection(source_1, n_components=int(n_components)),
-        pca_projection(source_2, n_components=int(n_components)),
+        pca_projection(source_1, n_components=int(n_components_source_1)),
+        pca_projection(source_2, n_components=int(n_components_source_2)),
+        pca_projection(target, n_components=int(n_components_target))
     )
 
 

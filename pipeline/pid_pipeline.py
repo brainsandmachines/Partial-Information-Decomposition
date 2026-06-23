@@ -150,7 +150,7 @@ class PIDPipeline:
             )
 
         if self.functions.feature_manipulation is not None:
-            source_1, source_2 = self.functions.feature_manipulation(
+            target, source_1, source_2 = self.functions.feature_manipulation(target,
                 source_1,
                 source_2,
                 **(feature_manipulation_kwargs or {}),
