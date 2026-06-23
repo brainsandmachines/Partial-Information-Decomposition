@@ -18,6 +18,7 @@ from pipeline.pipeline_utils import (
     voxel_best_layer_for_sources,
 )
 
+from pipeline.pipeline_phases.sources_target_features import prepare_target_for_voxel
 
 def run_voxel_experiment(config: dict[str, Any]) -> dict[str, Any]:
     """Run one voxel experiment from an already-loaded config dictionary.
@@ -64,7 +65,6 @@ def nsd_voxel_target(
     if voxel_index is None:
         raise ValueError("target_kwargs['voxel_index'] must be an int for run_voxel_experiment.")
 
-    from pipeline.pipeline_phases.sources_target_features import prepare_target_for_voxel
 
     target_context = prepare_target_for_voxel(
         voxel_index=int(voxel_index),
@@ -92,8 +92,8 @@ def _choose_layer_kwargs(config: dict[str, Any]) -> dict[str, Any]:
     """
 
     choose_layer_kwargs = dict(config.get("choose_layer_kwargs", {}))
-    if config["functions"].get("choose_layer") == "voxel_best_layer":
-        choose_layer_kwargs.setdefault("voxel_index", config["target_kwargs"]["voxel_index"])
+    # if config["functions"].get("choose_layer") == "voxel_best_layer":
+    #     choose_layer_kwargs.setdefault("voxel_index", config["target_kwargs"]["voxel_index"])
     return choose_layer_kwargs
 
 

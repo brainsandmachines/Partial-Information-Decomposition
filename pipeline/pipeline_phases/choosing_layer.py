@@ -101,6 +101,8 @@ def voxel_best_layer(voxel_index: int = None, index_layer: int = None, path_to_r
 
     return {'v': int(voxel_index), 'l': int(index_layer)}
 
+
+
     
 def overall_best_layer(model_name: str, path_to_results: str) -> dict:
     """Choose the overall best layer index for one model from an OTC CSV.

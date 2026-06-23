@@ -8,6 +8,7 @@ from typing import Any, Callable
 import numpy as np
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
+from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 
 PipelineFunction = Callable[..., Any]
 
@@ -198,7 +199,8 @@ def random_layer_selection_for_sources(
 
 def voxel_best_layer_for_sources(
     sources: dict[str, dict[str, Any]],
-    voxel_index: int,
+    X1_index: int,
+    X2_index: int,
     X1_path_to_results: str | Path,
     X2_path_to_results: str | Path,
 ) -> dict[str, int]:
@@ -220,8 +222,8 @@ def voxel_best_layer_for_sources(
     from pipeline.pipeline_phases.choosing_layer import voxel_best_layer
 
     selected_layers = {
-        "X1": voxel_best_layer(voxel_index=int(voxel_index), path_to_results=str(X1_path_to_results)),
-        "X2": voxel_best_layer(voxel_index=int(voxel_index), path_to_results=str(X2_path_to_results)),
+        "X1": voxel_best_layer(voxel_index=int(X1_index), path_to_results=str(X1_path_to_results)),
+        "X2": voxel_best_layer(voxel_index=int(X2_index), path_to_results=str(X2_path_to_results)),
     }
     missing_sources = [source_name for source_name, result in selected_layers.items() if result["l"] is None]
     if missing_sources:
@@ -245,7 +247,6 @@ def overall_best_layer_for_sources(
         selected_layers: dict, best layer indexes under "X1" and "X2".
     """
 
-    from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 
     selected_layers: dict[str, int] = {}
     for source_name in ("X1", "X2"):
