@@ -2,7 +2,6 @@ import torch
 import numpy as np
 from pathlib import Path
 import sys
-import yaml
 
 
 repo_root = Path(__file__).resolve().parents[1]
@@ -18,22 +17,6 @@ for path in (repo_root, external_root):
  n_project function or PCA or ICA etc..."""
 
 
-def choose_manipulation_function(manip_func_name:str):
-    MANIP_FUNC_NAME = ['pca_projection', 'jl_projection', 'ica_projection', 'cca_projection']
-
-    if manip_func_name not in MANIP_FUNC_NAME:
-        raise ValueError(f"Invalid manipulation function name: {manip_func_name}. Must be one of {MANIP_FUNC_NAME}.")
-    else:
-        if manip_func_name == 'pca_projection':
-            return pca_projection
-        elif manip_func_name == 'jl_projection':
-            return jl_projection
-        elif manip_func_name == 'ica_projection':
-            return ica_projection
-        elif manip_func_name == 'cca_projection':
-            return cca_projection
-        
-        
 def pca_projection(features, n_components):
     """Apply PCA projection to reduce dimensionality of features.
     Input: 
@@ -85,19 +68,6 @@ def jl_projection(features, n_samples, eps=0.1, jl_dim=None):
     
     return ft_reduced
 
-
-def ica_projection(features):
-    """Placeholder for ICA feature reduction.
-
-    Input:
-        - features: numpy array or torch tensor of shape (n_samples, n_features)
-
-    Output:
-        - Raises NotImplementedError because ICA reduction is not implemented yet.
-    """
-    raise NotImplementedError("ica_projection is not implemented yet.")
-
-
 def cca_projection(features1, features2, n_components):
     """Apply Canonical Correlation Analysis (CCA) to find linear combinations of two sets of features that are maximally correlated.
     Input: 
@@ -128,94 +98,3 @@ def cca_projection(features1, features2, n_components):
     cca = CCA(n_components=n_components)
     X1_c, X2_c = cca.fit_transform(X_scaled, Y_scaled)
     return X1_c, X2_c
-
-
-def run_feature_reduction_smoke(config_path: Path | str = repo_root / "pipeline" / "smoke_example.yaml") -> dict:
-    """Run a small smoke test for the feature reduction functions using source features from the real-data smoke config.
-
-    Input:
-        - config_path: Path or str, path to the YAML config used by the source/target feature smoke example.
-
-    Output:
-        - results: dict, mapping each reduction name to its status and output shape, with printed diagnostics.
-    """
-
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
-
-    try:
-        from pipeline.pipeline_phases.sources_target_features import prepare_sources, prepare_target, feature_extraction
-    except Exception as exc:
-        raise RuntimeError(
-            "Could not import sources_target_features. Check the h5py/numpy environment and the source smoke config."
-        ) from exc
-
-    sources_config = config["sources"]
-    target_config = config["target"]
-    images_config = config["images"]
-    paths_config = config["paths"]
-
-    nsd_root = Path(paths_config["NSD_ROOT"])
-    hdf_path = nsd_root / Path(paths_config["HDF_PATH"])
-    pkl_info_path = nsd_root / Path(paths_config["PKL_INFO_PATH"])
-    neural_data_path = Path(paths_config["NEURAL_DATA_PATH"]) / f"{target_config['target_name']}_{target_config['betas_roi']}_betas_per_stimulus.zarr"
-
-    target = prepare_target(hdf_path, pkl_info_path, neural_data_path)
-    sources = prepare_sources(sources_config["source1_name"], sources_config["source2_name"])
-
-    n_debug_images = int(images_config["N_DEBUG_IMAGES"])
-    batch_size_process = int(images_config["BATCH_SIZE_PROCESS"])
-    batch_size_dataloader = int(images_config["BATCH_SIZE_DATALOADER"])
-    ids = target["image_ids_for_subj"][:n_debug_images].astype("int64")
-    y = target["neural_data"][:n_debug_images]
-
-    layer1 = sources_config.get("DEBUG_LAYER_1") if sources_config.get("DEBUG_LAYER_1") is None else sources["X1_context"]["layers_ordered"][0]
-    layer2 = sources_config.get("DEBUG_LAYER_2") if sources_config.get("DEBUG_LAYER_2") is None else sources["X2_context"]["layers_ordered"][0]
-    x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], batch_size_process, batch_size_dataloader)
-    x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], batch_size_process, batch_size_dataloader)
-
-    pca_components = images_config['N_DEBUG_IMAGES'] // 2  # or any other number <= n_debug_images
-    jl_dim = max(1, min(2, x1.shape[1]))
-    cca_components = images_config['N_DEBUG_IMAGES'] // 2  # or any other number <= n_debug_images
-
-    results = {
-        "inputs": {
-            "X1": tuple(x1.shape),
-            "X2": tuple(x2.shape),
-            "T": tuple(y.shape),
-            "layer1": layer1,
-            "layer2": layer2,
-        }
-    }
-
-    pca_x1 = pca_projection(x1, pca_components)
-    results["pca_projection"] = {"status": "ok", "shape": tuple(pca_x1.shape)}
-
-    jl_x1 = jl_projection(torch.as_tensor(x1, dtype=torch.float32), n_samples=x1.shape[0], jl_dim=jl_dim)
-    results["jl_projection"] = {"status": "ok", "shape": tuple(jl_x1.shape)}
-
-    # cca_x1, cca_x2 = cca_projection(x1, x2, cca_components)
-    # results["cca_projection"] = {"status": "ok", "X1_shape": tuple(cca_x1.shape), "X2_shape": tuple(cca_x2.shape)} -- > Exception has occurred: _ArrayMemoryError Unable to allocate 1.13 TiB for an array with shape (193600, 802816) and data type float64
- 
-    try:
-        ica_projection(x1)
-    except NotImplementedError as exc:
-        results["ica_projection"] = {"status": "skipped", "reason": str(exc)}
-
-    print("Feature reduction smoke test")
-    print(f"inputs: X1={x1.shape}, X2={x2.shape}, T={y.shape}")
-    print(f"pca_projection: {results['pca_projection']}")
-    print(f"jl_projection: {results['jl_projection']}")
-    #print(f"cca_projection: {results['cca_projection']}")
-    print(f"ica_projection: {results['ica_projection']}")
-    return results
-
-
-if __name__ == "__main__":
-    config_arg = Path(sys.argv[1]) if len(sys.argv) > 1 else repo_root / "pipeline" / "smoke_example.yaml"
-    run_feature_reduction_smoke(config_arg)
-
-
-
-
-

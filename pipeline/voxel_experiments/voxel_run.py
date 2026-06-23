@@ -1,20 +1,12 @@
-import torch
-import numpy as np 
 import yaml
 from pathlib import Path
 import sys
-from functools import partial
+
 root = Path(__file__).resolve().parents[2]
-sys.path.append(str(root)) 
+if str(root) not in sys.path:
+    sys.path.insert(0, str(root))
 
-from voxel_experiment import run_voxel_experiment
-from pipeline_phases import report_results
-
-
-
-
-
-
+from pipeline.voxel_experiments.voxel_experiment import run_voxel_experiment
 
 if __name__ == "__main__":
     

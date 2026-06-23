@@ -111,13 +111,12 @@ File description: Helpers for selecting model layers globally, by index, or voxe
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `choose_layer_function (line 12)` | layer_func_name: str | No annotation; returns callable. | Resolve a layer-selection helper name, including random, specific index, voxel best, and overall best. |
-| `random_layer_selection (line 30)` | n_layers | `layer_idx` | Choose a random layer index from the available layers. |
-| `specific_index_layer_selection (line 44)` | layer_names, index | `layer_names[index]` | Choose a specific layer value from the available layer list by index. |
-| `voxel_best_layer (line 65)` | voxel_index: int=None, index_layer: int=None, path_to_results: str=None | Annotated: `dict` | Choose the best model layer for one voxel, or a representative voxel for one layer, using a CSV with `voxel_index` and `best_layer_index` columns. |
-| `overall_best_layer (line 127)` | model_name: str, path_to_results: str | Annotated: `dict` | Choose the overall best layer index for one model from an OTC CSV with `model_name` and `best_layer_index`, normalizing whitespace and invisible format characters before comparison. |
-| `_read_csv_rows (line 165)` | path_to_results: str | Annotated: `tuple[list[dict[str, str]], set[str]]` | Read CSV rows and columns for layer-selection helpers without importing pandas. |
-| `_normalize_csv_value (line 181)` | value | Annotated: `str` | Normalize CSV/config values to stripped strings without invisible format characters for exact lookup comparisons. |
+| `random_layer_selection (line 10)` | n_layers | `layer_idx` | Choose a random layer index from the available layers. |
+| `specific_index_layer_selection (line 24)` | layer_names, index | `layer_names[index]` | Choose a specific layer value from the available layer list by index. |
+| `voxel_best_layer (line 45)` | voxel_index: int=None, index_layer: int=None, path_to_results: str=None | Annotated: `dict` | Choose the best model layer for one voxel, or a representative voxel for one layer, using a CSV with `voxel_index` and `best_layer_index` columns. |
+| `overall_best_layer (line 107)` | model_name: str, path_to_results: str | Annotated: `dict` | Choose the overall best layer index for one model from an OTC CSV with `model_name` and `best_layer_index`, normalizing whitespace and invisible format characters before comparison. |
+| `_read_csv_rows (line 145)` | path_to_results: str | Annotated: `tuple[list[dict[str, str]], set[str]]` | Read CSV rows and columns for layer-selection helpers without importing pandas. |
+| `_normalize_csv_value (line 161)` | value | Annotated: `str` | Normalize CSV/config values to stripped strings without invisible format characters for exact lookup comparisons. |
 
 ### `pipeline/pipeline_utils.py`
 
@@ -125,6 +124,7 @@ File description: Shared adapters and helpers for config-driven PID experiment r
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
+| `choose_random_sources (line 15)` | sources_list: list[str], size: int=2, replace: bool=False | Annotated: `np.ndarray` | Randomly select source names from a list; retained for user-directed source choice experiments. |
 | `run_configured_pid_pipeline (line 31)` | config: dict[str, Any], function_registry: dict[str, PipelineFunction], choose_layer_kwargs: dict[str, Any] \| None=None | Annotated: `dict[str, Any]` | Resolve configured functions, build `PIDPipeline`, pass kwargs sections into `PIDPipeline.run`, and return the context. |
 | `pipeline_functions_from_config (line 64)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction] | Annotated: `PIDPipelineFunctions` | Resolve configured function names into the dataclass consumed by `PIDPipeline`. |
 | `resolve_pipeline_function (line 91)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction], step_name: str, required: bool | Annotated: `PipelineFunction \| None` | Resolve one configured function name from a runner registry. |
@@ -138,6 +138,13 @@ File description: Shared adapters and helpers for config-driven PID experiment r
 | `pca_each_source (line 292)` | source_1: Any, source_2: Any, n_components: int | Annotated: `tuple[Any, Any]` | Apply PCA separately to X1 and X2. |
 | `pid_calc_adapter (line 312)` | target: Any, source_1: Any, source_2: Any, method: str, config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | Annotated: `dict[str, Any]` | Lazily import `pid_calc`, coerce T/X1/X2 to 2D tensors, fill PID dimensions, and return `pid`, `mi`, and `method`. |
 | `print_pid_mi_adapter (line 361)` | pid_results: dict[str, Any], context: dict[str, Any], **report_kwargs: Any | Annotated: `Any` | Call the existing PID/MI print helper on `pid_calc_adapter` output. |
+| `_as_2d_tensor (line 383)` | value: Any | Annotated: `Any` | Convert samples to a 2D torch tensor for PID calculation. |
+| `_random_layer_index_for_source (line 404)` | sources: dict[str, dict[str, Any]], source_name: str, rng: np.random.Generator | Annotated: `int` | Select one random layer index for one source context. |
+| `_layer_index_values (line 434)` | sources: dict[str, dict[str, Any]], source_name: str, requested_index: int | Annotated: `list[int]` | Create valid index values for specific layer selection. |
+| `_model_name_for_source (line 452)` | sources: dict[str, dict[str, Any]], source_name: str | Annotated: `str` | Read a source model name from a source context. |
+| `_overall_best_layer_model_names (line 469)` | path_to_results: str \| Path | Annotated: `list[str]` | Read model names from an overall best-layer CSV for diagnostics. |
+| `source_context (line 503)` | sources: Any, source_name: str | Annotated: `Any` | Read one source context from the sources object. |
+| `choose_one_layer (line 519)` | layer_func: Callable[..., Any], source_context_value: Any, layer_kwargs: dict[str, Any] | Annotated: `Any` | Adapt a layer-selection callable to a single source context; retained for manual/legacy experiments. |
 
 ### `pipeline/sources_target_features.py`
 
@@ -145,15 +152,12 @@ File description: Builds X1/X2 model feature sources and target neural-data cont
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `prepare_sources (line 22)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict]` | Prepare source model contexts for feature extraction under `X1_context` and `X2_context`. |
-| `prepare_target (line 43)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
-| `prepare_target_for_voxel (line 65)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target context for one voxel by selecting one neural response column. |
-| `make_nsd_dataloader (line 91)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
-| `batching (line 114)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
-| `extract_NSD_model_transform (line 145)` | model, stim_dataset, subj_image_ids | call `make_nsd_dataloader(...)` | Create a full-subject NSD DataLoader using a model's image transforms. |
-| `feature_extraction (line 164)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
-| `features_pipeline (line 217)` | model1, model2, subj_id, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Main function to run the feature extraction pipeline. |
-| `main (line 322)` | No inputs | No explicit return; likely `None` / side effects. | Run a cluster smoke test using constants from `smoke_example.yaml`. |
+| `prepare_sources (line 21)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict]` | Prepare source model contexts for feature extraction under `X1_context` and `X2_context`. |
+| `prepare_target (line 42)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
+| `prepare_target_for_voxel (line 64)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target context for one voxel by selecting one neural response column. |
+| `make_nsd_dataloader (line 90)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
+| `batching (line 113)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
+| `feature_extraction (line 144)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
 
 ### `pipeline/voxel_experiments/voxel_experiment.py`
 

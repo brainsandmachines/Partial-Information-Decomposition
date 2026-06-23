@@ -1,33 +1,11 @@
 import csv
 
-import torch
 import numpy as np
-import yaml
-import sys
 import unicodedata
-from pathlib import Path
 
 """"A file with functions help to choose the layer to each source"""
 
 
-def choose_layer_function(layer_func_name:str):
-    LAYER_FUNC_NAME = ['random_layer_selection', 'specific_index_layer_selection', 'voxel_best_layer', 'overall_best_layer']
-
-
-    if layer_func_name not in LAYER_FUNC_NAME:
-        raise ValueError(f"Invalid layer function name: {layer_func_name}. Must be one of {LAYER_FUNC_NAME}.")
-
-    else:
-        if layer_func_name == 'random_layer_selection':
-            return random_layer_selection
-        elif layer_func_name == 'specific_index_layer_selection':
-            return specific_index_layer_selection
-        elif layer_func_name == 'voxel_best_layer':
-            return voxel_best_layer
-        elif layer_func_name == 'overall_best_layer':
-            return overall_best_layer
-        
-    
 def random_layer_selection(n_layers):
     """Choose a random layer index from the available layers.
     

@@ -2,7 +2,6 @@ import numpy as np
 from pathlib import Path
 import sys
 import time
-import yaml 
 
 repo_root = Path(__file__).resolve().parents[1]
 external_root = repo_root / "external"
@@ -142,25 +141,6 @@ def batching(model_context: dict, batch_start: int, batch_end: int, stim_dataset
     return features_batch
 
 
-def extract_NSD_model_transform(model,stim_dataset,subj_image_ids):
-    """Create a full-subject NSD DataLoader using a model's image transforms.
-    
-    Inputs:
-        model: dict, model context containing an "image_transforms" entry.
-        stim_dataset: h5py.Dataset-like object, dataset containing the stimuli images.
-        subj_image_ids: np.ndarray, ordered image IDs for this subject.
-    
-    Outputs:
-        dataloader: DataLoader, loader over all selected subject images in subj_image_ids order.
-    """
-    return make_nsd_dataloader(
-        model_context=model,
-        stim_dataset=stim_dataset,
-        image_ids=subj_image_ids,
-        batch_size=subj_image_ids.shape[0])
-
-
-
 def feature_extraction(layer_index: int, model_context: dict, subj_image_ids: np.ndarray,
                        stim_dataset, batch_size_process: int, batch_size_dataloader: int = 128) -> np.ndarray:
     """Extract features from the models and the neural data.
@@ -211,136 +191,3 @@ def feature_extraction(layer_index: int, model_context: dict, subj_image_ids: np
     end_extraction = time.perf_counter()  # end timer for feature extraction
     print(f"Feature extraction for model {model_name} layer {layer_name} completed in {end_extraction - start_extraction:.2f} seconds.")
     return model_features
-    
-
-
-def features_pipeline(model1,model2,subj_id,hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> dict:
-    """Main function to run the feature extraction pipeline.
-    
-    Inputs: 
-        model1: str, name of the first model
-        model2: str, name of the second model
-        subj_id: str, subject ID
-        hdf_path: Path, path to the hdf file containing neural data
-        pkl_info_path: Path, path to the pkl file containing info about the neural data
-        neural_data_path: Path, path to the directory containing neural data
-        
-    Outputs: 
-        context = {
-            'sources_context': sources_context,
-            'target_context': target_context
-        }
-        
-        source_context example: {
-            'X1_context': {
-                'model_name': model_name,
-                'model': model,
-                'image_transforms': image_transforms,
-                'layers_ordered': layers_ordered,
-                'dataloader': dataloader,
-                'features': features
-            
-        target_context example: {
-            'neural_data': neural_data,
-            'stim': stim, ------->     Images presented to the subject during the experiment
-            'hdf_file': hdf_file,
-            'image_ids_for_subj': image_ids_for_subj,
-            'shared1000_subj': shared1000_subj
-        }"""
-    
-
-    sources_context = prepare_sources(model_1=model1, model_2=model2)
-    
-    target_context = prepare_target(hdf_path=hdf_path,
-                                    pkl_info_path=pkl_info_path,
-                                    neural_data_path=neural_data_path)
-
-    
-    #NSD batch
-    subj_imgs = target_context["image_ids_for_subj"]
-    stim = target_context["stim"]
-
-    # --- Extract features for a specific layer ---
-    layer_name = "layer3"  # specify the layer to extract features from
-    
-    features_X1 = feature_extraction(layer_name=layer_name, model_context=sources_context['X1_context'],
-                                     subj_image_ids=subj_imgs, stim_dataset=stim, batch_size_process=128)
-    
-    features_X2 = feature_extraction(layer_name=layer_name, model_context=sources_context['X2_context'],
-                                     subj_image_ids=subj_imgs, stim_dataset=stim, batch_size_process=128)
-    
-
-    sources_context['X1_context']['features'] = features_X1
-    sources_context['X2_context']['features'] = features_X2
-
-    return {'sources_context': sources_context, 'target_context': target_context}
-
-
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-print(f"Project root directory: {PROJECT_ROOT}")
-deepdive_path = PROJECT_ROOT / 'third_party' / 'DeepDive' / 'deepdive'
-for path in [deepdive_path, PROJECT_ROOT / 'model_opts']:
-    if str(path) not in sys.path:
-        sys.path.append(str(path))
-
-
-
-with open("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/toy_examples/smoke_example.yaml", "r") as f:
-    config = yaml.safe_load(f)
-
-
-
-
-MODEL_1_NAME = config["sources"]["source1_name"]
-MODEL_2_NAME = config["sources"]["source2_name"]
-DEBUG_LAYER_1 = config["sources"]["DEBUG_LAYER_1"]
-DEBUG_LAYER_2 = config["sources"]["DEBUG_LAYER_2"]
-N_DEBUG_IMAGES = config["images"]["N_DEBUG_IMAGES"]
-BATCH_SIZE_PROCESS = config["images"]["BATCH_SIZE_PROCESS"]
-BATCH_SIZE_DATALOADER = config["images"]["BATCH_SIZE_DATALOADER"]
-
-subject_name = config["target"]["target_name"]
-betas_general_roi = config["target"]["betas_roi"]
-
-# --- Paths and Directories ---
-# NSD data paths
-NSD_ROOT = Path(config["paths"]["NSD_ROOT"])   # Should be modified when running on cluster or locally
-HDF_PATH = NSD_ROOT / Path(config["paths"]["HDF_PATH"])
-PKL_INFO_PATH = NSD_ROOT / Path(config["paths"]["PKL_INFO_PATH"])
-
-# Path to neural data
-NEURAL_DATA_PATH = Path(config["paths"]["NEURAL_DATA_PATH"])
-NEURAL_DATA_PATH = NEURAL_DATA_PATH / f"{subject_name}_{betas_general_roi}_betas_per_stimulus.zarr"
-
-# Directory to save per-voxel results
-per_voxel_results_dir = PROJECT_ROOT / "results/encoding/per_voxel_results"
-per_voxel_results_dir.mkdir(parents=True, exist_ok=True)
-
-
-
-def main():
-    try:
-        """Run a cluster smoke test using the constants above as inputs and printed diagnostics as output."""
-        target = prepare_target(HDF_PATH, PKL_INFO_PATH, NEURAL_DATA_PATH)
-        sources = prepare_sources(MODEL_1_NAME, MODEL_2_NAME)
-        ids = target["image_ids_for_subj"][:N_DEBUG_IMAGES].astype("int64")
-        y = target["neural_data"][:N_DEBUG_IMAGES]
-        assert target["stim"].dtype.kind in "uifb", f"stim must be numeric image data, got {target['stim'].dtype}"
-        layer1 = 0
-        layer2 = 0
-        x1 = feature_extraction(layer1, sources["X1_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
-        x2 = feature_extraction(layer2, sources["X2_context"], ids, target["stim"], BATCH_SIZE_PROCESS, BATCH_SIZE_DATALOADER)
-        print(f"models: Source 1: {MODEL_1_NAME} / Source 2: {MODEL_2_NAME}")
-        print(f"layers: {layer1} / {layer2}")
-        print(f"image_ids: {ids[0]} .. {ids[-1]} ({len(ids)})")
-        print(f"shapes: X1={x1.shape}, X2={x2.shape}, T={y.shape}")
-        assert x1.shape[0] == x2.shape[0] == y.shape[0] == len(ids)
-    except Exception as e:
-        print(f"\nError during feature extraction pipeline: {e}")
-        print(f"\n NOTE!")
-        print(f"\nSmoke Example can be used only when path is knonwn and data is available. Please adjust the paths and constants in debug_sources_target_features_example.py to run the smoke test.\n")
-
-
-if __name__ == "__main__":
-    main()

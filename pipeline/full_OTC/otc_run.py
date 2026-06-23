@@ -8,9 +8,10 @@ from pathlib import Path
 import yaml
 
 root = Path(__file__).resolve().parents[2]
-sys.path.append(str(root))
+if str(root) not in sys.path:
+    sys.path.insert(0, str(root))
 
-from otc_experiment import run_otc_experiment
+from pipeline.full_OTC.otc_experiment import run_otc_experiment
 
 
 if __name__ == "__main__":
