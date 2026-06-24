@@ -323,9 +323,9 @@ def pca_each_source(target: Any, source_1: Any, source_2: Any, n_components_sour
         prj_target = target
 
     return (
+        prj_target,
         prj_source1,
-        prj_source2,
-        prj_target
+        prj_source2
     )
 
 
