@@ -9,3 +9,4 @@ Running as ohadshee from golan.neuro account with golan-neuro QOS
 ------------------------------------
 Tue 23 Jun 2026 10:14:10 IDT
  STARTING JOB WITH THE COMMAND:  sleep 600 
+[2026-06-23T12:14:42.102] error: *** JOB 18347059 ON ise-6000p-01 CANCELLED AT 2026-06-23T12:14:42 DUE TO TIME LIMIT ***

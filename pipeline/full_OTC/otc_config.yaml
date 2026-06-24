@@ -16,22 +16,22 @@ target_kwargs:
   n_images: 1000
 
 sources_kwargs:
-  model_name_1: levit_128_classification
+  model_name_1: RN50_clip
   model_name_2: ResNet50-SimCLR_selfsupervised
 
 choose_layer_kwargs:
   path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
 
 feature_extraction_kwargs:
-  batch_size_process: 100
-  batch_size_dataloader: 100
+  batch_size_process: 500
+  batch_size_dataloader: 500
 
 preprocess_kwargs: {}
 
 feature_manipulation_kwargs:
-  n_components_source_1: 130
-  n_components_source_2: 120
-  n_components_target: 100
+  n_components_source_1: 20
+  n_components_source_2: 20
+  n_components_target: 500
 
 
 pid_kwargs:
