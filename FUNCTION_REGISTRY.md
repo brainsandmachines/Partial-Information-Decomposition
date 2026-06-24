@@ -46,8 +46,8 @@ File description: General utility functions shared by analysis and simulation sc
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `check_file_exists (line 21)` | file_path | `new_file_path` | Check if a file exists at the given path. |
-| `check_folder_exists (line 36)` | folder_path | `new_folder_path` | Check if a folder exists at the given path. |
+| `check_file_exists (line 21)` | file_path | `new_file_path` | Check if a file exists at the given path. if it exists change it's name by adding a number at the end. |
+| `check_folder_exists (line 36)` | folder_path | `new_folder_path` | Check if a folder exists at the given path. if it doesn't exist, create it. |
 | `create_permuation (line 51)` | list_to_permute | call `permute_type(...)` | This function take a range of indices and return a permuted version of it. |
 | `standardize_np (line 70)` | X, eps: float=1e-12 | `(X - mean) / (std + eps)` | Column-standardize a NumPy-compatible array. |
 | `Tee class (line 79)` | class | class | Class with methods listed below. |
@@ -55,7 +55,7 @@ File description: General utility functions shared by analysis and simulation sc
 | `Tee.write (line 83)` | self, data | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 | `Tee.flush (line 88)` | self | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 | `check_equal_type_invariance (line 92)` | a, b | Annotated: `bool` | Check if two inputs are equal in value and type invariance. |
-| `meta_exists (line 112)` | meta_data: dict, csv_path | Annotated: `bool` | Check whether a row with identical meta_data already exists in a CSV file. |
+| `meta_exists (line 112)` | meta_data: dict, csv_path | Annotated: `bool` | Check whether a row with identical meta_data already exists in a CSV file. it is invariant to type differences (e.g., int vs float vs str). |
 | `_to_float_or_none (line 148)` | value | None; call `float(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `extract_all_components (line 156)` | ca_results: dict, pid_results: dict, mi_results: dict, global_results: dict=None, betas_dict: dict=None | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
 | `summarize_seed_results (line 188)` | results: list[dict] | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
@@ -64,9 +64,9 @@ File description: General utility functions shared by analysis and simulation sc
 | `save_csv_column_means (line 236)` | csv_path: Path \| str, output_csv_path: Path \| str, decimals: int=6 | Annotated: `pd.DataFrame` | Compute the mean of all numeric CSV columns and save to a new CSV. |
 | `load_csv_and_add_data (line 271)` | csv_path: Path \| str, data: dict, mode: Literal['append_row', 'update_first_row', 'add_columns']='append_row', save_path: Path \| str \| None=None, detect_seed_metadata: bool=True | Annotated: `pd.DataFrame` | Load a CSV, add data to it, and save it back. |
 | `save_seed_summary_table_image (line 339)` | csv_path: Path \| str, image_path: Path \| str, decimals: int=5, dpi: int=300 | Annotated: `Path \| None` | No docstring; infer behavior from name/signature before reuse. |
-| `_normalize_config_value (line 373)` | value | `value`; 'np.random.Generator'; call `str(...)`; ... | No docstring; infer behavior from name/signature before reuse. |
+| `_normalize_config_value (line 373)` | value | `value`; `'np.random.Generator'`; call `str(...)`; call `float(...)`; ... | No docstring; infer behavior from name/signature before reuse. |
 | `get_experiment_name (line 385)` | config: dict | Annotated: `str` | No docstring; infer behavior from name/signature before reuse. |
-| `_parse_csv_numeric (line 399)` | value: str | ''; call `float(...)`; `stripped` | No docstring; infer behavior from name/signature before reuse. |
+| `_parse_csv_numeric (line 399)` | value: str | `''`; call `float(...)`; `stripped` | No docstring; infer behavior from name/signature before reuse. |
 | `get_seed_runs_csv_path (line 411)` | config: dict | Annotated: `Path` | No docstring; infer behavior from name/signature before reuse. |
 | `get_seed_summary_csv_path (line 419)` | config: dict | Annotated: `Path` | No docstring; infer behavior from name/signature before reuse. |
 | `load_seed_run_checkpoint (line 427)` | config: dict | Annotated: `tuple[Path, list[dict], list[str]]` | No docstring; infer behavior from name/signature before reuse. |
@@ -88,87 +88,33 @@ File description: General utility functions shared by analysis and simulation sc
 
 Real-data source/target feature extraction helpers, layer utilities, and agnostic PID comparison runners.
 
-### `pipeline/pid_pipeline.py`
+### `pipeline/analysis/pca_analysis/pca_as_function.py`
 
-File description: Strict orchestrator for one PID pipeline run from user-selected target/source/layer/extraction/PID/report functions.
-
-| Function / Method | Inputs | Outputs | What it does |
-|---|---|---|---|
-| `PIDPipelineFunctions class (line 10)` | class | class | Dataclass storing user-selected functions for target extraction, sources extraction, layer choice, feature extraction, optional preprocessing, optional feature manipulation, PID calculation, and optional reporting. |
-| `PIDPipeline class (line 42)` | class | class | Strict PID pipeline orchestrator that connects the user-provided functions without choosing methods or adapting signatures. |
-| `PIDPipeline.__init__ (line 45)` | self, functions: PIDPipelineFunctions | None | Validate that required pipeline functions are callable and optional functions are callable or None, then store the selected functions. |
-| `PIDPipeline.run (line 85)` | self, *, target_kwargs: dict[str, Any] \| None=None, sources_kwargs: dict[str, Any] \| None=None, choose_layer_kwargs: dict[str, Any] \| None=None, feature_extraction_kwargs: dict[str, Any] \| None=None, preprocess_kwargs: dict[str, Any] \| None=None, feature_manipulation_kwargs: dict[str, Any] \| None=None, pid_kwargs: dict[str, Any] \| None=None, report_kwargs: dict[str, Any] \| None=None | Annotated: `dict[str, Any]` | Run target extraction, source extraction, layer choice, feature extraction, optional preprocessing, optional feature manipulation, PID calculation, and optional reporting; returns the full run context. |
-
-### `pipeline/feature_manipulations.py`
-
-File description: Placeholder module for future feature manipulation helpers.
-
-No functions or methods defined in this file.
-
-### `pipeline/pipeline_phases/choosing_layer.py`
-
-File description: Helpers for selecting model layers globally, by index, or voxel-wise from saved encoding results.
+File description: Python module for pca as function-related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `random_layer_selection (line 10)` | n_layers | `layer_idx` | Choose a random layer index from the available layers. |
-| `specific_index_layer_selection (line 24)` | layer_names, index | `layer_names[index]` | Choose a specific layer value from the available layer list by index. |
-| `voxel_best_layer (line 45)` | voxel_index: int=None, index_layer: int=None, path_to_results: str=None | Annotated: `dict` | Choose the best model layer for one voxel, or a representative voxel for one layer, using a CSV with `voxel_index` and `best_layer_index` columns. |
-| `overall_best_layer (line 107)` | model_name: str, path_to_results: str | Annotated: `dict` | Choose the overall best layer index for one model from an OTC CSV with `model_name` and `best_layer_index`, normalizing whitespace and invisible format characters before comparison. |
-| `_read_csv_rows (line 145)` | path_to_results: str | Annotated: `tuple[list[dict[str, str]], set[str]]` | Read CSV rows and columns for layer-selection helpers without importing pandas. |
-| `_normalize_csv_value (line 161)` | value | Annotated: `str` | Normalize CSV/config values to stripped strings without invisible format characters for exact lookup comparisons. |
+| `pca_as_function (line 29)` | pipeline_config: str \| Path, pca_config: str \| Path | Annotated: `dict[str, Any]` | Run the full-OTC PID experiment from the YAML config beside this file. |
+| `plot_ (line 62)` | results_dict: dict[str, Any], pca_config: str, pipeline_config: str | Annotated: `None` | Plot the results of the PID computation as a function of the number of PCA components. |
 
-### `pipeline/pipeline_utils.py`
+### `pipeline/analysis/pca_analysis/unique_search_pca.py`
 
-File description: Shared adapters and helpers for config-driven PID experiment runners.
+File description: Search source-1 PCA component subsets for source-1 unique PID information.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `choose_random_sources (line 15)` | sources_list: list[str], size: int=2, replace: bool=False | Annotated: `np.ndarray` | Randomly select source names from a list; retained for user-directed source choice experiments. |
-| `run_configured_pid_pipeline (line 31)` | config: dict[str, Any], function_registry: dict[str, PipelineFunction], choose_layer_kwargs: dict[str, Any] \| None=None | Annotated: `dict[str, Any]` | Resolve configured functions, build `PIDPipeline`, pass kwargs sections into `PIDPipeline.run`, and return the context. |
-| `pipeline_functions_from_config (line 64)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction] | Annotated: `PIDPipelineFunctions` | Resolve configured function names into the dataclass consumed by `PIDPipeline`. |
-| `resolve_pipeline_function (line 91)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction], step_name: str, required: bool | Annotated: `PipelineFunction \| None` | Resolve one configured function name from a runner registry. |
-| `validate_pipeline_config_sections (line 120)` | config: dict[str, Any], required_sections: tuple[str, ...] | Annotated: `None` | Validate required config sections. |
-| `nsd_sources (line 136)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Load two source model contexts and expose them under `X1` and `X2` for `PIDPipeline`. |
-| `specific_layer_index (line 153)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Select one configured layer index for each source through the layer-selection helper. |
-| `random_layer_selection_for_sources (line 177)` | sources: dict[str, dict[str, Any]], random_seed: int \| None=None | Annotated: `dict[str, int]` | Select a random valid layer index for each source. |
-| `voxel_best_layer_for_sources (line 199)` | sources: dict[str, dict[str, Any]], voxel_index: int, X1_path_to_results: str \| Path, X2_path_to_results: str \| Path | Annotated: `dict[str, int]` | Select best layer indexes for X1 and X2 from separate per-model voxel CSV files. |
-| `overall_best_layer_for_sources (line 232)` | sources: dict[str, dict[str, Any]], path_to_results: str \| Path | Annotated: `dict[str, int]` | Select overall best layer indexes for X1 and X2 from one all-models OTC CSV. |
-| `nsd_feature_extraction (line 260)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `Any` | Call the existing NSD feature extraction helper for one source and selected layer. |
-| `pca_each_source (line 292)` | source_1: Any, source_2: Any, n_components: int | Annotated: `tuple[Any, Any]` | Apply PCA separately to X1 and X2. |
-| `pid_calc_adapter (line 312)` | target: Any, source_1: Any, source_2: Any, method: str, config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | Annotated: `dict[str, Any]` | Lazily import `pid_calc`, coerce T/X1/X2 to 2D tensors, fill PID dimensions, and return `pid`, `mi`, and `method`. |
-| `print_pid_mi_adapter (line 361)` | pid_results: dict[str, Any], context: dict[str, Any], **report_kwargs: Any | Annotated: `Any` | Call the existing PID/MI print helper on `pid_calc_adapter` output. |
-| `_as_2d_tensor (line 383)` | value: Any | Annotated: `Any` | Convert samples to a 2D torch tensor for PID calculation. |
-| `_random_layer_index_for_source (line 404)` | sources: dict[str, dict[str, Any]], source_name: str, rng: np.random.Generator | Annotated: `int` | Select one random layer index for one source context. |
-| `_layer_index_values (line 434)` | sources: dict[str, dict[str, Any]], source_name: str, requested_index: int | Annotated: `list[int]` | Create valid index values for specific layer selection. |
-| `_model_name_for_source (line 452)` | sources: dict[str, dict[str, Any]], source_name: str | Annotated: `str` | Read a source model name from a source context. |
-| `_overall_best_layer_model_names (line 469)` | path_to_results: str \| Path | Annotated: `list[str]` | Read model names from an overall best-layer CSV for diagnostics. |
-| `source_context (line 503)` | sources: Any, source_name: str | Annotated: `Any` | Read one source context from the sources object. |
-| `choose_one_layer (line 519)` | layer_func: Callable[..., Any], source_context_value: Any, layer_kwargs: dict[str, Any] | Annotated: `Any` | Adapt a layer-selection callable to a single source context; retained for manual/legacy experiments. |
-
-### `pipeline/sources_target_features.py`
-
-File description: Builds X1/X2 model feature sources and target neural-data context for the real-data PID pipeline.
-
-| Function / Method | Inputs | Outputs | What it does |
-|---|---|---|---|
-| `prepare_sources (line 21)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict]` | Prepare source model contexts for feature extraction under `X1_context` and `X2_context`. |
-| `prepare_target (line 42)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
-| `prepare_target_for_voxel (line 64)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target context for one voxel by selecting one neural response column. |
-| `make_nsd_dataloader (line 90)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
-| `batching (line 113)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
-| `feature_extraction (line 144)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
-
-### `pipeline/voxel_experiments/voxel_experiment.py`
-
-File description: Thin config-driven voxel experiment runner that owns voxel target extraction and delegates shared pipeline adapters to `pipeline_utils`.
-
-| Function / Method | Inputs | Outputs | What it does |
-|---|---|---|---|
-| `run_voxel_experiment (line 30)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Validate voxel config, arrange voxel-specific layer kwargs, run the shared configured PID pipeline, and return the context. |
-| `nsd_voxel_target (line 50)` | voxel_index: int, subj_id: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, n_images: int \| None=None | Annotated: `dict[str, Any]` | Load one voxel target using the NSD target helper, optionally trim samples, and expose neural responses under `target`. |
-| `_choose_layer_kwargs (line 92)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Inject `target_kwargs.voxel_index` into `voxel_best_layer` kwargs when needed. |
-| `_validate_config (line 108)` | config: dict[str, Any] | Annotated: `None` | Validate required config sections and enforce integer voxel indexes. |
+| `run_pid_pc_subset_search (line 23)` | target: Any, source_1: Any, source_2: Any, pid_callable: Callable[..., Any] \| None=None, *, cmi_threshold: float=1e-06, unique_threshold: float=1e-06, beam_width: int=5, max_subset_size: int=3, floating_tolerance: float=1e-09, max_runtime_seconds: float=600, rng_seed: int=56, pid_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, use_floating_backward: bool=True | Annotated: `dict[str, Any]` | Run beam search over source_1 PCA columns for source-1 unique PID. |
+| `_as_2d_array (line 148)` | value: Any, name: str | Annotated: `np.ndarray` | Convert one input to a finite non-empty 2D float array. |
+| `_gaussian_cmi_bits (line 163)` | x: np.ndarray, y: np.ndarray, z: np.ndarray, eps: float=1e-10 | Annotated: `float` | Calculate Gaussian conditional MI I(x; y \| z) in bits. |
+| `_conditional_cov (line 180)` | cov_a: np.ndarray, cross_ab: np.ndarray, cov_b: np.ndarray, eps: float | Annotated: `np.ndarray` | Compute covariance of variable a conditioned on variable b. |
+| `_logdet (line 191)` | matrix: np.ndarray, eps: float | Annotated: `float` | Return a stable log determinant for a covariance-like matrix. |
+| `_evaluate_subset (line 204)` | subset: tuple[int, ...], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \| Path \| None, unique_threshold: float, start: float, cmi_score: float \| None | Annotated: `dict[str, Any]` | Evaluate one source_1 PC subset with PIDPipeline and cache the result. |
+| `_floating_backward (line 248)` | row: dict[str, Any], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \| Path \| None, unique_threshold: float, tolerance: float, start: float, max_runtime_seconds: float | Annotated: `dict[str, Any]` | Prune PCs whose removal does not meaningfully reduce unique information. |
+| `_pid_components (line 284)` | pid_result: Any | Annotated: `dict[str, Any]` | Extract a PID component dictionary from common project PID result shapes. |
+| `_to_float (line 300)` | value: Any | Annotated: `float` | Convert numeric scalar-like values to float. |
+| `_top_rows (line 310)` | rows: list[dict[str, Any]], beam_width: int | Annotated: `list[dict[str, Any]]` | Keep highest-unique rows, de-duplicated by subset. |
+| `_append_csv_row (line 321)` | path: str \| Path \| None, subset: tuple[int, ...], start: float, status: str, *, cmi_score: float \| None=None, row: dict[str, Any] \| None=None | Annotated: `None` | Append one compact row to a CSV file, creating the header when needed. |
+| `_toy_pid (line 363)` | target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, **pid_kwargs: Any | Annotated: `dict[str, dict[str, float]]` | Return a tiny Gaussian-CMI-based PID-like result for local smoke runs. |
 
 ### `pipeline/full_OTC/otc_experiment.py`
 
@@ -176,9 +122,128 @@ File description: Thin config-driven full-OTC experiment runner that uses the fu
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `run_otc_experiment (line 29)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Validate full-OTC config, run the shared configured PID pipeline, and return the context. |
-| `nsd_otc_target (line 47)` | hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, subj_id: str \| None=None, voxel_index: int \| None=None, n_images: int \| None=None | Annotated: `dict[str, Any]` | Load the full OTC target matrix, optionally trim samples, ignore voxel-specific config keys, and expose neural responses under `target`. |
-| `_validate_config (line 86)` | config: dict[str, Any] | Annotated: `None` | Validate required config sections and reject voxel-specific best-layer selection. |
+| `run_otc_experiment (line 21)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Run one full-OTC experiment from an already-loaded config dictionary. |
+| `nsd_otc_target (line 39)` | hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, subj_id: str \| None=None, voxel_index: int \| None=None, n_images: int \| None=None | Annotated: `dict[str, Any]` | Load the full OTC target matrix and expose it under the PIDPipeline target key. |
+| `_validate_config (line 78)` | config: dict[str, Any] | Annotated: `None` | Validate the config sections needed to call the full-OTC runner. |
+
+### `pipeline/full_OTC/otc_run.py`
+
+File description: Run the full-OTC PID experiment from the YAML config beside this file.
+
+No functions or methods defined in this file.
+
+### `pipeline/pid_pipeline.py`
+
+File description: Strict orchestrator for one PID pipeline run from user-selected target/source/layer/extraction/PID/report functions.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `PIDPipelineFunctions class (line 10)` | class | class | Store the user-selected functions for one PID pipeline run. |
+| `PIDPipeline class (line 42)` | class | class | Run the PID pipeline by connecting the provided functions in order. |
+| `PIDPipeline.__init__ (line 45)` | self, functions: PIDPipelineFunctions | Annotated: `None` | Create a strict PID pipeline orchestrator. |
+| `PIDPipeline.run (line 85)` | self, *, target_kwargs: dict[str, Any] \| None=None, sources_kwargs: dict[str, Any] \| None=None, choose_layer_kwargs: dict[str, Any] \| None=None, feature_extraction_kwargs: dict[str, Any] \| None=None, preprocess_kwargs: dict[str, Any] \| None=None, feature_manipulation_kwargs: dict[str, Any] \| None=None, pid_kwargs: dict[str, Any] \| None=None, report_kwargs: dict[str, Any] \| None=None | Annotated: `dict[str, Any]` | Run target, sources, layers, features, optional transforms, PID, and report. |
+
+### `pipeline/pipeline_phases/choosing_layer.py`
+
+File description: Helpers for selecting model layers globally, by index, or voxel-wise from saved encoding results.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `random_layer_selection (line 9)` | n_layers | `layer_idx` | Choose a random layer index from the available layers. |
+| `specific_index_layer_selection (line 23)` | layer_names, index | `layer_names[index]` | Choose a specific layer index from the available layers. |
+| `voxel_best_layer (line 44)` | voxel_index: int=None, index_layer: int=None, path_to_results: str=None | Annotated: `dict` | Choose the best model layer for one voxel, or a representative voxel for one layer. |
+| `overall_best_layer (line 107)` | model_name: str, path_to_results: str | Annotated: `dict` | Choose the overall best layer index for one model from an OTC CSV. |
+| `_read_csv_rows (line 146)` | path_to_results: str | Annotated: `tuple[list[dict[str, str]], set[str]]` | Read CSV rows and column names for layer-selection helpers. |
+| `_normalize_csv_value (line 163)` | value | Annotated: `str` | Normalize CSV values before exact lookup comparisons. |
+
+### `pipeline/pipeline_phases/feature_manipulations.py`
+
+File description: Python module for feature manipulations-related project logic.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `pca_projection (line 20)` | features, n_components | `ft_reduced` | Apply PCA projection to reduce dimensionality of features. |
+| `jl_projection (line 38)` | features, n_samples, eps=0.1, jl_dim=None | `ft_reduced` | Apply Johnson-Lindenstrauss projection to reduce dimensionality of features. |
+| `cca_projection (line 71)` | features1, features2, n_components | tuple of 2 values | Apply Canonical Correlation Analysis (CCA) to find linear combinations of two sets of features that are maximally correlated. |
+
+### `pipeline/pipeline_phases/mi_statistics.py`
+
+File description: Python module for mi statistics-related project logic.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `assert_mi (line 13)` | own_mi, pid_mi | `True` | This function checks if the mutual information calculated by the PID method is equal to the mutual information calculated by the own method. |
+
+### `pipeline/pipeline_phases/preprocessing_layer.py`
+
+File description: Python module for preprocessing layer-related project logic.
+
+No functions or methods defined in this file.
+
+### `pipeline/pipeline_phases/report_results.py`
+
+File description: Python module for report results-related project logic.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `print_pid_mi (line 6)` | pid_results, mi_result | No explicit return; likely `None` / side effects. | This functions takes the pid results and the mutual information results and prints them in a nice format. |
+
+### `pipeline/pipeline_phases/sources_target_features.py`
+
+File description: Python module for sources target features-related project logic.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `prepare_sources (line 21)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict]` | Prepare sources for feature extraction. |
+| `prepare_target (line 42)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
+| `prepare_target_for_voxel (line 64)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction for a specific voxel. |
+| `make_nsd_dataloader (line 90)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
+| `batching (line 113)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
+| `feature_extraction (line 144)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
+
+### `pipeline/pipeline_utils.py`
+
+File description: Shared adapters and helpers for config-driven PID experiment runners.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `choose_random_sources (line 18)` | sources_list: list[str], size: int=2, replace: bool=False | Annotated: `np.ndarray` | Randomly select a source from the list of available sources. |
+| `run_configured_pid_pipeline (line 34)` | config: dict[str, Any], function_registry: dict[str, PipelineFunction], choose_layer_kwargs: dict[str, Any] \| None=None | Annotated: `dict[str, Any]` | Run PIDPipeline from a config dictionary and function registry. |
+| `pipeline_functions_from_config (line 67)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction] | Annotated: `PIDPipelineFunctions` | Resolve configured function names into PIDPipelineFunctions. |
+| `resolve_pipeline_function (line 94)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction], step_name: str, required: bool | Annotated: `PipelineFunction \| None` | Resolve one configured pipeline step name from a registry. |
+| `validate_pipeline_config_sections (line 123)` | config: dict[str, Any], required_sections: tuple[str, ...] | Annotated: `None` | Validate that required config sections exist. |
+| `nsd_sources (line 139)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Load two model contexts and expose them under X1 and X2. |
+| `specific_layer_index (line 156)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Select one configured layer index for each source. |
+| `random_layer_selection_for_sources (line 180)` | sources: dict[str, dict[str, Any]], random_seed: int \| None=None | Annotated: `dict[str, int]` | Select a random valid layer index for each source. |
+| `voxel_best_layer_for_sources (line 202)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int, X1_path_to_results: str \| Path, X2_path_to_results: str \| Path | Annotated: `dict[str, int]` | Select each source model's best layer for one voxel index. |
+| `overall_best_layer_for_sources (line 236)` | sources: dict[str, dict[str, Any]], path_to_results: str \| Path | Annotated: `dict[str, int]` | Select each source model's overall best OTC layer from one CSV file. |
+| `nsd_feature_extraction (line 267)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `Any` | Extract features for one NSD source and selected layer. |
+| `pca_each_source (line 299)` | target: Any, source_1: Any, source_2: Any, n_components_source_1: int, n_components_source_2: int, n_components_target: int | Annotated: `tuple[Any, Any]` | Apply PCA separately to source_1 and source_2. |
+| `pid_calc_adapter (line 334)` | target: Any, source_1: Any, source_2: Any, method: str, config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | Annotated: `dict[str, Any]` | Call pid_calc using the strict PIDPipeline array order. |
+| `print_pid_mi_adapter (line 381)` | pid_results: dict[str, Any], context: dict[str, Any], **report_kwargs: Any | Annotated: `Any` | Print PID and MI outputs from pid_calc_adapter. |
+| `_as_2d_tensor (line 399)` | value: Any | Annotated: `Any` | Convert samples to a 2D torch tensor. |
+| `_random_layer_index_for_source (line 420)` | sources: dict[str, dict[str, Any]], source_name: str, rng: np.random.Generator | Annotated: `int` | Select one random layer index for one source context. |
+| `_layer_index_values (line 450)` | sources: dict[str, dict[str, Any]], source_name: str, requested_index: int | Annotated: `list[int]` | Create valid layer-index values for one source. |
+| `_model_name_for_source (line 468)` | sources: dict[str, dict[str, Any]], source_name: str | Annotated: `str` | Read a source model name from a source context. |
+| `_overall_best_layer_model_names (line 485)` | path_to_results: str \| Path | Annotated: `list[str]` | Read model names from an overall best-layer CSV for diagnostics. |
+| `source_context (line 519)` | sources: Any, source_name: str | Annotated: `Any` | Read one source context from the sources object. |
+| `choose_one_layer (line 535)` | layer_func: Callable[..., Any], source_context_value: Any, layer_kwargs: dict[str, Any] | Annotated: `Any` | Choose one layer by adapting to the common layer-selection helper signatures. |
+
+### `pipeline/toy_examples/pid_pipeline_toy_example.py`
+
+File description: Tiny no-data-loading example for debugging the strict PID pipeline flow.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `toy_target_extraction (line 17)` | No inputs | Annotated: `dict[str, Any]` | Create tiny fake target data. |
+| `toy_sources_extraction (line 30)` | model_1: str, model_2: str | Annotated: `dict[str, dict[str, Any]]` | Create tiny fake source contexts with two layers per source. |
+| `toy_choose_layer (line 61)` | sources: dict[str, dict[str, Any]], layer_index: int=0 | Annotated: `dict[str, str]` | Choose one layer for each source by index. |
+| `toy_feature_extraction (line 78)` | source_context: dict[str, Any], layer_name: str, target_context: dict[str, Any] | Annotated: `list[list[float]]` | Read fake features for one selected source layer. |
+| `toy_preprocess (line 98)` | target: list[list[float]], source_1: list[list[float]], source_2: list[list[float]], scale: float=1.0 | Annotated: `tuple[list[list[float]], list[list[float]], list[list[float]]]` | Scale target and source values together as a visible preprocessing step. |
+| `toy_feature_manipulation (line 123)` | source_1: list[list[float]], source_2: list[list[float]], keep_columns: int=1 | Annotated: `tuple[list[list[float]], list[list[float]]]` | Keep the first columns from both source feature matrices. |
+| `toy_pid_calculation (line 145)` | target: list[list[float]], source_1: list[list[float]], source_2: list[list[float]], method_name: str='toy_pid' | Annotated: `dict[str, Any]` | Return a readable dummy PID result from tiny arrays. |
+| `toy_pid_report (line 177)` | pid_results: dict[str, Any], context: dict[str, Any] | Annotated: `str` | Print a compact toy pipeline report. |
+| `main (line 198)` | No inputs | Annotated: `dict[str, Any]` | Run the tiny toy PID pipeline. |
 
 ### `pipeline/toy_examples/voxel_experiment_smoke_example.py`
 
@@ -186,16 +251,58 @@ File description: No-data smoke example for debugging the config-driven voxel ex
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `smoke_voxel_target (line 17)` | voxel_index: int, subj_id: str, n_images: int=3 | Annotated: `dict[str, Any]` | Create a tiny fake voxel target context with `target`, `voxel_index`, `subj_id`, and image IDs. |
-| `smoke_sources (line 38)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Create fake X1/X2 model contexts with two layers and fixed features. |
-| `smoke_choose_layer (line 69)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Return configured fake layer indexes for X1 and X2. |
-| `smoke_feature_extraction (line 85)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], feature_shift: float=0.0 | Annotated: `list[list[float]]` | Read fake source features for the selected layer and align them to target sample count. |
+| `smoke_voxel_target (line 17)` | voxel_index: int, subj_id: str, n_images: int=3 | Annotated: `dict[str, Any]` | Create a tiny fake voxel target context. |
+| `smoke_sources (line 38)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict[str, Any]]` | Create tiny fake source contexts. |
+| `smoke_choose_layer (line 69)` | sources: dict[str, dict[str, Any]], X1_index: int, X2_index: int | Annotated: `dict[str, int]` | Choose fake layer indexes from config. |
+| `smoke_feature_extraction (line 85)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], feature_shift: float=0.0 | Annotated: `list[list[float]]` | Read fake source features for one selected layer. |
 | `smoke_feature_manipulation (line 111)` | source_1: list[list[float]], source_2: list[list[float]], keep_columns: int=1 | Annotated: `tuple[list[list[float]], list[list[float]]]` | Keep the first columns from both fake source matrices. |
-| `smoke_pid_calculation (line 133)` | target: list[list[float]], source_1: list[list[float]], source_2: list[list[float]], method: str='smoke_pid' | Annotated: `dict[str, Any]` | Return deterministic PID-like and MI-like smoke outputs. |
-| `smoke_report (line 167)` | pid_results: dict[str, Any], context: dict[str, Any] | Annotated: `str` | Print a compact smoke report. |
-| `register_smoke_functions (line 188)` | No inputs | Annotated: `None` | Register smoke functions into `PIPELINE_STEP_FUNCTIONS` for this example run. |
-| `smoke_config (line 211)` | No inputs | Annotated: `dict[str, Any]` | Build a YAML-shaped config dictionary for `run_voxel_experiment`. |
-| `main (line 242)` | No inputs | Annotated: `dict[str, Any]` | Register smoke functions and run the voxel experiment smoke config. |
+| `smoke_pid_calculation (line 133)` | target: list[list[float]], source_1: list[list[float]], source_2: list[list[float]], method: str='smoke_pid' | Annotated: `dict[str, Any]` | Return a tiny deterministic PID-like result. |
+| `smoke_report (line 167)` | pid_results: dict[str, Any], context: dict[str, Any] | Annotated: `str` | Print a compact smoke run report. |
+| `register_smoke_functions (line 188)` | No inputs | Annotated: `None` | Register smoke wrapper functions for this example run. |
+| `smoke_config (line 211)` | No inputs | Annotated: `dict[str, Any]` | Create a small YAML-shaped config for run_voxel_experiment. |
+| `main (line 242)` | No inputs | Annotated: `dict[str, Any]` | Run the voxel experiment smoke example. |
+
+### `pipeline/trash/old_middle_man_functions.py`
+
+File description: Deprecated pipeline helpers moved out of the active pipeline.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `prepare_sources_step (line 19)` | prepare_sources: Callable[..., Any] \| None, model_1: str \| None, model_2: str \| None, source_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `Any` | Prepare source contexts when a source-preparation function is provided. |
+| `prepare_target_step (line 46)` | prepare_target: Callable[..., Any] \| None, target_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `Any` | Prepare target context when a target-preparation function is provided. |
+| `target_data_step (line 67)` | target_data: Any, context: dict[str, Any] | Annotated: `Any` | Choose the target samples for PID. |
+| `choose_layers_step (line 86)` | choose_layer: Callable[..., Any] \| None, layer_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `dict[str, Any]` | Choose one layer for each source when a layer-selection function is provided. |
+| `extract_or_use_features_step (line 115)` | extract_features: Callable[..., Any] \| None, source_1_features: Any, source_2_features: Any, feature_extraction_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `dict[str, Any]` | Extract source features or use precomputed source features. |
+| `manipulate_features_step (line 168)` | manipulate_features: Callable[..., Any] \| None, feature_manipulation_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `dict[str, Any]` | Apply an optional feature-manipulation function to source features. |
+| `calculate_pid_step (line 200)` | calculate_pid: Callable[..., Any] \| None, pid_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `Any` | Calculate PID when a PID function is provided. |
+| `report_results_step (line 227)` | report: Callable[..., Any] \| None, report_kwargs: dict[str, Any], context: dict[str, Any] | Annotated: `Any` | Report PID results when a reporting function is provided. |
+| `source_context (line 248)` | sources: Any, source_name: str | Annotated: `Any` | Read one source context from the sources object. |
+| `source_step_kwargs (line 264)` | kwargs: dict[str, Any], source_name: str | Annotated: `dict[str, Any]` | Merge shared and source-specific keyword arguments for one source step. |
+| `call_pid_function (line 282)` | pid_func: Callable[..., Any], target_data: Any, source_1_features: Any, source_2_features: Any, pid_kwargs: dict[str, Any] | Annotated: `Any` | Call a PID function using either local or existing PID_calc-style arguments. |
+| `choose_layer_function (line 310)` | layer_func_name: str | `layer_funcs[layer_func_name]` | Resolve an old layer-selection helper name to a callable. |
+| `choose_manipulation_function (line 338)` | manip_func_name: str | `manip_funcs[manip_func_name]` | Resolve an old feature-manipulation helper name to a callable. |
+| `ica_projection (line 361)` | features | No explicit return; likely `None` / side effects. | Placeholder for ICA feature reduction. |
+| `run_feature_reduction_smoke (line 374)` | config_path: Path \| str | Annotated: `dict` | Run the old feature-reduction smoke test using source features from a YAML config. |
+| `extract_NSD_model_transform (line 441)` | model, stim_dataset, subj_image_ids | call `make_nsd_dataloader(...)` | Create a full-subject NSD DataLoader using a model's image transforms. |
+| `features_pipeline (line 463)` | model1, model2, subj_id, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Run the old source/target feature extraction pipeline. |
+| `smoke_example_config (line 506)` | No inputs | dict (MODEL_1_NAME, MODEL_2_NAME, DEBUG_LAYER_1, DEBUG_LAYER_2, layer_func, manipulation_func, N_DEBUG_IMAGES, BATCH_SIZE_PROCESS...) | Load the old smoke-example configuration. |
+
+### `pipeline/voxel_experiments/voxel_experiment.py`
+
+File description: Thin config-driven voxel experiment runner that owns voxel target extraction and delegates shared pipeline adapters to `pipeline_utils`.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `run_voxel_experiment (line 23)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Run one voxel experiment from an already-loaded config dictionary. |
+| `nsd_voxel_target (line 43)` | voxel_index: int, subj_id: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, n_images: int \| None=None | Annotated: `dict[str, Any]` | Load one voxel target and expose it under the PIDPipeline target key. |
+| `_choose_layer_kwargs (line 84)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Arrange voxel-specific kwargs for the configured choose_layer function. |
+| `_validate_config (line 100)` | config: dict[str, Any] | Annotated: `None` | Validate the config sections needed to call the voxel runner. |
+
+### `pipeline/voxel_experiments/voxel_run.py`
+
+File description: Python module for voxel run-related project logic.
+
+No functions or methods defined in this file.
 
 ## Partial_Information_Decomposition
 
@@ -208,9 +315,9 @@ File description: Main PID dispatcher and wrappers for Idep, Tilde, Delta, Thin 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `pid_calc (line 28)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None | tuple of 2 values | No docstring; infer behavior from name/signature before reuse. |
-| `pid_idep_wrapper (line 53)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. |
-| `pid_tilde_wrapper (line 81)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. |
-| `delta_wrapper (line 119)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. |
+| `pid_idep_wrapper (line 53)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
+| `pid_tilde_wrapper (line 81)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
+| `delta_wrapper (line 119)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
 | `_to_numpy_samples (line 175)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
 | `flow_pid_wrapper (line 185)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
 
@@ -222,14 +329,14 @@ File description: PID-specific covariance, table, plotting, and helper utilities
 |---|---|---|---|
 | `LinearRegression_fit (line 11)` | X, y | `model` | No docstring; infer behavior from name/signature before reuse. |
 | `compute_ridge_cv_r2 (line 25)` | X, y, alphas=None | tuple of 2 values | Compute cross-validated R² using RidgeCV with efficient LOO cross-validation. |
-| `cond_cov (line 61)` | sigma_1, sigma_2, sigma12, sigma21 | `cond_cov` | This function will compute the conditional covariance matrix of two Gaussian variables Sigma_1\|2 = Sigma_1 - Sigma12*inv(Sigma_2)*Sigma21 input: sigma_1,sigma_2 are torch tensors of shape (d,d) d is the dimension of e... |
+| `cond_cov (line 61)` | sigma_1, sigma_2, sigma12, sigma21 | `cond_cov` | This function will compute the conditional covariance matrix of two Gaussian variables Sigma_1\|2 = Sigma_1 - Sigma12*inv(Sigma_2)*Sigma21 |
 | `ledoit_wolf_cov_torch (line 75)` | X: torch.Tensor, assume_centered: bool=False | Annotated: `torch.Tensor` | Fit Ledoit-Wolf on X (N,פ) and return covariance as torch.Tensor on same device/dtype. |
 | `create_cov_matrix (line 87)` | rvs: list=[], verbose=False, Sigma=None, dims: list=None, device='cpu', check_singular=True | `cov_dict` | This function will create the covariance matrix for the three variables M1,M2,T input: M1,M2,T are torch tensors of shape (N,p) rvs is a list of the three variables [M1,M2,T] N is the number of observations, p is the... |
 | `reorder_cov_blocks (line 152)` | Sigma: torch.Tensor, dims: dict[str, int], old_order: list[str], new_order: list[str] | Annotated: `torch.Tensor` | Reorder covariance matrix blocks according to variable names. |
-| `para_create_cov_matrix (line 193)` | dims, Sigmas=None, verbose=False | `cov_dict` | This function will create the covariance matrix for the three variables M1,M2,T output: a len(rvs)*len(rvs)*p covariance matrix |
+| `para_create_cov_matrix (line 193)` | dims, Sigmas=None, verbose=False | `cov_dict` | This function will create the covariance matrix for the three variables M1,M2,T |
 | `old_para_create_cov_matrix (line 241)` | dims, Sigmas=None, verbose=False | `cov_dict` | This function will create the covariance matrix for the three variables M1,M2,T input: M1,M2,T are torch tensors of shape (N,p) rvs is a list of the three variables [M1,M2,T] N is the number of observations, p is the... |
 | `whiten_block (line 290)` | Sigma_xx: torch.Tensor, Sigma_xy: torch.Tensor, Sigma_yy: torch.Tensor | Annotated: `torch.Tensor` | return Ux^{-T} @ Sigma_xy @ Uy^{-1} where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular. |
-| `para_whiten_block (line 307)` | Sigma_xx: torch.Tensor, Sigma_xy: torch.Tensor, Sigma_yy: torch.Tensor | Annotated: `torch.Tensor` | Computes: Ux^{-T} @ Sigma_xy @ Uy^{-1} where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular. |
+| `para_whiten_block (line 307)` | Sigma_xx: torch.Tensor, Sigma_xy: torch.Tensor, Sigma_yy: torch.Tensor | Annotated: `torch.Tensor` | Computes: Ux^{-T} @ Sigma_xy @ Uy^{-1} where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular. Supports batched inputs of shape (N, d, d). |
 | `plot_cov_blocks (line 332)` | cov_dict, x0_dim, x1_dim, x2_dim, *, title='Covariance (block view)', cmap='Blues', vmin=None, vmax=None, fine_grid=False, show_colorbar=True | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 | `standardize (line 373)` | X: torch.Tensor, eps: float=1e-12 | Annotated: `torch.Tensor` | Standardize columns of X to zero mean and unit variance. |
 | `assert_full_rank (line 385)` | X: torch.Tensor, jitter=0 | Annotated: `None` | Assert that the input matrix X is full rank. |
@@ -249,8 +356,8 @@ File description: PID-specific covariance, table, plotting, and helper utilities
 | `plot_all_mi_heatmaps (line 816)` | csv_path, title='Mutual Information Heatmaps', *, n_col='N', p_col='p', figsize=(16, 5), save_path=None, annotate=True, mean_fmt='.2f', std_fmt='.2f', log_scale=False, cmap='viridis', annotation_mode='pm', fontsize=9, aggfunc='mean' | No explicit return; likely `None` / side effects. | Plot theoretical, naive, and bias-corrected MI heatmaps in one figure. |
 | `plot_block_heatmap (line 983)` | csv_path, save_path=None | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 | `anchored_oas_shrinkage (line 1043)` | Sigma_full: torch.Tensor, cov_loo_all: torch.Tensor, n_samples: int | tuple of 2 values | Calculates OAS parameters ONCE on the full matrix, and applies the EXACT SAME linear shrinkage to all LOO matrices. |
-| `oas_cov_torch (line 1084)` | S: torch.Tensor, N: int | Annotated: `torch.Tensor` | Apply Oracle Approximating Shrinkage (OAS) to a covariance matrix. |
-| `residual_rvs (line 1115)` | rv_list: list, predictor_index=0 | list | Given a list of random variables (Torch.Tensors), returns a list where we predict the second rv using the first rv and return the residuls. |
+| `oas_cov_torch (line 1084)` | S: torch.Tensor, N: int | Annotated: `torch.Tensor` | Apply Oracle Approximating Shrinkage (OAS) to a covariance matrix. Requires ONLY the sample covariance matrix S and sample size N. |
+| `residual_rvs (line 1115)` | rv_list: list, predictor_index=0 | list of 2 values | Given a list of random variables (Torch.Tensors), returns a list where we predict the second rv using the first rv and return the residuls. |
 
 ### `Partial_Information_Decomposition/__init__.py`
 
@@ -284,8 +391,8 @@ File description: Python module for heatmap plot-related project logic.
 | `display_p_label (line 230)` | v | call `str(...)`; `f'[{', '.join(map(str, v))}]'` | Pretty display for p values on the y-axis. |
 | `sort_p_index (line 244)` | values | call `sorted(...)`; `v`; call `tuple(...)` | Sort p values numerically when they are tuples like: (dx1, dx2, dt) |
 | `sort_p_index.key (line 250)` | v | `v`; call `tuple(...)` | No docstring; infer behavior from name/signature before reuse. |
-| `optional_pivot_table (line 258)` | df, *, index, columns, values, aggfunc, reference_index, reference_columns | `mat`; None | Build a pivot table for an optional statistic and align it with the mean matrix. |
-| `plot_single_component_heatmap (line 287)` | df, *, pid_ver, component_key, base_title=None, x_col='N', y_col='p', aggfunc='last', cmap='viridis', figsize=(9, 7), save_dir=None, show=True, mean_fmt='.3f', std_fmt='.3f' | tuple of 2 values; None | Plot one heatmap for one PID version and one component. |
+| `optional_pivot_table (line 258)` | df, *, index, columns, values, aggfunc, reference_index, reference_columns | None; `mat` | Build a pivot table for an optional statistic and align it with the mean matrix. |
+| `plot_single_component_heatmap (line 287)` | df, *, pid_ver, component_key, base_title=None, x_col='N', y_col='p', aggfunc='last', cmap='viridis', figsize=(9, 7), save_dir=None, show=True, mean_fmt='.3f', std_fmt='.3f' | None; tuple of 2 values | Plot one heatmap for one PID version and one component. |
 | `plot_pid_and_mi_heatmaps_from_csv (line 508)` | csv_path, *, base_title=None, save_dir=None, pid_versions=None, components=('red', 'unq1', 'unq2', 'syn', 'mi_x1_t', 'mi_x2_t', 'mi_x1x2_t', 'mi_m7', 'mi_m8'), x_col='N', y_col='p', seed=None, aggfunc='last', cmap='viridis', figsize=(9, 7), show=True | `figures` | Read a checkpoint CSV and create heatmaps for PID components and mutual information values. |
 
 ### `Partial_Information_Decomposition/mi_functions.py`
@@ -298,10 +405,10 @@ File description: Mutual information calculations from covariance matrices and r
 | `safe_logdet (line 73)` | A: torch.Tensor | Annotated: `float` | Compute log determinant and raise if matrix is not positive definite. |
 | `np_safe_logdet (line 91)` | A, eps=1e-08 | `val` | Stable logdet for covariance matrices. |
 | `calcualte_mi (line 103)` | config, sigma_dict, term='full' | dict (mi_tri, mi_bi_1, mi_bi_2, nume, deno); dict (term) | This function calculates the tri-variate mutual information using the covariance matrices and the formula MI = 0.5 * (log\|deno_matrix\| - log\|nume_matrix\|) |
-| `calculate_mi_raw (line 129)` | device: torch.device, sigma: torch.Tensor, dims: list | dict (tri_mi, bi_mi_1_t, bi_mi_2_t) | This function calculates the tri-variate or bi-variate mutual information using the covariance matrices without any whitening - in raw mode (: Input: device: torch.device - the device on which to perform the calculati... |
+| `calculate_mi_raw (line 129)` | device: torch.device, sigma: torch.Tensor, dims: list | dict (tri_mi, bi_mi_1_t, bi_mi_2_t) | This function calculates the tri-variate or bi-variate mutual information using the covariance matrices without any whitening - in raw mode (: |
 | `para_calcualte_mi (line 184)` | config, sigma_dict, term='full', assumed_whitened=True | dict (mi_tri, mi_bi_1, mi_bi_2, nume, deno); dict (term) | This function calculates the tri-variate mutual information using the for multiple covariances matrices and the formula MI = 0.5 * (log\|deno_matrix\| - log\|nume_matrix\|) |
-| `calculate_mi_lr (line 215)` | config, sigma_dict | dict (mi_tri, mi_bi_1, mi_bi_2, nume, deno_1, deno_2) | This function calculates the trivarite (X1;X2,T) mutual information using the covaraince matrix especially for functions that use linear regression. |
-| `mi_wrapper (line 252)` | config, sigma_dict, whiten_terms_dict, tri_variate=True | `mi` | This function is a wrapper for the mutual information calculation functions. |
+| `calculate_mi_lr (line 215)` | config, sigma_dict | dict (mi_tri, mi_bi_1, mi_bi_2, nume, deno_1, deno_2) | This function calculates the trivarite (X1;X2,T) mutual information using the covaraince matrix especially for functions that use linear regression. The function above uses matrices that ill-conditioned using linear r... |
+| `mi_wrapper (line 252)` | config, sigma_dict, whiten_terms_dict, tri_variate=True | `mi` | This function is a wrapper for the mutual information calculation functions. It takes in the config and sigma_dict and calls the appropriate function based on the mi_type argument. |
 | `pid_components (line 277)` | pid_config, print_results=False | `pid_dict` | Calculate PID components with the known components. |
 
 ### `Partial_Information_Decomposition/output_utils.py`
@@ -310,7 +417,7 @@ File description: Small output/path helpers shared by PID plotting and simulatio
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `safe_filename (line 4)` | name | call `str(...)` | Return the filename exactly as given. |
+| `safe_filename (line 4)` | name | call `str(...)` | Return the filename exactly as given. Nothing is deleted or replaced. |
 
 ## Partial_Information_Decomposition/Idep
 
@@ -323,12 +430,12 @@ File description: Python module for Idep multivariate gauss-related project logi
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `Idep_multivariate_gauss class (line 29)` | class | class | Class with methods listed below. |
-| `Idep_multivariate_gauss.__init__ (line 30)` | self, config, rng=None, sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None, base_e: bool=True, bias_correction: bool=False | No explicit return; likely `None` / side effects. | Initialize the Idep multivariate gaussian class input: M1,M2,T are torch tensors of shape (N,P) N is the number of observations P is the number of variables in each observation config is a dictionary containing the co... |
-| `Idep_multivariate_gauss.create_model_M (line 126)` | self, block1: Optional[torch.tensor]=None, block2: Optional[torch.tensor]=None, block3: Optional[torch.tensor]=None | Annotated: `torch.tensor` | This function will create the dependency matrix for the given blocks input: block (1,2,3) is a torch tensor of shape (d,d) (Defined byu the paper as P or Q or R or a multiplication of them) output: a torch tensor of s... |
-| `Idep_multivariate_gauss.dependency_matrix (line 150)` | self, constraints: list, cov_matrix: Optional[torch.tensor]=None, cov_dict: Optional[dict]=None | Annotated: `dict` | This function will create the dependency matrix for the given constraint input: cov_matrix is a torch tensor of shape (d,d) d is the dimension of each observation. |
+| `Idep_multivariate_gauss.__init__ (line 30)` | self, config, rng=None, sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None, base_e: bool=True, bias_correction: bool=False | No explicit return; likely `None` / side effects. | Initialize the Idep multivariate gaussian class |
+| `Idep_multivariate_gauss.create_model_M (line 126)` | self, block1: Optional[torch.tensor]=None, block2: Optional[torch.tensor]=None, block3: Optional[torch.tensor]=None | Annotated: `torch.tensor` | This function will create the dependency matrix for the given blocks |
+| `Idep_multivariate_gauss.dependency_matrix (line 150)` | self, constraints: list, cov_matrix: Optional[torch.tensor]=None, cov_dict: Optional[dict]=None | Annotated: `dict` | This function will create the dependency matrix for the given constraint |
 | `Idep_multivariate_gauss.compute_Idep (line 214)` | self | Annotated: `dict` | This function calcualtes the mutual information for a given covariance matrix - U models in the lattice |
 | `Idep_multivariate_gauss.pid_values (line 261)` | self, unique_1, unique_2 | `self.PID_values` | This function will compute the PID values using the I_dep values input: unique_0, unique_1 are the unique informations for source 0 and source 1 output: a dictionary with the PID values keys: 'red', 'unq1', 'unq2', 'syn' |
-| `Idep_multivariate_gauss.idep (line 309)` | self, cov_matrix: Optional[torch.tensor]=None | Annotated: `dict` | This function will compute the full Idep PID decomposition input: cov_matrix is a torch tensor of shape (d,d) in case you want to provide a different covariance matrix output: Dictionary with PID values Dictionary wit... |
+| `Idep_multivariate_gauss.idep (line 309)` | self, cov_matrix: Optional[torch.tensor]=None | Annotated: `dict` | This function will compute the full Idep PID decomposition |
 
 ### `Partial_Information_Decomposition/Idep/Idep_simulations.py`
 
@@ -347,14 +454,14 @@ File description: Python module for Idep univariabe gauss-related project logic.
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `Idep_univariate_gauss class (line 18)` | class | class | Class with methods listed below. |
-| `Idep_univariate_gauss.__init__ (line 19)` | self, sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None | No explicit return; likely `None` / side effects. | Initialize the Idep univariate gaussian class input: M1,M2,T are torch tensors of shape (N,1) N is the number of observations |
-| `Idep_univariate_gauss.dependency_matrix (line 46)` | self, constraints: list, cov_matrix: Optional[torch.tensor]=None, cov_dict: Optional[dict]=None | Annotated: `dict` | This function will create the dependency matrix for the given constraint input: cov_matrix is a torch tensor of shape (d,d) d is the dimension of each observation. |
+| `Idep_univariate_gauss.__init__ (line 19)` | self, sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None | No explicit return; likely `None` / side effects. | Initialize the Idep univariate gaussian class |
+| `Idep_univariate_gauss.dependency_matrix (line 46)` | self, constraints: list, cov_matrix: Optional[torch.tensor]=None, cov_dict: Optional[dict]=None | Annotated: `dict` | This function will create the dependency matrix for the given constraint |
 | `Idep_univariate_gauss.compute_Idep (line 116)` | self, unique: list=[0, 1] | Annotated: `dict` | This function calcualtes the mutual information for a given covariance matrix - U models in the lattice |
 | `Idep_univariate_gauss.pid_values (line 170)` | self, unique_0, unique_1 | `self.PID_values` | This function will compute the PID values using the I_dep values input: unique_0, unique_1 are the unique informations for source 0 and source 1 output: a dictionary with the PID values keys: 'red', 'unq0', 'unq1', 'syn' |
-| `Idep_univariate_gauss.idep (line 197)` | self, cov_matrix: Optional[torch.tensor]=None | Annotated: `dict` | This function will compute the full Idep PID decomposition input: cov_matrix is a torch tensor of shape (d,d) in case you want to provide a different covariance matrix output: a dictionary with the PID values keys: 'r... |
-| `test_idep_gauss_q0_example (line 221)` | p=0.3, r=0.5, tol=1e-08 | No explicit return; likely `None` / side effects. | Test Example 1 from the paper: q = corr(X0, Y) = 0 p = corr(X0, X1) != 0 r = corr(X1, Y) != 0 Expected: unq0 = 0 red = 0 unq1 = 1/2 log(1 / (1 - r^2)) syn = 1/2 log(((1 - p^2)(1 - r^2)) / (1 - p^2 - r^2)) |
-| `check_idep_gauss_r0_example (line 271)` | p=0.3, q=0.5, tol=1e-08 | No explicit return; likely `None` / side effects. | Example 2 from the paper: r = corr(X1, Y) = 0 p = corr(X0, X1) != 0 q = corr(X0, Y) != 0 Expected: unq1 = 0 red = 0 unq0 = 1/2 log(1 / (1 - q^2)) syn = 1/2 log(((1 - p^2)(1 - q^2)) / (1 - p^2 - q^2)) |
-| `check_idep_gauss_p0_example (line 323)` | q=0.3, r=0.5, tol=1e-08 | No explicit return; likely `None` / side effects. | Example 3 from the paper: p = corr(X0, X1) = 0 q = corr(X0, Y) != 0 r = corr(X1, Y) != 0 Expected: unq0 = 1/2 log((1 - q^2 r^2) / (1 - q^2)) unq1 = 1/2 log((1 - q^2 r^2) / (1 - r^2)) red = 1/2 log(1 / (1 - q^2 r^2)) s... |
+| `Idep_univariate_gauss.idep (line 197)` | self, cov_matrix: Optional[torch.tensor]=None | Annotated: `dict` | This function will compute the full Idep PID decomposition |
+| `test_idep_gauss_q0_example (line 221)` | p=0.3, r=0.5, tol=1e-08 | No explicit return; likely `None` / side effects. | Test Example 1 from the paper: q = corr(X0, Y) = 0 p = corr(X0, X1) != 0 r = corr(X1, Y) != 0 |
+| `check_idep_gauss_r0_example (line 271)` | p=0.3, q=0.5, tol=1e-08 | No explicit return; likely `None` / side effects. | Example 2 from the paper: r = corr(X1, Y) = 0 p = corr(X0, X1) != 0 q = corr(X0, Y) != 0 |
+| `check_idep_gauss_p0_example (line 323)` | q=0.3, r=0.5, tol=1e-08 | No explicit return; likely `None` / side effects. | Example 3 from the paper: p = corr(X0, X1) = 0 q = corr(X0, Y) != 0 r = corr(X1, Y) != 0 |
 | `tests (line 375)` | No inputs | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 
 ### `Partial_Information_Decomposition/Idep/parallel_Idep_multivariate_gauss.py`
@@ -364,10 +471,10 @@ File description: Python module for parallel Idep multivariate gauss-related pro
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `para_Idep_multivariate_gauss class (line 23)` | class | class | Class with methods listed below. |
-| `para_Idep_multivariate_gauss.__init__ (line 24)` | self, N=None, df=None, device='cuda', sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None, dims: Optional[list]=None, bias_correction: bool=False | No explicit return; likely `None` / side effects. | Initialize the Idep multivariate gaussian class input: M1,M2,T are torch tensors of shape (N,P) N is the number of observations P is the number of variables in each observation |
+| `para_Idep_multivariate_gauss.__init__ (line 24)` | self, N=None, df=None, device='cuda', sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None, dims: Optional[list]=None, bias_correction: bool=False | No explicit return; likely `None` / side effects. | Initialize the Idep multivariate gaussian class |
 | `para_Idep_multivariate_gauss.compute_Idep (line 110)` | self | Annotated: `dict` | This function calcualtes the mutual information for a given covariance matrix - U models in the lattice |
 | `para_Idep_multivariate_gauss.pid_values (line 167)` | self, unique_1, unique_2 | `self.PID_values` | This function will compute the PID values using the I_dep values input: unique_0, unique_1 are the unique informations for source 0 and source 1 output: a dictionary with the PID values keys: 'red', 'unq1', 'unq2', 'syn' |
-| `para_Idep_multivariate_gauss.idep (line 195)` | self, cov_matrix: Optional[torch.tensor]=None | Annotated: `dict` | This function will compute the full Idep PID decomposition input: cov_matrix is a torch tensor of shape (d,d) in case you want to provide a different covariance matrix output: a dictionary with the PID values keys: 'r... |
+| `para_Idep_multivariate_gauss.idep (line 195)` | self, cov_matrix: Optional[torch.tensor]=None | Annotated: `dict` | This function will compute the full Idep PID decomposition |
 
 ## Partial_Information_Decomposition/Idep/Idep_Simulations
 
@@ -379,7 +486,7 @@ File description: Python module for Covariance utils-related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `on_covariance (line 5)` | config, data | dict (cov) | This will call an intermidate function on the covariance Input: data: a tuple containing the covariance matrix and a list of random variables config: a dictionary with data and parameters for the function to apply on... |
+| `on_covariance (line 5)` | config, data | dict (cov) | This will call an intermidate function on the covariance |
 
 ### `Partial_Information_Decomposition/Idep/Idep_Simulations/Simulation_utils.py`
 
@@ -390,30 +497,30 @@ File description: Python module for Simulation utils-related project logic.
 | `mean_std_csv_results (line 23)` | results_dict | tuple of 2 values | Helper: Compute mean results across seeds |
 | `m7_m8_mean_std_csv_results (line 31)` | results_dict | tuple of 2 values | Helper: Compute mean results across seeds |
 | `N_P_variation_simulation (line 41)` | config, simulation_func=None, mean_std_func=m7_m8_mean_std_csv_results | `all_results` | Helper: Run simulations across different N and p values and then create a heatamp of the results. |
-| `to_python_scalar (line 92)` | value | `value`; call `value.numpy().tolist(...)`; call `value.item(...)`; ... | Convert torch/numpy scalar values into normal Python scalars. |
+| `to_python_scalar (line 92)` | value | `value`; call `value.numpy().tolist(...)`; call `value.item(...)`; call `value.tolist(...)` | Convert torch/numpy scalar values into normal Python scalars. |
 | `flatten_pid_results (line 115)` | pid_results | `flat` | Flatten nested PID result dictionaries. |
 | `get_pid_ver_csv_path (line 157)` | output_folder, pid_ver, csv_title='pid_results' | `output_folder / f'{csv_title_safe}_{pid_ver_safe}.csv'` | Return the CSV path for a specific pid_ver. |
 | `append_row_to_csv (line 179)` | row, output_folder, csv_title='pid_results' | `output_csv` | Append one row to the CSV file corresponding to row["pid_ver"]. |
-| `already_exists_in_csv (line 213)` | output_folder, N, p, pid_ver, seed, csv_title='pid_results' | call `mask.any(...)`; False | Check whether this exact simulation setting already exists in the CSV file specific to pid_ver. |
-| `sample_data_from_cov (line 247)` | config, true_cov: torch.tensor, rng: np.random.Generator | Annotated: `np.ndarray` | Sample multivariate Gaussian data from the specified covariance. |
+| `already_exists_in_csv (line 213)` | output_folder, N, p, pid_ver, seed, csv_title='pid_results' | call `mask.any(...)`; `False` | Check whether this exact simulation setting already exists in the CSV file specific to pid_ver. |
+| `sample_data_from_cov (line 247)` | config, true_cov: torch.tensor, rng: np.random.Generator | Annotated: `np.ndarray` | Sample multivariate Gaussian data from the specified covariance. and return it's covariance matrix. This is a helper function for the m7_whiten bias simulation. |
 | `build_m8_terms (line 271)` | config, cov_dict, whiten: bool='whiten_ver', para=False | dict (P, Q, R, Sigma) | Build the covariance matrix for M7 using the specified covariance dictionary. |
 | `build_m7_terms (line 320)` | config, cov_dict, whiten: bool='whiten_ver', para=False | dict (P, Q, R, Sigma) | Build the covariance matrix for M7 using the specified covariance dictionary. |
-| `extract_num_den_matrices (line 404)` | config: dict, matrix: torch.tensor | tuple of 3 values | Extract the numerator and denominator covariance matrices for M7/M8 from the full covariance matrix. |
+| `extract_num_den_matrices (line 404)` | config: dict, matrix: torch.tensor | tuple of 3 values | Extract the numerator and denominator covariance matrices for M7/M8 from the full covariance matrix. assumes whitening |
 | `mi_bias_calc (line 417)` | config: dict | `bias_dict` | No docstring; infer behavior from name/signature before reuse. |
 | `para_nume_logdet (line 442)` | config, Sigmas: torch.Tensor | Annotated: `float` | Helper function to compute log determinant of the numerator covariance matrix. |
 | `para_unique_bias_calc (line 451)` | config: dict | dict (i, k, h, j) | Helper function to compute bias for the unique information estimator. |
-| `plot_heatmap_mean_std (line 500)` | results, x_col='N', y_col='p', mean_col='mean', std_col='std', emp_bias_col='emp_bias', ground_truth_col='ground_truth', var_col='var', mse_col='mse', title=None, cmap='viridis', figsize=(8, 6), save_path=None, mean_fmt='.3f', std_fmt='.3f' | `v`; call `str(...)`; call `tuple(...)` | Create a heatmap where: x-axis = N y-axis = p color = mean text = mean ± std Parameters ---------- results : list[dict] or pd.DataFrame Each entry should look like: {'N': ..., 'p': ..., 'mean': ..., 'std': ...} Note:... |
+| `plot_heatmap_mean_std (line 500)` | results, x_col='N', y_col='p', mean_col='mean', std_col='std', emp_bias_col='emp_bias', ground_truth_col='ground_truth', var_col='var', mse_col='mse', title=None, cmap='viridis', figsize=(8, 6), save_path=None, mean_fmt='.3f', std_fmt='.3f' | `v`; call `str(...)`; call `tuple(...)` | Create a heatmap where: x-axis = N y-axis = p color = mean text = mean ± std |
 | `plot_heatmap_mean_std.normalize_y (line 536)` | v | `v`; call `tuple(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `plot_heatmap_mean_std.display_label (line 544)` | v | call `str(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `corrected_statistic (line 622)` | statistics: np.ndarray, bias_correction: float | Annotated: `np.ndarray` | Apply bias correction to the raw statistics. |
 | `plot_nodes_as_alpha (line 629)` | node_dict, title=None, save_path=None | No explicit return; likely `None` / side effects. | Helper function to plot the bias-corrected statistics as a function of alpha. |
 | `save_nodes_results_csv (line 655)` | i_result, j_result, k_result, h_result, save_path | `df` | No docstring; infer behavior from name/signature before reuse. |
-| `_to_scalar (line 676)` | value | call `float(...)`; None; call `value.item(...)` | No docstring; infer behavior from name/signature before reuse. |
+| `_to_scalar (line 676)` | value | None; call `float(...)`; call `value.item(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `_build_pid_rows_from_node (line 684)` | node_rows, known_component | tuple of 2 values | Build PID rows from node summaries by filling missing components. |
-| `plot_pid_trajectory_vs_p_over_N (line 733)` | results, ground_truth=None, save_path=None, title='PID components vs p/N', p_col='p', n_col='N', components=None, figsize=(10, 6), dpi=300, descending_x=True | `traj`; `p`; None; ... | Plot PID components and mutual information terms as a function of p/N. |
+| `plot_pid_trajectory_vs_p_over_N (line 733)` | results, ground_truth=None, save_path=None, title='PID components vs p/N', p_col='p', n_col='N', components=None, figsize=(10, 6), dpi=300, descending_x=True | None; `traj`; `p`; call `np.sum(...)`; ... | Plot PID components and mutual information terms as a function of p/N. |
 | `plot_pid_trajectory_vs_p_over_N.get_total_p (line 790)` | p | `p`; call `np.sum(...)`; call `sum(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `plot_pid_trajectory_vs_p_over_N.normalize_dims (line 797)` | p | None; call `tuple(...)`; `p` | No docstring; infer behavior from name/signature before reuse. |
-| `CCA_reduction (line 879)` | device, rv_list: list, n_components: int=None | dict (X0, X1) | Will implement Canonical Correlation Analysis. |
+| `CCA_reduction (line 879)` | device, rv_list: list, n_components: int=None | dict (X0, X1) | Will implement Canonical Correlation Analysis. For feature reduction. |
 | `make_pre_config (line 905)` | exp, MI_config, mi0_config, above0__M7_mi_config, above0__M8_mi_config, n_p_config, unk_cfg, de_config=None | `config` | No docstring; infer behavior from name/signature before reuse. |
 
 ### `Partial_Information_Decomposition/Idep/Idep_Simulations/logdet_m7_m8.py`
@@ -422,7 +529,7 @@ File description: Python module for logdet m7 m8-related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `simulate_m7_m8_log_det (line 18)` | data: list, sim_config: dict, rng: torch.Generator \| None=None | dict (M8, M7) | Inputs: data: list containing the true covariance matrices for M7 and M8 models, in the form [m7_true_cov, m8_true_cov] config: dictionary containing simulation parameters: n_samples: number of samples to draw for eac... |
+| `simulate_m7_m8_log_det (line 18)` | data: list, sim_config: dict, rng: torch.Generator \| None=None | dict (M8, M7) | Inputs: data: list containing the true covariance matrices for M7 and M8 models, in the form [m7_true_cov, m8_true_cov] |
 | `calculate_bias (line 200)` | config: dict, m8: bool, m7: bool, m7_wishart: bool, bias_correction: bool=True | Annotated: `list[dict]` | Run the specified simulation function over combinations of N and p values, calculating mean and std of results. |
 | `simulation_wrapper (line 234)` | config: dict | Annotated: `dict` | Run the logdet bias simulation for M7 and M8 models, returning a summary of results. |
 | `sort_m7_m8_results (line 257)` | results_list | tuple of 2 values | Helper: Sort results list by N and p values for sperate by m7 and m8. |
@@ -456,10 +563,10 @@ File description: Python module for premutations bias corr-related project logic
 | `permutation_null_debias (line 24)` | X: ArrayLike \| tuple[ArrayLike, ...], Y: ArrayLike \| tuple[ArrayLike, ...], func: Callable[..., float], *, n_perm: int=20, random_state: int \| np.random.Generator \| None=None, **func_kwargs: Any | Annotated: `dict[str, Any]` | No docstring; infer behavior from name/signature before reuse. |
 | `safe_logdet (line 85)` | A: np.ndarray, eps: float=1e-08 | Annotated: `float` | No docstring; infer behavior from name/signature before reuse. |
 | `sample_cov (line 97)` | X: np.ndarray | Annotated: `np.ndarray` | No docstring; infer behavior from name/signature before reuse. |
-| `gaussian_mi_logdet (line 101)` | X: np.ndarray, Y: np.ndarray, eps: float=1e-08 | Annotated: `float` | Plug-in Gaussian MI estimator: I(X;Y) = 1/2 [log\|S_X\| + log\|S_Y\| - log\|S_XY\|] |
+| `gaussian_mi_logdet (line 101)` | X: np.ndarray, Y: np.ndarray, eps: float=1e-08 | Annotated: `float` | Plug-in Gaussian MI estimator: |
 | `gaussian_mi_from_cov (line 121)` | Sigma: np.ndarray, dx: int | Annotated: `float` | True Gaussian MI from the population covariance. |
 | `random_orthonormal_matrix (line 140)` | n: int, k: int, rng: np.random.Generator | Annotated: `np.ndarray` | Return an n x k matrix with orthonormal columns. |
-| `make_population_cov (line 149)` | dx: int, dy: int, canonical_corrs: list[float], rng: np.random.Generator | Annotated: `np.ndarray` | Construct a population covariance: Cov(X) = I_dx Cov(Y) = I_dy Cov(X,Y) = U diag(canonical_corrs) V.T The values in canonical_corrs must be smaller than 1. |
+| `make_population_cov (line 149)` | dx: int, dy: int, canonical_corrs: list[float], rng: np.random.Generator | Annotated: `np.ndarray` | Construct a population covariance: |
 | `sample_multivariate_gaussian (line 187)` | n: int, Sigma: np.ndarray, dx: int, rng: np.random.Generator | Annotated: `tuple[np.ndarray, np.ndarray]` | Sample (X,Y) from the joint Gaussian. |
 | `run_multivariate_logdet_permutation_sim (line 210)` | *, n: int=100, dx: int=15, dy: int=20, canonical_corrs: list[float]=[0.6, 0.4, 0.2], n_trials: int=100, n_perm: int=30, seed: int=0 | Annotated: `tuple[pd.DataFrame, pd.DataFrame]` | No docstring; infer behavior from name/signature before reuse. |
 
@@ -474,8 +581,8 @@ File description: Python module for shrinkaging-related project logic.
 | `shrunk_cov (line 41)` | X, alpha=0.1 | `sc.covariance_`; `sc_list` | No docstring; infer behavior from name/signature before reuse. |
 | `shrinkage_covariance (line 54)` | X, method='ledoit_wolf', alpha=0.1 | call `ledoit_wolf_cov(...)`; call `shrunk_cov(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `custom_shrunk_cov (line 63)` | X, alpha=0.1, target=None, assume_centered=False, ddof=0 | `Sigma_hat` | Shrink sample covariance toward a user-supplied symmetric target matrix. |
-| `shrinkage_m7_m8_simulation (line 108)` | config: dict, evluation_func: callable=None, data=None | dict (M8, M7) | This function takes true covriances and return a smaple with shrinkage covariance estimation for both M7 and M8 models. |
-| `evaluate_shrinkage (line 137)` | config: dict, results_dict: dict | `evaluation_results` | Will evaluate the preformance of the shrinkage covriance according to some evaluation function (e.g. |
+| `shrinkage_m7_m8_simulation (line 108)` | config: dict, evluation_func: callable=None, data=None | dict (M8, M7) | This function takes true covriances and return a smaple with shrinkage covariance estimation for both M7 and M8 models. It also returns the true covariances for both models. The function can be used to evaluate the pe... |
+| `evaluate_shrinkage (line 137)` | config: dict, results_dict: dict | `evaluation_results` | Will evaluate the preformance of the shrinkage covriance according to some evaluation function (e.g. Frobenius norm between the true covariance and the estimated covariance) |
 | `_to_torch_float64 (line 162)` | X: TensorLike, device: str=None | Annotated: `torch.Tensor` | Convert input to torch.float64 tensor. |
 | `_check_same_shape (line 176)` | A: torch.Tensor, B: torch.Tensor | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 | `_check_spd (line 183)` | A: torch.Tensor, name: str='matrix', eps: float=1e-12 | No explicit return; likely `None` / side effects. | Check positive definiteness via eigenvalues. |
@@ -485,7 +592,7 @@ File description: Python module for shrinkaging-related project logic.
 | `precision_frobenius_error (line 242)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True | Annotated: `float` | \|\|Sigma_hat^{-1} - Sigma_true^{-1}\|\|_F |
 | `precision_relative_frobenius_error (line 264)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True, eps: float=1e-12 | Annotated: `float` | \|\|Sigma_hat^{-1} - Sigma_true^{-1}\|\|_F / \|\|Sigma_true^{-1}\|\|_F |
 | `logdet_error (line 289)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True | Annotated: `float` | \|log\|Sigma_hat\| - log\|Sigma_true\|\| |
-| `gaussian_kl_true_to_hat (line 317)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True | Annotated: `float` | KL( N(0, Sigma_true) \|\| N(0, Sigma_hat) ) = 0.5 * [ tr(Sigma_hat^{-1} Sigma_true) - p + log\|Sigma_hat\| - log\|Sigma_true\| ] |
+| `gaussian_kl_true_to_hat (line 317)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True | Annotated: `float` | KL( N(0, Sigma_true) \|\| N(0, Sigma_hat) ) |
 | `gaussian_kl_hat_to_true (line 349)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True | Annotated: `float` | KL( N(0, Sigma_hat) \|\| N(0, Sigma_true) ) |
 | `gaussian_symmetric_kl (line 366)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None, check_spd: bool=True | Annotated: `float` | Symmetric KL = KL(true \|\| hat) + KL(hat \|\| true) |
 | `eigenvalue_l2_error (line 390)` | Sigma_true: TensorLike, Sigma_hat: TensorLike, device: str=None | Annotated: `float` | \|\|eig(Sigma_hat) - eig(Sigma_true)\|\|_2 Uses sorted eigenvalues from eigvalsh. |
@@ -511,7 +618,7 @@ File description: Python module for unique m7 m8-related project logic.
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `simulate_m7_m8_idep (line 25)` | data: list, sim_config: dict, rng: torch.Generator \| None=None, intermediate_func: callable=None | dict (i, k, h, j) | Run MI simulation under the same covariance construction used in the logdet experiments. |
-| `sort_m7_m8_results (line 311)` | results_list | list | Helper: Sort results list by N and p values for sperate by m7 and m8. |
+| `sort_m7_m8_results (line 311)` | results_list | list of 4 values | Helper: Sort results list by N and p values for sperate by m7 and m8. |
 | `simulation_wrapper (line 329)` | config: dict | Annotated: `dict` | Run the logdet bias simulation for M7 and M8 models, returning a summary of results. |
 | `_save_config_yaml (line 348)` | config, save_path, exp_name | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 | `_render_heatmaps (line 354)` | i_result, j_result, k_result, h_result, save_path, exp_name | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
@@ -542,7 +649,7 @@ File description: Python module for jackknife-related project logic.
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `jackkinfe_func (line 14)` | config, cov_loo, calculate_statistic_func | `bias` | Calculate the jackknife bias correction for a given statistic calculated on leave-one-out covariance matrices. |
-| `jackknife_resample (line 36)` | config: dict | Annotated: `list` | Compute the full covnarice matrix across smaples and the covariance matrix of the left out ovbesrvation. |
+| `jackknife_resample (line 36)` | config: dict | Annotated: `list` | Compute the full covnarice matrix across smaples and the covariance matrix of the left out ovbesrvation. Using the formula for covariance matrix Σ(-j)=N-2/(S(-j)-(1/N)*s(-j)s(-j)T) Where S(-j)=S-ZjZjT and s(-j)=s-Zj |
 | `jackknife_whiten (line 99)` | config, m7_cov_dict | `cov_whiten` | No docstring; infer behavior from name/signature before reuse. |
 
 ### `Partial_Information_Decomposition/Idep/non_parametric_bias_corr/resampling_wrapper.py`
@@ -554,7 +661,7 @@ File description: Python module for resampling wrapper-related project logic.
 | `resampleing (line 20)` | resample_inputs: dict, rng | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
 | `calculate_statistic (line 34)` | config: dict, calc_func: callable, population: dict, rng: np.random.Generator | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
 | `calculate_bias (line 42)` | config: dict, statistic_dict: dict, bias_func: callable | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
-| `bias_resampling (line 51)` | config: dict, calc_func: callable=None | Annotated: `dict` | This function will calculate the statistics value and it's and will return a dictionary with the following keys: Input: data: the data to calculate the statistic on (covariance etc ) config: a dictionary with data ret... |
+| `bias_resampling (line 51)` | config: dict, calc_func: callable=None | Annotated: `dict` | This function will calculate the statistics value and it's and will return a dictionary with the following keys: |
 
 ## encoding_model
 
@@ -582,9 +689,9 @@ File description: Shared commonality analysis utilities.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `_ensure_2d (line 13)` | features | `features` | Raise value error if features are not 2D: (n_samples, n_features). |
+| `_ensure_2d (line 13)` | features | `features` | Raise value error if features are not 2D: (n_samples, n_features). If features are 1D, raise an error with instructions to reshape. |
 | `_score_only (line 22)` | score_result | `score_result`; `score_result[1]` | No docstring; infer behavior from name/signature before reuse. |
-| `commonality_analysis (line 28)` | features_X1, features_X2, target, method='standard', alphas=None, scale_by_target_variance=False, **_ignored_kwargs | dict (R²_X1, R²_X2, R²_X12, unique_X1, unique_X2, common, unexplained) | Decompose predictive power into unique, common, and unexplained components. |
+| `commonality_analysis (line 28)` | features_X1, features_X2, target, method='standard', alphas=None, scale_by_target_variance=False | dict (R²_X1, R²_X2, R²_X12, unique_X1, unique_X2, common, unexplained) | Decompose predictive power into unique, common, and unexplained components. |
 
 ### `encoding_model/encoding_utils.py`
 
@@ -597,7 +704,7 @@ File description: Python module for encoding utils-related project logic.
 | `ImageDataset.__len__ (line 31)` | self | call `len(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `ImageDataset.__getitem__ (line 34)` | self, idx | `img` | No docstring; infer behavior from name/signature before reuse. |
 | `plot_fmri (line 44)` | path, args, hemi, title='' | No explicit return; likely `None` / side effects. | Plot fMRI data on a brain surface and save the figure. |
-| `fmri_response_image (line 76)` | path, args, hemisphere, img_idx, train_img_dir, train_img_list, lh_fmri, rh_fmri | No explicit return; likely `None` / side effects. | This function outputs the fmri response that matches the image shown. |
+| `fmri_response_image (line 76)` | path, args, hemisphere, img_idx, train_img_dir, train_img_list, lh_fmri, rh_fmri | No explicit return; likely `None` / side effects. | This function outputs the fmri response that matches the image shown. accoring to the NSD dataset structure. |
 | `split_dataset (line 128)` | train_img_list, test_img_list, rand_seed=5, train_p=90 | tuple of 2 values; tuple of 3 values | No docstring; infer behavior from name/signature before reuse. |
 | `fmri_data_loader (line 153)` | lh_fmri, rh_fmri, train_img_list, test_img_list, train_img_dir, test_img_dir, batch_size=500, train_p=90 | tuple of 3 values | No docstring; infer behavior from name/signature before reuse. |
 | `map_correlation_to_rois (line 203)` | args, lh_correlation, rh_correlation, hemisphere | No explicit return; likely `None` / side effects. | Map correlation values to ROIs. |
@@ -605,7 +712,7 @@ File description: Python module for encoding utils-related project logic.
 | `get_specific_roi_fmri (line 294)` | args, lh_fmri, rh_fmri, roi_name | tuple of 2 values | Get fMRI data for a specific ROI. |
 | `visualize_encdoing_accuaracy (line 312)` | args, lh_correlation, rh_correlation, correlation_path, plot=True | tuple of 3 values | Visualize encoding accuracy with a bar graph and return ROI correlation values and ROI names for left and right hemispheres for a given subject. |
 | `save_corellation (line 396)` | roi_names, lh_correlation, rh_correlation, correlation_path, experiment_name | No explicit return; likely `None` / side effects. | Save correlation values to .npy files. |
-| `save_model (line 425)` | folder_path, model_name, save_dict, reg_lh: Optional[ndarray]=None, reg_rh: Optional[ndarray]=None, features_val_pred_lh: Optional[List]=None, features_val_pred_rh: Optional[List]=None, features_train: Optional[ndarray]=None, features_val_trained: Optional[ndarray]=None, predict_array: Optional[ndarray]=None, roi_names: Optional[List]=None, lh_correlation: Optional[ndarray]=None, rh_correlation: Optional[ndarray]=None | `models_folder` | Save the trained encoding model. |
+| `save_model (line 425)` | folder_path, model_name, save_dict, reg_lh: Optional[ndarray]=None, reg_rh: Optional[ndarray]=None, features_val_pred_lh: Optional[List]=None, features_val_pred_rh: Optional[List]=None, features_train: Optional[ndarray]=None, features_val_trained: Optional[ndarray]=None, predict_array: Optional[ndarray]=None, roi_names: Optional[List]=None, lh_correlation: Optional[ndarray]=None, rh_correlation: Optional[ndarray]=None | `models_folder` | Save the trained encoding model. with its corellation values and roi names and figs` |
 
 ### `encoding_model/fmri_model.py`
 
@@ -666,7 +773,7 @@ File description: Python module for suppression core-related project logic.
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `create_predictions (line 12)` | reg_lh, reg_rh, features | tuple of 2 values | Create fMRI predictions using trained regression models. |
-| `create_encoder (line 28)` | rng, features, target, n_features | tuple of 2 values | Create and train a linear regression encoder. |
+| `create_encoder (line 28)` | rng, features, target, n_features | tuple of 2 values | Create and train a linear regression encoder. mostly usable when the number of model features is larger than the number of samples. there for we randomly select a subset of features to use for training. |
 | `permutate_models (line 59)` | rng, features, suppression_strength | tuple of 2 values | No docstring; infer behavior from name/signature before reuse. |
 | `noise_component (line 80)` | rng, features, suppression_strength, permutation | tuple of 2 values | Create suppresion model using only noise component. |
 | `create_supression_model (line 106)` | rng, signal, suppresion_method, features, suppression_strength=0.5, snr=1.0, mixing_dimension=None | tuple of 3 values | Create suppression model features X_M1 and X_M2 based on the given parameters. |
@@ -690,7 +797,7 @@ File description: Python module for OTC-related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `load_OTC (line 8)` | subject_id: int, path_to_data: str | Annotated: `dict` | Load OTC fMRI data for a given subject. |
+| `load_OTC (line 8)` | subject_id: int, path_to_data: str | Annotated: `dict` | Load OTC fMRI data for a given subject. (This function assumes data files are zarr files stored in the specified path.) |
 | `main (line 30)` | No inputs | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
 
 ### `data/V1.py`
@@ -883,7 +990,7 @@ File description: Python module for both unique-related project logic.
 | `get_run_config (line 20)` | No inputs | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
 | `half_permute (line 36)` | rng, features, snr=10 | tuple of 2 values | No docstring; infer behavior from name/signature before reuse. |
 | `orthogonal_vectors (line 57)` | rng, n, p, features, noise=None, singal=None, unique_ratio=None, function=None | tuple of 3 values | No docstring; infer behavior from name/signature before reuse. |
-| `feature_creation (line 98)` | rng, unique_ratio, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | tuple of 3 values | Creates dummy predictors and a target Args: rng: Random number generator unique_ratio : number between 0 and 1, indicating the proportion of unique features in each source. |
+| `feature_creation (line 98)` | rng, unique_ratio, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | tuple of 3 values | Creates dummy predictors and a target |
 | `test_both_unique (line 139)` | rng, unique_ratio, n=1024, p=100, snr=10.0, method='standard' | tuple of 3 values | No docstring; infer behavior from name/signature before reuse. |
 | `run_single_seed (line 150)` | seed: int, config: dict | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
 | `main (line 164)` | No inputs | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
@@ -895,7 +1002,7 @@ File description: Python module for turned off unqiue-related project logic.
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `get_run_config (line 28)` | No inputs | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
-| `feature_creation (line 48)` | rng, r_str, u1_str, u2_str, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | tuple of 3 values | Creates dummy predictors and a target Args: rng: Random number generator r_str: strength of redundant features u1_str: strength of unique features in source 1 u2_str: strength of unique features in source 2 n: Number... |
+| `feature_creation (line 48)` | rng, r_str, u1_str, u2_str, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | tuple of 3 values | Creates dummy predictors and a target |
 | `test (line 86)` | rng, r_str, u1_str, u2_str, n=1024, p=100, snr=10.0, method='standard' | tuple of 4 values | No docstring; infer behavior from name/signature before reuse. |
 | `extract_betas (line 101)` | ca_results | dict (X1_betas, X2_betas, X12_betas, X12_1_betas, X12_2_betas) | No docstring; infer behavior from name/signature before reuse. |
 | `run_single_seed (line 120)` | seed: int, config: dict | Annotated: `dict` | No docstring; infer behavior from name/signature before reuse. |
@@ -1215,7 +1322,7 @@ File description: Python module for   init  -related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `average_rdms (line 7)` | rdm_array | `1 - fisherz_inv(fisherz(np.stack([1 - rdm for rdm in rdm_array])).mean(axis=0...`; call `np.arctanh(...)`; call `np.tanh(...)` | No docstring; infer behavior from name/signature before reuse. |
+| `average_rdms (line 7)` | rdm_array | `1 - fisherz_inv(fisherz(np.stack([1 - rdm for rdm in rdm_array])).mean(axis=0, keepdims...`; call `np.arctanh(...)`; call `np.tanh(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `average_rdms.fisherz (line 8)` | r, eps=1e-05 | call `np.arctanh(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `average_rdms.fisherz_inv (line 11)` | z | call `np.tanh(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `NSDBenchmark class (line 17)` | class | class | Class with methods listed below. |
@@ -1244,7 +1351,7 @@ File description: Python module for nsd parser-related project logic.
 | `load_voxel_info (line 81)` | subj, space | `roi_dfs` | No docstring; infer behavior from name/signature before reuse. |
 | `load_NSD_voxel_metadata (line 210)` | subjs, roi_group, space, voxels_to_include=None, savedir=None, overwrite=False | `voxel_metadata` | No docstring; infer behavior from name/signature before reuse. |
 | `load_NSD_brain_data (line 356)` | subjs, space, roi_group, voxel_metadata, annotations, savedir, output=False | `brain_data` | No docstring; infer behavior from name/signature before reuse. |
-| `load_NSD_benchmark_ROI_metadata (line 455)` | subjs, space, ncsnr_threshold=0.2, t_threshold=1, savedir=None, overwrite=False, **kwargs | `voxel_metadata`; `excl_idx`; call `np.isin(...)`; ... | No docstring; infer behavior from name/signature before reuse. |
+| `load_NSD_benchmark_ROI_metadata (line 455)` | subjs, space, ncsnr_threshold=0.2, t_threshold=1, savedir=None, overwrite=False, **kwargs | `voxel_metadata`; `excl_idx`; call `np.isin(...)`; call `np.logical_not(...)` | No docstring; infer behavior from name/signature before reuse. |
 | `load_NSD_benchmark_ROI_metadata.get_idx_by_roi_group (line 464)` | metadata, group_label, roi_names, logic='include', t_threshold=None | `excl_idx`; call `np.isin(...)`; call `np.logical_not(...)` | No docstring; infer behavior from name/signature before reuse. |
 
 ## supression_effect
@@ -1291,7 +1398,7 @@ File description: Python module for supp gauss multivariate-related project logi
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `crossfit_residualize (line 46)` | Y_raw, X_raw, n_splits=5, seed=0 | `residuals` | Residualize Y_raw against X_raw using cross-fitted linear regression. |
+| `crossfit_residualize (line 46)` | Y_raw, X_raw, n_splits=5, seed=0 | `residuals` | Residualize Y_raw against X_raw using cross-fitted linear regression. Returns residuals Y - E[Y\|X] predicted out-of-fold. |
 | `test_suppression (line 64)` | N=1000, P=1, suppression_strength=0.5, rng_seed=1, mode='simple', snr=1.0, method='ridge_cv', mixing_dimension=None | tuple of 3 values | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. |
 | `plot_pid_results (line 125)` | mi_results=None, pid_results=None, sub_title=None | No explicit return; likely `None` / side effects. | Plot bar chart for PID results. |
 | `get_seed_sweep_config (line 173)` | No inputs | Annotated: `dict` | Configuration for fixed-parameter suppression simulations across seeds. |
@@ -1311,10 +1418,10 @@ File description: Python module for Theortical cov toy example-related project l
 |---|---|---|---|
 | `make_spd_matrix (line 15)` | p, rng, eig_min=0.5, eig_max=2.0 | `Sigma` | Create a random symmetric positive definite covariance matrix. |
 | `check_spd (line 30)` | Sigma, name='Sigma', tol=1e-10 | No explicit return; likely `None` / side effects. | Check whether a matrix is symmetric positive definite. |
-| `theoretical_covariance_multivariate (line 52)` | Sigma_R, Sigma_U, Sigma_N, Sigma_eps, order=('X1', 'X2', 'Y') | tuple of 2 values | Theoretical covariance for the multivariate generative process: Y = R + U + eps X1 = R + U + N X2 = R + N where R ~ N(0, Sigma_R) U ~ N(0, Sigma_U) N ~ N(0, Sigma_N) eps ~ N(0, Sigma_eps) and all latent variables are... |
-| `simulate_multivariate_process (line 123)` | n, Sigma_R, Sigma_U, Sigma_N, Sigma_eps, rng=None | tuple of 3 values | Simulate: Y = R + U + eps X1 = R + U + N X2 = R + N |
+| `theoretical_covariance_multivariate (line 52)` | Sigma_R, Sigma_U, Sigma_N, Sigma_eps, order=('X1', 'X2', 'Y') | tuple of 2 values | Theoretical covariance for the multivariate generative process: |
+| `simulate_multivariate_process (line 123)` | n, Sigma_R, Sigma_U, Sigma_N, Sigma_eps, rng=None | tuple of 3 values | Simulate: |
 | `extract_covariance_blocks (line 161)` | Sigma_full, p | `blocks` | Extract covariance blocks assuming order [X1, X2, Y]. |
-| `whiten_theoretical_covariance_blocks (line 187)` | Sigma_full, p, device='cpu', dtype=torch.float64 | dict (Sigma_X1X1, Sigma_X2X2, Sigma_YY, Sigma_X1X2, Sigma_X1Y, Sigma_X2Y, P_X1X2, Q_X1Y...) | Given the full covariance matrix of [X1, X2, Y], compute the whitened cross-covariance blocks: P = whitened Cov(X1, X2) Q = whitened Cov(X1, Y) R = whitened Cov(X2, Y) using whiten_block from PID_util. |
+| `whiten_theoretical_covariance_blocks (line 187)` | Sigma_full, p, device='cpu', dtype=torch.float64 | dict (Sigma_X1X1, Sigma_X2X2, Sigma_YY, Sigma_X1X2, Sigma_X1Y, Sigma_X2Y, P_X1X2, Q_X1Y...) | Given the full covariance matrix of [X1, X2, Y], compute the whitened cross-covariance blocks: |
 | `validate_multivariate_covariance (line 281)` | n=1000000, p=5, seed=123, device='cpu' | dict (Sigma_R, Sigma_U, Sigma_N, Sigma_eps, Sigma_theoretical, Sigma_empirical, cov_blocks, abs_err...) | Validate the theoretical covariance by simulation, then compute whitened covariance blocks. |
 
 ### `toy_examples/simple_problems.py`
@@ -1356,7 +1463,7 @@ File description: Python module for toy example-related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `unq2_zero_with_red_unq1_syn (line 15)` | rng, n, p, noise_std=0.9 | tuple of 3 values | Continuous Gaussian-like example where theoretically: unq2 = 0 redundancy > 0 unq1 > 0 synergy > 0 The output dimensions are 3p: block 1: redundant information block 2: unique information for X1 block 3: synergistic/s... |
+| `unq2_zero_with_red_unq1_syn (line 15)` | rng, n, p, noise_std=0.9 | tuple of 3 values | Continuous Gaussian-like example where theoretically: |
 | `run_experiment (line 91)` | rng, suppresion_strength, mode='permuted', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | tuple of 2 values | Run commonality analysis experiment. |
 | `run_ridge_toy_method (line 175)` | rng_seed, n, p, mixing_dimension, snr | `decomp_dict` | Run the ridge-CV analysis for this specialized toy example. |
 | `main (line 196)` | No inputs | No explicit return; likely `None` / side effects. | Run the 2x3 factorial experiment design. |

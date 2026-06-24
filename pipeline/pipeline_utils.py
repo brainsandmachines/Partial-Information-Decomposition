@@ -7,8 +7,6 @@ from pathlib import Path
 from typing import Any, Callable
 import numpy as np
 
-import torch
-from Partial_Information_Decomposition.PID_calc import pid_calc
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.feature_manipulations import pca_projection
@@ -355,6 +353,8 @@ def pid_calc_adapter(
         pid_results: dict, contains "pid", "mi", and "method".
     """
 
+    import torch
+    from Partial_Information_Decomposition.PID_calc import pid_calc
 
     target_tensor = _as_2d_tensor(target)
     source_1_tensor = _as_2d_tensor(source_1)
@@ -409,7 +409,7 @@ def _as_2d_tensor(value: Any) -> Any:
 
     import torch
 
-    tensor = torch.as_tensor(value, dtype=torch.float64)
+    tensor = torch.as_tensor(value, dtype=torch.float32)
     if tensor.ndim == 1:
         tensor = tensor.reshape(-1, 1)
     if tensor.ndim != 2:
