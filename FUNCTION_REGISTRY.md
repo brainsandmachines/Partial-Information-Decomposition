@@ -97,6 +97,21 @@ File description: Python module for pca as function-related project logic.
 | `pca_as_function (line 29)` | pipeline_config: str \| Path, pca_config: str \| Path | Annotated: `dict[str, Any]` | Run the full-OTC PID experiment from the YAML config beside this file. |
 | `plot_ (line 62)` | results_dict: dict[str, Any], pca_config: str, pipeline_config: str | Annotated: `None` | Plot the results of the PID computation as a function of the number of PCA components. |
 
+### `pipeline/analysis/pca_analysis/otc_unique_search_pca.py`
+
+File description: Run PCA unique-information subset search on full OTC data and two sources.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `run_otc_unique_search_pca (line 25)` | config: dict[str, Any] \| str \| Path, max_source_components: int, *, search_source: str='X1', search_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, pid_callable: Callable[..., Any] \| None=None | Annotated: `dict[str, Any]` | Load OTC/source arrays, fix target/other-source PCs, and search one source. |
+| `_load_config (line 75)` | config: dict[str, Any] \| str \| Path | Annotated: `dict[str, Any]` | Load an OTC config dictionary or YAML file. |
+| `_load_otc_arrays (line 90)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Run PIDPipeline only through target/source/layer/feature extraction. |
+| `_skip_pid (line 112)` | target: Any, source_1: Any, source_2: Any, **pid_kwargs: Any | Annotated: `None` | Satisfy PIDPipeline while loading arrays without running PID. |
+| `_pca_search_inputs (line 123)` | context: dict[str, Any], config: dict[str, Any], search_source: str, max_source_components: int | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]` | Project target, searched source, and fixed source for subset search. |
+| `_project_or_keep (line 155)` | features: Any, n_components: int \| None, name: str | Annotated: `np.ndarray` | Apply PCA when requested, capping components to the valid matrix size. |
+| `_svd_pca (line 176)` | features: np.ndarray, n_components: int | Annotated: `np.ndarray` | Project features onto principal components using NumPy SVD. |
+| `main (line 188)` | No inputs | Annotated: `None` | Run OTC PCA unique search from command-line arguments. |
+
 ### `pipeline/analysis/pca_analysis/unique_search_pca.py`
 
 File description: Search source-1 PCA component subsets for source-1 unique PID information.
