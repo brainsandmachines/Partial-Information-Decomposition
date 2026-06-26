@@ -108,9 +108,8 @@ File description: Run PCA unique-information subset search on full OTC data and 
 | `_load_otc_arrays (line 90)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Run PIDPipeline only through target/source/layer/feature extraction. |
 | `_skip_pid (line 112)` | target: Any, source_1: Any, source_2: Any, **pid_kwargs: Any | Annotated: `None` | Satisfy PIDPipeline while loading arrays without running PID. |
 | `_pca_search_inputs (line 123)` | context: dict[str, Any], config: dict[str, Any], search_source: str, max_source_components: int | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]` | Project target, searched source, and fixed source for subset search. |
-| `_project_or_keep (line 155)` | features: Any, n_components: int \| None, name: str | Annotated: `np.ndarray` | Apply PCA when requested, capping components to the valid matrix size. |
-| `_svd_pca (line 176)` | features: np.ndarray, n_components: int | Annotated: `np.ndarray` | Project features onto principal components using NumPy SVD. |
-| `main (line 188)` | No inputs | Annotated: `None` | Run OTC PCA unique search from command-line arguments. |
+| `_project_or_keep (line 155)` | features: Any, n_components: int \| None, name: str | Annotated: `np.ndarray` | Apply scikit-learn PCA when requested, capping components to the valid matrix size. |
+| `main (line 179)` | No inputs | Annotated: `None` | Run OTC PCA unique search from command-line arguments. |
 
 ### `pipeline/analysis/pca_analysis/unique_search_pca.py`
 

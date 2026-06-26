@@ -1,7 +1,7 @@
 """Run PCA unique-information subset search on full OTC data and two sources."""
 
 from __future__ import annotations
-
+from sklearn.decomposition import PCA
 import argparse
 import sys
 from pathlib import Path
@@ -170,19 +170,10 @@ def _project_or_keep(features: Any, n_components: int | None, name: str) -> np.n
     n_components = min(int(n_components), min(array.shape))
     if n_components < 1:
         raise ValueError(f"{name} needs at least one PCA component")
-    return _svd_pca(array, n_components)
 
 
-def _svd_pca(features: np.ndarray, n_components: int) -> np.ndarray:
-    """Project features onto principal components using NumPy SVD.
-
-    Inputs: features is a 2D np.ndarray; n_components is the number of PCs.
-    Outputs: 2D np.ndarray PCA scores with n_components columns.
-    """
-
-    centered = features - features.mean(axis=0, keepdims=True)
-    u, singular_values, _ = np.linalg.svd(centered, full_matrices=False)
-    return u[:, :n_components] * singular_values[:n_components]
+    pca = PCA(n_components=n_components, svd_solver="randomized", random_state=56)
+    return pca.fit_transform(array)
 
 
 def main() -> None:
