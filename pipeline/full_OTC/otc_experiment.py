@@ -9,6 +9,8 @@ from typing import Any
 repo_root = Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
+    
+from pipeline.pipeline_phases.sources_target_features import prepare_target
 
 from pipeline.pipeline_utils import (
     COMMON_PIPELINE_STEP_FUNCTIONS,
@@ -60,7 +62,6 @@ def nsd_otc_target(
     """
 
     del subj_id, voxel_index
-    from pipeline.pipeline_phases.sources_target_features import prepare_target
 
     target_context = prepare_target(
         hdf_path=Path(hdf_path),

@@ -142,15 +142,16 @@ class PIDPipeline:
         source_2 = source_2_raw
 
         if self.functions.preprocess is not None:
-            target, source_1, source_2 = self.functions.preprocess(
+            source_1, source_2, target = self.functions.preprocess(
                 target,
                 source_1,
                 source_2,
+                
                 **(preprocess_kwargs or {}),
             )
 
         if self.functions.feature_manipulation is not None:
-            target, source_1, source_2 = self.functions.feature_manipulation(target,
+           source_1,source_2,target = self.functions.feature_manipulation(target,
                 source_1,
                 source_2,
                 **(feature_manipulation_kwargs or {}),

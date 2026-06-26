@@ -10,6 +10,7 @@ import numpy as np
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.feature_manipulations import pca_projection
+from pipeline.pipeline_phases.preprocessing_layer import permute_rv
 PipelineFunction = Callable[..., Any]
 
 
@@ -323,9 +324,9 @@ def pca_each_source(target: Any, source_1: Any, source_2: Any, n_components_sour
         prj_target = target
 
     return (
-        prj_target,
         prj_source1,
-        prj_source2
+        prj_source2,
+        prj_target
     )
 
 
@@ -513,6 +514,7 @@ COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     "pca_each_source": pca_each_source,
     "pid_calc": pid_calc_adapter,
     "print_pid_mi": print_pid_mi_adapter,
+    'permute_rv': permute_rv,
 }
 
 
