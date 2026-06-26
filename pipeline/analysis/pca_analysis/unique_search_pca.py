@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import csv
+from itertools import combinations
+from math import comb
 import sys
 import time
 from pathlib import Path
@@ -30,6 +32,8 @@ def run_pid_pc_subset_search(
     unique_threshold: float = 1e-6,
     beam_width: int = 5,
     max_subset_size: int = 3,
+    initial_subset_size: int = 1,
+    initial_subset_count: int | None = None,
     floating_tolerance: float = 1e-9,
     max_runtime_seconds: float = 600,
     rng_seed: int = 56,
@@ -42,8 +46,9 @@ def run_pid_pc_subset_search(
 
     Inputs: target/source_1/source_2 are 2D array-like objects with equal rows;
         pid_callable is a PID function or None for pid_calc_adapter; thresholds,
-        beam_width, max_subset_size, runtime, seed, pid_kwargs, CSV paths, and
-        use_floating_backward configure the search.
+        beam_width, subset sizes, runtime, seed, pid_kwargs, CSV paths, and
+        use_floating_backward configure the search. initial_subset_count can
+        randomly sample the initial subsets from the CMI-passing PCs.
     Outputs: dict with status, singleton CMI scores, evaluated rows, top rows,
         best subset, best unique information, and best PID result.
     """
@@ -53,6 +58,12 @@ def run_pid_pc_subset_search(
     source_2 = _as_2d_array(source_2, "source_2")
     if len({target.shape[0], source_1.shape[0], source_2.shape[0]}) != 1:
         raise ValueError(f"target, source_1, and source_2 must have the same rows, got {[target.shape, source_1.shape, source_2.shape]}")
+    if initial_subset_size < 1:
+        raise ValueError("initial_subset_size must be at least 1")
+    if max_subset_size < initial_subset_size:
+        raise ValueError("max_subset_size must be greater than or equal to initial_subset_size")
+    if initial_subset_count is not None and initial_subset_count < 1:
+        raise ValueError("initial_subset_count must be None or at least 1")
 
     start = time.monotonic()
     pid_kwargs = dict(pid_kwargs or {})
@@ -100,19 +111,38 @@ def run_pid_pc_subset_search(
     cache: dict[tuple[int, ...], dict[str, Any]] = {}
     beam: list[dict[str, Any]] = []
     status = "completed"
+    initial_subsets = _initial_subsets(candidates, initial_subset_size, initial_subset_count, rng_seed)
+    if not initial_subsets:
+        return {
+            "status": "no_initial_subsets",
+            "message": "Not enough CMI-passing source_1 PCs to build the requested initial subset size.",
+            "cmi_scores": cmi_scores,
+            "selected_candidates": candidates,
+            "all_evaluated_subsets": [],
+            "top_subsets": [],
+            "best_subset": None,
+            "best_unique": None,
+            "best_pid_components": None,
+            "best_red": None,
+            "best_unq1": None,
+            "best_unq2": None,
+            "best_syn": None,
+            "best_pid_result": None,
+        }
 
-    for pc in candidates:
+    for subset in initial_subsets:
         if time.monotonic() - start >= max_runtime_seconds:
             status = "timeout"
             break
-        beam.append(_evaluate_subset((pc,), target, source_1, source_2, pipeline, pid_kwargs, cache, all_csv_path, unique_threshold, start, cmi_scores[pc]))
+        cmi_score = cmi_scores[subset[0]] if len(subset) == 1 else None
+        beam.append(_evaluate_subset(subset, target, source_1, source_2, pipeline, pid_kwargs, cache, all_csv_path, unique_threshold, start, cmi_score))
 
     if status != "timeout":
         beam = _top_rows(beam, beam_width)
         if beam:
-            _append_csv_row(best_csv_path, beam[0]["subset"], start, "best_size_1", row=beam[0])
+            _append_csv_row(best_csv_path, beam[0]["subset"], start, f"best_size_{initial_subset_size}", row=beam[0])
 
-        for size in range(2, min(max_subset_size, len(candidates)) + 1):
+        for size in range(initial_subset_size + 1, min(max_subset_size, len(candidates)) + 1):
             expanded: list[dict[str, Any]] = []
             for row in beam:
                 for pc in candidates:
@@ -152,8 +182,29 @@ def run_pid_pc_subset_search(
         "best_unq2": None if best_components is None else best_components.get("unq2"), #Same as redundancy
         "best_syn": None if best_components is None else best_components.get("syn"), #Same as redundancy
         "best_pid_result": None if best is None else best["pid_result"],
-        "config": {"pid_kwargs": pid_kwargs},
+        "config": {"pid_kwargs": pid_kwargs, "initial_subset_size": initial_subset_size, "initial_subset_count": initial_subset_count},
     }
+
+
+def _initial_subsets(candidates: list[int], subset_size: int, subset_count: int | None, rng_seed: int) -> list[tuple[int, ...]]:
+    """Create initial source_1 PC subsets for the beam search.
+
+    Inputs: candidates is CMI-passing PC indices; subset_size is the starting
+        subset size; subset_count is optional random subset count; rng_seed is
+        the seed used when sampling.
+    Outputs: list of sorted PC-index tuples to evaluate first.
+    """
+
+    if subset_size > len(candidates):
+        return []
+    total_subsets = comb(len(candidates), subset_size)
+    if subset_count is None or subset_count >= total_subsets:
+        return list(combinations(candidates, subset_size))
+    rng = np.random.default_rng(rng_seed)
+    subsets: set[tuple[int, ...]] = set()
+    while len(subsets) < subset_count:
+        subsets.add(tuple(sorted(rng.choice(candidates, size=subset_size, replace=False).tolist())))
+    return sorted(subsets)
 
 
 def _as_2d_array(value: Any, name: str) -> np.ndarray:

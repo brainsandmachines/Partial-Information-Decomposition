@@ -9,6 +9,9 @@ search_kwargs:
   unique_threshold: 1.0e-6
   beam_width: 5
   max_subset_size: 3
+  initial_subset_size: 1
+  initial_subset_count: null
+  rng_seed: 56
   floating_tolerance: 1.0e-9
   max_runtime_seconds: 600
   use_floating_backward: true
