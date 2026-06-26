@@ -74,6 +74,11 @@ def run_pid_pc_subset_search(
             "top_subsets": [],
             "best_subset": None,
             "best_unique": None,
+            "best_pid_components": None,
+            "best_red": None,
+            "best_unq1": None,
+            "best_unq2": None,
+            "best_syn": None,
             "best_pid_result": None,
         }
 
@@ -132,6 +137,7 @@ def run_pid_pc_subset_search(
 
     rows = sorted(cache.values(), key=lambda row: (len(row["subset"]), row["subset"]))
     best = max(rows, key=lambda row: row["unique"]) if rows else None
+    best_components = None if best is None else {key: _to_float(best["pid"][key]) for key in ("red", "unq1", "unq2", "syn") if key in best["pid"]}
     return {
         "status": status,
         "cmi_scores": cmi_scores,
@@ -140,6 +146,11 @@ def run_pid_pc_subset_search(
         "top_subsets": beam,
         "best_subset": None if best is None else best["subset"],
         "best_unique": None if best is None else best["unique"],
+        "best_pid_components": best_components,
+        "best_red": None if best_components is None else best_components.get("red"), #The redundancy from the subset that yielded that best unique component.
+        "best_unq1": None if best_components is None else best_components.get("unq1"),
+        "best_unq2": None if best_components is None else best_components.get("unq2"), #Same as redundancy
+        "best_syn": None if best_components is None else best_components.get("syn"), #Same as redundancy
         "best_pid_result": None if best is None else best["pid_result"],
         "config": {"pid_kwargs": pid_kwargs},
     }

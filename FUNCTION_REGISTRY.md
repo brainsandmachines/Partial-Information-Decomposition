@@ -103,13 +103,15 @@ File description: Run PCA unique-information subset search on full OTC data and 
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `run_otc_unique_search_pca (line 25)` | config: dict[str, Any] \| str \| Path, max_source_components: int, *, search_source: str='X1', search_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, pid_callable: Callable[..., Any] \| None=None | Annotated: `dict[str, Any]` | Load OTC/source arrays, fix target/other-source PCs, and search one source. |
-| `_load_config (line 75)` | config: dict[str, Any] \| str \| Path | Annotated: `dict[str, Any]` | Load an OTC config dictionary or YAML file. |
-| `_load_otc_arrays (line 90)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Run PIDPipeline only through target/source/layer/feature extraction. |
-| `_skip_pid (line 112)` | target: Any, source_1: Any, source_2: Any, **pid_kwargs: Any | Annotated: `None` | Satisfy PIDPipeline while loading arrays without running PID. |
-| `_pca_search_inputs (line 123)` | context: dict[str, Any], config: dict[str, Any], search_source: str, max_source_components: int | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]` | Project target, searched source, and fixed source for subset search. |
-| `_project_or_keep (line 155)` | features: Any, n_components: int \| None, name: str | Annotated: `np.ndarray` | Apply scikit-learn PCA when requested, capping components to the valid matrix size. |
-| `main (line 179)` | No inputs | Annotated: `None` | Run OTC PCA unique search from command-line arguments. |
+| `run_otc_unique_search_pca (line 27)` | config: dict[str, Any] \| str \| Path, max_source_components: int, *, search_source: str='X1', search_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, pid_callable: Callable[..., Any] \| None=None | Annotated: `dict[str, Any]` | Load OTC/source arrays, fix target/other-source PCs, and search one source. |
+| `run_otc_unique_search_from_yaml (line 77)` | config_path: str \| Path=DEFAULT_SEARCH_CONFIG | Annotated: `dict[str, Any]` | Run OTC unique search from one YAML analysis config file. |
+| `_load_config (line 98)` | config: dict[str, Any] \| str \| Path | Annotated: `dict[str, Any]` | Load an OTC config dictionary or YAML file. |
+| `_resolve_path (line 113)` | value: str \| Path \| None, base_dir: Path | Annotated: `Path \| None` | Resolve optional YAML paths relative to the YAML file directory. |
+| `_load_otc_arrays (line 126)` | config: dict[str, Any] | Annotated: `dict[str, Any]` | Run PIDPipeline only through target/source/layer/feature extraction. |
+| `_skip_pid (line 148)` | target: Any, source_1: Any, source_2: Any, **pid_kwargs: Any | Annotated: `None` | Satisfy PIDPipeline while loading arrays without running PID. |
+| `_pca_search_inputs (line 159)` | context: dict[str, Any], config: dict[str, Any], search_source: str, max_source_components: int | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]` | Project target, searched source, and fixed source for subset search. |
+| `_project_or_keep (line 191)` | features: Any, n_components: int \| None, name: str | Annotated: `np.ndarray` | Apply scikit-learn PCA when requested, capping components to the valid matrix size. |
+| `main (line 216)` | config_path: str \| Path \| None=None | Annotated: `None` | Run OTC PCA unique search from a YAML config file. |
 
 ### `pipeline/analysis/pca_analysis/unique_search_pca.py`
 
@@ -118,17 +120,17 @@ File description: Search source-1 PCA component subsets for source-1 unique PID 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `run_pid_pc_subset_search (line 23)` | target: Any, source_1: Any, source_2: Any, pid_callable: Callable[..., Any] \| None=None, *, cmi_threshold: float=1e-06, unique_threshold: float=1e-06, beam_width: int=5, max_subset_size: int=3, floating_tolerance: float=1e-09, max_runtime_seconds: float=600, rng_seed: int=56, pid_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, use_floating_backward: bool=True | Annotated: `dict[str, Any]` | Run beam search over source_1 PCA columns for source-1 unique PID. |
-| `_as_2d_array (line 148)` | value: Any, name: str | Annotated: `np.ndarray` | Convert one input to a finite non-empty 2D float array. |
-| `_gaussian_cmi_bits (line 163)` | x: np.ndarray, y: np.ndarray, z: np.ndarray, eps: float=1e-10 | Annotated: `float` | Calculate Gaussian conditional MI I(x; y \| z) in bits. |
-| `_conditional_cov (line 180)` | cov_a: np.ndarray, cross_ab: np.ndarray, cov_b: np.ndarray, eps: float | Annotated: `np.ndarray` | Compute covariance of variable a conditioned on variable b. |
-| `_logdet (line 191)` | matrix: np.ndarray, eps: float | Annotated: `float` | Return a stable log determinant for a covariance-like matrix. |
-| `_evaluate_subset (line 204)` | subset: tuple[int, ...], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \| Path \| None, unique_threshold: float, start: float, cmi_score: float \| None | Annotated: `dict[str, Any]` | Evaluate one source_1 PC subset with PIDPipeline and cache the result. |
-| `_floating_backward (line 248)` | row: dict[str, Any], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \| Path \| None, unique_threshold: float, tolerance: float, start: float, max_runtime_seconds: float | Annotated: `dict[str, Any]` | Prune PCs whose removal does not meaningfully reduce unique information. |
-| `_pid_components (line 284)` | pid_result: Any | Annotated: `dict[str, Any]` | Extract a PID component dictionary from common project PID result shapes. |
-| `_to_float (line 300)` | value: Any | Annotated: `float` | Convert numeric scalar-like values to float. |
-| `_top_rows (line 310)` | rows: list[dict[str, Any]], beam_width: int | Annotated: `list[dict[str, Any]]` | Keep highest-unique rows, de-duplicated by subset. |
-| `_append_csv_row (line 321)` | path: str \| Path \| None, subset: tuple[int, ...], start: float, status: str, *, cmi_score: float \| None=None, row: dict[str, Any] \| None=None | Annotated: `None` | Append one compact row to a CSV file, creating the header when needed. |
-| `_toy_pid (line 363)` | target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, **pid_kwargs: Any | Annotated: `dict[str, dict[str, float]]` | Return a tiny Gaussian-CMI-based PID-like result for local smoke runs. |
+| `_as_2d_array (line 159)` | value: Any, name: str | Annotated: `np.ndarray` | Convert one input to a finite non-empty 2D float array. |
+| `_gaussian_cmi_bits (line 174)` | x: np.ndarray, y: np.ndarray, z: np.ndarray, eps: float=1e-10 | Annotated: `float` | Calculate Gaussian conditional MI I(x; y \| z) in bits. |
+| `_conditional_cov (line 191)` | cov_a: np.ndarray, cross_ab: np.ndarray, cov_b: np.ndarray, eps: float | Annotated: `np.ndarray` | Compute covariance of variable a conditioned on variable b. |
+| `_logdet (line 202)` | matrix: np.ndarray, eps: float | Annotated: `float` | Return a stable log determinant for a covariance-like matrix. |
+| `_evaluate_subset (line 215)` | subset: tuple[int, ...], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \| Path \| None, unique_threshold: float, start: float, cmi_score: float \| None | Annotated: `dict[str, Any]` | Evaluate one source_1 PC subset with PIDPipeline and cache the result. |
+| `_floating_backward (line 259)` | row: dict[str, Any], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \| Path \| None, unique_threshold: float, tolerance: float, start: float, max_runtime_seconds: float | Annotated: `dict[str, Any]` | Prune PCs whose removal does not meaningfully reduce unique information. |
+| `_pid_components (line 295)` | pid_result: Any | Annotated: `dict[str, Any]` | Extract a PID component dictionary from common project PID result shapes. |
+| `_to_float (line 311)` | value: Any | Annotated: `float` | Convert numeric scalar-like values to float. |
+| `_top_rows (line 321)` | rows: list[dict[str, Any]], beam_width: int | Annotated: `list[dict[str, Any]]` | Keep highest-unique rows, de-duplicated by subset. |
+| `_append_csv_row (line 332)` | path: str \| Path \| None, subset: tuple[int, ...], start: float, status: str, *, cmi_score: float \| None=None, row: dict[str, Any] \| None=None | Annotated: `None` | Append one compact row to a CSV file, creating the header when needed. |
+| `_toy_pid (line 374)` | target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, **pid_kwargs: Any | Annotated: `dict[str, dict[str, float]]` | Return a tiny Gaussian-CMI-based PID-like result for local smoke runs. |
 
 ### `pipeline/full_OTC/otc_experiment.py`
 

@@ -1,8 +1,7 @@
 """Run PCA unique-information subset search on full OTC data and two sources."""
 
 from __future__ import annotations
-from sklearn.decomposition import PCA
-import argparse
+
 import sys
 from pathlib import Path
 from typing import Any, Callable
@@ -20,6 +19,9 @@ from pipeline.pipeline_utils import (
     run_configured_pid_pipeline,
     validate_pipeline_config_sections,
 )
+
+
+DEFAULT_SEARCH_CONFIG = Path(__file__).with_name("otc_unique_search_config.yaml")
 
 
 def run_otc_unique_search_pca(
@@ -72,6 +74,27 @@ def run_otc_unique_search_pca(
     return result
 
 
+def run_otc_unique_search_from_yaml(config_path: str | Path = DEFAULT_SEARCH_CONFIG) -> dict[str, Any]:
+    """Run OTC unique search from one YAML analysis config file.
+
+    Inputs: config_path is a str or Path to a YAML file with pipeline_config,
+        max_source_components, search_source, optional CSV paths, and search_kwargs.
+    Outputs: dict search result from run_otc_unique_search_pca.
+    """
+
+    config_path = Path(config_path)
+    analysis_config = _load_config(config_path)
+    base_dir = config_path.resolve().parent
+    return run_otc_unique_search_pca(
+        config=_resolve_path(analysis_config["pipeline_config"], base_dir),
+        max_source_components=int(analysis_config["max_source_components"]),
+        search_source=analysis_config.get("search_source", "X1"),
+        all_csv_path=_resolve_path(analysis_config.get("all_csv_path"), base_dir),
+        best_csv_path=_resolve_path(analysis_config.get("best_csv_path"), base_dir),
+        search_kwargs=dict(analysis_config.get("search_kwargs", {})),
+    )
+
+
 def _load_config(config: dict[str, Any] | str | Path) -> dict[str, Any]:
     """Load an OTC config dictionary or YAML file.
 
@@ -85,6 +108,19 @@ def _load_config(config: dict[str, Any] | str | Path) -> dict[str, Any]:
 
     with Path(config).open("r") as config_file:
         return yaml.safe_load(config_file)
+
+
+def _resolve_path(value: str | Path | None, base_dir: Path) -> Path | None:
+    """Resolve optional YAML paths relative to the YAML file directory.
+
+    Inputs: value is a str, Path, or None; base_dir is the YAML parent Path.
+    Outputs: absolute Path or None.
+    """
+
+    if value is None:
+        return None
+    path = Path(value)
+    return path if path.is_absolute() else base_dir / path
 
 
 def _load_otc_arrays(config: dict[str, Any]) -> dict[str, Any]:
@@ -171,46 +207,25 @@ def _project_or_keep(features: Any, n_components: int | None, name: str) -> np.n
     if n_components < 1:
         raise ValueError(f"{name} needs at least one PCA component")
 
+    from sklearn.decomposition import PCA
 
     pca = PCA(n_components=n_components, svd_solver="randomized", random_state=56)
     return pca.fit_transform(array)
 
 
-def main() -> None:
-    """Run OTC PCA unique search from command-line arguments.
+def main(config_path: str | Path | None = None) -> None:
+    """Run OTC PCA unique search from a YAML config file.
 
-    Inputs: command-line flags for config, searched source, PCA max, search
-        limits, and optional CSV paths.
+    Inputs: config_path is a str, Path, or None; when None, sys.argv[1] or the
+        default YAML path is used.
     Outputs: None, prints a compact result summary.
     """
 
-    parser = argparse.ArgumentParser(description="Run OTC PCA unique-information subset search.")
-    parser.add_argument("--config", default=ROOT / "pipeline" / "full_OTC" / "otc_config.yaml")
-    parser.add_argument("--max-source-components", type=int, required=True)
-    parser.add_argument("--search-source", choices=("X1", "X2"), default="X1")
-    parser.add_argument("--max-subset-size", type=int, default=3)
-    parser.add_argument("--beam-width", type=int, default=5)
-    parser.add_argument("--max-runtime-seconds", type=float, default=600)
-    parser.add_argument("--cmi-threshold", type=float, default=1e-6)
-    parser.add_argument("--unique-threshold", type=float, default=1e-6)
-    parser.add_argument("--all-csv", default=None)
-    parser.add_argument("--best-csv", default=None)
-    args = parser.parse_args()
-    result = run_otc_unique_search_pca(
-        args.config,
-        max_source_components=args.max_source_components,
-        search_source=args.search_source,
-        all_csv_path=args.all_csv,
-        best_csv_path=args.best_csv,
-        search_kwargs={
-            "max_subset_size": args.max_subset_size,
-            "beam_width": args.beam_width,
-            "max_runtime_seconds": args.max_runtime_seconds,
-            "cmi_threshold": args.cmi_threshold,
-            "unique_threshold": args.unique_threshold,
-        },
-    )
-    print({key: result.get(key) for key in ("status", "search_source", "fixed_source", "best_subset", "best_unique", "pca_components")})
+    if config_path is None:
+        config_path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_SEARCH_CONFIG
+    result = run_otc_unique_search_from_yaml(config_path)
+    keys = ("status", "search_source", "fixed_source", "best_subset", "best_pid_components", "pca_components")
+    print({key: result.get(key) for key in keys})
 
 
 if __name__ == "__main__":
