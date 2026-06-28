@@ -11,7 +11,7 @@ from pipeline.pipeline_phases.sources_target_features import feature_extraction
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.feature_manipulations import pca_projection
-from pipeline.pipeline_phases.preprocessing_layer import permute_rv
+from pipeline.pipeline_phases.preprocessing_layer import permute_rv,ridge_on_target_cv
 PipelineFunction = Callable[..., Any]
 
 
@@ -561,3 +561,19 @@ def choose_one_layer(layer_func: Callable[..., Any], source_context_value: Any, 
     if hasattr(selected, "__index__") and layer_names:
         return layer_names[int(selected)]
     return selected
+
+
+def ridge_preprocessing(source_1: Any, source_2: Any, target: Any, **preprocess_kwargs: Any) -> tuple[Any, Any, Any]:
+    """Apply ridge regression preprocessing to sources and target.
+
+    Inputs:
+        source_1: any, first source feature matrix.
+        source_2: any, second source feature matrix.
+        target: any, target feature matrix.
+        preprocess_kwargs: any, keyword arguments for preprocess_layer."""
+    
+    source_1 = ridge_on_target_cv(source_1, target, **preprocess_kwargs)
+    source_2 = ridge_on_target_cv(source_2, target, **preprocess_kwargs)
+    
+    return source_1, source_2, target
+    
