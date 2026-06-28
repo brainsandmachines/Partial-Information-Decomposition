@@ -94,7 +94,9 @@ File description: Run the configured full-OTC PID pipeline once per unordered mo
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `run_pairwise_pid_pipeline (line 32)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scan cross-list combinations once per unordered model pair, skip self/completed pairs in either orientation, append PID/MI metadata to CSV, and then create heatmaps in `<csv_stem>_figures`. Task-specific batch orchestration; one stored orientation preserves both directions through unq1 and unq2. |
+| `to_deepdive_model_name (line 44)` | model_name: str | Annotated: `str` | Convert stored CLIP ViT aliases to canonical DeepDive identifiers and print each conversion; return all other identifiers unchanged. Task-specific naming-boundary helper. |
+| `pairwise_nsd_sources (line 62)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, Any]` | Load pairwise sources through the existing `nsd_sources` helper using canonical DeepDive identifiers, then restore stored aliases in source metadata for best-layer CSV lookup and result reporting. |
+| `run_pairwise_pid_pipeline (line 87)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scan cross-list combinations once per unordered model pair, skip self/completed pairs in either orientation, append PID/MI metadata to CSV, and then create heatmaps in `<csv_stem>_figures`. Registers the pairwise source-name adapter so DeepDive loading and stored result names use their respective identifiers. |
 
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 

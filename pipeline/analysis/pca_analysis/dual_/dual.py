@@ -15,12 +15,18 @@ if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
 from pipeline.full_OTC import otc_experiment
+from pipeline.pipeline_utils import nsd_sources
 from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
 
 
+DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
+    "ViT-B_32_clip": "ViT-B/32_clip",
+    "ViT-L_14_clip": "ViT-L/14_clip",
+}
+
+
 model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
-model_2_names = ['nf_resnet50_classification','hardcorenas_f_classification']
-'''[,'eca_nfnet_l0_classification',
+'''model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
         'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
@@ -31,6 +37,52 @@ model_2_names = ['nf_resnet50_classification','hardcorenas_f_classification']
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised',
         'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']'''
+
+model_2_names = model_1_names  # Compare all models against each other
+
+
+def to_deepdive_model_name(model_name: str) -> str:
+    """Convert a stored model alias to the canonical name expected by DeepDive.
+
+    Inputs:
+        model_name: str, model identifier used by the pairwise model list and
+            best-layer results CSV.
+
+    Output:
+        deepdive_model_name: str, canonical DeepDive model identifier. Names
+            that do not require conversion are returned unchanged.
+    """
+
+    deepdive_model_name = DEEPDIVE_MODEL_NAME_CONVERSIONS.get(model_name, model_name)
+    if deepdive_model_name != model_name:
+        print(f"Changed model name: {model_name} -> {deepdive_model_name}")
+    return deepdive_model_name
+
+
+def pairwise_nsd_sources(model_name_1: str, model_name_2: str) -> dict[str, Any]:
+    """Load pairwise NSD sources using DeepDive-compatible model identifiers.
+
+    Inputs:
+        model_name_1: str, stored identifier for source X1.
+        model_name_2: str, stored identifier for source X2.
+
+    Output:
+        sources: dict[str, Any], source contexts under "X1" and "X2". Each
+            model is loaded with its canonical DeepDive name, while its
+            context retains the stored identifier for best-layer CSV lookup
+            and result reporting.
+    """
+
+    sources = nsd_sources(
+        model_name_1=to_deepdive_model_name(model_name_1),
+        model_name_2=to_deepdive_model_name(model_name_2),
+    )
+    sources["X1"]["model_name"] = model_name_1
+    sources["X1_name"] = model_name_1
+    sources["X2"]["model_name"] = model_name_2
+    sources["X2_name"] = model_name_2
+    return sources
+
 
 def run_pairwise_pid_pipeline(
     model_1_names: list[str],
@@ -106,6 +158,8 @@ def run_pairwise_pid_pipeline(
         )
     }
     config = deepcopy(otc_config)
+    otc_experiment.PIPELINE_STEP_FUNCTIONS[pairwise_nsd_sources.__name__] = pairwise_nsd_sources
+    config["functions"]["sources_extraction"] = pairwise_nsd_sources.__name__
 
     for model_1 in model_1_names:
         for model_2 in model_2_names:
@@ -152,6 +206,7 @@ def run_pairwise_pid_pipeline(
                 index=False,
             )
             completed_pairs.add(pair)
+            print(f"Completed PID for pair: {model_1}, {model_2}. Results appended to {output_path}")
 
     return output_path
 
