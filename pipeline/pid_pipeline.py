@@ -143,6 +143,7 @@ class PIDPipeline:
         source_2 = source_2_raw
         self.source_2_name = sources['X2_name']
         print("\nRunning PID with Source 1:", self.source_1_name, "and Source 2:", self.source_2_name)
+        
         if self.functions.preprocess is not None:
             source_1, source_2, target = self.functions.preprocess(
                 source_1,
@@ -150,11 +151,12 @@ class PIDPipeline:
                 target,
                 **(preprocess_kwargs or {}),
             )
+    
 
         if self.functions.feature_manipulation is not None:
-           source_1,source_2,target = self.functions.feature_manipulation(target,
-                source_1,
+           source_1,source_2,target = self.functions.feature_manipulation(source_1,
                 source_2,
+                target,
                 **(feature_manipulation_kwargs or {}),
             )
 

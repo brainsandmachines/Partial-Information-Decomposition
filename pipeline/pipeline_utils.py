@@ -295,7 +295,7 @@ def nsd_feature_extraction(
     )
 
 
-def pca_each_source(target: Any, source_1: Any, source_2: Any, n_components_source_1: int, n_components_source_2: int,n_components_target: int) -> tuple[Any, Any]:
+def pca_each_source(source_1: Any, source_2: Any, target: Any, n_components_source_1: int, n_components_source_2: int,n_components_target: int) -> tuple[Any, Any]:
     """Apply PCA separately to source_1 and source_2.
 
     Inputs:
