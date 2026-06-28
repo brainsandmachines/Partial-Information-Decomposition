@@ -88,6 +88,14 @@ File description: General utility functions shared by analysis and simulation sc
 
 Real-data source/target feature extraction helpers, layer utilities, and agnostic PID comparison runners.
 
+### `pipeline/analysis/pca_analysis/dual_/dual.py`
+
+File description: Run the configured full-OTC PID pipeline once per unordered model pair with resumable CSV checkpointing.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `run_pairwise_pid_pipeline (line 32)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scan cross-list combinations once per unordered model pair, skip self/completed pairs in either orientation, append PID/MI metadata to CSV, and then create heatmaps in `<csv_stem>_figures`. Task-specific batch orchestration; one stored orientation preserves both directions through unq1 and unq2. |
+
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 
 File description: Python module for pca as function-related project logic.
@@ -132,6 +140,14 @@ File description: Search source-1 PCA component subsets for source-1 unique PID 
 | `_top_rows (line 372)` | rows: list[dict[str, Any]], beam_width: int | Annotated: `list[dict[str, Any]]` | Keep highest-unique rows, de-duplicated by subset. |
 | `_append_csv_row (line 383)` | path: str \| Path \| None, subset: tuple[int, ...], start: float, status: str, *, cmi_score: float \| None=None, row: dict[str, Any] \| None=None | Annotated: `None` | Append one compact row to a CSV file, creating the header when needed. |
 | `_toy_pid (line 425)` | target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, **pid_kwargs: Any | Annotated: `dict[str, dict[str, float]]` | Return a tiny Gaussian-CMI-based PID-like result for local smoke runs. |
+
+### `pipeline/plotting/pairwise_pid_heatmaps.py`
+
+File description: Create publication-friendly PID component matrices from the resumable pairwise OTC CSV.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `plot_pairwise_pid_matrices (line 12)` | csv_path: str \| Path, output_dir: str \| Path, *, model_order: list[str] \| None=None, value_format: str='.3f', cmap: str='viridis', figsize: tuple[float, float] \| None=None, dpi: int=300 | Annotated: `dict[str, Path]` | Validate ordered pair rows, construct directional unique-information and symmetric redundancy/synergy matrices, then save annotated PNG and CSV outputs. Plotting-specific; preserves the X1/unq1 and X2/unq2 convention from `run_pairwise_pid_pipeline`. |
 
 ### `pipeline/full_OTC/otc_experiment.py`
 
