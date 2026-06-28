@@ -17,7 +17,7 @@ target_kwargs:
 
 sources_kwargs:
   model_name_1: RN50_clip
-  model_name_2: ResNet50-SimCLR_selfsupervised
+  model_name_2: RN101_clip
 
 choose_layer_kwargs:
   path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
@@ -29,9 +29,9 @@ feature_extraction_kwargs:
 preprocess_kwargs: {}
 
 feature_manipulation_kwargs:
-  n_components_source_1: 20
-  n_components_source_2: 20
-  n_components_target: 500
+  n_components_source_1: 500
+  n_components_source_2: 500
+  n_components_target: 1000
 
 
 pid_kwargs:

@@ -1,0 +1,12 @@
+------------------------------------
+Sat 27 Jun 2026 12:22:24 IDT
+SLURM_JOBID:		18449226
+SLURM_JOB_NODELIST:	ise-6000-02
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/18449226
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 1
+SLURM_GPU_INDEX:	0
+Running as ohadshee from golan.neuro account with golan-neuro QOS
+------------------------------------
+Sat 27 Jun 2026 12:22:23 IDT
+ STARTING JOB WITH THE COMMAND:  sleep 600 
+[2026-06-27T14:22:45.086] error: *** JOB 18449226 ON ise-6000-02 CANCELLED AT 2026-06-27T14:22:45 DUE TO TIME LIMIT ***

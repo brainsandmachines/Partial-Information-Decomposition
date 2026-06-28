@@ -1,0 +1,20 @@
+------------------------------------
+Sun 28 Jun 2026 10:12:47 IDT
+SLURM_JOBID:		18496782
+SLURM_JOB_NODELIST:	cs-6000-01
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/18496782
+Allocated Resouces:	cpu - 8 / mem -  MB / gpu - 1
+SLURM_GPU_INDEX:	4
+Running as ohadshee from golan.neuro account with golan-neuro QOS
+------------------------------------
+/var/spool/slurmd/job18496782/slurm_script: line 9: activate: No such file or directory
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/full_OTC/otc_run.py", line 14, in <module>
+    from pipeline.full_OTC.otc_experiment import run_otc_experiment
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/full_OTC/otc_experiment.py", line 13, in <module>
+    from pipeline.pipeline_phases.sources_target_features import prepare_target
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pipeline_phases/sources_target_features.py", line 13, in <module>
+    from external.mayas_project.features_and_encoding.feat_ext_and_encoding import DataLoader, ImageDatasetNSD, extract_features_per_layer, prepare_subject_context, prepare_model_context
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/features_and_encoding/feat_ext_and_encoding.py", line 7, in <module>
+    import h5py
+ModuleNotFoundError: No module named 'h5py'

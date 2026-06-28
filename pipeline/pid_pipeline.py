@@ -139,8 +139,10 @@ class PIDPipeline:
 
         target = target_context["target"]
         source_1 = source_1_raw
+        self.source_1_name = sources['X1_name']
         source_2 = source_2_raw
-
+        self.source_2_name = sources['X2_name']
+        print("Running PID with Source 1:", self.source_1_name, "and Source 2:", self.source_2_name)
         if self.functions.preprocess is not None:
             source_1, source_2, target = self.functions.preprocess(
                 target,
@@ -182,5 +184,8 @@ class PIDPipeline:
                 context,
                 **(report_kwargs or {}),
             )
+
+        print("PID computation completed successfully.\n" \
+        "for models:", self.source_1_name, "and", self.source_2_name)
 
         return context

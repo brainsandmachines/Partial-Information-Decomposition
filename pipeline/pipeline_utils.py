@@ -6,6 +6,7 @@ from inspect import signature
 from pathlib import Path
 from typing import Any, Callable
 import numpy as np
+from pipeline.pipeline_phases.sources_target_features import feature_extraction
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
@@ -149,7 +150,7 @@ def nsd_sources(model_name_1: str, model_name_2: str) -> dict[str, dict[str, Any
     from pipeline.pipeline_phases.sources_target_features import prepare_sources
 
     sources = prepare_sources(model_name_1=model_name_1, model_name_2=model_name_2)
-    return {"X1": sources["X1_context"], "X2": sources["X2_context"]}
+    return {"X1": sources["X1_context"], "X1_name": model_name_1, "X2": sources["X2_context"], "X2_name": model_name_2}
 
 
 def specific_layer_index(
@@ -283,7 +284,6 @@ def nsd_feature_extraction(
         features: any, extracted features returned by feature_extraction.
     """
 
-    from pipeline.pipeline_phases.sources_target_features import feature_extraction
 
     return feature_extraction(
         layer_index=int(layer_index),

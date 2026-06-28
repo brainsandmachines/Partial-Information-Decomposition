@@ -1,0 +1,12 @@
+------------------------------------
+Fri 26 Jun 2026 21:08:30 IDT
+SLURM_JOBID:		18424514
+SLURM_JOB_NODELIST:	ise-6000-02
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/18424514
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 1
+SLURM_GPU_INDEX:	7
+Running as ohadshee from golan.neuro account with golan-neuro QOS
+------------------------------------
+Fri 26 Jun 2026 21:08:13 IDT
+ STARTING JOB WITH THE COMMAND:  sleep 600 
+[2026-06-26T21:37:11.501] error: *** JOB 18424514 ON ise-6000-02 CANCELLED AT 2026-06-26T21:37:11 DUE to SIGNAL Terminated ***

@@ -41,7 +41,7 @@ def pca_as_function(pipeline_config: str | Path, pca_config: str | Path) -> dict
         print(f"\nRunning PID computation with {n_components} PCA components...")
         # Update the pipeline config with the current number of PCA components
         pipeline_config["feature_manipulation_kwargs"]["n_components_source_1"] = n_components
-        pipeline_config["feature_manipulation_kwargs"]["n_components_source_2"] = n_components
+        #pipeline_config["feature_manipulation_kwargs"]["n_components_source_2"] = n_components
     
         # Run the OTC experiment with the updated config
         results = run_otc_experiment(pipeline_config) #This is the context
@@ -74,9 +74,8 @@ def plot_(results_dict: dict[str, Any], pca_config: str,pipeline_config: str ) -
     synergistic_info = [results_dict[n]["syn"] for n in n_components_list]
     title = (
     "PID Computation as a Function of PCA Components\n"
-    f"Target Components: {target_components}\n"
-    f"Source 1: {model_name_1}\n Vs"
-    f"Source 2: {model_name_2}")
+    f"Target and Source 2 {model_name_2} Fixed Components: {target_components}\n VS"
+    f"Source 1: {model_name_1}\n")
 
     plt.figure(figsize=(10, 6))
     plt.plot(n_components_list, unique_info_source_1, label="Unique Info Source 1", marker='o')
