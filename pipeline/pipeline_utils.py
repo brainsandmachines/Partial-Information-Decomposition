@@ -504,19 +504,6 @@ def _overall_best_layer_model_names(path_to_results: str | Path) -> list[str]:
         return []
 
 
-COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
-    "nsd_sources": nsd_sources,
-    "random_layer_selection": random_layer_selection_for_sources,
-    "specific_layer_index": specific_layer_index,
-    "specific_index_layer_selection": specific_layer_index,
-    "overall_best_layer": overall_best_layer_for_sources,
-    "nsd_feature_extraction": nsd_feature_extraction,
-    "pca_each_source": pca_each_source,
-    "pid_calc": pid_calc_adapter,
-    "print_pid_mi": print_pid_mi_adapter,
-    'permute_rv': permute_rv,
-}
-
 
 def source_context(sources: Any, source_name: str) -> Any:
     """Read one source context from the sources object.
@@ -577,3 +564,18 @@ def ridge_preprocessing(source_1: Any, source_2: Any, target: Any, **preprocess_
     
     return source_1, source_2, target
     
+COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
+    "nsd_sources": nsd_sources,
+    "random_layer_selection": random_layer_selection_for_sources,
+    "specific_layer_index": specific_layer_index,
+    "specific_index_layer_selection": specific_layer_index,
+    "overall_best_layer": overall_best_layer_for_sources,
+    "nsd_feature_extraction": nsd_feature_extraction,
+    "pca_each_source": pca_each_source,
+    "pid_calc": pid_calc_adapter,
+    "print_pid_mi": print_pid_mi_adapter,
+    'permute_rv': permute_rv,
+    'ridge_on_target_cv': ridge_on_target_cv,
+    'ridge_preprocessing': ridge_preprocessing
+}
+
