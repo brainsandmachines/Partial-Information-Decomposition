@@ -16,7 +16,14 @@ if str(repo_root) not in sys.path:
 
 from pipeline.full_OTC import otc_experiment
 from pipeline.pipeline_utils import nsd_sources
-from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
+
+try:
+    from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
+except ModuleNotFoundError:
+    plotting_dir = repo_root / "pipeline" / "plotting"
+    if str(plotting_dir) not in sys.path:
+        sys.path.insert(0, str(plotting_dir))
+    from pairwise_pid_heatmaps import plot_pairwise_pid_matrices
 
 
 DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
@@ -25,8 +32,8 @@ DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
 }
 
 
-model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
-'''model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
+#model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
+model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
         'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
@@ -36,7 +43,7 @@ model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
         'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised',
-        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']'''
+        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
 
 model_2_names = model_1_names  # Compare all models against each other
 
@@ -216,28 +223,14 @@ def run_pairwise_pid_pipeline(
 if __name__ == "__main__":
 
 
-    parser = argparse.ArgumentParser(
-        description="Run OTC PID across ordered pairs of model names."
-    )
-    parser.add_argument(
-        "config_path",
-        type=str,
-        help="Path to the YAML config file for the OTC pipeline.",
-    )
-    parser.add_argument(
-        "csv_path",
-        type=str,
-        help="Path to the output CSV file for checkpointing results.",
-    )
-    args = parser.parse_args()
 
-
-    config_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/full_OTC/otc_config.yaml')
-    csv_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/dual_')
-    plot_path = csv_path / f"{csv_path.stem}_figures.png"
-    with open(args.config_path, "r") as f:
+    config_path = Path("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml")
+    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results.csv')
+    
+    
+    plot_path = f"{csv_path} / 'pairwise_figures'"
+    with open(config_path, "r") as f:
         otc_config = yaml.safe_load(f)
-
 
     run_pairwise_pid_pipeline(
         model_1_names=model_1_names,

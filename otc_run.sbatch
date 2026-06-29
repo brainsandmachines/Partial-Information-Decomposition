@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=03:00:00
+#SBATCH --time=10:00:00
 #SBATCH --gpus=1
 #SBATCH --partition=rtx6000
 #SBATCH --qos=golan-neuro

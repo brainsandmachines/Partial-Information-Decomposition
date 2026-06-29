@@ -1,89 +1,0 @@
-------------------------------------
-Fri 26 Jun 2026 19:50:04 IDT
-SLURM_JOBID:		18422070
-SLURM_JOB_NODELIST:	ise-cpu256-19
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/18422070
-Allocated Resouces:	cpu - 8 / mem -  MB / gpu - 1
-SLURM_GPU_INDEX:	0
-Running as ohadshee from golan.neuro account with golan-neuro QOS
-------------------------------------
-Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
-Using device: cuda
-Number of images: 73000
-Image shape: (425, 425, 3), dtype: uint8
-nsdID shape: (73000,), Shared1000 shape: (73000,)
-Neural data shape: (10000, 8088)
-Image IDs shape: (10000,)
-Number of voxels: 8088
-Number of projections for SRP: 7894
-Model options for RN50_clip: {'model_name': 'RN50', 'train_type': 'clip', 'train_data': 'openai400M', 'model_source': 'clip', 'call': "get_clip_model('RN50')"}
-Image transforms for RN50_clip: Compose(
-    Resize(size=224, interpolation=bicubic, max_size=None, antialias=True)
-    CenterCrop(size=(224, 224))
-    <function _convert_image_to_rgb at 0x7fdc0c64b1a0>
-    ToTensor()
-    Normalize(mean=(0.48145466, 0.4578275, 0.40821073), std=(0.26862954, 0.26130258, 0.27577711))
-)
-Loaded model: RN50_clip
-Ordered layers from model: ['Conv2d-1', 'BatchNorm2d-1', 'ReLU-1', 'Conv2d-2', 'BatchNorm2d-2', 'ReLU-2', 'Conv2d-3', 'BatchNorm2d-3', 'ReLU-3', 'AvgPool2d-1', 'Conv2d-4', 'BatchNorm2d-4', 'ReLU-4', 'Conv2d-5', 'BatchNorm2d-5', 'ReLU-5', 'Identity-1', 'Conv2d-6', 'BatchNorm2d-6', 'AvgPool2d-2', 'Conv2d-7', 'BatchNorm2d-7', 'ReLU-6', 'Bottleneck-1', 'Conv2d-8', 'BatchNorm2d-8', 'ReLU-7', 'Conv2d-9', 'BatchNorm2d-9', 'ReLU-8', 'Identity-2', 'Conv2d-10', 'BatchNorm2d-10', 'ReLU-9', 'Bottleneck-2', 'Conv2d-11', 'BatchNorm2d-11', 'ReLU-10', 'Conv2d-12', 'BatchNorm2d-12', 'ReLU-11', 'Identity-3', 'Conv2d-13', 'BatchNorm2d-13', 'ReLU-12', 'Bottleneck-3', 'Conv2d-14', 'BatchNorm2d-14', 'ReLU-13', 'Conv2d-15', 'BatchNorm2d-15', 'ReLU-14', 'AvgPool2d-3', 'Conv2d-16', 'BatchNorm2d-16', 'AvgPool2d-4', 'Conv2d-17', 'BatchNorm2d-17', 'ReLU-15', 'Bottleneck-4', 'Conv2d-18', 'BatchNorm2d-18', 'ReLU-16', 'Conv2d-19', 'BatchNorm2d-19', 'ReLU-17', 'Identity-4', 'Conv2d-20', 'BatchNorm2d-20', 'ReLU-18', 'Bottleneck-5', 'Conv2d-21', 'BatchNorm2d-21', 'ReLU-19', 'Conv2d-22', 'BatchNorm2d-22', 'ReLU-20', 'Identity-5', 'Conv2d-23', 'BatchNorm2d-23', 'ReLU-21', 'Bottleneck-6', 'Conv2d-24', 'BatchNorm2d-24', 'ReLU-22', 'Conv2d-25', 'BatchNorm2d-25', 'ReLU-23', 'Identity-6', 'Conv2d-26', 'BatchNorm2d-26', 'ReLU-24', 'Bottleneck-7', 'Conv2d-27', 'BatchNorm2d-27', 'ReLU-25', 'Conv2d-28', 'BatchNorm2d-28', 'ReLU-26', 'AvgPool2d-5', 'Conv2d-29', 'BatchNorm2d-29', 'AvgPool2d-6', 'Conv2d-30', 'BatchNorm2d-30', 'ReLU-27', 'Bottleneck-8', 'Conv2d-31', 'BatchNorm2d-31', 'ReLU-28', 'Conv2d-32', 'BatchNorm2d-32', 'ReLU-29', 'Identity-7', 'Conv2d-33', 'BatchNorm2d-33', 'ReLU-30', 'Bottleneck-9', 'Conv2d-34', 'BatchNorm2d-34', 'ReLU-31', 'Conv2d-35', 'BatchNorm2d-35', 'ReLU-32', 'Identity-8', 'Conv2d-36', 'BatchNorm2d-36', 'ReLU-33', 'Bottleneck-10', 'Conv2d-37', 'BatchNorm2d-37', 'ReLU-34', 'Conv2d-38', 'BatchNorm2d-38', 'ReLU-35', 'Identity-9', 'Conv2d-39', 'BatchNorm2d-39', 'ReLU-36', 'Bottleneck-11', 'Conv2d-40', 'BatchNorm2d-40', 'ReLU-37', 'Conv2d-41', 'BatchNorm2d-41', 'ReLU-38', 'Identity-10', 'Conv2d-42', 'BatchNorm2d-42', 'ReLU-39', 'Bottleneck-12', 'Conv2d-43', 'BatchNorm2d-43', 'ReLU-40', 'Conv2d-44', 'BatchNorm2d-44', 'ReLU-41', 'Identity-11', 'Conv2d-45', 'BatchNorm2d-45', 'ReLU-42', 'Bottleneck-13', 'Conv2d-46', 'BatchNorm2d-46', 'ReLU-43', 'Conv2d-47', 'BatchNorm2d-47', 'ReLU-44', 'AvgPool2d-7', 'Conv2d-48', 'BatchNorm2d-48', 'AvgPool2d-8', 'Conv2d-49', 'BatchNorm2d-49', 'ReLU-45', 'Bottleneck-14', 'Conv2d-50', 'BatchNorm2d-50', 'ReLU-46', 'Conv2d-51', 'BatchNorm2d-51', 'ReLU-47', 'Identity-12', 'Conv2d-52', 'BatchNorm2d-52', 'ReLU-48', 'Bottleneck-15', 'Conv2d-53', 'BatchNorm2d-53', 'ReLU-49', 'Conv2d-54', 'BatchNorm2d-54', 'ReLU-50', 'Identity-13', 'Conv2d-55', 'BatchNorm2d-55', 'ReLU-51', 'Bottleneck-16', 'AttentionPool2d-1', 'ModifiedResNet-1']
-Total number of layers: 200
-Model options for ResNet50-SimCLR_selfsupervised: {'model_name': 'ResNet50-SimCLR', 'train_type': 'selfsupervised', 'train_data': 'imagenet', 'model_source': 'vissl', 'call': "get_vissl_model('ResNet50-SimCLR')"}
-Image transforms for ResNet50-SimCLR_selfsupervised: Compose(
-    Resize(size=(224, 224), interpolation=bilinear, max_size=None, antialias=True)
-    ToTensor()
-    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-)
-Loaded model: ResNet50-SimCLR_selfsupervised
-Ordered layers from model: ['Conv2d-1', 'BatchNorm2d-1', 'ReLU-1', 'MaxPool2d-1', 'Conv2d-2', 'BatchNorm2d-2', 'ReLU-2', 'Conv2d-3', 'BatchNorm2d-3', 'ReLU-3', 'Conv2d-4', 'BatchNorm2d-4', 'Conv2d-5', 'BatchNorm2d-5', 'ReLU-4', 'Bottleneck-1', 'Conv2d-6', 'BatchNorm2d-6', 'ReLU-5', 'Conv2d-7', 'BatchNorm2d-7', 'ReLU-6', 'Conv2d-8', 'BatchNorm2d-8', 'ReLU-7', 'Bottleneck-2', 'Conv2d-9', 'BatchNorm2d-9', 'ReLU-8', 'Conv2d-10', 'BatchNorm2d-10', 'ReLU-9', 'Conv2d-11', 'BatchNorm2d-11', 'ReLU-10', 'Bottleneck-3', 'Conv2d-12', 'BatchNorm2d-12', 'ReLU-11', 'Conv2d-13', 'BatchNorm2d-13', 'ReLU-12', 'Conv2d-14', 'BatchNorm2d-14', 'Conv2d-15', 'BatchNorm2d-15', 'ReLU-13', 'Bottleneck-4', 'Conv2d-16', 'BatchNorm2d-16', 'ReLU-14', 'Conv2d-17', 'BatchNorm2d-17', 'ReLU-15', 'Conv2d-18', 'BatchNorm2d-18', 'ReLU-16', 'Bottleneck-5', 'Conv2d-19', 'BatchNorm2d-19', 'ReLU-17', 'Conv2d-20', 'BatchNorm2d-20', 'ReLU-18', 'Conv2d-21', 'BatchNorm2d-21', 'ReLU-19', 'Bottleneck-6', 'Conv2d-22', 'BatchNorm2d-22', 'ReLU-20', 'Conv2d-23', 'BatchNorm2d-23', 'ReLU-21', 'Conv2d-24', 'BatchNorm2d-24', 'ReLU-22', 'Bottleneck-7', 'Conv2d-25', 'BatchNorm2d-25', 'ReLU-23', 'Conv2d-26', 'BatchNorm2d-26', 'ReLU-24', 'Conv2d-27', 'BatchNorm2d-27', 'Conv2d-28', 'BatchNorm2d-28', 'ReLU-25', 'Bottleneck-8', 'Conv2d-29', 'BatchNorm2d-29', 'ReLU-26', 'Conv2d-30', 'BatchNorm2d-30', 'ReLU-27', 'Conv2d-31', 'BatchNorm2d-31', 'ReLU-28', 'Bottleneck-9', 'Conv2d-32', 'BatchNorm2d-32', 'ReLU-29', 'Conv2d-33', 'BatchNorm2d-33', 'ReLU-30', 'Conv2d-34', 'BatchNorm2d-34', 'ReLU-31', 'Bottleneck-10', 'Conv2d-35', 'BatchNorm2d-35', 'ReLU-32', 'Conv2d-36', 'BatchNorm2d-36', 'ReLU-33', 'Conv2d-37', 'BatchNorm2d-37', 'ReLU-34', 'Bottleneck-11', 'Conv2d-38', 'BatchNorm2d-38', 'ReLU-35', 'Conv2d-39', 'BatchNorm2d-39', 'ReLU-36', 'Conv2d-40', 'BatchNorm2d-40', 'ReLU-37', 'Bottleneck-12', 'Conv2d-41', 'BatchNorm2d-41', 'ReLU-38', 'Conv2d-42', 'BatchNorm2d-42', 'ReLU-39', 'Conv2d-43', 'BatchNorm2d-43', 'ReLU-40', 'Bottleneck-13', 'Conv2d-44', 'BatchNorm2d-44', 'ReLU-41', 'Conv2d-45', 'BatchNorm2d-45', 'ReLU-42', 'Conv2d-46', 'BatchNorm2d-46', 'Conv2d-47', 'BatchNorm2d-47', 'ReLU-43', 'Bottleneck-14', 'Conv2d-48', 'BatchNorm2d-48', 'ReLU-44', 'Conv2d-49', 'BatchNorm2d-49', 'ReLU-45', 'Conv2d-50', 'BatchNorm2d-50', 'ReLU-46', 'Bottleneck-15', 'Conv2d-51', 'BatchNorm2d-51', 'ReLU-47', 'Conv2d-52', 'BatchNorm2d-52', 'ReLU-48', 'Conv2d-53', 'BatchNorm2d-53', 'ReLU-49', 'Bottleneck-16', 'AdaptiveAvgPool2d-1', 'Identity-1', 'ResNet-1']
-Total number of layers: 175
-
-==================================================
-Processing layer: Conv2d-51 from model: RN50_clip
-
-For model RN50_clip Layer Conv2d-51: Extracting features for 10000 images in batches of 500...
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.62s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.62s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.61s/it]
-Feature extraction for model RN50_clip layer Conv2d-51 completed in 87.81 seconds.
-
-==================================================
-Processing layer: Conv2d-51 from model: ResNet50-SimCLR_selfsupervised
-
-For model ResNet50-SimCLR_selfsupervised Layer Conv2d-51: Extracting features for 10000 images in batches of 500...
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.18s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.18s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]

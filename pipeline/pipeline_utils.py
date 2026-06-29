@@ -11,7 +11,7 @@ from pipeline.pipeline_phases.sources_target_features import feature_extraction
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.feature_manipulations import pca_projection
-from pipeline.pipeline_phases.preprocessing_layer import permute_rv,ridge_on_target_cv
+from pipeline.pipeline_phases.preprocessing_layer import permute_rv,ridge_train_to_test_prediction
 PipelineFunction = Callable[..., Any]
 
 
@@ -550,7 +550,7 @@ def choose_one_layer(layer_func: Callable[..., Any], source_context_value: Any, 
     return selected
 
 
-def ridge_preprocessing(source_1: Any, source_2: Any, target: Any, **preprocess_kwargs: Any) -> tuple[Any, Any, Any]:
+def ridge_preprocessing(source_1: Any, source_2: Any, target: Any,rng,test_size,**preprocess_kwargs: Any) -> tuple[Any, Any, Any]:
     """Apply ridge regression preprocessing to sources and target.
 
     Inputs:
@@ -559,11 +559,40 @@ def ridge_preprocessing(source_1: Any, source_2: Any, target: Any, **preprocess_
         target: any, target feature matrix.
         preprocess_kwargs: any, keyword arguments for preprocess_layer."""
     
-    source_1 = ridge_on_target_cv(source_1, target, **preprocess_kwargs)
-    source_2 = ridge_on_target_cv(source_2, target, **preprocess_kwargs)
+    if preprocess_kwargs.get("n_components_target", None) is not None:
+        prj_target = pca_projection(target, n_components=preprocess_kwargs.get("n_components_target", None))
+        print(f"\nTarget PCA projection applied with target shape: {prj_target.shape}")
+    else:
+        prj_target = target
+
+    # Split to test and training
+    n_samples = prj_target.shape[0]
+    training_size = n_samples - int(test_size * n_samples)
+
+
+    random_indices = rng.permutation(n_samples)
+    train_indices = random_indices[:training_size]  
+    test_indices = random_indices[training_size:]
+
+    source_1_train = source_1[train_indices]
+    source_2_train = source_2[train_indices]
+    target_train = prj_target[train_indices]
+
+    source_1_test = source_1[test_indices]
+    source_2_test = source_2[test_indices]
+    target_test = prj_target[test_indices]
     
-    return source_1, source_2, target
-    
+    print(f"\nRidge regression preprocessing applied with training size: {training_size} and test size: {n_samples - training_size}")
+    preprocess_kwargs.pop("n_components_target", None)  # Remove n_components_target from kwargs before passing to ridge_on_target_cv
+    source_1_pred,info_1 = ridge_train_to_test_prediction(source_1_train, target_train, source_test=source_1_test, target_test=target_test, **preprocess_kwargs)
+    source_2_pred,info_2 = ridge_train_to_test_prediction(source_2_train, target_train, source_test=source_2_test, target_test=target_test, **preprocess_kwargs)
+
+    return source_1_pred, source_2_pred, target_test
+
+
+
+
+
 COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     "nsd_sources": nsd_sources,
     "random_layer_selection": random_layer_selection_for_sources,
@@ -575,7 +604,6 @@ COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     "pid_calc": pid_calc_adapter,
     "print_pid_mi": print_pid_mi_adapter,
     'permute_rv': permute_rv,
-    'ridge_on_target_cv': ridge_on_target_cv,
+    'ridge_train_to_test_prediction': ridge_train_to_test_prediction,
     'ridge_preprocessing': ridge_preprocessing
 }
-

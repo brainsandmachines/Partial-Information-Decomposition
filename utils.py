@@ -1,3 +1,5 @@
+from inspect import signature
+
 import torch
 import numpy as np
 import os
@@ -13,7 +15,8 @@ from typing import Callable, Literal
 import seaborn as sns
 from sklearn.linear_model import RidgeCV, LinearRegression
 from sklearn.linear_model import MultiTaskLassoCV,LassoCV
-
+from typing import Any, Callable, Literal
+import inspect
 RUN_SIGNATURE_COLUMN = "__run_signature__"
 
 
@@ -876,3 +879,14 @@ def _to_numpy_samples(data):
     if data.ndim == 1:
         data = data.reshape(-1, 1)
     return data
+
+
+def inspect_function(function:Callable[..., Any], input_name:str) -> bool:
+    """Inspect a function's signature to check if it accepts a specific input name.
+
+    Inputs:
+        function: callable, the function to inspect.
+        input_name: str, the name of the input parameter to check for."""
+    
+    sig = signature(function)
+    return input_name in sig.parameters

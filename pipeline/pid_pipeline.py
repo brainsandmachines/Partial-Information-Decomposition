@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Callable
-
-
+import numpy as np
+import utils
 @dataclass
 class PIDPipelineFunctions:
     """Store the user-selected functions for one PID pipeline run.
@@ -82,6 +82,28 @@ class PIDPipeline:
 
         self.functions = functions
 
+    def add_rng_to_kwargs(self, kwargs: dict[str, Any],func ,rng: np.random.Generator) -> dict[str, Any]:
+        """Add the random number generator to the provided kwargs dictionary.
+
+        Inputs:
+            kwargs: dict, keyword arguments for a pipeline function.
+            rng: np.random.Generator, random number generator for reproducibility.
+
+        Output:
+            updated_kwargs: dict, updated keyword arguments with 'rng' added.
+        """
+        if kwargs is None:
+            kwargs = {}
+
+        elif func is None:
+            return kwargs  # If the function is None, return the original kwargs
+
+        elif not utils.inspect_function(func, 'rng'):
+            return kwargs  # If the function does not accept 'rng', return the original kwargs
+        
+        updated_kwargs = {**kwargs, "rng": rng}
+        return updated_kwargs
+
     def run(
         self,
         *,
@@ -111,6 +133,19 @@ class PIDPipeline:
             selected_layers, raw_features, target, source_1, source_2, pid_results,
             and report_output.
         """
+
+        rng_seed = pid_kwargs['rng_seed']
+        rng = np.random.default_rng(rng_seed)
+        
+        #Add RNG to all kwargs for reproducibility
+        target_kwargs = self.add_rng_to_kwargs(target_kwargs, self.functions.target_extraction, rng)
+        sources_kwargs = self.add_rng_to_kwargs(sources_kwargs, self.functions.sources_extraction, rng)
+        choose_layer_kwargs = self.add_rng_to_kwargs(choose_layer_kwargs, self.functions.choose_layer, rng)
+        feature_extraction_kwargs = self.add_rng_to_kwargs(feature_extraction_kwargs, self.functions.feature_extraction, rng)
+        preprocess_kwargs = self.add_rng_to_kwargs(preprocess_kwargs, self.functions.preprocess, rng)
+        feature_manipulation_kwargs = self.add_rng_to_kwargs(feature_manipulation_kwargs, self.functions.feature_manipulation, rng)
+        pid_kwargs = self.add_rng_to_kwargs(pid_kwargs, self.functions.pid_calculation, rng)
+        report_kwargs = self.add_rng_to_kwargs(report_kwargs, self.functions.pid_report, rng)
 
         target_context = self.functions.target_extraction(**(target_kwargs or {}))
         if not isinstance(target_context, dict) or "target" not in target_context:
@@ -142,7 +177,8 @@ class PIDPipeline:
         self.source_1_name = sources['X1_name']
         source_2 = source_2_raw
         self.source_2_name = sources['X2_name']
-        print("\nRunning PID with Source 1:", self.source_1_name, "and Source 2:", self.source_2_name)
+
+        print("\nRunning PID with Source 1:", self.source_1_name, "and Source 2:", self.source_2_name, "😀")
         
         if self.functions.preprocess is not None:
             source_1, source_2, target = self.functions.preprocess(
