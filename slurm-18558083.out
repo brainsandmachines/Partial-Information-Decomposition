@@ -1,13 +1,13 @@
 ------------------------------------
-Sun 28 Jun 2026 16:28:58 IDT
-SLURM_JOBID:		18511719
-SLURM_JOB_NODELIST:	ise-cpu256-22
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/18511719
+Mon 29 Jun 2026 11:52:40 IDT
+SLURM_JOBID:		18558083
+SLURM_JOB_NODELIST:	ise-cpu256-09
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/18558083
 Allocated Resouces:	cpu - 8 / mem -  MB / gpu - 1
 SLURM_GPU_INDEX:	0
 Running as ohadshee from golan.neuro account with golan-neuro QOS
 ------------------------------------
-/var/spool/slurmd/job18511719/slurm_script: line 9: activate: No such file or directory
+/var/spool/slurmd/job18558083/slurm_script: line 9: activate: No such file or directory
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
 Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
 Using device: cuda
@@ -40,5 +40,33 @@ Total number of layers: 175
 ==================================================
 Processing layer: LayerNorm-38 from model: crossvit_base_240_classification
 
-For model crossvit_base_240_classification Layer LayerNorm-38: Extracting features for 10000 images in batches of 500...
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s][2026-06-28T16:29:09.930] error: *** JOB 18511719 ON ise-cpu256-22 CANCELLED AT 2026-06-28T16:29:09 DUE to SIGNAL Terminated ***
+For model crossvit_base_240_classification Layer LayerNorm-38: Extracting features for 1000 images in batches of 500...
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.48s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.48s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.48s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.48s/it]
+Feature extraction for model crossvit_base_240_classification layer LayerNorm-38 completed in 10.97 seconds.
+
+==================================================
+Processing layer: Conv2d-51 from model: ResNet50-SimCLR_selfsupervised
+
+For model ResNet50-SimCLR_selfsupervised Layer Conv2d-51: Extracting features for 1000 images in batches of 500...
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.32s/it]
+Feature extraction for model ResNet50-SimCLR_selfsupervised layer Conv2d-51 completed in 5.00 seconds.
+
+Running PID with Source 1: crossvit_base_240_classification and Source 2: ResNet50-SimCLR_selfsupervised 😀
+
+Target PCA projection applied with target shape: (1000, 20)
+
+Ridge regression preprocessing applied with training size: 500 and test size: 500
+PID Results:
+  red: 4.428670289428615
+  unq1: 0.09690881965155107
+  unq2: 0.11076935730966397
+  syn: 0.33781226923629504
+Mutual Information Results:
+  tri_mi: 4.974160735626125
+  bi_mi_1: 4.525579109080166
+  bi_mi_2: 4.539439646738279
+
+PID computation completed successfully.
+for models: crossvit_base_240_classification and ResNet50-SimCLR_selfsupervised

@@ -1,847 +1,0 @@
-------------------------------------
-Sun 28 Jun 2026 16:29:47 IDT
-SLURM_JOBID:		18511723
-SLURM_JOB_NODELIST:	ise-cpu256-22
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/18511723
-Allocated Resouces:	cpu - 8 / mem -  MB / gpu - 1
-SLURM_GPU_INDEX:	0
-Running as ohadshee from golan.neuro account with golan-neuro QOS
-------------------------------------
-/var/spool/slurmd/job18511723/slurm_script: line 9: activate: No such file or directory
-Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
-Using device: cuda
-Number of images: 73000
-Image shape: (425, 425, 3), dtype: uint8
-nsdID shape: (73000,), Shared1000 shape: (73000,)
-Neural data shape: (10000, 8088)
-Image IDs shape: (10000,)
-Number of voxels: 8088
-Number of projections for SRP: 7894
-Model options for crossvit_base_240_classification: {'model_name': 'crossvit_base_240', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('crossvit_base_240', pretrained = True)"}
-Image transforms for crossvit_base_240_classification: Compose(
-    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
-    MaybeToTensor()
-    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
-)
-Loaded model: crossvit_base_240_classification
-Ordered layers from model: ['Conv2d-1', 'PatchEmbed-1', 'Dropout-1', 'Conv2d-2', 'PatchEmbed-2', 'Dropout-2', 'LayerNorm-1', 'Linear-1', 'Identity-1', 'Identity-2', 'Identity-3', 'Linear-2', 'Dropout-3', 'Attention-1', 'Identity-4', 'Identity-5', 'LayerNorm-2', 'Linear-3', 'GELU-1', 'Dropout-4', 'Identity-6', 'Linear-4', 'Dropout-5', 'Mlp-1', 'Identity-7', 'Identity-8', 'Block-1', 'LayerNorm-3', 'Linear-5', 'Identity-9', 'Identity-10', 'Identity-11', 'Linear-6', 'Dropout-6', 'Attention-2', 'Identity-12', 'Identity-13', 'LayerNorm-4', 'Linear-7', 'GELU-2', 'Dropout-7', 'Identity-14', 'Linear-8', 'Dropout-8', 'Mlp-2', 'Identity-15', 'Identity-16', 'Block-2', 'LayerNorm-5', 'Linear-9', 'Identity-17', 'Identity-18', 'Identity-19', 'Linear-10', 'Dropout-9', 'Attention-3', 'Identity-20', 'Identity-21', 'LayerNorm-6', 'Linear-11', 'GELU-3', 'Dropout-10', 'Identity-22', 'Linear-12', 'Dropout-11', 'Mlp-3', 'Identity-23', 'Identity-24', 'Block-3', 'LayerNorm-7', 'Linear-13', 'Identity-25', 'Identity-26', 'Identity-27', 'Linear-14', 'Dropout-12', 'Attention-4', 'Identity-28', 'Identity-29', 'LayerNorm-8', 'Linear-15', 'GELU-4', 'Dropout-13', 'Identity-30', 'Linear-16', 'Dropout-14', 'Mlp-4', 'Identity-31', 'Identity-32', 'Block-4', 'LayerNorm-9', 'Linear-17', 'Identity-33', 'Identity-34', 'Identity-35', 'Linear-18', 'Dropout-15', 'Attention-5', 'Identity-36', 'Identity-37', 'LayerNorm-10', 'Linear-19', 'GELU-5', 'Dropout-16', 'Identity-38', 'Linear-20', 'Dropout-17', 'Mlp-5', 'Identity-39', 'Identity-40', 'Block-5', 'LayerNorm-11', 'GELU-6', 'Linear-21', 'LayerNorm-12', 'GELU-7', 'Linear-22', 'LayerNorm-13', 'Linear-23', 'Linear-24', 'Linear-25', 'Dropout-18', 'Linear-26', 'Dropout-19', 'CrossAttention-1', 'Identity-41', 'CrossAttentionBlock-1', 'LayerNorm-14', 'GELU-8', 'Linear-27', 'LayerNorm-15', 'Linear-28', 'Linear-29', 'Linear-30', 'Dropout-20', 'Linear-31', 'Dropout-21', 'CrossAttention-3', 'Identity-42', 'CrossAttentionBlock-2', 'LayerNorm-16', 'GELU-9', 'Linear-32', 'MultiScaleBlock-1-1', 'MultiScaleBlock-1-2', 'LayerNorm-17', 'Linear-33', 'Identity-43', 'Identity-44', 'Identity-45', 'Linear-34', 'Dropout-22', 'Attention-10', 'Identity-46', 'Identity-47', 'LayerNorm-18', 'Linear-35', 'GELU-10', 'Dropout-23', 'Identity-48', 'Linear-36', 'Dropout-24', 'Mlp-6', 'Identity-49', 'Identity-50', 'Block-10', 'LayerNorm-19', 'Linear-37', 'Identity-51', 'Identity-52', 'Identity-53', 'Linear-38', 'Dropout-25', 'Attention-11', 'Identity-54', 'Identity-55', 'LayerNorm-20', 'Linear-39', 'GELU-11', 'Dropout-26', 'Identity-56', 'Linear-40', 'Dropout-27', 'Mlp-7', 'Identity-57', 'Identity-58', 'Block-11', 'LayerNorm-21', 'Linear-41', 'Identity-59', 'Identity-60', 'Identity-61', 'Linear-42', 'Dropout-28', 'Attention-12', 'Identity-62', 'Identity-63', 'LayerNorm-22', 'Linear-43', 'GELU-12', 'Dropout-29', 'Identity-64', 'Linear-44', 'Dropout-30', 'Mlp-8', 'Identity-65', 'Identity-66', 'Block-12', 'LayerNorm-23', 'Linear-45', 'Identity-67', 'Identity-68', 'Identity-69', 'Linear-46', 'Dropout-31', 'Attention-13', 'Identity-70', 'Identity-71', 'LayerNorm-24', 'Linear-47', 'GELU-13', 'Dropout-32', 'Identity-72', 'Linear-48', 'Dropout-33', 'Mlp-9', 'Identity-73', 'Identity-74', 'Block-13', 'LayerNorm-25', 'Linear-49', 'Identity-75', 'Identity-76', 'Identity-77', 'Linear-50', 'Dropout-34', 'Attention-14', 'Identity-78', 'Identity-79', 'LayerNorm-26', 'Linear-51', 'GELU-14', 'Dropout-35', 'Identity-80', 'Linear-52', 'Dropout-36', 'Mlp-10', 'Identity-81', 'Identity-82', 'Block-14', 'LayerNorm-27', 'GELU-15', 'Linear-53', 'LayerNorm-28', 'GELU-16', 'Linear-54', 'LayerNorm-29', 'Linear-55', 'Linear-56', 'Linear-57', 'Dropout-37', 'Linear-58', 'Dropout-38', 'CrossAttention-5', 'Identity-83', 'CrossAttentionBlock-3', 'LayerNorm-30', 'GELU-17', 'Linear-59', 'LayerNorm-31', 'Linear-60', 'Linear-61', 'Linear-62', 'Dropout-39', 'Linear-63', 'Dropout-40', 'CrossAttention-7', 'Identity-84', 'CrossAttentionBlock-4', 'LayerNorm-32', 'GELU-18', 'Linear-64', 'MultiScaleBlock-3-1', 'MultiScaleBlock-3-2', 'LayerNorm-33', 'Linear-65', 'Identity-85', 'Identity-86', 'Identity-87', 'Linear-66', 'Dropout-41', 'Attention-19', 'Identity-88', 'Identity-89', 'LayerNorm-34', 'Linear-67', 'GELU-19', 'Dropout-42', 'Identity-90', 'Linear-68', 'Dropout-43', 'Mlp-11', 'Identity-91', 'Identity-92', 'Block-19', 'LayerNorm-35', 'Linear-69', 'Identity-93', 'Identity-94', 'Identity-95', 'Linear-70', 'Dropout-44', 'Attention-20', 'Identity-96', 'Identity-97', 'LayerNorm-36', 'Linear-71', 'GELU-20', 'Dropout-45', 'Identity-98', 'Linear-72', 'Dropout-46', 'Mlp-12', 'Identity-99', 'Identity-100', 'Block-20', 'LayerNorm-37', 'Linear-73', 'Identity-101', 'Identity-102', 'Identity-103', 'Linear-74', 'Dropout-47', 'Attention-21', 'Identity-104', 'Identity-105', 'LayerNorm-38', 'Linear-75', 'GELU-21', 'Dropout-48', 'Identity-106', 'Linear-76', 'Dropout-49', 'Mlp-13', 'Identity-107', 'Identity-108', 'Block-21', 'LayerNorm-39', 'Linear-77', 'Identity-109', 'Identity-110', 'Identity-111', 'Linear-78', 'Dropout-50', 'Attention-22', 'Identity-112', 'Identity-113', 'LayerNorm-40', 'Linear-79', 'GELU-22', 'Dropout-51', 'Identity-114', 'Linear-80', 'Dropout-52', 'Mlp-14', 'Identity-115', 'Identity-116', 'Block-22', 'LayerNorm-41', 'Linear-81', 'Identity-117', 'Identity-118', 'Identity-119', 'Linear-82', 'Dropout-53', 'Attention-23', 'Identity-120', 'Identity-121', 'LayerNorm-42', 'Linear-83', 'GELU-23', 'Dropout-54', 'Identity-122', 'Linear-84', 'Dropout-55', 'Mlp-15', 'Identity-123', 'Identity-124', 'Block-23', 'LayerNorm-43', 'GELU-24', 'Linear-85', 'LayerNorm-44', 'GELU-25', 'Linear-86', 'LayerNorm-45', 'Linear-87', 'Linear-88', 'Linear-89', 'Dropout-56', 'Linear-90', 'Dropout-57', 'CrossAttention-9', 'Identity-125', 'CrossAttentionBlock-5', 'LayerNorm-46', 'GELU-26', 'Linear-91', 'LayerNorm-47', 'Linear-92', 'Linear-93', 'Linear-94', 'Dropout-58', 'Linear-95', 'Dropout-59', 'CrossAttention-11', 'Identity-126', 'CrossAttentionBlock-6', 'LayerNorm-48', 'GELU-27', 'Linear-96', 'MultiScaleBlock-5-1', 'MultiScaleBlock-5-2', 'LayerNorm-49', 'LayerNorm-50', 'Dropout-60', 'Dropout-61', 'Linear-97', 'Linear-98', 'CrossVit-1']
-Total number of layers: 430
-Model options for ResNet50-SimCLR_selfsupervised: {'model_name': 'ResNet50-SimCLR', 'train_type': 'selfsupervised', 'train_data': 'imagenet', 'model_source': 'vissl', 'call': "get_vissl_model('ResNet50-SimCLR')"}
-Image transforms for ResNet50-SimCLR_selfsupervised: Compose(
-    Resize(size=(224, 224), interpolation=bilinear, max_size=None, antialias=True)
-    ToTensor()
-    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-)
-Loaded model: ResNet50-SimCLR_selfsupervised
-Ordered layers from model: ['Conv2d-1', 'BatchNorm2d-1', 'ReLU-1', 'MaxPool2d-1', 'Conv2d-2', 'BatchNorm2d-2', 'ReLU-2', 'Conv2d-3', 'BatchNorm2d-3', 'ReLU-3', 'Conv2d-4', 'BatchNorm2d-4', 'Conv2d-5', 'BatchNorm2d-5', 'ReLU-4', 'Bottleneck-1', 'Conv2d-6', 'BatchNorm2d-6', 'ReLU-5', 'Conv2d-7', 'BatchNorm2d-7', 'ReLU-6', 'Conv2d-8', 'BatchNorm2d-8', 'ReLU-7', 'Bottleneck-2', 'Conv2d-9', 'BatchNorm2d-9', 'ReLU-8', 'Conv2d-10', 'BatchNorm2d-10', 'ReLU-9', 'Conv2d-11', 'BatchNorm2d-11', 'ReLU-10', 'Bottleneck-3', 'Conv2d-12', 'BatchNorm2d-12', 'ReLU-11', 'Conv2d-13', 'BatchNorm2d-13', 'ReLU-12', 'Conv2d-14', 'BatchNorm2d-14', 'Conv2d-15', 'BatchNorm2d-15', 'ReLU-13', 'Bottleneck-4', 'Conv2d-16', 'BatchNorm2d-16', 'ReLU-14', 'Conv2d-17', 'BatchNorm2d-17', 'ReLU-15', 'Conv2d-18', 'BatchNorm2d-18', 'ReLU-16', 'Bottleneck-5', 'Conv2d-19', 'BatchNorm2d-19', 'ReLU-17', 'Conv2d-20', 'BatchNorm2d-20', 'ReLU-18', 'Conv2d-21', 'BatchNorm2d-21', 'ReLU-19', 'Bottleneck-6', 'Conv2d-22', 'BatchNorm2d-22', 'ReLU-20', 'Conv2d-23', 'BatchNorm2d-23', 'ReLU-21', 'Conv2d-24', 'BatchNorm2d-24', 'ReLU-22', 'Bottleneck-7', 'Conv2d-25', 'BatchNorm2d-25', 'ReLU-23', 'Conv2d-26', 'BatchNorm2d-26', 'ReLU-24', 'Conv2d-27', 'BatchNorm2d-27', 'Conv2d-28', 'BatchNorm2d-28', 'ReLU-25', 'Bottleneck-8', 'Conv2d-29', 'BatchNorm2d-29', 'ReLU-26', 'Conv2d-30', 'BatchNorm2d-30', 'ReLU-27', 'Conv2d-31', 'BatchNorm2d-31', 'ReLU-28', 'Bottleneck-9', 'Conv2d-32', 'BatchNorm2d-32', 'ReLU-29', 'Conv2d-33', 'BatchNorm2d-33', 'ReLU-30', 'Conv2d-34', 'BatchNorm2d-34', 'ReLU-31', 'Bottleneck-10', 'Conv2d-35', 'BatchNorm2d-35', 'ReLU-32', 'Conv2d-36', 'BatchNorm2d-36', 'ReLU-33', 'Conv2d-37', 'BatchNorm2d-37', 'ReLU-34', 'Bottleneck-11', 'Conv2d-38', 'BatchNorm2d-38', 'ReLU-35', 'Conv2d-39', 'BatchNorm2d-39', 'ReLU-36', 'Conv2d-40', 'BatchNorm2d-40', 'ReLU-37', 'Bottleneck-12', 'Conv2d-41', 'BatchNorm2d-41', 'ReLU-38', 'Conv2d-42', 'BatchNorm2d-42', 'ReLU-39', 'Conv2d-43', 'BatchNorm2d-43', 'ReLU-40', 'Bottleneck-13', 'Conv2d-44', 'BatchNorm2d-44', 'ReLU-41', 'Conv2d-45', 'BatchNorm2d-45', 'ReLU-42', 'Conv2d-46', 'BatchNorm2d-46', 'Conv2d-47', 'BatchNorm2d-47', 'ReLU-43', 'Bottleneck-14', 'Conv2d-48', 'BatchNorm2d-48', 'ReLU-44', 'Conv2d-49', 'BatchNorm2d-49', 'ReLU-45', 'Conv2d-50', 'BatchNorm2d-50', 'ReLU-46', 'Bottleneck-15', 'Conv2d-51', 'BatchNorm2d-51', 'ReLU-47', 'Conv2d-52', 'BatchNorm2d-52', 'ReLU-48', 'Conv2d-53', 'BatchNorm2d-53', 'ReLU-49', 'Bottleneck-16', 'AdaptiveAvgPool2d-1', 'Identity-1', 'ResNet-1']
-Total number of layers: 175
-
-==================================================
-Processing layer: LayerNorm-38 from model: crossvit_base_240_classification
-
-For model crossvit_base_240_classification Layer LayerNorm-38: Extracting features for 10000 images in batches of 500...
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.18s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.18s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.18s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.18s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.18s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.18s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
-Feature extraction for model crossvit_base_240_classification layer LayerNorm-38 completed in 76.23 seconds.
-
-==================================================
-Processing layer: Conv2d-51 from model: ResNet50-SimCLR_selfsupervised
-
-For model ResNet50-SimCLR_selfsupervised Layer Conv2d-51: Extracting features for 10000 images in batches of 500...
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.309503184336428e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.393012591005999e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.509269653698908e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.7112304628863484e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.876214240735142e-12.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.794630830198045e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.509269653698908e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.7112304628863484e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.876214240735142e-12.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.794630830198045e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.128853647866748e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.6286918742310945e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4813101573428753e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9552823249391338e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.0379468385355324e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.128853647866748e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.6286918742310945e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4813101573428753e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9552823249391338e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.0379468385355324e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.497824973055288e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.762133548081749e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.733008069328747e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.371630752369015e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.507187956193093e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.864053769817247e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.015884539995909e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.798056951749174e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.4966330658979814e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.607450059841312e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.282346002947861e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.481936347199849e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.636261623034102e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.153206360577258e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.421542352365918e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.070245891909849e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0589455978760043e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.928577877043153e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.740242973814816e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.6542396299526e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5617794835165455e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.6043301132029342e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4015320015658972e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.3778845842082887e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4565754158368804e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.05845807066396e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.148959232783909e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9313193266867756e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.8983137284322993e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9692867336829067e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.5740758413661524e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6712680956109125e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.471582938312622e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.401461918211112e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4926689601301177e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.5740015391638735e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.7158724985886238e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.4425797768022903e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.442145457555057e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.5216753957456604e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.585334334450408e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.730474678638075e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.5020200900580676e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.4817882738357184e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.4986170344429866e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.126366969283481e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.3254659288247694e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.024504006774123e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.031342092427394e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.050882017660797e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.1279170061066e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.368290949078983e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.084104052841212e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.136908924427644e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.112436944429646e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0819721119048609e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.1107212927186083e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0746356693402959e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0766696867392511e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0746102674374924e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4406801085442567e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4826741612239402e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.432546081758801e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4397094183493664e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4337647513684715e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.916562375470221e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9759774261274288e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9203284296054335e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9305446130601922e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.917406144968936e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.543329991055998e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6171020905962905e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.550776834198132e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.56564440803686e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.539107057941692e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.370276502323577e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.47701742953177e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.3842553648355533e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.406523774174275e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.370232093402592e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.4811656607635086e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.605046299843707e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.494305372304552e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.522221175307095e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.474634351936402e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.943737235725166e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.111928740892836e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.970306915514811e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.004575681117785e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.9347140535237486e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.849254757275048e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.076727908701287e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.882321284569116e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.94401699977243e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.846597327443305e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0431934072130389e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0724222931912664e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0467569921956965e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0557402418953643e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.043201933725868e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.9978911714190204e-11.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5377291107121493e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5038022216362634e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.1605139765835659e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0389371307706341e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5377291107121493e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5038022216362634e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.1605139765835659e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0389371307706341e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:266: UserWarning: Singular matrix in solving dual problem. Using least-squares solution instead.
-  warnings.warn(
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.724517638747926e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.2081893525391934e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.5192512792825426e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.560875760921789e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.094590473289415e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.724517638747926e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.2081893525391934e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.5192512792825426e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.560875760921789e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.094590473289415e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.305998418414504e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.119573653900034e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.780428830564176e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.72599348544378e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.3028810242363704e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.323430667976027e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.842181821120619e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.123020424020353e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.391841500530404e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.674025055884101e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.771763315706949e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 9.446722293304788e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.663042505574481e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.85620743407145e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.16849024584576e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0024993057911047e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0854976917329395e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0422374074892105e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.009110572880445e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.599445600054878e-10.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5288605936802924e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.594017473571796e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5616732351730889e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5320651414185704e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.365170421152584e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.0241555098721165e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.1001880234905457e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.108924368471321e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.0571739867136785e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9190835587323818e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.59445998018748e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.644447771871228e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.655619280034216e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.55897769640967e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.440418755966789e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.570579831801979e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.6613672094176763e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.754034416658669e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.5982947732549064e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.4442622087738073e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.663068153831773e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.676979692419536e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.77216088867749e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.631260708265472e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.473615256017638e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.1845328858112225e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.2515148613329075e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.366630334042611e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.229396110057905e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.0523643874432764e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.279728014315424e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.29878477048851e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.58318127683333e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.287638131321273e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.059031664231497e-09.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0992977195201092e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.098101609642299e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.1360175911079295e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.1024918755708768e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.078298961232349e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4576912121810892e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4616955645863072e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.5210829928946623e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4675261006402707e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.4381905444338372e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9410432372524156e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9406444451419702e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.0232869601954917e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:01:17.377] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:01:17.378] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.9577774068579856e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.929061177463609e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.5694076200011295e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:02:17.385] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:02:17.385] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.573799129379495e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6859744650664652e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:02:47.415] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:02:47.416] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.5929272950975246e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.5655610969010922e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.4012582972309247e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.4099720380709186e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.5702846901131124e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:04:17.382] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:04:17.382] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.438639240016528e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 3.402554682452319e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:04:47.413] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:04:47.414] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.524467200894833e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.5298790496417496e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.745072246237214e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.5653052893612767e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 4.5246750346450426e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:06:17.381] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:06:17.381] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.002419183914753e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.021591758553768e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:06:47.411] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:06:47.412] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.289420895200237e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 6.054727208493205e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 5.998959551334337e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.929568113240748e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.956710135204048e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:08:17.385] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:08:17.386] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.318313149402456e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 8.005904561514399e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:08:47.416] error: slurm_get_node_energy: Socket timed out on send/recv operation
-[2026-06-28T19:08:47.417] error: _get_joules_task: can't get info from slurmd
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 7.939585344729494e-08.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0532107808103319e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0559919871866441e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.105081111063555e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0639466552220256e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/linear_model/_ridge.py:264: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.0550549944809973e-07.
-  dual_coef = linalg.solve(K, y, assume_a="pos", overwrite_a=False)
-[2026-06-28T19:30:57.377] error: *** JOB 18511723 ON ise-cpu256-22 CANCELLED AT 2026-06-28T19:30:57 DUE to SIGNAL Terminated ***

@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --time=72:00:00
+#SBATCH --gpus=1
+#SBATCH --partition=rtx_pro_6000
+#SBATCH --qos=golan-neuro
+#SBATCH --job-name=pair_wise
+
+# Activate the Python environment
+source activate pid_env
+
+# Run the analysis script
+python pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_comp.py

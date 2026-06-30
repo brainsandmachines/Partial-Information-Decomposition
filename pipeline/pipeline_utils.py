@@ -309,16 +309,19 @@ def pca_each_source(source_1: Any, source_2: Any, target: Any, n_components_sour
     """
 
     if n_components_source_1 is not None:
+        print("\nApplying PCA projection to source_1...n_components_source_1: ",n_components_source_1)
         prj_source1 = pca_projection(source_1, n_components=int(n_components_source_1))
     else:
         prj_source1 = source_1
 
     if n_components_source_2 is not None:
+        print("\nApplying PCA projection to source_2...n_components_source_2: ",n_components_source_2)
         prj_source2 = pca_projection(source_2, n_components=int(n_components_source_2))
     else:
         prj_source2 = source_2
 
     if n_components_target is not None:
+        print("\nApplying PCA projection to target...n_components_target: ",n_components_target)
         prj_target = pca_projection(target, n_components=int(n_components_target))
     else:
         prj_target = target

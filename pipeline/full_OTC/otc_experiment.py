@@ -73,6 +73,9 @@ def nsd_otc_target(
         target_context["neural_data"] = target_context["neural_data"][: int(n_images)]
         target_context["image_ids_for_subj"] = target_context["image_ids_for_subj"][: int(n_images)]
     target_context["target"] = target_context["neural_data"]
+
+
+    print(f"\nLoaded full OTC target with shape {target_context['target'].shape}.")
     return target_context
 
 
