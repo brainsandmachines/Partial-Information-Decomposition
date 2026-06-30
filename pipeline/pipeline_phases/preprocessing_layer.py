@@ -114,7 +114,7 @@ def ridge_train_to_test_prediction(
     """
 
     if alphas is None:
-        alphas = np.logspace(-3, 3, 25)
+        alphas = np.logspace(-1, 8, 50)
 
     if scoring not in {"r2", "neg_mse"}:
         raise ValueError("scoring must be either 'r2' or 'neg_mse'.")
@@ -185,7 +185,6 @@ def ridge_train_to_test_prediction(
 
     search.fit(X_train, y_train)
 
-    print(f"Best alpha: {search.best_params_['ridge__alpha']} with {scoring}={search.best_score_:.4f} - ☑️")
 
     y_test_pred = search.predict(X_test)
 
@@ -210,5 +209,6 @@ def ridge_train_to_test_prediction(
             test_score = -mean_squared_error(y_test, y_test_pred)
 
         info["test_score"] = float(test_score)
+    print(f"Best alpha: {search.best_params_['ridge__alpha']} with test score={test_score:.4f} - ☑️")
 
     return test_prediction, info
