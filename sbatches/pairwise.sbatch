@@ -4,6 +4,8 @@
 #SBATCH --partition=rtx_pro_6000
 #SBATCH --qos=golan-neuro
 #SBATCH --job-name=pair_wise
+#SBATCH --output=/home/ohadshee/Desktop/Partial-Information-Decomposition/pair_wise_logs/%x-%j.out
+#SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/pair_wise_logs/%x-%j.err
 
 # Activate the Python environment
 source activate pid_env

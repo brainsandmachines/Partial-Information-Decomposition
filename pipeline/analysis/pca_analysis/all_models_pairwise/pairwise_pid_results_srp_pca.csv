@@ -1,0 +1,2 @@
+model_1,model_2,layer_1,layer_2,subj_id,n_samples,n_components_source_1,n_components_source_2,n_components_target,pid_method,rng_seed,bias_correction,red,unq1,unq2,syn,bi_mi_1,bi_mi_2,tri_mi
+nf_resnet50_classification,hardcorenas_f_classification,141,294,subj01,10000,100,100,100,tilde,56,True,9.296605175523444,0.8301590332355531,1.0007051476829805,1.0559956314170709,10.126764208758999,10.297310323206426,12.18346498785905

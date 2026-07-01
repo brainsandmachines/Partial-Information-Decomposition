@@ -39,7 +39,7 @@ feature_manipulation_kwargs:
 
 pid_kwargs:
   method: tilde
-  rng_seed: 12
+  rng_seed: 56
   config:
     device: cuda
     bias_correction: True

@@ -36,18 +36,18 @@ DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
 }
 
 
-#model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
-model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
-        'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
-        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
-        ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
-        'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
-        'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
-        'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
-        'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
-        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
-        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised',
-        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
+model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
+# model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
+#         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
+#         'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
+#         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
+#         'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
+#         'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
+#         'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
+#         'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
+#         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
+#         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised',
+#         'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
 
 model_2_names = model_1_names  # Compare all models against each other
 
@@ -323,6 +323,7 @@ def run_pairwise_pid_pipeline(
                 pair = frozenset((model_1, model_2))
                 if model_1 == model_2 or pair in completed_pairs:
                     continue
+                    print(f"Skipping pair: {model_1}, {model_2} (self-pair or already completed)")
 
                 if model_1 not in feature_cache:
                     feature_cache[model_1] = extract_model_projection(
@@ -333,6 +334,7 @@ def run_pairwise_pid_pipeline(
                         source_components,
                         random_state,
                     )
+                    print(f"Extracted and cached features for model: {model_1}")
                 if model_2 not in feature_cache:
                     feature_cache[model_2] = extract_model_projection(
                         model_2,
@@ -342,6 +344,7 @@ def run_pairwise_pid_pipeline(
                         source_components,
                         random_state,
                     )
+                    print(f"Extracted and cached features for model: {model_2}")
                 source_1, layer_1 = feature_cache[model_1]
                 source_2, layer_2 = feature_cache[model_2]
                 pid_results = pid_calculation(
