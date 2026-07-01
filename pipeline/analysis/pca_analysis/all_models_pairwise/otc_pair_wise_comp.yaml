@@ -25,8 +25,8 @@ choose_layer_kwargs:
 feature_extraction_kwargs:
   batch_size_process: 128
   batch_size_dataloader: 16
-  use_srp: false
-  srp_n_components: 2000
+  use_srp: true
+  srp_n_components: null
 
 preprocess_kwargs:
   n_components_target : 200

@@ -119,7 +119,8 @@ def extract_model_projection(
         choose_layer_kwargs: dict[str, Any], contains path_to_results for the
             overall best-layer CSV.
         feature_extraction_kwargs: dict[str, Any], contains outer and DataLoader
-            batch sizes plus optional use_srp and srp_n_components settings.
+            batch sizes plus use_srp and srp_n_components. A null SRP dimension
+            uses target_context["n_projections"] automatically.
         n_components: int, requested final PCA dimension.
         random_state: int, seed used by randomized PCA.
 
@@ -131,6 +132,8 @@ def extract_model_projection(
 
     use_srp = bool(feature_extraction_kwargs.get("use_srp", False))
     srp_components = feature_extraction_kwargs.get("srp_n_components")
+    if use_srp and srp_components is None:
+        srp_components = target_context.get("n_projections")
     if use_srp and (srp_components is None or int(srp_components) < 1):
         raise ValueError("srp_n_components must be a positive integer when use_srp is true.")
     model_context = prepare_model_context(to_deepdive_model_name(model_name))
