@@ -1,29 +1,33 @@
-"""Run the OTC PID pipeline across ordered pairs of model names."""
+"""Run deterministic OTC PID comparisons across unordered model pairs."""
 
 from __future__ import annotations
 
-from copy import deepcopy
+import gc
 import sys
 from pathlib import Path
 from typing import Any
-import argparse
-import yaml
+
+import numpy as np
 import pandas as pd
+import torch
+import yaml
+from sklearn.decomposition import PCA
 
 repo_root = Path(__file__).resolve().parents[4]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
+from external.mayas_project.features_and_encoding.feat_ext_and_encoding import (
+    batch_process,
+    get_layer_feature_count,
+    get_sparse_projection_gpu,
+    prepare_model_context,
+)
 from pipeline.full_OTC import otc_experiment
-from pipeline.pipeline_utils import nsd_sources
-
-try:
-    from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
-except ModuleNotFoundError:
-    plotting_dir = repo_root / "pipeline" / "plotting"
-    if str(plotting_dir) not in sys.path:
-        sys.path.insert(0, str(plotting_dir))
-    from pairwise_pid_heatmaps import plot_pairwise_pid_matrices
+from pipeline.pipeline_phases.choosing_layer import overall_best_layer
+from pipeline.pipeline_phases.sources_target_features import batching
+from pipeline.pipeline_utils import resolve_pipeline_function
+from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
 
 
 DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
@@ -66,29 +70,141 @@ def to_deepdive_model_name(model_name: str) -> str:
     return deepdive_model_name
 
 
-def pairwise_nsd_sources(model_name_1: str, model_name_2: str) -> dict[str, Any]:
-    """Load pairwise NSD sources using DeepDive-compatible model identifiers.
+def deterministic_pca(
+    features: Any,
+    n_components: int,
+    random_state: int,
+) -> np.ndarray:
+    """Project one sample matrix with reproducible randomized PCA.
 
     Inputs:
-        model_name_1: str, stored identifier for source X1.
-        model_name_2: str, stored identifier for source X2.
+        features: array-like, samples with shape (n_samples, n_features).
+        n_components: int, requested number of principal components.
+        random_state: int, seed used by randomized SVD.
 
     Output:
-        sources: dict[str, Any], source contexts under "X1" and "X2". Each
-            model is loaded with its canonical DeepDive name, while its
-            context retains the stored identifier for best-layer CSV lookup
-            and result reporting.
+        projected: np.ndarray, float64 samples with shape
+            (n_samples, min(n_components, n_samples, n_features)).
     """
 
-    sources = nsd_sources(
-        model_name_1=to_deepdive_model_name(model_name_1),
-        model_name_2=to_deepdive_model_name(model_name_2),
+    array = np.asarray(features, dtype=np.float64)
+    if array.ndim != 2:
+        raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
+    effective_components = min(int(n_components), *array.shape)
+    if effective_components < 1:
+        raise ValueError("n_components must leave at least one PCA component.")
+    pca = PCA(
+        n_components=effective_components,
+        svd_solver="randomized",
+        random_state=int(random_state),
+        copy=False,
     )
-    sources["X1"]["model_name"] = model_name_1
-    sources["X1_name"] = model_name_1
-    sources["X2"]["model_name"] = model_name_2
-    sources["X2_name"] = model_name_2
-    return sources
+    return np.asarray(pca.fit_transform(array), dtype=np.float64)
+
+
+def extract_model_projection(
+    model_name: str,
+    target_context: dict[str, Any],
+    choose_layer_kwargs: dict[str, Any],
+    feature_extraction_kwargs: dict[str, Any],
+    n_components: int,
+    random_state: int,
+) -> tuple[np.ndarray, int]:
+    """Extract one selected model layer and return its memory-safe PCA projection.
+
+    Inputs:
+        model_name: str, stored model identifier used for layer lookup.
+        target_context: dict[str, Any], contains stimulus images and ordered
+            image IDs.
+        choose_layer_kwargs: dict[str, Any], contains path_to_results for the
+            overall best-layer CSV.
+        feature_extraction_kwargs: dict[str, Any], contains outer and DataLoader
+            batch sizes plus optional use_srp and srp_n_components settings.
+        n_components: int, requested final PCA dimension.
+        random_state: int, seed used by randomized PCA.
+
+    Output:
+        projection_and_layer: tuple[np.ndarray, int], the float64 projected
+            features with shape (n_samples, n_components) and selected layer
+            index. Raw batches are discarded immediately after reduction.
+    """
+
+    use_srp = bool(feature_extraction_kwargs.get("use_srp", False))
+    srp_components = feature_extraction_kwargs.get("srp_n_components")
+    if use_srp and (srp_components is None or int(srp_components) < 1):
+        raise ValueError("srp_n_components must be a positive integer when use_srp is true.")
+    model_context = prepare_model_context(to_deepdive_model_name(model_name))
+    layer_result = overall_best_layer(
+        model_name=model_name,
+        path_to_results=str(choose_layer_kwargs["path_to_results"]),
+    )
+    if layer_result["l"] is None:
+        raise ValueError(f"No overall best layer found for model {model_name!r}.")
+    layer_index = int(layer_result["l"])
+    layer_name = model_context["layers_ordered"][layer_index]
+    model = model_context["model"]
+    raw_dimension = get_layer_feature_count(model, layer_name)
+    intermediate_dimension = (
+        min(int(srp_components), int(raw_dimension))
+        if use_srp
+        else int(raw_dimension)
+    )
+    n_samples = len(target_context["image_ids_for_subj"])
+    intermediate = np.empty(
+        (n_samples, intermediate_dimension),
+        dtype=np.float64,
+    )
+    batch_size_process = int(feature_extraction_kwargs["batch_size_process"])
+    batch_size_dataloader = int(feature_extraction_kwargs["batch_size_dataloader"])
+    sparse_projection = None
+
+    try:
+        if raw_dimension > intermediate_dimension:
+            model_device = str(next(model.parameters()).device)
+            sparse_projection = get_sparse_projection_gpu(
+                raw_dimension,
+                intermediate_dimension,
+                device=model_device,
+            )
+
+        for batch_start in range(0, n_samples, batch_size_process):
+            batch_end = min(batch_start + batch_size_process, n_samples)
+            if sparse_projection is None:
+                reduced_batch = batching(
+                    model_context=model_context,
+                    batch_start=batch_start,
+                    batch_end=batch_end,
+                    stim_dataset=target_context["stim"],
+                    subj_image_ids=target_context["image_ids_for_subj"],
+                    layer_name=layer_name,
+                    batch_size_dataloader=batch_size_dataloader,
+                )
+            else:
+                reduced_batch = batch_process(
+                    model=model,
+                    batch_start=batch_start,
+                    batch_end=batch_end,
+                    batch_size_process=batch_size_process,
+                    batch_size_dataloader=batch_size_dataloader,
+                    layer_name=layer_name,
+                    sparse_projection_mat_gpu=sparse_projection,
+                    stim_dataset=target_context["stim"],
+                    image_ids_for_subj=target_context["image_ids_for_subj"],
+                    image_transforms=model_context["image_transforms"],
+                )
+            intermediate[batch_start:batch_end] = reduced_batch
+            del reduced_batch
+
+        return (
+            deterministic_pca(intermediate, n_components, random_state),
+            layer_index,
+        )
+    finally:
+        del model_context, model
+        if sparse_projection is not None:
+            del sparse_projection
+        gc.collect()
+        torch.cuda.empty_cache()
 
 
 def run_pairwise_pid_pipeline(
@@ -109,14 +225,10 @@ def run_pairwise_pid_pipeline(
         output_path: Path, path to the CSV containing existing and newly
             calculated pair results.
 
-    The function scans the Cartesian product of the two model lists but treats
-    (A, B) and (B, A) as the same completed pair. The first unseen orientation
-    is evaluated and stored; its unq1 and unq2 values cover both unique-
-    information directions. Self-pairs and pairs already present in either CSV
-    orientation are skipped. Each successful row is appended immediately.
-    Pipeline or save errors are raised after preserving rows completed earlier
-    in the run. After all pairs finish, heatmaps are saved in a sibling
-    directory named ``<csv_stem>_figures``.
+    The target is projected once. Each model is extracted with optional
+    batchwise SRP, projected with deterministic PCA, and retained only as its
+    small final array in memory. Self-pairs and completed CSV pairs are skipped,
+    and each successful row is appended immediately.
     """
 
     columns = [
@@ -164,73 +276,131 @@ def run_pairwise_pid_pipeline(
             existing_results["model_2"].astype(str),
         )
     }
-    config = deepcopy(otc_config)
-    otc_experiment.PIPELINE_STEP_FUNCTIONS[pairwise_nsd_sources.__name__] = pairwise_nsd_sources
-    config["functions"]["sources_extraction"] = pairwise_nsd_sources.__name__
+    config = otc_config
+    registry = otc_experiment.PIPELINE_STEP_FUNCTIONS
+    target_extraction = resolve_pipeline_function(
+        config["functions"], registry, "target_extraction", required=True
+    )
+    pid_calculation = resolve_pipeline_function(
+        config["functions"], registry, "pid_calculation", required=True
+    )
+    pid_report = resolve_pipeline_function(
+        config["functions"], registry, "pid_report", required=False
+    )
+    feature_kwargs = config.get("feature_manipulation_kwargs", {})
+    extraction_kwargs = config.get("feature_extraction_kwargs", {})
+    pid_kwargs = config.get("pid_kwargs", {})
+    pid_config = pid_kwargs.get("config") or {}
+    random_state = int(pid_kwargs.get("rng_seed", 56))
+    source_components = int(feature_kwargs["n_components_source_1"])
+    if source_components != int(feature_kwargs["n_components_source_2"]):
+        raise ValueError(
+            "Memory-cached pairwise comparisons require equal PCA dimensions "
+            "for source 1 and source 2."
+        )
+    target_context = target_extraction(**config.get("target_kwargs", {}))
+    try:
+        target = deterministic_pca(
+            target_context["target"],
+            feature_kwargs["n_components_target"],
+            random_state,
+        )
+    except Exception:
+        hdf_file = target_context.get("hdf_file")
+        if hdf_file is not None:
+            hdf_file.close()
+        raise
+    target_context.pop("target", None)
+    target_context.pop("neural_data", None)
+    feature_cache: dict[str, tuple[np.ndarray, int]] = {}
 
-    for model_1 in model_1_names:
-        for model_2 in model_2_names:
-            pair = frozenset((model_1, model_2))
-            if model_1 == model_2 or pair in completed_pairs:
-                continue
+    try:
+        for model_1 in model_1_names:
+            for model_2 in model_2_names:
+                pair = frozenset((model_1, model_2))
+                if model_1 == model_2 or pair in completed_pairs:
+                    continue
 
-            config["sources_kwargs"]["model_name_1"] = model_1
-            config["sources_kwargs"]["model_name_2"] = model_2
-            results = otc_experiment.run_otc_experiment(config)
-            pid_results = results["pid_results"]
-            pid = pid_results["pid"]
-            mi = pid_results["mi"]
-            selected_layers = results["selected_layers"]
-            feature_kwargs = config.get("feature_manipulation_kwargs", {})
-            pid_kwargs = config.get("pid_kwargs", {})
-            pid_config = pid_kwargs.get("config") or {}
+                if model_1 not in feature_cache:
+                    feature_cache[model_1] = extract_model_projection(
+                        model_1,
+                        target_context,
+                        config["choose_layer_kwargs"],
+                        extraction_kwargs,
+                        source_components,
+                        random_state,
+                    )
+                if model_2 not in feature_cache:
+                    feature_cache[model_2] = extract_model_projection(
+                        model_2,
+                        target_context,
+                        config["choose_layer_kwargs"],
+                        extraction_kwargs,
+                        source_components,
+                        random_state,
+                    )
+                source_1, layer_1 = feature_cache[model_1]
+                source_2, layer_2 = feature_cache[model_2]
+                pid_results = pid_calculation(
+                    target,
+                    source_1,
+                    source_2,
+                    **pid_kwargs,
+                )
+                pid = pid_results["pid"]
+                mi = pid_results["mi"]
+                if pid_report is not None:
+                    pid_report(pid_results, {}, **config.get("report_kwargs", {}))
 
-            row = {
-                "model_1": model_1,
-                "model_2": model_2,
-                "layer_1": selected_layers["X1"],
-                "layer_2": selected_layers["X2"],
-                "subj_id": config.get("target_kwargs", {}).get("subj_id"),
-                "n_samples": len(results["target"]),
-                "n_components_source_1": feature_kwargs.get("n_components_source_1"),
-                "n_components_source_2": feature_kwargs.get("n_components_source_2"),
-                "n_components_target": feature_kwargs.get("n_components_target"),
-                "pid_method": pid_results.get("method", pid_kwargs.get("method")),
-                "rng_seed": pid_kwargs.get("rng_seed"),
-                "bias_correction": pid_config.get("bias_correction"),
-                "red": pid["red"],
-                "unq1": pid["unq1"],
-                "unq2": pid["unq2"],
-                "syn": pid["syn"],
-                "bi_mi_1": mi["bi_mi_1"],
-                "bi_mi_2": mi["bi_mi_2"],
-                "tri_mi": mi["tri_mi"],
-            }
-            pd.DataFrame([row], columns=columns).to_csv(
-                output_path,
-                mode="a",
-                header=False,
-                index=False,
-            )
-            completed_pairs.add(pair)
-            print(f"Completed PID for pair: {model_1}, {model_2}. Results appended to {output_path}")
+                row = {
+                    "model_1": model_1,
+                    "model_2": model_2,
+                    "layer_1": layer_1,
+                    "layer_2": layer_2,
+                    "subj_id": config.get("target_kwargs", {}).get("subj_id"),
+                    "n_samples": len(target),
+                    "n_components_source_1": source_1.shape[1],
+                    "n_components_source_2": source_2.shape[1],
+                    "n_components_target": target.shape[1],
+                    "pid_method": pid_results.get("method", pid_kwargs.get("method")),
+                    "rng_seed": pid_kwargs.get("rng_seed"),
+                    "bias_correction": pid_config.get("bias_correction"),
+                    "red": pid["red"],
+                    "unq1": pid["unq1"],
+                    "unq2": pid["unq2"],
+                    "syn": pid["syn"],
+                    "bi_mi_1": mi["bi_mi_1"],
+                    "bi_mi_2": mi["bi_mi_2"],
+                    "tri_mi": mi["tri_mi"],
+                }
+                pd.DataFrame([row], columns=columns).to_csv(
+                    output_path,
+                    mode="a",
+                    header=False,
+                    index=False,
+                )
+                completed_pairs.add(pair)
+                print(
+                    f"Completed PID for pair: {model_1}, {model_2}. "
+                    f"Results appended to {output_path}"
+                )
+    finally:
+        hdf_file = target_context.get("hdf_file")
+        if hdf_file is not None:
+            hdf_file.close()
 
     return output_path
 
-
-
-
 if __name__ == "__main__":
-
-
-
-    config_path = Path("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml")
-    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results.csv')
-    
-    
-    plot_path = f"{csv_path} / 'pairwise_figures'"
-    with open(config_path, "r") as f:
-        otc_config = yaml.safe_load(f)
+    analysis_dir = Path(
+        "/home/ohadshee/Desktop/Partial-Information-Decomposition/"
+        "pipeline/analysis/pca_analysis/all_models_pairwise"
+    )
+    config_path = analysis_dir / "otc_pair_wise_comp.yaml"
+    csv_path = analysis_dir / "pairwise_pid_results_srp_pca.csv"
+    plot_path = csv_path.parent / "pairwise_figures_srp_pca"
+    with open(config_path, "r") as config_file:
+        otc_config = yaml.safe_load(config_file)
 
     run_pairwise_pid_pipeline(
         model_1_names=model_1_names,

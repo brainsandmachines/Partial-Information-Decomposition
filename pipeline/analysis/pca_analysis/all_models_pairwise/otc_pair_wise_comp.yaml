@@ -23,8 +23,10 @@ choose_layer_kwargs:
   path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
 
 feature_extraction_kwargs:
-  batch_size_process: 500
-  batch_size_dataloader: 500
+  batch_size_process: 128
+  batch_size_dataloader: 16
+  use_srp: false
+  srp_n_components: 2000
 
 preprocess_kwargs:
   n_components_target : 200

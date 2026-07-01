@@ -88,15 +88,16 @@ File description: General utility functions shared by analysis and simulation sc
 
 Real-data source/target feature extraction helpers, layer utilities, and agnostic PID comparison runners.
 
-### `pipeline/analysis/pca_analysis/dual_/dual.py`
+### `pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_comp.py`
 
-File description: Run the configured full-OTC PID pipeline once per unordered model pair with resumable CSV checkpointing.
+File description: Extract deterministic memory-safe model projections once per job and run resumable PID comparisons for every unordered model pair.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `to_deepdive_model_name (line 44)` | model_name: str | Annotated: `str` | Convert stored CLIP ViT aliases to canonical DeepDive identifiers and print each conversion; return all other identifiers unchanged. Task-specific naming-boundary helper. |
-| `pairwise_nsd_sources (line 62)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, Any]` | Load pairwise sources through the existing `nsd_sources` helper using canonical DeepDive identifiers, then restore stored aliases in source metadata for best-layer CSV lookup and result reporting. |
-| `run_pairwise_pid_pipeline (line 87)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scan cross-list combinations once per unordered model pair, skip self/completed pairs in either orientation, append PID/MI metadata to CSV, and then create heatmaps in `<csv_stem>_figures`. Registers the pairwise source-name adapter so DeepDive loading and stored result names use their respective identifiers. |
+| `to_deepdive_model_name (line 55)` | model_name: str | Annotated: `str` | Convert stored CLIP ViT aliases to canonical DeepDive identifiers and print each conversion; return all other identifiers unchanged. Task-specific naming-boundary helper. |
+| `deterministic_pca (line 73)` | features: Any, n_components: int, random_state: int | Annotated: `np.ndarray` | Apply seeded randomized PCA to a 2D sample matrix and return a float64 projection, capping the requested components to the valid matrix dimensions. |
+| `extract_model_projection (line 105)` | model_name: str, target_context: dict[str, Any], choose_layer_kwargs: dict[str, Any], feature_extraction_kwargs: dict[str, Any], n_components: int, random_state: int | Annotated: `tuple[np.ndarray, int]` | Extract one selected model layer in bounded batches, optionally apply deterministic SRP using configured components, discard raw batches, and return the final PCA projection plus layer index. With SRP disabled, the full raw-width intermediate is retained until PCA. |
+| `run_pairwise_pid_pipeline (line 210)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Project the target once, retain only final model PCA arrays in an in-memory per-job cache, compute each unordered PID pair, and checkpoint successful rows to CSV. |
 
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 
