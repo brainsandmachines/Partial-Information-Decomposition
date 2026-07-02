@@ -14,6 +14,7 @@ def plot_heldout_variance_explained(
     output_path: str | Path | None = None,
     *,
     show_cumulative: bool = True,
+    number_of_pcs: int | None = None,
     dpi: int = 300,
 ) -> Path:
     """Plot variance explained on held-out data by each retained PC.
@@ -25,6 +26,7 @@ def plot_heldout_variance_explained(
             beside the CSV using the same filename stem.
         show_cumulative: bool, whether to overlay cumulative explained variance.
         dpi: int, resolution of the saved PNG.
+        number_of_pcs: int or None, number of PCs to include in the plot.
 
     Output:
         figure_path: Path, location of the saved variance-explained figure.
@@ -49,6 +51,9 @@ def plot_heldout_variance_explained(
         variance_table["pc_index"],
         errors="raise",
     ).to_numpy()
+
+    pc_indices = pc_indices[:number_of_pcs] if number_of_pcs is not None else pc_indices
+
     explained_ratios = pd.to_numeric(
         variance_table["heldout_explained_variance_ratio"],
         errors="raise",
@@ -103,3 +108,14 @@ def plot_heldout_variance_explained(
     figure.savefig(figure_path, dpi=dpi, bbox_inches="tight")
     plt.close(figure)
     return figure_path
+
+
+
+if __name__ == "__main__":
+    plot_heldout_variance_explained(
+        variance_csv_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/results/subj01_heldout_pca_variance_explained.csv",
+        output_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_heldout_pca_variance_explained.png",
+        show_cumulative=False,
+        dpi=600,
+        number_of_pcs=300,
+    )

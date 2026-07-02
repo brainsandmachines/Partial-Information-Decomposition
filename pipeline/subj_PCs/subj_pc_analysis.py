@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -11,9 +12,11 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
+repo_root = Path(__file__).resolve().parents[2]
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+
 from pipeline.pipeline_phases.sources_target_features import prepare_target
-
-
 def split_unique_shared(
     subj_id: str,
     hdf_path: str | Path,
@@ -36,6 +39,8 @@ def split_unique_shared(
             subject image IDs, and neural arrays for the unique training set
             and shared held-out set.
     """
+
+
 
     target_data = prepare_target(
         Path(hdf_path),

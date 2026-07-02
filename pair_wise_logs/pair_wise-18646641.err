@@ -1,0 +1,5 @@
+/var/spool/slurmd/job18646641/slurm_script: line 11: activate: No such file or directory
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_comp.py", line 51
+    ,'dino_vitb16_selfsupervised'] #dino_resnet50_selfsupervised - missing
+    ^
+SyntaxError: invalid syntax

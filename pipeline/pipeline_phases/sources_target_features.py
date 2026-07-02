@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 import sys
 import time
-
+from sklearn.externals import joblib
 repo_root = Path(__file__).resolve().parents[1]
 external_root = repo_root / "external"
 for path in (repo_root, external_root):
@@ -59,6 +59,43 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> di
 
     """
     return prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
+
+
+def shared1000_subj_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path, pca_model_path:Path,scaler_model_path:Path) -> np.ndarray:
+        """This function returns the shared1000 images for a given and subject 
+        and the corresponding neural data PCA'ed and scaled (if models are provided).
+
+        If a pca_model and scaler model are provided, the function will use them to transform the neural data.
+
+        if not returns the full neural data not scaled.
+
+        Inputs:
+            hdf_path: path to hdf file containing neural data
+            pkl_info_path: path to pkl file containing info about the neural data
+            neural_data_path: path to the directory containing the neural data
+            pca_model_path: path to the PCA model
+            scaler_model_path: path to the scaler model
+
+        Outputs:
+            shared1000_subj: np.ndarray, shared1000 images for the subject."""
+
+
+
+        subject_context = prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
+
+        if pca_model_path.exists() and scaler_model_path.exists():
+
+            pca_model = joblib.load(pca_model_path)
+            scaler_model = joblib.load(scaler_model_path)
+
+            neural_data = subject_context["neural_data"]
+            shared_neural_data = neural_data[subject_context["shared1000_subj"]]
+            stim = subject_context["stim"][subject_context["shared1000_subj"]]
+            neural_data_scaled = pca_model.transform(shared_neural_data)
+            neural_data_pca = scaler_model.transform(neural_data_scaled) #(1000, n_components_)
+            assert (neural_data_pca.shape[0],neural_data_pca.shape[1]) == (1000, pca_model.n_components_), "Shape mismatch between PCA transformed data and expected dimensions"
+
+            return {'neural_data':neural_data_pca, 'stim': stim}
 
 
 def prepare_target_for_voxel(voxel_index:int, subj_id:str, hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> dict:
