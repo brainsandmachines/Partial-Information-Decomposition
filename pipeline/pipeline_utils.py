@@ -13,6 +13,7 @@ from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.feature_manipulations import pca_projection
 from pipeline.pipeline_phases.preprocessing_layer import permute_rv,ridge_train_to_test_prediction
 PipelineFunction = Callable[..., Any]
+from pipeline.pipeline_phases.choosing_layer import voxel_best_layer
 
 
 def choose_random_sources(sources_list: list[str], size: int = 2, replace: bool = False) -> np.ndarray:
@@ -221,7 +222,6 @@ def voxel_best_layer_for_sources(
     """
 
     del sources
-    from pipeline.pipeline_phases.choosing_layer import voxel_best_layer
 
     selected_layers = {
         "X1": voxel_best_layer(voxel_index=int(X1_index), path_to_results=str(X1_path_to_results)),

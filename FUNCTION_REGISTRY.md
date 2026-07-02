@@ -10,6 +10,7 @@ Generated from AST, so signatures and line numbers reflect the current code. Des
 
 - repository root: Repository-level package markers and broad utilities.
 - `pipeline/`: Real-data source/target feature extraction helpers, layer utilities, and agnostic PID comparison runners.
+- `pipeline/subj_PCs/`: Subject-level PCA fitting, held-out variance evaluation, and plotting.
 - `Partial_Information_Decomposition/`: PID calculation, mutual information helpers, bias correction, plotting, and PID-specific utilities.
 - `Partial_Information_Decomposition/Idep/`: Idep PID estimators and Gaussian implementation classes.
 - `Partial_Information_Decomposition/Idep/Idep_Simulations/`: Simulation, covariance, shrinkage, and analysis helpers for Idep experiments.
@@ -151,6 +152,25 @@ File description: Create publication-friendly PID component matrices from the re
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `plot_pairwise_pid_matrices (line 12)` | csv_path: str \| Path, output_dir: str \| Path, *, model_order: list[str] \| None=None, value_format: str='.3f', cmap: str='viridis', figsize: tuple[float, float] \| None=None, dpi: int=300 | Annotated: `dict[str, Path]` | Validate ordered pair rows, construct directional unique-information and symmetric redundancy/synergy matrices, then save annotated PNG and CSV outputs. Plotting-specific; preserves the X1/unq1 and X2/unq2 convention from `run_pairwise_pid_pipeline`. |
+
+### `pipeline/subj_PCs/subj_pc_analysis.py`
+
+File description: Fit subject-level PCA on unique NSD images and evaluate retained components on shared held-out images.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `split_unique_shared (line 17)` | subj_id: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, variance_threshold: float=0.99 | Annotated: `dict[str, Any]` | Load a subject context and use its one-dimensional `shared1000_subj` mask to split aligned neural rows and subject image IDs. Task-specific; `unique_neural_data` is training data and `shared_neural_data` is held out. |
+| `pca_by_variance (line 78)` | neural_data: np.ndarray, variance_threshold: float=0.99 | Annotated: `dict[str, Any]` | Fit `StandardScaler` and full-SVD PCA on two-dimensional training samples, retaining the requested training-variance fraction. Returns the fitted models and training scores; expects a float threshold in `(0, 1]`, with `1.0` retaining all components. |
+| `heldout_pca (line 121)` | pca_model: PCA, scaler_model: StandardScaler, heldout_data: np.ndarray | Annotated: `np.ndarray` | Apply the training scaler and fitted PCA basis to aligned two-dimensional held-out samples without refitting either transformation. |
+| `main (line 150)` | subj_id: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, variance_threshold: float=0.99, save_models_path: str \| Path \| None=None | Annotated: `dict[str, Any]` | Run the subject PCA analysis and optionally save models plus a per-PC held-out variance CSV. Held-out ratios divide each PC score's sample variance by total held-out sample variance after training-set scaling; PC indices are one-based. |
+
+### `pipeline/subj_PCs/plotting.py`
+
+File description: Plot saved held-out PCA variance explained by component index.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `plot_heldout_variance_explained (line 12)` | variance_csv_path: str \| Path, output_path: str \| Path \| None=None, *, show_cumulative: bool=True, dpi: int=300 | Annotated: `Path` | Read the CSV produced by `subj_pc_analysis.main`, validate PC indices and held-out explained-variance ratios, and save a per-PC percentage bar plot with an optional cumulative line. |
 
 ### `pipeline/full_OTC/otc_experiment.py`
 

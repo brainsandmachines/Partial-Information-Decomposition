@@ -402,20 +402,20 @@ if __name__ == "__main__":
         "/home/ohadshee/Desktop/Partial-Information-Decomposition/"
         "pipeline/analysis/pca_analysis/all_models_pairwise"
     )
-    config_path = analysis_dir / "otc_pair_wise_comp.yaml"
-    csv_path = analysis_dir / "pairwise_pid_results_srp_pca.csv"
-    plot_path = csv_path.parent / "pairwise_figures_srp_pca"
-    with open(config_path, "r") as config_file:
-        otc_config = yaml.safe_load(config_file)
+    # config_path = analysis_dir / "otc_pair_wise_comp.yaml"
+    # csv_path = analysis_dir / "pairwise_pid_results_srp_pca.csv"
+    # plot_path = csv_path.parent / "pairwise_figures_srp_pca"
+    # with open(config_path, "r") as config_file:
+    #     otc_config = yaml.safe_load(config_file)
 
-    run_pairwise_pid_pipeline(
-        model_1_names=model_1_names,
-        model_2_names=model_2_names,
-        otc_config=otc_config,
-        csv_path=csv_path,
-    )
-
+    # run_pairwise_pid_pipeline(
+    #     model_1_names=model_1_names,
+    #     model_2_names=model_2_names,
+    #     otc_config=otc_config,
+    #     csv_path=csv_path,
+    # )
+    csv_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results_srp_pca.csv')
     plot_pairwise_pid_matrices(
         csv_path=csv_path,
-        output_dir=plot_path,
+        output_dir='/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_srp',
     )

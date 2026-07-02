@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from pathlib import Path
 import sys
+from sklearn.decomposition import PCA
 
 
 repo_root = Path(__file__).resolve().parents[1]
@@ -26,7 +27,6 @@ def pca_projection(features, n_components):
     Output:
         - ft_reduced: numpy array of shape (n_samples, n_components) with the PCA-reduced features
     """
-    from sklearn.decomposition import PCA
 
     if type(features) == torch.Tensor:
         features = features.cpu().numpy()
