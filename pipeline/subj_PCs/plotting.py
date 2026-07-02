@@ -109,20 +109,23 @@ def plot_heldout_variance_explained(
         figsize=(figure_width, 6.0),
         constrained_layout=True,
     )
+    bar_alpha = 0.55 if training_percent is not None else 0.85
     axis.bar(
         pc_indices,
         explained_percent,
+        width=0.8,
         color="#4C72B0",
-        alpha=0.85,
+        alpha=bar_alpha,
         label="Per-PC held-out variance",
     )
 
     if training_percent is not None:
-        axis.plot(
+        axis.bar(
             pc_indices,
             training_percent,
+            width=0.8,
             color="#55A868",
-            linewidth=2.0,
+            alpha=bar_alpha,
             label="Per-PC training variance",
         )
 
