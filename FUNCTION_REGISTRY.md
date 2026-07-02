@@ -170,7 +170,7 @@ File description: Plot saved held-out PCA variance explained by component index.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `plot_heldout_variance_explained (line 12)` | variance_csv_path: str \| Path, output_path: str \| Path \| None=None, *, show_cumulative: bool=True, dpi: int=300 | Annotated: `Path` | Read the CSV produced by `subj_pc_analysis.main`, validate PC indices and held-out explained-variance ratios, and save a per-PC percentage bar plot with an optional cumulative line. |
+| `plot_heldout_variance_explained (line 12)` | variance_csv_path: str \| Path, output_path: str \| Path \| None=None, *, show_cumulative: bool=True, show_training: bool=False, number_of_pcs: int \| None=None, dpi: int=300 | Annotated: `Path` | Read the CSV produced by `subj_pc_analysis.main`, validate PC indices and explained-variance ratios, and save a per-PC held-out percentage bar plot with optional cumulative held-out and per-PC training percentage lines. Plotting-specific; training values come from the PCA fit while held-out values come from projecting shared data without refitting. |
 
 ### `pipeline/full_OTC/otc_experiment.py`
 

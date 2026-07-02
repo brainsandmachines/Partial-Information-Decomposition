@@ -14,6 +14,7 @@ def plot_heldout_variance_explained(
     output_path: str | Path | None = None,
     *,
     show_cumulative: bool = True,
+    show_training: bool = False,
     number_of_pcs: int | None = None,
     dpi: int = 300,
 ) -> Path:
@@ -25,8 +26,10 @@ def plot_heldout_variance_explained(
         output_path: str, Path, or None, destination PNG path. When None, save
             beside the CSV using the same filename stem.
         show_cumulative: bool, whether to overlay cumulative explained variance.
-        dpi: int, resolution of the saved PNG.
+        show_training: bool, whether to overlay the per-PC training explained
+            variance after converting its stored ratios to percentages.
         number_of_pcs: int or None, number of PCs to include in the plot.
+        dpi: int, resolution of the saved PNG.
 
     Output:
         figure_path: Path, location of the saved variance-explained figure.
@@ -38,6 +41,9 @@ def plot_heldout_variance_explained(
         "pc_index",
         "heldout_explained_variance_ratio",
     }
+    if show_training:
+        required_columns.add("training_explained_variance_ratio")
+
     missing_columns = required_columns.difference(variance_table.columns)
     if missing_columns:
         raise ValueError(
@@ -52,24 +58,51 @@ def plot_heldout_variance_explained(
         errors="raise",
     ).to_numpy()
 
-    pc_indices = pc_indices[:number_of_pcs] if number_of_pcs is not None else pc_indices
+    if number_of_pcs is not None:
+        pc_indices = pc_indices[:number_of_pcs]
 
     explained_ratios = pd.to_numeric(
         variance_table["heldout_explained_variance_ratio"],
         errors="raise",
     ).to_numpy(dtype=float)
+    if number_of_pcs is not None:
+        explained_ratios = explained_ratios[:number_of_pcs]
+
+    training_ratios = None
+    if show_training:
+        training_ratios = pd.to_numeric(
+            variance_table["training_explained_variance_ratio"],
+            errors="raise",
+        ).to_numpy(dtype=float)
+        if number_of_pcs is not None:
+            training_ratios = training_ratios[:number_of_pcs]
+
     if not np.all(np.isfinite(pc_indices)) or not np.all(
         np.isfinite(explained_ratios)
     ):
         raise ValueError("PC indices and explained-variance ratios must be finite.")
     if np.any(explained_ratios < 0.0):
         raise ValueError("Explained-variance ratios cannot be negative.")
+    if training_ratios is not None:
+        if not np.all(np.isfinite(training_ratios)):
+            raise ValueError(
+                "Training explained-variance ratios must be finite."
+            )
+        if np.any(training_ratios < 0.0):
+            raise ValueError(
+                "Training explained-variance ratios cannot be negative."
+            )
     if len(np.unique(pc_indices)) != len(pc_indices):
         raise ValueError("PC indices must be unique.")
 
     order = np.argsort(pc_indices)
     pc_indices = pc_indices[order]
     explained_percent = 100.0 * explained_ratios[order]
+    training_percent = (
+        100.0 * training_ratios[order]
+        if training_ratios is not None
+        else None
+    )
 
     figure_width = min(18.0, max(8.0, 0.18 * len(pc_indices) + 6.0))
     figure, axis = plt.subplots(
@@ -84,6 +117,15 @@ def plot_heldout_variance_explained(
         label="Per-PC held-out variance",
     )
 
+    if training_percent is not None:
+        axis.plot(
+            pc_indices,
+            training_percent,
+            color="#55A868",
+            linewidth=2.0,
+            label="Per-PC training variance",
+        )
+
     if show_cumulative:
         axis.plot(
             pc_indices,
@@ -94,8 +136,16 @@ def plot_heldout_variance_explained(
         )
 
     axis.set_xlabel("PC index")
-    axis.set_ylabel("Held-out variance explained (%)")
-    axis.set_title("Held-out variance explained by principal component")
+    axis.set_ylabel(
+        "Variance explained (%)"
+        if show_training
+        else "Held-out variance explained (%)"
+    )
+    axis.set_title(
+        "Training and held-out variance explained by principal component"
+        if show_training
+        else "Held-out variance explained by principal component"
+    )
     axis.grid(axis="y", alpha=0.3)
     axis.legend()
 
