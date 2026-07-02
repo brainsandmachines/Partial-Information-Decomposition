@@ -16,6 +16,7 @@ def plot_heldout_variance_explained(
     show_cumulative: bool = True,
     show_training: bool = False,
     plot_training_minus_heldout: bool = False,
+    separate_panels: bool = False,
     number_of_pcs: int | None = None,
     dpi: int = 300,
 ) -> Path:
@@ -31,12 +32,22 @@ def plot_heldout_variance_explained(
             variance after converting its stored ratios to percentages.
         plot_training_minus_heldout: bool, whether to plot the difference between
             training and held-out explained variance.
+        separate_panels: bool, whether to plot held-out and training explained
+            variance as two bar graphs next to each other. This mode plots
+            both datasets regardless of ``show_training`` and cannot be
+            combined with ``plot_training_minus_heldout``.
         number_of_pcs: int or None, number of PCs to include in the plot.
         dpi: int, resolution of the saved PNG.
 
     Output:
         figure_path: Path, location of the saved variance-explained figure.
     """
+
+    if separate_panels and plot_training_minus_heldout:
+        raise ValueError(
+            "separate_panels cannot be combined with "
+            "plot_training_minus_heldout."
+        )
 
     csv_path = Path(variance_csv_path)
     variance_table = pd.read_csv(csv_path)
@@ -107,75 +118,118 @@ def plot_heldout_variance_explained(
         else None
     )
 
-    figure_width = min(18.0, max(8.0, 0.18 * len(pc_indices) + 6.0))
-    figure, axis = plt.subplots(
-        figsize=(figure_width, 6.0),
-        constrained_layout=True,
-    )
-    bar_alpha_heldout = 0.0 if training_percent is not None else 0.85
-    bar_alpha_training = 0.85 if training_percent is not None else 0.85
-    trn_minus_heldout_alpha = 0.85 if plot_training_minus_heldout else 0.0
-
-    trn_minus_heldout = (
-        training_percent - explained_percent
-        if training_percent is not None
-        else None
-    )
-    
-    if plot_training_minus_heldout:
-        axis.bar(
-            pc_indices,
-            trn_minus_heldout,
-            width=0.8,
-            color="#0F0093",
-            alpha=trn_minus_heldout_alpha,
-            label="Per-PC training minus held-out variance",
+    panel_width = min(18.0, max(8.0, 0.18 * len(pc_indices) + 6.0))
+    if separate_panels:
+        figure, (heldout_axis, training_axis) = plt.subplots(
+            ncols=2,
+            figsize=(min(30.0, 2.0 * panel_width), 6.0),
+            sharey=True,
+            constrained_layout=True,
         )
-    
-    if not plot_training_minus_heldout:
-        axis.bar(
+        heldout_axis.bar(
             pc_indices,
             explained_percent,
             width=0.8,
             color="#000000",
-            alpha=bar_alpha_heldout,
+            alpha=0.85,
             label="Per-PC held-out variance",
         )
-
-    if training_percent is not None and show_training:
-        axis.bar(
+        training_axis.bar(
             pc_indices,
             training_percent,
             width=0.8,
             color="#12AA35",
-            alpha=bar_alpha_training,
+            alpha=0.85,
             label="Per-PC training variance",
         )
 
-    if show_cumulative:
-        axis.plot(
-            pc_indices,
-            np.cumsum(explained_percent),
-            color="#DD8452",
-            linewidth=2.0,
-            label="Cumulative held-out variance",
+        if show_cumulative:
+            heldout_axis.plot(
+                pc_indices,
+                np.cumsum(explained_percent),
+                color="#DD8452",
+                linewidth=2.0,
+                label="Cumulative held-out variance",
+            )
+
+        heldout_axis.set_title("Held-out variance explained")
+        training_axis.set_title("Training variance explained")
+        for panel_axis in (heldout_axis, training_axis):
+            panel_axis.set_xlabel("PC index")
+            panel_axis.set_ylabel("Variance explained (%)")
+            panel_axis.grid(axis="y", alpha=0.3)
+            panel_axis.legend()
+    else:
+        figure, axis = plt.subplots(
+            figsize=(panel_width, 6.0),
+            constrained_layout=True,
+        )
+        bar_alpha_heldout = 0.0 if training_percent is not None else 0.85
+        bar_alpha_training = 0.85 if training_percent is not None else 0.85
+        trn_minus_heldout_alpha = (
+            0.85 if plot_training_minus_heldout else 0.0
         )
 
-    axis.set_xlabel("PC index")
-    axis.set_ylabel(
-        "Variance explained (%)"
-        if show_training or plot_training_minus_heldout
-        else "Held-out variance explained (%)"
-    )
-    axis.set_title(
-        "Training Explained Variance Minus Held-out Variance Explained by Principal Component"
-        if plot_training_minus_heldout
-        else "Training and held-out variance explained by principal component"
-        if show_training
-        else "Held-out variance explained by principal component"
-    )
-    axis.grid(axis="y", alpha=0.3)
-    axis.legend()
+        trn_minus_heldout = (
+            training_percent - explained_percent
+            if training_percent is not None
+            else None
+        )
+
+        if plot_training_minus_heldout:
+            axis.bar(
+                pc_indices,
+                trn_minus_heldout,
+                width=0.8,
+                color="#0F0093",
+                alpha=trn_minus_heldout_alpha,
+                label="Per-PC training minus held-out variance",
+            )
+
+        if not plot_training_minus_heldout:
+            axis.bar(
+                pc_indices,
+                explained_percent,
+                width=0.8,
+                color="#000000",
+                alpha=bar_alpha_heldout,
+                label="Per-PC held-out variance",
+            )
+
+        if training_percent is not None and show_training:
+            axis.bar(
+                pc_indices,
+                training_percent,
+                width=0.8,
+                color="#12AA35",
+                alpha=bar_alpha_training,
+                label="Per-PC training variance",
+            )
+
+        if show_cumulative:
+            axis.plot(
+                pc_indices,
+                np.cumsum(explained_percent),
+                color="#DD8452",
+                linewidth=2.0,
+                label="Cumulative held-out variance",
+            )
+
+        axis.set_xlabel("PC index")
+        axis.set_ylabel(
+            "Variance explained (%)"
+            if show_training or plot_training_minus_heldout
+            else "Held-out variance explained (%)"
+        )
+        axis.set_title(
+            "Training Explained Variance Minus Held-out Variance Explained by Principal Component"
+            if plot_training_minus_heldout
+            else "Training and held-out variance explained by principal component"
+            if show_training
+            else "Held-out variance explained by principal component"
+        )
+        axis.grid(axis="y", alpha=0.3)
+        axis.legend()
 
     figure_path = (
         Path(output_path)

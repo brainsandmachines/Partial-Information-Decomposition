@@ -170,7 +170,7 @@ File description: Plot saved held-out PCA variance explained by component index.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `plot_heldout_variance_explained (line 12)` | variance_csv_path: str \| Path, output_path: str \| Path \| None=None, *, show_cumulative: bool=True, show_training: bool=False, number_of_pcs: int \| None=None, dpi: int=300 | Annotated: `Path` | Read the CSV produced by `subj_pc_analysis.main`, validate PC indices and explained-variance ratios, and save a per-PC held-out percentage bar plot with an optional cumulative held-out line. When training values are enabled, plot them as same-width percentage bars overlaid with the held-out bars at medium opacity. Plotting-specific; training values come from the PCA fit while held-out values come from projecting shared data without refitting. |
+| `plot_heldout_variance_explained (line 12)` | variance_csv_path: str \| Path, output_path: str \| Path \| None=None, *, show_cumulative: bool=True, show_training: bool=False, plot_training_minus_heldout: bool=False, separate_panels: bool=False, number_of_pcs: int \| None=None, dpi: int=300 | Annotated: `Path` | Read the CSV produced by `subj_pc_analysis.main`, validate PC indices and training/held-out explained-variance ratios, convert them to percentages, and save either one bar graph, an optional training-minus-held-out graph, or separate held-out and training bar panels in one figure. `separate_panels` and `plot_training_minus_heldout` are mutually exclusive. Plotting-specific; training values come from the PCA fit while held-out values come from projecting shared data without refitting. |
 
 ### `pipeline/full_OTC/otc_experiment.py`
 
