@@ -209,17 +209,15 @@ def main(
         data_split["shared_neural_data"])
     
     heldout_total_variance = float(
-        np.var(heldout_scaled, axis=0, ddof=1).sum()
-    )
+        np.var(heldout_scaled, axis=0, ddof=1).sum())
     if not np.isfinite(heldout_total_variance) or heldout_total_variance <= 0.0:
         raise ValueError(
-            "Held-out standardized data must have positive finite variance."
-        )
+            "Held-out standardized data must have positive finite variance.")
 
     heldout_component_variance = np.var(heldout_scores, axis=0, ddof=1)
     heldout_explained_ratio = (
-        heldout_component_variance / heldout_total_variance
-    )
+        heldout_component_variance / heldout_total_variance)
+    
     variance_table = pd.DataFrame(
         {
             "pc_index": np.arange(1, heldout_scores.shape[1] + 1),

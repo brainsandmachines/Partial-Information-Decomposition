@@ -250,7 +250,8 @@ if __name__ == "__main__":
         output_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_heldout_pca_variance_explained.png",
         show_cumulative=False,
         show_training=False,
-        plot_training_minus_heldout=True,
+        plot_training_minus_heldout=False,
+        separate_panels=True,
         dpi=600,
         number_of_pcs=300,
     )
