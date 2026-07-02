@@ -15,6 +15,7 @@ def plot_heldout_variance_explained(
     *,
     show_cumulative: bool = True,
     show_training: bool = False,
+    plot_training_minus_heldout: bool = False,
     number_of_pcs: int | None = None,
     dpi: int = 300,
 ) -> Path:
@@ -28,6 +29,8 @@ def plot_heldout_variance_explained(
         show_cumulative: bool, whether to overlay cumulative explained variance.
         show_training: bool, whether to overlay the per-PC training explained
             variance after converting its stored ratios to percentages.
+        plot_training_minus_heldout: bool, whether to plot the difference between
+            training and held-out explained variance.
         number_of_pcs: int or None, number of PCs to include in the plot.
         dpi: int, resolution of the saved PNG.
 
@@ -41,8 +44,8 @@ def plot_heldout_variance_explained(
         "pc_index",
         "heldout_explained_variance_ratio",
     }
-    if show_training:
-        required_columns.add("training_explained_variance_ratio")
+
+    required_columns.add("training_explained_variance_ratio")
 
     missing_columns = required_columns.difference(variance_table.columns)
     if missing_columns:
@@ -69,13 +72,13 @@ def plot_heldout_variance_explained(
         explained_ratios = explained_ratios[:number_of_pcs]
 
     training_ratios = None
-    if show_training:
-        training_ratios = pd.to_numeric(
-            variance_table["training_explained_variance_ratio"],
-            errors="raise",
-        ).to_numpy(dtype=float)
-        if number_of_pcs is not None:
-            training_ratios = training_ratios[:number_of_pcs]
+
+    training_ratios = pd.to_numeric(
+        variance_table["training_explained_variance_ratio"],
+        errors="raise",
+    ).to_numpy(dtype=float)
+    if number_of_pcs is not None:
+        training_ratios = training_ratios[:number_of_pcs]
 
     if not np.all(np.isfinite(pc_indices)) or not np.all(
         np.isfinite(explained_ratios)
@@ -109,23 +112,43 @@ def plot_heldout_variance_explained(
         figsize=(figure_width, 6.0),
         constrained_layout=True,
     )
-    bar_alpha = 0.55 if training_percent is not None else 0.85
-    axis.bar(
-        pc_indices,
-        explained_percent,
-        width=0.8,
-        color="#4C72B0",
-        alpha=bar_alpha,
-        label="Per-PC held-out variance",
-    )
+    bar_alpha_heldout = 0.0 if training_percent is not None else 0.85
+    bar_alpha_training = 0.85 if training_percent is not None else 0.85
+    trn_minus_heldout_alpha = 0.85 if plot_training_minus_heldout else 0.0
 
-    if training_percent is not None:
+    trn_minus_heldout = (
+        training_percent - explained_percent
+        if training_percent is not None
+        else None
+    )
+    
+    if plot_training_minus_heldout:
+        axis.bar(
+            pc_indices,
+            trn_minus_heldout,
+            width=0.8,
+            color="#0F0093",
+            alpha=trn_minus_heldout_alpha,
+            label="Per-PC training minus held-out variance",
+        )
+    
+    if not plot_training_minus_heldout:
+        axis.bar(
+            pc_indices,
+            explained_percent,
+            width=0.8,
+            color="#000000",
+            alpha=bar_alpha_heldout,
+            label="Per-PC held-out variance",
+        )
+
+    if training_percent is not None and show_training:
         axis.bar(
             pc_indices,
             training_percent,
             width=0.8,
-            color="#55A868",
-            alpha=bar_alpha,
+            color="#12AA35",
+            alpha=bar_alpha_training,
             label="Per-PC training variance",
         )
 
@@ -141,11 +164,13 @@ def plot_heldout_variance_explained(
     axis.set_xlabel("PC index")
     axis.set_ylabel(
         "Variance explained (%)"
-        if show_training
+        if show_training or plot_training_minus_heldout
         else "Held-out variance explained (%)"
     )
     axis.set_title(
-        "Training and held-out variance explained by principal component"
+        "Training Explained Variance Minus Held-out Variance Explained by Principal Component"
+        if plot_training_minus_heldout
+        else "Training and held-out variance explained by principal component"
         if show_training
         else "Held-out variance explained by principal component"
     )
@@ -164,11 +189,14 @@ def plot_heldout_variance_explained(
 
 
 
+
 if __name__ == "__main__":
     plot_heldout_variance_explained(
-        variance_csv_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/results/subj01_heldout_pca_variance_explained.csv",
+        variance_csv_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_results/subj01_heldout_pca_variance_explained.csv",
         output_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_heldout_pca_variance_explained.png",
         show_cumulative=False,
+        show_training=False,
+        plot_training_minus_heldout=True,
         dpi=600,
         number_of_pcs=300,
     )
