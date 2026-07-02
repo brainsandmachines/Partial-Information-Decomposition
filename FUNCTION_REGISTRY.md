@@ -252,10 +252,11 @@ File description: Python module for sources target features-related project logi
 |---|---|---|---|
 | `prepare_sources (line 21)` | model_name_1: str, model_name_2: str | Annotated: `dict[str, dict]` | Prepare sources for feature extraction. |
 | `prepare_target (line 42)` | hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction. |
-| `prepare_target_for_voxel (line 64)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction for a specific voxel. |
-| `make_nsd_dataloader (line 90)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
-| `batching (line 113)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
-| `feature_extraction (line 144)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
+| `shared1000_subj_target (line 64)` | hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, pca_model_path: str \| Path \| None=None, scaler_model_path: str \| Path \| None=None | Annotated: `dict[str, np.ndarray]` | Load exactly 1,000 shared stimulus images and their aligned subject neural rows using `prepare_subject_context`. Task-specific; stimulus rows are selected through `image_ids_for_subj`, and optional saved models must be supplied as a pair and are applied as scaler then PCA without refitting. Returns raw neural data when model paths are omitted. Related functions: `prepare_target`, `split_unique_shared`, and `heldout_pca`. |
+| `prepare_target_for_voxel (line 200)` | voxel_index: int, subj_id: str, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path | Annotated: `dict` | Prepare target for feature extraction for a specific voxel. |
+| `make_nsd_dataloader (line 226)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | Annotated: `DataLoader` | Create a DataLoader for an ordered subset of NSD images. |
+| `batching (line 249)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | Annotated: `np.ndarray` | Batch process a range of images for feature extraction. |
+| `feature_extraction (line 280)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | Annotated: `np.ndarray` | Extract features from the models and the neural data. |
 
 ### `pipeline/pipeline_utils.py`
 

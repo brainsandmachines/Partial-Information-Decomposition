@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 import sys
 import time
-from sklearn.externals import joblib
+import joblib
 repo_root = Path(__file__).resolve().parents[1]
 external_root = repo_root / "external"
 for path in (repo_root, external_root):
@@ -61,41 +61,140 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> di
     return prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
 
 
-def shared1000_subj_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path, pca_model_path:Path,scaler_model_path:Path) -> np.ndarray:
-        """This function returns the shared1000 images for a given and subject 
-        and the corresponding neural data PCA'ed and scaled (if models are provided).
+def shared1000_subj_target(
+    hdf_path: str | Path,
+    pkl_info_path: str | Path,
+    neural_data_path: str | Path,
+    pca_model_path: str | Path | None = None,
+    scaler_model_path: str | Path | None = None,
+) -> dict[str, np.ndarray]:
+    """Load a subject's shared 1,000 stimuli and aligned neural responses.
 
-        If a pca_model and scaler model are provided, the function will use them to transform the neural data.
+    When both saved model paths are supplied, the neural responses are first
+    transformed by the saved scaler and then projected into the saved PCA
+    space. When neither model path is supplied, the raw shared neural
+    responses are returned.
 
-        if not returns the full neural data not scaled.
+    Inputs:
+        hdf_path: str or Path, NSD HDF5 file containing the global stimulus
+            image dataset.
+        pkl_info_path: str or Path, pickle file containing the NSD shared-1,000
+            flags.
+        neural_data_path: str or Path, subject neural-data Zarr directory.
+        pca_model_path: str, Path, or None, saved fitted PCA model. It must be
+            supplied together with ``scaler_model_path``.
+        scaler_model_path: str, Path, or None, saved fitted scaler model. It
+            must be supplied together with ``pca_model_path``.
 
-        Inputs:
-            hdf_path: path to hdf file containing neural data
-            pkl_info_path: path to pkl file containing info about the neural data
-            neural_data_path: path to the directory containing the neural data
-            pca_model_path: path to the PCA model
-            scaler_model_path: path to the scaler model
+    Output:
+        shared_target: dict[str, np.ndarray], with ``neural_data`` of shape
+            (1000, n_voxels) without models or (1000, n_components) with
+            models, and ``stim`` containing the 1,000 aligned stimulus images.
+    """
 
-        Outputs:
-            shared1000_subj: np.ndarray, shared1000 images for the subject."""
+    has_pca_path = pca_model_path is not None
+    has_scaler_path = scaler_model_path is not None
+    if has_pca_path != has_scaler_path:
+        raise ValueError(
+            "pca_model_path and scaler_model_path must be provided together."
+        )
 
+    pca_model = None
+    scaler_model = None
+    if has_pca_path:
+        pca_path = Path(pca_model_path)
+        scaler_path = Path(scaler_model_path)
+        if not pca_path.is_file():
+            raise FileNotFoundError(f"PCA model does not exist: {pca_path}")
+        if not scaler_path.is_file():
+            raise FileNotFoundError(
+                f"Scaler model does not exist: {scaler_path}"
+            )
+        pca_model = joblib.load(pca_path)
+        scaler_model = joblib.load(scaler_path)
 
+    subject_context = prepare_subject_context(
+        Path(hdf_path),
+        Path(pkl_info_path),
+        Path(neural_data_path),
+    )
+    hdf_file = subject_context.get("hdf_file")
 
-        subject_context = prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
+    try:
+        neural_data = np.asarray(subject_context["neural_data"])
+        shared_mask = np.asarray(
+            subject_context["shared1000_subj"],
+            dtype=bool,
+        )
+        image_ids = np.asarray(subject_context["image_ids_for_subj"])
 
-        if pca_model_path.exists() and scaler_model_path.exists():
+        if neural_data.ndim != 2:
+            raise ValueError(
+                "neural_data must have shape (n_images, n_voxels), "
+                f"but received {neural_data.shape}."
+            )
+        if shared_mask.ndim != 1 or shared_mask.shape[0] != neural_data.shape[0]:
+            raise ValueError(
+                "shared1000_subj must be a one-dimensional mask with one "
+                "entry per neural-data row."
+            )
+        if image_ids.ndim != 1 or image_ids.shape[0] != neural_data.shape[0]:
+            raise ValueError(
+                "image_ids_for_subj must contain one image ID per "
+                "neural-data row."
+            )
 
-            pca_model = joblib.load(pca_model_path)
-            scaler_model = joblib.load(scaler_model_path)
+        shared_count = int(np.count_nonzero(shared_mask))
+        if shared_count != 1000:
+            raise ValueError(
+                "Expected exactly 1000 shared images, "
+                f"but found {shared_count}."
+            )
 
-            neural_data = subject_context["neural_data"]
-            shared_neural_data = neural_data[subject_context["shared1000_subj"]]
-            stim = subject_context["stim"][subject_context["shared1000_subj"]]
-            neural_data_scaled = pca_model.transform(shared_neural_data)
-            neural_data_pca = scaler_model.transform(neural_data_scaled) #(1000, n_components_)
-            assert (neural_data_pca.shape[0],neural_data_pca.shape[1]) == (1000, pca_model.n_components_), "Shape mismatch between PCA transformed data and expected dimensions"
+        shared_neural_data = neural_data[shared_mask]
+        shared_image_ids = image_ids[shared_mask]
+        if not np.issubdtype(shared_image_ids.dtype, np.integer):
+            raise TypeError("Shared NSD image IDs must be integers.")
 
-            return {'neural_data':neural_data_pca, 'stim': stim}
+        stim_dataset = subject_context["stim"]
+        if np.any(shared_image_ids < 0) or np.any(
+            shared_image_ids >= stim_dataset.shape[0]
+        ):
+            raise IndexError(
+                "A shared NSD image ID is outside the stimulus dataset."
+            )
+
+        shared_stim = np.empty(
+            (shared_count, *stim_dataset.shape[1:]),
+            dtype=stim_dataset.dtype,
+        )
+        for output_index, image_id in enumerate(shared_image_ids):
+            shared_stim[output_index] = stim_dataset[int(image_id)]
+
+        if pca_model is not None and scaler_model is not None:
+            scaled_neural_data = scaler_model.transform(shared_neural_data)
+            shared_neural_data = pca_model.transform(scaled_neural_data)
+            expected_components = getattr(pca_model, "n_components_", None)
+            if (
+                shared_neural_data.ndim != 2
+                or shared_neural_data.shape[0] != shared_count
+                or (
+                    expected_components is not None
+                    and shared_neural_data.shape[1] != expected_components
+                )
+            ):
+                raise ValueError(
+                    "PCA-transformed neural data has an unexpected shape: "
+                    f"{shared_neural_data.shape}."
+                )
+
+        return {
+            "neural_data": np.asarray(shared_neural_data),
+            "stim": shared_stim,
+        }
+    finally:
+        if hdf_file is not None:
+            hdf_file.close()
 
 
 def prepare_target_for_voxel(voxel_index:int, subj_id:str, hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> dict:
