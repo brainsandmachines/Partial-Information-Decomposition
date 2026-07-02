@@ -1,0 +1,2 @@
+/var/spool/slurmd/job18765469/slurm_script: line 11: activate: No such file or directory
+[2026-07-02T17:03:27.479] error: *** JOB 18765469 ON ise-cpu-intl-15 CANCELLED AT 2026-07-02T17:03:27 DUE to SIGNAL Terminated ***

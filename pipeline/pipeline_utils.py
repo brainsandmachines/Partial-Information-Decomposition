@@ -6,7 +6,7 @@ from inspect import signature
 from pathlib import Path
 from typing import Any, Callable
 import numpy as np
-from pipeline.pipeline_phases.sources_target_features import feature_extraction
+from pipeline.pipeline_phases.sources_target_features import feature_extraction, shared1000_subj_target
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
@@ -608,5 +608,6 @@ COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     "print_pid_mi": print_pid_mi_adapter,
     'permute_rv': permute_rv,
     'ridge_train_to_test_prediction': ridge_train_to_test_prediction,
-    'ridge_preprocessing': ridge_preprocessing
+    'ridge_preprocessing': ridge_preprocessing,
+    '1000shared_target': shared1000_subj_target
 }

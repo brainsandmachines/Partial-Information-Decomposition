@@ -285,11 +285,12 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_324_pcs'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
         pkl_info_path=stimulus_info_path,
         neural_data_path=subject_neural_data_path,
-        variance_threshold=1,
-        save_models_path=Path(__file__).resolve().parent / "results",
+        variance_threshold=0.60,
+        save_models_path=Path(save_path),
     )
