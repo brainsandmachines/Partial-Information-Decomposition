@@ -932,6 +932,14 @@ File description: Small Python wrapper for JWKay/PID/IdepGauss.R.
 | `absolute_path (line 203)` | value: str | Annotated: `Path` | No docstring; infer behavior from name/signature before reuse. |
 | `main (line 210)` | No inputs | Annotated: `int` | No docstring; infer behavior from name/signature before reuse. |
 
+### `library_wrappers/missmda_ncp.py`
+
+File description: Minimal task-specific Python subprocess wrapper for R's `missMDA::estim_ncpPCA`. Inputs are raw numeric sample tables ordered as rows=samples and columns=continuous features, not covariance matrices. The function intentionally performs no validation or custom error handling so NumPy and R errors remain directly debuggable. It uses missMDA 1.21 with FactoMineR 2.13; complete tables must use LOO or K-fold because upstream GCV requires a missing value.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `estimate_ncp_pca (line 35)` | data, ncp_min=0, ncp_max=5, method="Regularized", scale=True, method_cv="gcv", nbsim=100, p_na=0.05, threshold=1e-4, seed=None, rscript=RSCRIPT, verbose=False | Unannotated dictionary | Write raw samples to a temporary CSV, call the original R estimator, and return `{"ncp": int, "criterion": dict[int, float]}` without preflight validation or a CLI layer. |
+
 ### `library_wrappers/Thin_PID.py`
 
 File description: Wrapper for warrenzha/flow-pid's exact Gaussian Thin-PID definition.
@@ -1068,6 +1076,20 @@ File description: Python module for turned off unqiue-related project logic.
 | `test_u2str (line 195)` | seed: int, config: dict, final_ratio: float | `results` | No docstring; infer behavior from name/signature before reuse. |
 | `plot_keys_vs_alpha (line 226)` | csv_path: Union[str, Path], keys: Sequence[str], *, x_col: str='alpha', sort_alpha: bool=False, logx: bool=False, figsize: tuple[float, float]=(8, 4.5), marker: Optional[str]=None, save_path: Optional[Union[str, Path]]=None | Annotated: `None` | Plot selected columns (keys) vs x_col from a CSV file. |
 | `main (line 290)` | No inputs | No explicit return; likely `None` / side effects. | No docstring; infer behavior from name/signature before reuse. |
+
+## Simulations/PCA_rank
+
+Known-rank PCA simulation and missMDA component-selection evaluation.
+
+### `Simulations/PCA_rank/pca_simulation.py`
+
+File description: Create controlled low-rank sample matrices, add relative Gaussian noise, evaluate `missMDA::estim_ncpPCA` with EM/K-fold across seeds, save raw and grouped CSV results, and plot success-rate heatmaps with noise on x and loading correlation on y.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `create_T_and_P (line 29)` | n_samples: int, n_features: int, rank: int, loading_corr: float=0.0, component_strengths: np.ndarray \| list[float] \| None=None, random_state: int \| None=None | Annotated: `tuple[np.ndarray, np.ndarray]` | Create standardized score matrix T and centered unit-norm loading matrix P with controlled pairwise loading correlation. |
+| `generate_rank_simulation_data (line 53)` | n_samples: int, n_features: int, rank: int, loading_corr: float, noise_std: float, random_state: int, component_strengths: list[float] \| np.ndarray \| None=None, center_columns: bool=True | Annotated: `dict` | Form unit-standard-deviation `X_signal = T @ P.T`, add relative Gaussian noise, optionally center columns, and return data plus condition metadata. |
+| `run_rank_simulation (line 79)` | grid: dict[str, list], output_dir: str \| Path=OUTPUT_DIR, nbsim: int=NBSIM | Annotated: `tuple[pd.DataFrame, pd.DataFrame]` | Run robust EM/K-fold rank selection across the grid, save raw/summary CSVs, and create per-rank success heatmaps over loading correlation and noise. |
 
 ## Simulations/Theoretical_Examples/Covariance
 
