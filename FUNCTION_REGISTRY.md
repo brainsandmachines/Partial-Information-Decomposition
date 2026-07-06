@@ -934,11 +934,11 @@ File description: Small Python wrapper for JWKay/PID/IdepGauss.R.
 
 ### `library_wrappers/missmda_ncp.py`
 
-File description: Portable minimal Python subprocess wrapper for R's `missMDA::estim_ncpPCA`. Rscript is resolved from the `RSCRIPT` environment variable, `PATH`, or beside the active Python executable. Inputs are raw numeric sample tables ordered as rows=samples and columns=continuous features, not covariance matrices. The function performs no custom validation or error handling. It uses missMDA 1.21 with FactoMineR 2.13; complete tables must use LOO or K-fold because upstream GCV requires a missing value.
+File description: Portable minimal Python subprocess wrapper for R's `missMDA::estim_ncpPCA`. It calls `Rscript` through the operating system PATH and assumes no environment name or installation directory. Inputs are raw numeric sample tables ordered as rows=samples and columns=continuous features, not covariance matrices. The function performs no custom validation or error handling. It uses missMDA 1.21 with FactoMineR 2.13; complete tables must use LOO or K-fold because upstream GCV requires a missing value.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `estimate_ncp_pca (line 42)` | data, ncp_min=0, ncp_max=5, method="Regularized", scale=True, method_cv="gcv", nbsim=100, p_na=0.05, threshold=1e-4, seed=None, rscript=RSCRIPT, verbose=False | Unannotated dictionary | Write raw samples to a temporary CSV, call the original R estimator through the portable Rscript resolution, and return `{"ncp": int, "criterion": dict[int, float]}` without preflight validation or a CLI layer. |
+| `estimate_ncp_pca (line 35)` | data, ncp_min=0, ncp_max=5, method="Regularized", scale=True, method_cv="gcv", nbsim=100, p_na=0.05, threshold=1e-4, seed=None, rscript=RSCRIPT, verbose=False | Unannotated dictionary | Write raw samples to a temporary CSV, call the original R estimator through Rscript on PATH, and return `{"ncp": int, "criterion": dict[int, float]}` without preflight validation or a CLI layer. |
 
 ### `library_wrappers/Thin_PID.py`
 

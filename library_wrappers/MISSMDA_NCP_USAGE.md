@@ -10,12 +10,9 @@ conda activate your-environment
 conda install -c conda-forge r-missmda=1.21 r-factominer=2.13
 ```
 
-The wrapper finds Rscript from the `RSCRIPT` environment variable, then from
-`PATH`, then beside the active Python executable. To override it explicitly:
-
-```bash
-export RSCRIPT=/path/to/Rscript
-```
+The wrapper calls `Rscript` from the operating system `PATH`; it does not
+assume an environment name or installation directory. If Rscript is not on
+`PATH`, pass `rscript="/path/to/Rscript"` to `estimate_ncp_pca`.
 
 Use it from Python:
 
