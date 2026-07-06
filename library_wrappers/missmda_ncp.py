@@ -1,13 +1,20 @@
 """Minimal Python wrapper for R's ``missMDA::estim_ncpPCA``."""
 
+import os
 from pathlib import Path
+import shutil
 import subprocess
+import sys
 import tempfile
 
 import numpy as np
 
 
-RSCRIPT = Path.home() / "anaconda3/envs/PID_env/bin/Rscript"
+RSCRIPT = (
+    os.environ.get("RSCRIPT")
+    or shutil.which("Rscript")
+    or Path(sys.executable).with_name("Rscript")
+)
 
 R_CODE = r"""
 a <- commandArgs(TRUE)

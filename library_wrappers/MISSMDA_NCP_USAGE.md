@@ -6,9 +6,15 @@ The wrapper has one function and calls the original R
 Install the compatible R packages with:
 
 ```bash
-/home/ohadshee/anaconda3/bin/conda install \
-  -n PID_env -c conda-forge \
-  r-missmda=1.21 r-factominer=2.13
+conda activate your-environment
+conda install -c conda-forge r-missmda=1.21 r-factominer=2.13
+```
+
+The wrapper finds Rscript from the `RSCRIPT` environment variable, then from
+`PATH`, then beside the active Python executable. To override it explicitly:
+
+```bash
+export RSCRIPT=/path/to/Rscript
 ```
 
 Use it from Python:
