@@ -50,6 +50,7 @@ def eigenvector_pca_cv(
     center: bool = True,
     scale: bool = False,
     include_zero_components: bool = True,
+    method_pca: str = None,
     eps: float = 1e-12,
 ) -> EigenvectorPCACVResult:
     """
@@ -74,7 +75,7 @@ def eigenvector_pca_cv(
         X_train.shape == (n_train_samples, n_features)
         P.shape == (n_features, n_components)
     """
-
+    assert method_pca is None, "method_pca must be specified as 'SVD' or 'sklearn'."
     X = np.asarray(X, dtype=float)
 
     if X.ndim != 2:
@@ -104,6 +105,7 @@ def eigenvector_pca_cv(
 
     if pca_fit_fn is None:
         pca_fit_fn = fit_pca_loadings_svd
+        print("Using default PCA fitting function (SVD).!!!")
 
     press = np.zeros(max_components + 1, dtype=float)
 
@@ -128,10 +130,19 @@ def eigenvector_pca_cv(
         # f = 0:
         # Predict each feature by the training mean.
         # After centering, this prediction is zero.
-        press[0] += np.sum(x_test ** 2)
+        if include_zero_components:
+            press[0] += np.sum(x_test ** 2)
+        else:
+            press[0] = np.nan  # Ignore f=0 in the MSEP calculation.
 
+        if method_pca is 'SVD':
+            P_full = pca_fit_fn(X_train, max_components)  # shape: (n_features, max_components)
         for f in range(1, max_components + 1):
-            P = pca_fit_fn(X_train, f)  # expected shape: (n_features, f)
+
+            if method_pca == 'SVD': 
+                P = P_full[:, :f]  # shape: (n_features, f)
+            else:
+                P = pca_fit_fn(X_train, f)  # expected shape: (n_features, f)
 
             if not isinstance(P, np.ndarray):
                 raise TypeError("pca_fit_fn must return a NumPy array.")
@@ -143,7 +154,7 @@ def eigenvector_pca_cv(
                     f"pca_fit_fn returned shape {P.shape}, "
                     f"but expected {expected_shape}."
                 )
-
+            
             for j in range(n_features):
                 # Remove x_ij from the held-out row.
                 x_i_minus_j = np.delete(x_test, j)      # shape: (n_features - 1,)
@@ -186,6 +197,7 @@ def eigenvector_pca_cv(
         n_samples=n_samples,
         n_features=n_features,
         max_components=max_components,
+        method_pca='SVD',
         time = 0.0
     )
 
@@ -237,10 +249,10 @@ def regular_PCA(X: np.ndarray, variance_threshold: float) -> np.ndarray:
 
 if __name__ == "__main__":
     # Example usage
-    n_samples = 500
-    n_features = 50
-    rank = 10
-    loading_corr = 0.
+    n_samples = 50
+    n_features = 4
+    rank = 2
+    loading_corr = 0.9
     noise_std = 0.5
     random_state = 42
 
@@ -256,10 +268,10 @@ if __name__ == "__main__":
     X = data["X"]
     result = eigenvector_pca_cv(
         X,
-        max_components=40,
-        pca_fit_fn=fit_pca_loadings_sklearn,
+        max_components=3,
+        pca_fit_fn=fit_pca_loadings_svd,
         center=True,
-        scale=False,
+        scale=True,
     )
 
     print("Selected components:", result.selected_n_components)

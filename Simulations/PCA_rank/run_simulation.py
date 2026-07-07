@@ -42,7 +42,8 @@ def run_simulation(
         max_components=max_components,
         pca_fit_fn=fit_pca_loadings_sklearn,
         center=True,
-        scale=False,
+        scale=True,
+        method_pca='SVD'
     )
 
     end_eigenvector = perf_counter() 
