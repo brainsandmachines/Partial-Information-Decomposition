@@ -197,7 +197,6 @@ def eigenvector_pca_cv(
         n_samples=n_samples,
         n_features=n_features,
         max_components=max_components,
-        method_pca='SVD',
         time = 0.0
     )
 

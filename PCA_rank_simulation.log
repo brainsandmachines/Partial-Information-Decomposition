@@ -8,23 +8,10 @@ Traceback (most recent call last):
   File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/PCA_rank/run_simulation.py", line 93, in <module>
     results = run_simulation(
               ^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/PCA_rank/run_simulation.py", line 39, in run_simulation
-    ncp_estimate = estimate_ncp_pca(X,ncp_max = max_components ,method="EM",method_cv = 'Kfold' ,nbsim=5,seed  = random_state)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/library_wrappers/missmda_ncp.py", line 79, in estimate_ncp_pca
-    subprocess.run(
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 550, in run
-    stdout, stderr = process.communicate(input, timeout=timeout)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 1201, in communicate
-    self.wait()
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 1264, in wait
-    return self._wait(timeout=timeout)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 2053, in _wait
-    (pid, sts) = self._try_wait(0)
-                 ^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 2011, in _try_wait
-    (pid, sts) = os.waitpid(self.pid, wait_flags)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-KeyboardInterrupt
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/PCA_rank/run_simulation.py", line 44, in run_simulation
+    eigenvector_result  = eigenvector_pca_cv(
+                          ^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/PCA_rank/eigenvector_pca.py", line 193, in eigenvector_pca_cv
+    return EigenvectorPCACVResult(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: EigenvectorPCACVResult.__init__() got an unexpected keyword argument 'method_pca'
