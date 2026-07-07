@@ -75,7 +75,7 @@ def eigenvector_pca_cv(
         X_train.shape == (n_train_samples, n_features)
         P.shape == (n_features, n_components)
     """
-    assert method_pca is None, "method_pca must be specified as 'SVD' or 'sklearn'."
+    assert method_pca is not None, "method_pca must be specified as 'SVD' or 'sklearn'."
     X = np.asarray(X, dtype=float)
 
     if X.ndim != 2:
@@ -135,7 +135,7 @@ def eigenvector_pca_cv(
         else:
             press[0] = np.nan  # Ignore f=0 in the MSEP calculation.
 
-        if method_pca is 'SVD':
+        if method_pca == 'SVD':
             P_full = pca_fit_fn(X_train, max_components)  # shape: (n_features, max_components)
         for f in range(1, max_components + 1):
 

@@ -1,9 +1,13 @@
+import sys
+
 from eigenvector_pca import eigenvector_pca_cv,fit_pca_loadings_sklearn
 from pca_simulation import generate_rank_simulation_data
 from rowwise_PCA import rowwise_loo_pca_variance_threshold
 import numpy as np
 from library_wrappers.missmda_ncp import estimate_ncp_pca
 from time import perf_counter
+
+from utils import Tee
 
 
 def run_simulation(
@@ -31,10 +35,10 @@ def run_simulation(
 
 
     # EM-wold
-    start = perf_counter()
-    ncp_estimate = estimate_ncp_pca(X,ncp_max = max_components ,method="EM",method_cv = 'Kfold' ,nbsim=5,seed  = random_state)
-    end_ncp =  perf_counter()
-    ncp_estimate['time'] = end_ncp - start 
+    # start = perf_counter()
+    # ncp_estimate = estimate_ncp_pca(X,ncp_max = max_components ,method="EM",method_cv = 'Kfold' ,nbsim=5,seed  = random_state)
+    # end_ncp =  perf_counter()
+    #ncp_estimate['time'] = end_ncp - start 
     
     
     eigenvector_result  = eigenvector_pca_cv(
@@ -47,7 +51,7 @@ def run_simulation(
     )
 
     end_eigenvector = perf_counter() 
-    eigenvector_result.time = end_eigenvector - end_ncp
+    #eigenvector_result.time = end_eigenvector - #end_ncp
 
     # Run row-wise LOOCV PCA
     rowwise_result = rowwise_loo_pca_variance_threshold(X, variance_threshold=0.95)
@@ -61,17 +65,22 @@ def run_simulation(
         "simulation_data": data,
         "ncp_estimate": ncp_estimate,
     }
+log = open("PCA_rank_simulation.log", "w")
+
+sys.stdout = Tee(sys.stdout, log)
+sys.stderr = Tee(sys.stderr, log)
 
 
 if __name__ == "__main__":
     # Example usage
     n_samples = [100]
-    n_features = [50,70,80]
-    rank = [5,10,20,40]
-    loading_corr = [0.1,0.5,0.9]
-    noise_std = [0.1,0.3,0.9,1.2]
-    random_state = 56 
+    n_features = [50,70]
+    rank = [5,20,40]
+    loading_corr = [0.4,0.9]
+    noise_std = [0.1,0.3]
+    random_state = 23
     total_runs = len(n_samples) * len(n_features) * len(rank) * len(loading_corr) * len(noise_std)
+    print(f"Total simulations to run: {total_runs}")
     run_count = 0
     for n_s in n_samples:
         for n_f in n_features:
