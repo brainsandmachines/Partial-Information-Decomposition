@@ -36,11 +36,26 @@ def create_T_and_P(
     random_state: int | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Create scores and correlated loadings. Inputs define sizes, rank, correlation, strengths, and seed; outputs are T and P arrays."""
+
+    if rank > 1:
+        lower_bound = -1.0 / (rank - 1)
+
+    if not (lower_bound < loading_corr < 1.0):
+        raise ValueError(
+            f"loading_corr={loading_corr} is invalid for rank={rank}. "
+            f"To make the equicorrelation matrix positive definite, use "
+            f"{lower_bound} < loading_corr < 1.0."
+        )
+    
     rng = np.random.default_rng(random_state)
+
+    #Create the score matrix T - How strongly each sample expresses each component
     T = rng.normal(size=(n_samples, rank))
     T = (T - T.mean(0, keepdims=True)) / T.std(0, keepdims=True)
     if component_strengths is not None:
         T *= np.asarray(component_strengths)[None, :]
+
+    #Create the loading matrix P - Pjk​ tells how strongly feature j participates in component k.
     A = rng.normal(size=(n_features, rank))
     Q, _ = np.linalg.qr(A - A.mean(0, keepdims=True))
     C = np.full((rank, rank), loading_corr)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable
+from Simulations.PCA_rank.rowwise_PCA import rowwise_loo_pca_variance_threshold
 from pca_simulation import generate_rank_simulation_data
 import numpy as np
 from sklearn.decomposition import PCA
@@ -277,5 +278,5 @@ if __name__ == "__main__":
 
     variance_threshold = 0.99
     print(f"\nRunning regular PCA with variance threshold of {variance_threshold}")
-    P_regular = regular_PCA(X, variance_threshold=variance_threshold)
+    P_regular = rowwise_loo_pca_variance_threshold(X, variance_threshold=variance_threshold)
     print("Number of Pcs chosen:", P_regular.shape[1])
