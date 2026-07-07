@@ -34,11 +34,11 @@ def run_simulation(
     max_components = min(n_samples, n_features) - 2
 
 
-    # EM-wold
-    # start = perf_counter()
-    # ncp_estimate = estimate_ncp_pca(X,ncp_max = max_components ,method="EM",method_cv = 'Kfold' ,nbsim=5,seed  = random_state)
-    # end_ncp =  perf_counter()
-    #ncp_estimate['time'] = end_ncp - start 
+    #EM-wold
+    start = perf_counter()
+    ncp_estimate = estimate_ncp_pca(X,ncp_max = max_components ,method="EM",method_cv = 'Kfold' ,nbsim=5,seed  = random_state)
+    end_ncp =  perf_counter()
+    ncp_estimate['time'] = end_ncp - start 
     
     
     eigenvector_result  = eigenvector_pca_cv(
@@ -51,7 +51,7 @@ def run_simulation(
     )
 
     end_eigenvector = perf_counter() 
-    #eigenvector_result.time = end_eigenvector - #end_ncp
+    eigenvector_result.time = end_eigenvector - end_ncp
 
     # Run row-wise LOOCV PCA
     rowwise_result = rowwise_loo_pca_variance_threshold(X, variance_threshold=0.95)
@@ -73,7 +73,7 @@ sys.stderr = Tee(sys.stderr, log)
 
 if __name__ == "__main__":
     # Example usage
-    n_samples = [100]
+    n_samples = [80]
     n_features = [50,70]
     rank = [5,20,40]
     loading_corr = [0.4,0.9]

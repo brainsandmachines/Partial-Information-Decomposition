@@ -1,22 +1,30 @@
+Total simulations to run: 24
 ======================================================================
 
-Running simulation with n_samples=100, n_features=50, rank=5, loading_corr=0.1, noise_std=0.1
+Running simulation with n_samples=80, n_features=50, rank=5, loading_corr=0.4, noise_std=0.1
 
 TRUE RANK: 5
-Failed to enable GUI event loop integration for 'qt'
 Traceback (most recent call last):
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/matplotlibtools.py", line 49, in do_enable_gui
-    enable_gui(guiname)
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 567, in enable_gui
-    return gui_hook(app)
-           ^^^^^^^^^^^^^
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 187, in enable_qt
-    self.enable_qt4(app)
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhook.py", line 213, in enable_qt4
-    app, inputhook_qt4 = create_inputhook_qt4(self, app)
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ohadshee/.vscode/extensions/ms-python.debugpy-2026.6.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/pydev_ipython/inputhookqt4.py", line 87, in create_inputhook_qt4
-    app = QtGui.QApplication([" "])
-          ^^^^^^^^^^^^^^^^^^
-AttributeError: module 'PySide6.QtGui' has no attribute 'QApplication'. Did you mean: 'QGuiApplication'?
-Backend qtagg is interactive backend. Turning interactive mode on.
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/PCA_rank/run_simulation.py", line 93, in <module>
+    results = run_simulation(
+              ^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/PCA_rank/run_simulation.py", line 39, in run_simulation
+    ncp_estimate = estimate_ncp_pca(X,ncp_max = max_components ,method="EM",method_cv = 'Kfold' ,nbsim=5,seed  = random_state)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/library_wrappers/missmda_ncp.py", line 79, in estimate_ncp_pca
+    subprocess.run(
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 1201, in communicate
+    self.wait()
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 1264, in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 2053, in _wait
+    (pid, sts) = self._try_wait(0)
+                 ^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/anaconda3/envs/PID_env/lib/python3.12/subprocess.py", line 2011, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
