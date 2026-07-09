@@ -231,7 +231,8 @@ def main(
         variance_threshold=variance_threshold,
     )
     pca_results = pca_func(
-        data_split["unique_neural_data"]
+        data_split["unique_neural_data"],
+        max_features=1000,
     )
     heldout_scores = heldout_pca(
         pca_results["pca"],

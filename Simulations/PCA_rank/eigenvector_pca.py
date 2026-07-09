@@ -103,7 +103,7 @@ def eigenvector_pca_cv(
 
     if pca_fit_fn is None:
         pca_fit_fn = fit_pca_loadings_svd
-        print("Using default PCA fitting function (SVD).!!!")
+        print("Using default PCA fitting function (SVD)!!!")
 
     press = np.zeros(max_components + 1, dtype=float)
 
@@ -136,7 +136,8 @@ def eigenvector_pca_cv(
         if method_pca == 'SVD':
             P_full = pca_fit_fn(X_train, max_components)  # shape: (n_features, max_components)
         for f in range(1, max_components + 1):
-
+            if f % 10 == 0:
+                print(f"Processing component {f} of {max_components}...✅")
             if method_pca == 'SVD': 
                 P = P_full[:, :f]  # shape: (n_features, f)
             else:

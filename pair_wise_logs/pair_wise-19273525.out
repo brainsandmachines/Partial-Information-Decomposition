@@ -357,3 +357,54 @@ Empty layer shape for layer BatchNorm2d-21: torch.Size([1, 768, 7, 7])
 Empty layer features flattened shape for layer BatchNorm2d-21: torch.Size([1, 37632])
 Stimulus batch shape: (128,)
 DataLoader created with batch size: 16
+Extracted and cached features for model: visformer_small_classification
+PID Results:
+  red: 9.82907527498569
+  unq1: 0.42871339166275924
+  unq2: 1.1912782369184445
+  syn: 1.1017129386446385
+Mutual Information Results:
+  tri_mi: 12.550779842211533
+  bi_mi_1: 10.25778866664845
+  bi_mi_2: 11.020353511904135
+Completed PID for pair: semnasnet_100_classification, visformer_small_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results_srp_pca.csv
+Model options for convit_base_classification: {'model_name': 'convit_base', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('convit_base', pretrained = True)"}
+Image transforms for convit_base_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: convit_base_classification
+Ordered layers from model: ['Conv2d-1', 'Identity-1', 'PatchEmbed-1', 'Dropout-1', 'LayerNorm-1', 'Linear-1', 'Linear-2', 'Dropout-2', 'Linear-3', 'Linear-4', 'Dropout-3', 'GPSA-1', 'Identity-2', 'LayerNorm-2', 'Linear-5', 'GELU-1', 'Dropout-4', 'Identity-3', 'Linear-6', 'Dropout-5', 'Mlp-1', 'Identity-4', 'Block-1', 'LayerNorm-3', 'Linear-7', 'Linear-8', 'Dropout-6', 'Linear-9', 'Linear-10', 'Dropout-7', 'GPSA-2', 'Identity-5', 'LayerNorm-4', 'Linear-11', 'GELU-2', 'Dropout-8', 'Identity-6', 'Linear-12', 'Dropout-9', 'Mlp-2', 'Identity-7', 'Block-2', 'LayerNorm-5', 'Linear-13', 'Linear-14', 'Dropout-10', 'Linear-15', 'Linear-16', 'Dropout-11', 'GPSA-3', 'Identity-8', 'LayerNorm-6', 'Linear-17', 'GELU-3', 'Dropout-12', 'Identity-9', 'Linear-18', 'Dropout-13', 'Mlp-3', 'Identity-10', 'Block-3', 'LayerNorm-7', 'Linear-19', 'Linear-20', 'Dropout-14', 'Linear-21', 'Linear-22', 'Dropout-15', 'GPSA-4', 'Identity-11', 'LayerNorm-8', 'Linear-23', 'GELU-4', 'Dropout-16', 'Identity-12', 'Linear-24', 'Dropout-17', 'Mlp-4', 'Identity-13', 'Block-4', 'LayerNorm-9', 'Linear-25', 'Linear-26', 'Dropout-18', 'Linear-27', 'Linear-28', 'Dropout-19', 'GPSA-5', 'Identity-14', 'LayerNorm-10', 'Linear-29', 'GELU-5', 'Dropout-20', 'Identity-15', 'Linear-30', 'Dropout-21', 'Mlp-5', 'Identity-16', 'Block-5', 'LayerNorm-11', 'Linear-31', 'Linear-32', 'Dropout-22', 'Linear-33', 'Linear-34', 'Dropout-23', 'GPSA-6', 'Identity-17', 'LayerNorm-12', 'Linear-35', 'GELU-6', 'Dropout-24', 'Identity-18', 'Linear-36', 'Dropout-25', 'Mlp-6', 'Identity-19', 'Block-6', 'LayerNorm-13', 'Linear-37', 'Linear-38', 'Dropout-26', 'Linear-39', 'Linear-40', 'Dropout-27', 'GPSA-7', 'Identity-20', 'LayerNorm-14', 'Linear-41', 'GELU-7', 'Dropout-28', 'Identity-21', 'Linear-42', 'Dropout-29', 'Mlp-7', 'Identity-22', 'Block-7', 'LayerNorm-15', 'Linear-43', 'Linear-44', 'Dropout-30', 'Linear-45', 'Linear-46', 'Dropout-31', 'GPSA-8', 'Identity-23', 'LayerNorm-16', 'Linear-47', 'GELU-8', 'Dropout-32', 'Identity-24', 'Linear-48', 'Dropout-33', 'Mlp-8', 'Identity-25', 'Block-8', 'LayerNorm-17', 'Linear-49', 'Linear-50', 'Dropout-34', 'Linear-51', 'Linear-52', 'Dropout-35', 'GPSA-9', 'Identity-26', 'LayerNorm-18', 'Linear-53', 'GELU-9', 'Dropout-36', 'Identity-27', 'Linear-54', 'Dropout-37', 'Mlp-9', 'Identity-28', 'Block-9', 'LayerNorm-19', 'Linear-55', 'Linear-56', 'Dropout-38', 'Linear-57', 'Linear-58', 'Dropout-39', 'GPSA-10', 'Identity-29', 'LayerNorm-20', 'Linear-59', 'GELU-10', 'Dropout-40', 'Identity-30', 'Linear-60', 'Dropout-41', 'Mlp-10', 'Identity-31', 'Block-10', 'LayerNorm-21', 'Linear-61', 'Dropout-42', 'Linear-62', 'Dropout-43', 'MHSA-1', 'Identity-32', 'LayerNorm-22', 'Linear-63', 'GELU-11', 'Dropout-44', 'Identity-33', 'Linear-64', 'Dropout-45', 'Mlp-11', 'Identity-34', 'Block-11', 'LayerNorm-23', 'Linear-65', 'Dropout-46', 'Linear-66', 'Dropout-47', 'MHSA-2', 'Identity-35', 'LayerNorm-24', 'Linear-67', 'GELU-12', 'Dropout-48', 'Identity-36', 'Linear-68', 'Dropout-49', 'Mlp-12', 'Identity-37', 'Block-12', 'LayerNorm-25', 'Dropout-50', 'Linear-69', 'ConVit-1']
+Total number of layers: 232
+Empty layer shape for layer LayerNorm-22: torch.Size([1, 197, 768])
+Empty layer features flattened shape for layer LayerNorm-22: torch.Size([1, 151296])
+Stimulus batch shape: (128,)
+DataLoader created with batch size: 16
+Extracted and cached features for model: convit_base_classification
+PID Results:
+  red: 9.392780431306372
+  unq1: 0.8650082353420778
+  unq2: 0.6855128070843897
+  syn: 1.0543410358552503
+Mutual Information Results:
+  tri_mi: 11.99764250958809
+  bi_mi_1: 10.25778866664845
+  bi_mi_2: 10.078293238390762
+Completed PID for pair: semnasnet_100_classification, convit_base_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results_srp_pca.csv
+Changed model name: ViT-B_32_clip -> ViT-B/32_clip
+Model options for ViT-B/32_clip: {'model_name': 'ViT-B/32', 'train_type': 'clip', 'train_data': 'openai400M', 'model_source': 'clip', 'call': "get_clip_model('ViT-B/32')"}
+Image transforms for ViT-B/32_clip: Compose(
+    Resize(size=224, interpolation=bicubic, max_size=None, antialias=True)
+    CenterCrop(size=(224, 224))
+    <function _convert_image_to_rgb at 0x7fd330f12520>
+    ToTensor()
+    Normalize(mean=(0.48145466, 0.4578275, 0.40821073), std=(0.26862954, 0.26130258, 0.27577711))
+)
+Loaded model: ViT-B/32_clip
+Ordered layers from model: ['Conv2d-1', 'LayerNorm-1', 'LayerNorm-2', 'MultiheadAttention-1-1', 'LayerNorm-3', 'Linear-1', 'QuickGELU-1', 'Linear-2', 'ResidualAttentionBlock-1', 'LayerNorm-4', 'MultiheadAttention-2-1', 'LayerNorm-5', 'Linear-3', 'QuickGELU-2', 'Linear-4', 'ResidualAttentionBlock-2', 'LayerNorm-6', 'MultiheadAttention-3-1', 'LayerNorm-7', 'Linear-5', 'QuickGELU-3', 'Linear-6', 'ResidualAttentionBlock-3', 'LayerNorm-8', 'MultiheadAttention-4-1', 'LayerNorm-9', 'Linear-7', 'QuickGELU-4', 'Linear-8', 'ResidualAttentionBlock-4', 'LayerNorm-10', 'MultiheadAttention-5-1', 'LayerNorm-11', 'Linear-9', 'QuickGELU-5', 'Linear-10', 'ResidualAttentionBlock-5', 'LayerNorm-12', 'MultiheadAttention-6-1', 'LayerNorm-13', 'Linear-11', 'QuickGELU-6', 'Linear-12', 'ResidualAttentionBlock-6', 'LayerNorm-14', 'MultiheadAttention-7-1', 'LayerNorm-15', 'Linear-13', 'QuickGELU-7', 'Linear-14', 'ResidualAttentionBlock-7', 'LayerNorm-16', 'MultiheadAttention-8-1', 'LayerNorm-17', 'Linear-15', 'QuickGELU-8', 'Linear-16', 'ResidualAttentionBlock-8', 'LayerNorm-18', 'MultiheadAttention-9-1', 'LayerNorm-19', 'Linear-17', 'QuickGELU-9', 'Linear-18', 'ResidualAttentionBlock-9', 'LayerNorm-20', 'MultiheadAttention-10-1', 'LayerNorm-21', 'Linear-19', 'QuickGELU-10', 'Linear-20', 'ResidualAttentionBlock-10', 'LayerNorm-22', 'MultiheadAttention-11-1', 'LayerNorm-23', 'Linear-21', 'QuickGELU-11', 'Linear-22', 'ResidualAttentionBlock-11', 'LayerNorm-24', 'MultiheadAttention-12-1', 'LayerNorm-25', 'Linear-23', 'QuickGELU-12', 'Linear-24', 'ResidualAttentionBlock-12', 'Transformer-1', 'LayerNorm-26', 'VisionTransformer-1']
+Total number of layers: 89
+Empty layer shape for layer LayerNorm-17: torch.Size([1, 50, 768])
+Empty layer features flattened shape for layer LayerNorm-17: torch.Size([1, 38400])
+Stimulus batch shape: (128,)
+DataLoader created with batch size: 16
