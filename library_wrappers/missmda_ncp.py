@@ -1,35 +1,22 @@
-"""Minimal Python wrapper for R's ``missMDA::estim_ncpPCA``."""
+"""Minimal in-process Python wrapper for R's ``missMDA::estim_ncpPCA``."""
 
 from pathlib import Path
-import subprocess
-import tempfile
+import warnings
 
 import numpy as np
 
+try:
+    from rpy2 import robjects as ro
+    from rpy2.robjects.packages import importr
+except ImportError as error:
+    ro = None
+    importr = None
+    RPY2_IMPORT_ERROR = error
+else:
+    RPY2_IMPORT_ERROR = None
+
 
 RSCRIPT = "Rscript"
-
-R_CODE = r"""
-a <- commandArgs(TRUE)
-if (nzchar(a[11])) set.seed(as.integer(a[11]))
-result <- missMDA::estim_ncpPCA(
-  read.csv(a[1], header=FALSE),
-  ncp.min=as.integer(a[3]),
-  ncp.max=as.integer(a[4]),
-  method=a[5],
-  scale=as.logical(a[6]),
-  method.cv=a[7],
-  nbsim=as.integer(a[8]),
-  pNA=as.numeric(a[9]),
-  threshold=as.numeric(a[10]),
-  verbose=as.logical(a[12])
-)
-write.csv(data.frame(
-  selected_ncp=as.integer(result$ncp),
-  component=as.integer(names(result$criterion)),
-  msep=as.numeric(result$criterion)
-), a[2], row.names=FALSE)
-"""
 
 
 def estimate_ncp_pca(
@@ -61,7 +48,9 @@ def estimate_ncp_pca(
         p_na: Float fraction of values masked during K-fold validation.
         threshold: Float convergence threshold.
         seed: Optional integer R random seed.
-        rscript: String or Path to the Rscript executable.
+        rscript: Deprecated string or Path accepted for call-site
+            compatibility. The wrapper now uses ``rpy2`` in the current
+            Python process and does not start ``Rscript`` subprocesses.
         verbose: Boolean controlling the R progress display.
 
     Returns:
@@ -69,35 +58,62 @@ def estimate_ncp_pca(
         tested component count to its float MSEP value.
 
     Notes:
-        The wrapper intentionally performs no validation. NumPy, subprocess,
-        and R errors are allowed to surface directly for debugging.
+        The wrapper intentionally performs no preflight validation. NumPy,
+        rpy2, and R errors are allowed to surface directly for debugging.
     """
-    with tempfile.TemporaryDirectory() as directory:
-        input_csv = Path(directory) / "input.csv"
-        output_csv = Path(directory) / "output.csv"
-        np.savetxt(input_csv, np.asarray(data, dtype=float), delimiter=",")
-        subprocess.run(
-            [
-                str(rscript),
-                "-e",
-                R_CODE,
-                str(input_csv),
-                str(output_csv),
-                str(ncp_min),
-                str(ncp_max),
-                method,
-                str(scale).upper(),
-                method_cv,
-                str(nbsim),
-                str(p_na),
-                str(threshold),
-                "" if seed is None else str(seed),
-                str(verbose).upper(),
-            ],
-            check=True,
+    if rscript not in (None, RSCRIPT, Path(RSCRIPT)):
+        warnings.warn(
+            "estimate_ncp_pca no longer uses the rscript argument; rpy2 "
+            "selects the embedded R runtime.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        rows = np.loadtxt(output_csv, delimiter=",", skiprows=1, ndmin=2)
+
+    if RPY2_IMPORT_ERROR is not None:
+        raise ImportError(
+            "estimate_ncp_pca requires rpy2 so missMDA can run in-process. "
+            "Install rpy2 and make sure the R package missMDA is available "
+            "in the embedded R library path."
+        ) from RPY2_IMPORT_ERROR
+
+    array = np.asarray(data, dtype=float)
+    if array.ndim == 1:
+        array = array[:, None]
+
+    if seed is not None:
+        ro.r["set.seed"](int(seed))
+
+    values = ro.FloatVector(array.ravel(order="F"))
+    r_matrix = ro.r["matrix"](values, nrow=array.shape[0], ncol=array.shape[1])
+    r_data = ro.r["as.data.frame"](r_matrix)
+
+    miss_mda = importr("missMDA")
+    result = miss_mda.estim_ncpPCA(
+        r_data,
+        ncp_min=int(ncp_min),
+        ncp_max=int(ncp_max),
+        method=method,
+        scale=bool(scale),
+        method_cv=method_cv,
+        nbsim=int(nbsim),
+        pNA=float(p_na),
+        threshold=float(threshold),
+        verbose=bool(verbose),
+    )
+
+    selected_ncp = int(result.rx2("ncp")[0])
+    criterion = result.rx2("criterion")
+    criterion_values = [float(value) for value in criterion]
+    criterion_names = criterion.names
+    if criterion_names is None:
+        component_counts = range(int(ncp_min), int(ncp_min) + len(criterion_values))
+    else:
+        component_counts = [int(float(name)) for name in criterion_names]
+
     return {
-        "ncp": int(rows[0, 0]),
-        "criterion": {int(row[1]): float(row[2]) for row in rows},
+        "ncp": selected_ncp,
+        "criterion": {
+            component: value
+            for component, value in zip(component_counts, criterion_values)
+        },
     }

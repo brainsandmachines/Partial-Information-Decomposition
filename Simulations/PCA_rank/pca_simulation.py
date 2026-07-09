@@ -108,16 +108,13 @@ def run_rank_simulation(
     for condition in product(*values):
         row, start = dict(zip(names, condition)), perf_counter()
         n, p, rank, corr, noise, seed = condition
-        try:
-            print(f"\nRunning condition: n={n}, p={p}, rank={rank}, corr={corr}, noise={noise}, seed={seed}")
-            X = generate_rank_simulation_data(n, p, rank, corr, noise, seed)["X"]
-            result = estimate_ncp_pca(
-                X, ncp_max=min(rank + 5, min(n, p) - 1), method=METHOD,
-                method_cv=METHOD_CV, nbsim=nbsim, seed=seed,
-            )
-            estimated, status, message = result["ncp"], "ok", ""
-        except Exception as error:
-            estimated, status, message = np.nan, "failed", str(error)
+        print(f"\nRunning condition: n={n}, p={p}, rank={rank}, corr={corr}, noise={noise}, seed={seed}")
+        X = generate_rank_simulation_data(n, p, rank, corr, noise, seed)["X"]
+        result = estimate_ncp_pca(
+            X, ncp_max=min(rank + 5, min(n, p) - 1), method=METHOD,
+            method_cv=METHOD_CV, nbsim=nbsim, seed=seed,
+        )
+        estimated, status, message = result["ncp"], "ok", ""
         rank_error = estimated - rank
         row.update(
             estimated_rank=estimated, rank_error=rank_error,

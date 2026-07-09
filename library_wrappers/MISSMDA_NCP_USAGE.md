@@ -1,18 +1,19 @@
 # Minimal `estim_ncpPCA` wrapper
 
 The wrapper has one function and calls the original R
-`missMDA::estim_ncpPCA` implementation through `Rscript`.
+`missMDA::estim_ncpPCA` implementation in-process through `rpy2`.
 
 Install the compatible R packages with:
 
 ```bash
 conda activate your-environment
-conda install -c conda-forge r-missmda=1.21 r-factominer=2.13
+conda install -c conda-forge r-missmda=1.21 r-factominer=2.13 rpy2
 ```
 
-The wrapper calls `Rscript` from the operating system `PATH`; it does not
-assume an environment name or installation directory. If Rscript is not on
-`PATH`, pass `rscript="/path/to/Rscript"` to `estimate_ncp_pca`.
+The wrapper does not start an `Rscript` subprocess. `rpy2` embeds R in the
+current Python process, so R errors raised by `missMDA::estim_ncpPCA` surface
+directly as Python exceptions and can stop an `sbatch` job. The deprecated
+`rscript` keyword is still accepted for old call sites, but it is ignored.
 
 Use it from Python:
 
@@ -37,8 +38,8 @@ print(result["criterion"])
 ```
 
 Rows are samples and columns are continuous features. The input is raw data,
-not a covariance matrix. The wrapper intentionally has no shape checks,
-assertions, argparse interface, or custom error handling.
+not a covariance matrix. The wrapper intentionally has no argparse interface
+or custom error handling.
 
 `missMDA` 1.21 cannot run GCV on a completely observed table. For complete
 data, call:

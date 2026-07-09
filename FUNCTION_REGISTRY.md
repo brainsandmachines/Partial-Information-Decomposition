@@ -934,11 +934,11 @@ File description: Small Python wrapper for JWKay/PID/IdepGauss.R.
 
 ### `library_wrappers/missmda_ncp.py`
 
-File description: Portable minimal Python subprocess wrapper for R's `missMDA::estim_ncpPCA`. It calls `Rscript` through the operating system PATH and assumes no environment name or installation directory. Inputs are raw numeric sample tables ordered as rows=samples and columns=continuous features, not covariance matrices. The function performs no custom validation or error handling. It uses missMDA 1.21 with FactoMineR 2.13; complete tables must use LOO or K-fold because upstream GCV requires a missing value.
+File description: Portable minimal Python wrapper for R's `missMDA::estim_ncpPCA`. It calls the original R estimator in-process through `rpy2`, without starting `Rscript` subprocesses or writing temporary CSV files. Inputs are raw numeric sample tables ordered as rows=samples and columns=continuous features, not covariance matrices. The function performs no preflight validation or custom R error handling. It uses missMDA with FactoMineR; complete tables must use LOO or K-fold because upstream GCV requires a missing value.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `estimate_ncp_pca (line 35)` | data, ncp_min=0, ncp_max=5, method="Regularized", scale=True, method_cv="gcv", nbsim=100, p_na=0.05, threshold=1e-4, seed=None, rscript=RSCRIPT, verbose=False | Unannotated dictionary | Write raw samples to a temporary CSV, call the original R estimator through Rscript on PATH, and return `{"ncp": int, "criterion": dict[int, float]}` without preflight validation or a CLI layer. |
+| `estimate_ncp_pca (line 22)` | data, ncp_min=0, ncp_max=5, method="Regularized", scale=True, method_cv="gcv", nbsim=100, p_na=0.05, threshold=1e-4, seed=None, rscript=RSCRIPT, verbose=False | Unannotated dictionary | Convert raw samples to an R data frame, call `missMDA::estim_ncpPCA` in the current Python process through `rpy2`, and return `{"ncp": int, "criterion": dict[int, float]}`. The deprecated `rscript` argument is accepted for compatibility but no subprocess is started. |
 
 ### `library_wrappers/Thin_PID.py`
 
@@ -1087,9 +1087,9 @@ File description: Create controlled low-rank sample matrices, add relative Gauss
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `create_T_and_P (line 29)` | n_samples: int, n_features: int, rank: int, loading_corr: float=0.0, component_strengths: np.ndarray \| list[float] \| None=None, random_state: int \| None=None | Annotated: `tuple[np.ndarray, np.ndarray]` | Create standardized score matrix T and centered unit-norm loading matrix P with controlled pairwise loading correlation. |
-| `generate_rank_simulation_data (line 53)` | n_samples: int, n_features: int, rank: int, loading_corr: float, noise_std: float, random_state: int, component_strengths: list[float] \| np.ndarray \| None=None, center_columns: bool=True | Annotated: `dict` | Form unit-standard-deviation `X_signal = T @ P.T`, add relative Gaussian noise, optionally center columns, and return data plus condition metadata. |
-| `run_rank_simulation (line 79)` | grid: dict[str, list], output_dir: str \| Path=OUTPUT_DIR, nbsim: int=NBSIM | Annotated: `tuple[pd.DataFrame, pd.DataFrame]` | Run robust EM/K-fold rank selection across the grid, save raw/summary CSVs, and create per-rank success heatmaps over loading correlation and noise. |
+| `create_T_and_P (line 30)` | n_samples: int, n_features: int, rank: int, loading_corr: float=0.0, component_strengths: np.ndarray \| list[float] \| None=None, random_state: int \| None=None | Annotated: `tuple[np.ndarray, np.ndarray]` | Create standardized score matrix T and centered unit-norm loading matrix P with controlled pairwise loading correlation. |
+| `generate_rank_simulation_data (line 69)` | n_samples: int, n_features: int, rank: int, loading_corr: float, noise_std: float, random_state: int, component_strengths: list[float] \| np.ndarray \| None=None, center_columns: bool=True | Annotated: `dict` | Form unit-standard-deviation `X_signal = T @ P.T`, add relative Gaussian noise, optionally center columns, and return data plus condition metadata. |
+| `run_rank_simulation (line 95)` | grid: dict[str, list], output_dir: str \| Path=OUTPUT_DIR, nbsim: int=NBSIM | Annotated: `tuple[pd.DataFrame, pd.DataFrame]` | Run EM/K-fold rank selection across the grid, save raw/summary CSVs, and create per-rank success heatmaps over loading correlation and noise. Errors from the missMDA wrapper are allowed to propagate so batch jobs fail fast instead of recording a failed row and continuing. |
 
 ## Simulations/Theoretical_Examples/Covariance
 
