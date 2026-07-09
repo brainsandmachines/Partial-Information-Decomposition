@@ -1,9 +1,0 @@
-------------------------------------
-Mon 06 Jul 2026 23:15:44 IDT
-SLURM_JOBID:		19106893
-SLURM_JOB_NODELIST:	ise-6000p-05
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/19106893
-Allocated Resouces:	cpu - 8 / mem -  MB / gpu - 1
-SLURM_GPU_INDEX:	3
-Running as ohadshee from golan.neuro account with golan-neuro QOS
-------------------------------------

@@ -1,12 +1,10 @@
-from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable
 from Simulations.PCA_rank.rowwise_PCA import rowwise_loo_pca_variance_threshold
-from pca_simulation import generate_rank_simulation_data
 import numpy as np
 from sklearn.decomposition import PCA
-
+from Simulations.PCA_rank.pca_simulation import generate_rank_simulation_data
 
 PCAFitFunction = Callable[[np.ndarray, int], np.ndarray]
 
@@ -76,7 +74,6 @@ def eigenvector_pca_cv(
         X_train.shape == (n_train_samples, n_features)
         P.shape == (n_features, n_components)
     """
-    assert method_pca is not None, "method_pca must be specified as 'SVD' or 'sklearn'."
     X = np.asarray(X, dtype=float)
 
     if X.ndim != 2:

@@ -1,14 +1,15 @@
 #!/bin/bash
 #SBATCH --time=24:00:00
-#SBATCH --gpus=1
-#SBATCH --partition=rtx_pro_6000
-#SBATCH --qos=golan-neuro
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
 #SBATCH --job-name=pca_simulation
-#SBATCH --output=/home/ohadshee/Desktop/Partial-Information-Decomposition/pca_simulation/%x-%j.out
-#SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/pca_simulation/%x-%j.err
 
-# Activate the Python environment
-source activate pid_env
+source /storage/modules/packages/anaconda/etc/profile.d/conda.sh
+conda activate /home/ohadshee/.conda/envs/pid_env
+export PYTHONNOUSERSITE=1
 
-# Run the analysis script
-python Simulations/PCA_rank/run_simulation.py
+which python
+python -c "import sys; print(sys.executable)"
+
+python -u Simulations/PCA_rank/run_simulation.py
+echo "Python finished at $(date)"

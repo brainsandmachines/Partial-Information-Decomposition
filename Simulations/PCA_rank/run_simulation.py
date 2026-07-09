@@ -73,12 +73,12 @@ sys.stderr = Tee(sys.stderr, log)
 
 if __name__ == "__main__":
     # Example usage
-    n_samples = [80]
-    n_features = [50,70]
-    rank = [5,20,40]
-    loading_corr = [0.4,0.9]
-    noise_std = [0.1,0.3]
-    random_state = 23
+    n_samples = [100]
+    n_features = [50,70,80]
+    rank = [5,10,20,40]
+    loading_corr = [0.1,0.5,0.9]
+    noise_std = [0.1,0.3,0.9,1.2]
+    random_state = 56 
     total_runs = len(n_samples) * len(n_features) * len(rank) * len(loading_corr) * len(noise_std)
     print(f"Total simulations to run: {total_runs}")
     run_count = 0

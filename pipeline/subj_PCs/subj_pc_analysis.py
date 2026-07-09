@@ -17,6 +17,14 @@ if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
 from pipeline.pipeline_phases.sources_target_features import prepare_target
+
+
+from Simulations.PCA_rank.eigenvector_pca import eigenvector_pca_cv
+from library_wrappers.missmda_ncp import estimate_ncp_pca
+
+
+
+
 def split_unique_shared(
     subj_id: str,
     hdf_path: str | Path,
@@ -153,6 +161,37 @@ def heldout_pca(
     return pca_model.transform(heldout_data_scaled)
 
 
+def pca_func(data,mode:str='eigenvector_CV',max_features:int=None):
+    """The function that chooses which PCA function to run based on the mode.
+    Inputs:
+        mode: str, the mode of PCA to run. For now the options are: 
+        pca_by_variance, rowwise_CV, eigenvector_CV and missmda_CV"""
+    
+    if max_features is None:
+        max_features = data.shape[1]-1
+    if mode == "pca_by_variance":
+        return pca_by_variance(data)
+
+    if mode == "eigenvector_CV":
+        output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD')
+    if mode == "missmda_CV":
+        output = estimate_ncp_pca(data,method_cv='kfold',ncp_max=max_features,method='EM')
+    
+    selected_n_components = output.selected_n_components
+    
+    scaler = StandardScaler()
+    neural_data_scaled = scaler.fit_transform(data)
+    pca_model = PCA(n_components=selected_n_components, svd_solver="full")
+    transformed_data = pca_model.fit_transform(neural_data_scaled)
+    
+    return {
+        "pca": pca_model,
+        "scaler": scaler,
+        "transformed_data": transformed_data,
+        "selected_n_components": selected_n_components,
+    }
+
+
 def main(
     subj_id: str,
     hdf_path: str | Path,
@@ -191,9 +230,8 @@ def main(
         neural_data_path,
         variance_threshold=variance_threshold,
     )
-    pca_results = pca_by_variance(
-        data_split["unique_neural_data"],
-        variance_threshold=variance_threshold,
+    pca_results = pca_func(
+        data_split["unique_neural_data"]
     )
     heldout_scores = heldout_pca(
         pca_results["pca"],
