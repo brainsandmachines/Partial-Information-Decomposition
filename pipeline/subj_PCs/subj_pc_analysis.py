@@ -232,7 +232,7 @@ def main(
     )
     pca_results = pca_func(
         data_split["unique_neural_data"],
-        max_features=1000,
+        max_features=50,
     )
     heldout_scores = heldout_pca(
         pca_results["pca"],
