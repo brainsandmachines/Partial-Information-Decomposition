@@ -19,6 +19,7 @@ Generated from AST, so signatures and line numbers reflect the current code. Des
 - `data/`: Data-specific loading/parsing scripts.
 - `library_wrappers/`: CLI and Python wrappers around external PID/R implementations.
 - `Simulations/Encoder_simulation/`: Encoder-based simulation scripts for unique/shared information examples.
+- `Simulations/PCA_rank/`: PCA component-selection simulations, eigenvector CV, row-wise CV, and missMDA comparisons.
 - `Simulations/Theoretical_Examples/Covariance/`: Theoretical covariance examples, sampling, and result utilities.
 - `Simulations/Theoretical_Examples/RVs_Story/`: Random-variable story examples, truth helpers, batching, and Flow-PID grid-search tooling.
 - `Simulations/Theoretical_Examples/RVs_Story/regular_examples/`: Regular theoretical examples, including equal-unique source examples.
@@ -1080,6 +1081,26 @@ File description: Python module for turned off unqiue-related project logic.
 ## Simulations/PCA_rank
 
 Known-rank PCA simulation and missMDA component-selection evaluation.
+
+### `Simulations/PCA_rank/eigenvector_pca.py`
+
+File description: Eigenvector cross-validation for PCA component selection, with optional row-level CSV checkpointing and strict resume validation.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `EigenvectorPCACVResult class (line 40)` | selected_n_components: int, press: np.ndarray, msep: np.ndarray, n_samples: int, n_features: int, time: float, max_components: int | class | Dataclass returned by eigenvector PCA CV with the selected component count, PRESS/MSEP arrays, input dimensions, runtime placeholder, and evaluated component limit. |
+| `fit_pca_loadings_svd (line 50)` | X_train: np.ndarray, n_components: int | Annotated: `np.ndarray` | Fit PCA loadings by NumPy SVD and return a loading matrix with shape `(n_features, n_components)`. |
+| `_pca_fit_function_id (line 72)` | pca_fit_fn: PCAFitFunction | Annotated: `str` | Build the module-qualified callable identifier recorded in eigenvector PCA checkpoint metadata. |
+| `_hash_array_for_checkpoint (line 94)` | X: np.ndarray | Annotated: `str` | Build a SHA-256 digest over dtype, shape, and bytes of the float array used by eigenvector PCA CV. |
+| `_checkpoint_press_fields (line 114)` | max_components: int | Annotated: `list[str]` | Return checkpoint PRESS column names from `press_0` through `press_max_components`. |
+| `_checkpoint_fieldnames (line 128)` | max_components: int | Annotated: `list[str]` | Return the complete checkpoint CSV schema: strict metadata, sample index, and PRESS columns. |
+| `_checkpoint_metadata (line 156)` | X: np.ndarray, max_components: int, pca_fit_fn: PCAFitFunction, center: bool, scale: bool, include_zero_components: bool, method_pca: str \| None, eps: float | Annotated: `dict[str, str]` | Build CSV-safe metadata used to allow resume only for identical data, dimensions, PCA options, tolerance, and PCA loading function identity. |
+| `_load_eigenvector_pca_checkpoint (line 199)` | checkpoint_csv_path: str \| Path, metadata: dict[str, str], max_components: int | Annotated: `dict[int, np.ndarray]` | Load completed held-out sample PRESS rows from a checkpoint CSV after validating exact schema and metadata compatibility. |
+| `_write_eigenvector_pca_checkpoint (line 263)` | checkpoint_csv_path: str \| Path, metadata: dict[str, str], completed_press: dict[int, np.ndarray], max_components: int | Annotated: `None` | Atomically rewrite the checkpoint CSV with all completed sample rows by fsyncing a temporary file and replacing the destination. |
+| `_eigenvector_pca_cv_sample_press (line 313)` | X: np.ndarray, sample_index: int, max_components: int, pca_fit_fn: PCAFitFunction, center: bool, scale: bool, include_zero_components: bool, method_pca: str \| None, eps: float | Annotated: `np.ndarray` | Compute one held-out sample's per-component PRESS contribution for eigenvector PCA CV. |
+| `eigenvector_pca_cv (line 409)` | X: np.ndarray, max_components: int \| None=None, pca_fit_fn: PCAFitFunction \| None=None, center: bool=True, scale: bool=False, include_zero_components: bool=True, method_pca: str \| None=None, eps: float=1e-12, checkpoint_csv_path: str \| Path \| None=None | Annotated: `EigenvectorPCACVResult` | Run eigenvector PCA CV and optionally resume from a strict row-level checkpoint CSV. Omitting `checkpoint_csv_path` preserves in-memory behavior. |
+| `fit_pca_loadings_sklearn (line 557)` | X_train: np.ndarray, n_components: int | Annotated: `np.ndarray` | Fit PCA loadings with sklearn full-SVD PCA and return a loading matrix with shape `(n_features, n_components)`; raises ImportError if sklearn PCA is unavailable. |
+| `regular_PCA (line 585)` | X: np.ndarray, variance_threshold: float | Annotated: `np.ndarray` | Fit sklearn PCA using a variance threshold and return component loadings; raises ImportError if sklearn PCA is unavailable. |
 
 ### `Simulations/PCA_rank/pca_simulation.py`
 
