@@ -215,12 +215,10 @@ def ridge_train_to_test_prediction(
 
 
 
-def pca_unqiue_stim(unqiue_stim,pca_function:str = 'eigenvector'):
-    """This will apply PCA to the unique stimuli (images that are shown only to a given subject)
-     Input:
-        unqiue_stim: torch.Tensor of shape (n_unique_stim, n_features)
-        pca_function: str about a PCA function that returns the nubmer of PCA components according to a different starterg
-            for example, eigenvector will return the the number of components found by a specific cross validation startegy
-            
+def ridge_pca_pipeline(data,model_path,adsf):
+    """This function 
             """
+    
     pass
+
+    

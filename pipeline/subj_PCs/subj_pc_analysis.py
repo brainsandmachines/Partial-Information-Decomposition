@@ -161,7 +161,7 @@ def heldout_pca(
     return pca_model.transform(heldout_data_scaled)
 
 
-def pca_func(data,mode:str='eigenvector_CV',max_features:int=None):
+def pca_func(data,mode:str='eigenvector_CV',max_features:int=None,variance_threshold:float=0.99):
     """The function that chooses which PCA function to run based on the mode.
     Inputs:
         mode: str, the mode of PCA to run. For now the options are: 
@@ -170,11 +170,14 @@ def pca_func(data,mode:str='eigenvector_CV',max_features:int=None):
     if max_features is None:
         max_features = data.shape[1]-1
     if mode == "pca_by_variance":
-        return pca_by_variance(data)
+        print("Running PCA by variance threshold")
+        return pca_by_variance(data,variance_threshold=variance_threshold)
 
     if mode == "eigenvector_CV":
+        print("Running Eigenvector PCA with cross-validation")
         output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD')
     if mode == "missmda_CV":
+        print("Running MissMDA PCA with cross-validation")
         output = estimate_ncp_pca(data,method_cv='kfold',ncp_max=max_features,method='EM')
     
     selected_n_components = output.selected_n_components
@@ -199,6 +202,7 @@ def main(
     neural_data_path: str | Path,
     variance_threshold: float = 0.99,
     save_models_path: str | Path | None = None,
+    max_features: int | None = None,
 ) -> dict[str, Any]:
     """Fit PCA on unique images and measure each PC on shared held-out data.
 
@@ -212,6 +216,7 @@ def main(
         save_models_path: str, Path, or None, output directory for the PCA
             model, scaler, and held-out variance CSV. When None, nothing is
             written to disk.
+        max_features: int or None, maximum number of features to use for PCA.
 
     Output:
         results: dict[str, Any], containing the fitted models, unique and
@@ -230,10 +235,17 @@ def main(
         neural_data_path,
         variance_threshold=variance_threshold,
     )
+
+    print(f"Loaded subject {subj_id} with {data_split['unique_neural_data'].shape[0]} unique images and {data_split['shared_neural_data'].shape[0]} shared held-out images.")
+
+    print(f"\n Fitting PCA on unique images")
     pca_results = pca_func(
-        data_split["unique_neural_data"],
-        max_features=50,
+        mode = 'pca_by_variance',
+        data = data_split["unique_neural_data"],
+        max_features=max_features,
+        variance_threshold=variance_threshold
     )
+    
     heldout_scores = heldout_pca(
         pca_results["pca"],
         pca_results["scaler"],
@@ -322,7 +334,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_324_pcs'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/max_pcs_10_moretime'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -330,4 +342,5 @@ if __name__ == "__main__":
         neural_data_path=subject_neural_data_path,
         variance_threshold=0.60,
         save_models_path=Path(save_path),
+        max_features = 10
     )
