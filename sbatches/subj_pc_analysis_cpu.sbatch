@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=240:00:00
+#SBATCH --time=120:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=24G
 ##SBATCH --qos=golan-neuro

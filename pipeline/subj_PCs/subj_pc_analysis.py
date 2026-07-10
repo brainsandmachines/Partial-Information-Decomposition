@@ -175,7 +175,8 @@ def pca_func(data,mode:str='eigenvector_CV',max_features:int=None,variance_thres
 
     if mode == "eigenvector_CV":
         print("Running Eigenvector PCA with cross-validation")
-        output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD')
+        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=50/checkpointmax=50.csv'
+        output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD',checkpoint_csv_path=csv_path)
     if mode == "missmda_CV":
         print("Running MissMDA PCA with cross-validation")
         output = estimate_ncp_pca(data,method_cv='kfold',ncp_max=max_features,method='EM')
@@ -240,7 +241,7 @@ def main(
 
     print(f"\n Fitting PCA on unique images")
     pca_results = pca_func(
-        mode = 'pca_by_variance',
+        mode = 'eigenvector_CV',
         data = data_split["unique_neural_data"],
         max_features=max_features,
         variance_threshold=variance_threshold
@@ -334,13 +335,13 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/max_pcs_10_moretime'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=50'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
         pkl_info_path=stimulus_info_path,
         neural_data_path=subject_neural_data_path,
-        variance_threshold=0.60,
+        variance_threshold=None,
         save_models_path=Path(save_path),
-        max_features = 10
+        max_features = 50
     )
