@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import time
 from typing import Callable
 
 import numpy as np
@@ -358,6 +359,7 @@ def eigenvector_pca_cv(
     press = np.zeros(max_components + 1, dtype=float)
     for sample_press in completed_press.values():
         press += sample_press
+    start = time.time()
     for i in range(n_samples):
         print(f"Processing sample {i + 1} of {n_samples}...")
         if i in completed_press:
@@ -386,6 +388,10 @@ def eigenvector_pca_cv(
                 max_components,
             )
 
+            end = time.time()
+            elapsed = end - start
+            print("Checkpoint saved. Elapsed time: {:.2f} seconds.".format(elapsed))
+
     msep = press / (n_samples * n_features)
     selected_n_components = int(
         np.argmin(msep) if include_zero_components else np.argmin(msep[1:]) + 1
@@ -398,7 +404,7 @@ def eigenvector_pca_cv(
         n_samples=n_samples,
         n_features=n_features,
         max_components=max_components,
-        time=0.0,
+        time=time.time() - start,
     )
 
 
