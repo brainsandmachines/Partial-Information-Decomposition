@@ -6,6 +6,7 @@ from sklearn.model_selection import KFold
 from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import RidgeCV
 from sklearn.multioutput import MultiOutputRegressor
+from sklearn.preprocessing import StandardScaler
 from pathlib import Path
 import sys
 import time
@@ -15,27 +16,46 @@ from pipeline.pipeline_utils import nsd_feature_extraction
 from pipeline.pipeline_phases.sources_target_features import prepare_target,prepare_sources
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 
-def find_alpha_per_pc(predictor, target):
-    """Find the best ridge alpha separately for each target PC."""
+def find_alpha_per_pc(
+    predictor: np.ndarray,
+    target: np.ndarray,
+) -> tuple[np.ndarray, MultiOutputRegressor, StandardScaler]:
+    """Standardize predictors and find one ridge alpha per target PC.
 
-    base_ridge = RidgeCV(
-        alphas=np.logspace(-3, 3, 50),
-        cv=5,
-        scoring="r2",
-        fit_intercept=True,
+    Inputs:
+        predictor: np.ndarray shaped (n_samples, n_features), model features.
+        target: np.ndarray shaped (n_samples, n_components), target PC scores.
+
+    Output:
+        tuple containing the selected alphas, fitted multi-output pipelines,
+        and the fitted predictor scaler shared by those pipelines.
+    """
+
+    base_ridge = make_pipeline(
+        StandardScaler(),
+        RidgeCV(
+            alphas=np.logspace(-3, 3, 50),
+            cv=5,
+            scoring="r2",
+            fit_intercept=True,
+        ),
     )
 
     ridge_per_pc = MultiOutputRegressor(base_ridge)
     ridge_per_pc.fit(predictor, target)
 
     alphas_per_pc = np.array([
-        estimator.alpha_
+        estimator.named_steps["ridgecv"].alpha_
         for estimator in ridge_per_pc.estimators_
     ])
 
+    predictor_scaler = ridge_per_pc.estimators_[0].named_steps[
+        "standardscaler"
+    ]
+
     assert alphas_per_pc.shape[0] == target.shape[1], "Number of alphas should match number of target PCs"
 
-    return alphas_per_pc, ridge_per_pc
+    return alphas_per_pc, ridge_per_pc, predictor_scaler
 
 
 
@@ -83,7 +103,8 @@ def main(
     pkl_info_path: Path,
     neural_data_path: Path,
     alphas_csv_path: str | Path,
-):
+    predictor_scaler_path: str | Path | None = None,
+) -> tuple[np.ndarray, MultiOutputRegressor]:
     """Find per-PC ridge alphas and save model, layer, and PC indexes.
 
     Inputs:
@@ -95,6 +116,8 @@ def main(
         pkl_info_path: Path, NSD stimulus-information pickle.
         neural_data_path: Path, subject neural-data path.
         alphas_csv_path: str or Path, destination CSV file.
+        predictor_scaler_path: str, Path, or None, saved predictor scaler path.
+            When None, save it beside the alpha CSV.
 
     Output:
         tuple, per-PC alpha array and fitted multi-output ridge model.
@@ -130,10 +153,23 @@ def main(
 
 
     # Find the best ridge alpha for each target PC
-    alphas_per_pc, ridge_model = find_alpha_per_pc(features, pca_target)
+    alphas_per_pc, ridge_model, predictor_scaler = find_alpha_per_pc(
+        features,
+        pca_target,
+    )
 
     output_path = Path(alphas_csv_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    scaler_output_path = (
+        Path(predictor_scaler_path)
+        if predictor_scaler_path is not None
+        else output_path.with_name(
+            f"{output_path.stem}_predictor_scaler.pkl"
+        )
+    )
+    scaler_output_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(predictor_scaler, scaler_output_path)
+
     with output_path.open("w", newline="", encoding="utf-8") as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["model_name", "layer_index", "pc_index", "alpha"])
@@ -143,3 +179,23 @@ def main(
         )
 
     return alphas_per_pc, ridge_model
+
+
+
+if __name__ == "__main__":
+
+    source_name = 'nf_resnet50_classification'
+    
+    #Path to best layer results
+    path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
+    
+    scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl')
+    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl')
+    
+    hdf_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5')
+    pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
+    neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
+
+    path_to_alphas_csv = Path('pipeline/ridge_find_alpha/results/alphas_per_pc.csv')
+    pre
+    main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
