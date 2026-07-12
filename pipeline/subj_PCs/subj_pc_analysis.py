@@ -114,8 +114,7 @@ def pca_by_variance(
         )
     if neural_array.shape[0] < 2 or neural_array.shape[1] < 1:
         raise ValueError("PCA requires at least two samples and one feature.")
-    if not 0.0 < variance_threshold <= 1.0:
-        raise ValueError("variance_threshold must be in the interval (0, 1].")
+
 
     scaler = StandardScaler()
     neural_data_scaled = scaler.fit_transform(neural_array)
@@ -241,7 +240,7 @@ def main(
 
     print(f"\n Fitting PCA on unique images")
     pca_results = pca_func(
-        mode = 'eigenvector_CV',
+        mode = 'pca_by_variance' ,
         data = data_split["unique_neural_data"],
         max_features=max_features,
         variance_threshold=variance_threshold
@@ -335,13 +334,13 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=50'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=90'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
         pkl_info_path=stimulus_info_path,
         neural_data_path=subject_neural_data_path,
-        variance_threshold=None,
+        variance_threshold=1.0,
         save_models_path=Path(save_path),
-        max_features = 50
+        max_features = 90
     )
