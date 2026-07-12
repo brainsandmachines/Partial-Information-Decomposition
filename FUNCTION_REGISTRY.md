@@ -160,9 +160,9 @@ File description: Find one model's ridge alpha separately for each target PCA co
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `find_alpha_per_pc (line 18)` | predictor, target | `tuple[np.ndarray, MultiOutputRegressor]` | Fit independent five-fold `RidgeCV` estimators for target PC columns and return their selected alphas plus the fitted wrapper. Task-specific; rows must align across predictor and target. |
-| `load_and_apply_pca (line 47)` | data: np.ndarray, pca_path: str \| Path, scaler_path: str \| Path | Annotated: `np.ndarray` | Apply a saved training scaler followed by its paired PCA model without refitting. |
-| `main (line 77)` | source_name: str, path_to_results: str \| Path, pc_path: str \| Path, scaler_path: str \| Path, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path, alphas_csv_path: str \| Path | `tuple[np.ndarray, MultiOutputRegressor]` | Extract aligned unique-image model features, project neural targets, fit per-PC ridge alphas, and overwrite a four-column `model_name`, `layer_index`, `pc_index`, `alpha` CSV using one-based PC indices. Task-specific. |
+| `find_alpha_per_pc (line 19)` | predictor: np.ndarray, target: np.ndarray | Annotated: `tuple[np.ndarray, MultiOutputRegressor, StandardScaler]` | Fit a predictor `StandardScaler` followed by an independent five-fold `RidgeCV` for each target PC; return selected alphas, fitted raw-input pipelines, and their identical full-training predictor scaler. Task-specific; rows must align, and scaling occurs before each `RidgeCV` inner split. |
+| `load_and_apply_pca (line 67)` | data: np.ndarray, pca_path: str \| Path, scaler_path: str \| Path | Annotated: `np.ndarray` | Apply a saved training scaler followed by its paired PCA model without refitting. |
+| `main (line 97)` | source_name: str, path_to_results: str \| Path, pc_path: str \| Path, scaler_path: str \| Path, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path, alphas_csv_path: str \| Path, predictor_scaler_path: str \| Path \| None=None | Annotated: `tuple[np.ndarray, MultiOutputRegressor]` | Extract aligned unique-image model features, project neural targets, fit standardized per-PC ridge pipelines, append one-based per-PC alpha rows to a validated four-column CSV, and save the predictor scaler under a model-specific default filename. The returned pipelines accept raw predictors. Task-specific; rerunning the same model appends duplicate rows. |
 
 ### `pipeline/subj_PCs/subj_pc_analysis.py`
 

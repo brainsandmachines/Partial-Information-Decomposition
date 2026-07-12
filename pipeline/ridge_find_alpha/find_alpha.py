@@ -117,7 +117,8 @@ def main(
         neural_data_path: Path, subject neural-data path.
         alphas_csv_path: str or Path, destination CSV file.
         predictor_scaler_path: str, Path, or None, saved predictor scaler path.
-            When None, save it beside the alpha CSV.
+            When None, save it beside the alpha CSV using a model-specific
+            filename so runs for different models do not overwrite each other.
 
     Output:
         tuple, per-PC alpha array and fitted multi-output ridge model.
@@ -139,6 +140,8 @@ def main(
 
     pca_target = load_and_apply_pca(unique_target_context["neural_data"], pc_path, scaler_path)
 
+    #Save memory 
+    del target 
 
     #Prepare model
     model_context = prepare_model_context(source_name)
@@ -150,6 +153,8 @@ def main(
 
     features = nsd_feature_extraction(model_context,layer_index,unique_target_context,batch_size_process=64)
 
+    #Save memory
+    del model_context
 
 
     # Find the best ridge alpha for each target PC
@@ -160,19 +165,33 @@ def main(
 
     output_path = Path(alphas_csv_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    safe_source_name = str(source_name).replace("/", "_").replace("\\", "_")
     scaler_output_path = (
         Path(predictor_scaler_path)
         if predictor_scaler_path is not None
         else output_path.with_name(
-            f"{output_path.stem}_predictor_scaler.pkl"
+            f"{output_path.stem}_{safe_source_name}_predictor_scaler.pkl"
         )
     )
     scaler_output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(predictor_scaler, scaler_output_path)
 
-    with output_path.open("w", newline="", encoding="utf-8") as csv_file:
+    csv_header = ["model_name", "layer_index", "pc_index", "alpha"]
+    csv_has_content = output_path.is_file() and output_path.stat().st_size > 0
+    if csv_has_content:
+        with output_path.open("r", newline="", encoding="utf-8") as csv_file:
+            existing_header = next(csv.reader(csv_file), None)
+        if existing_header != csv_header:
+            raise ValueError(
+                f"Existing alpha CSV has an incompatible header: {existing_header}. "
+                f"Expected: {csv_header}."
+            )
+
+    write_mode = "a" if csv_has_content else "w"
+    with output_path.open(write_mode, newline="", encoding="utf-8") as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(["model_name", "layer_index", "pc_index", "alpha"])
+        if not csv_has_content:
+            writer.writerow(csv_header)
         writer.writerows(
             (source_name, int(layer_index), pc_index, float(alpha))
             for pc_index, alpha in enumerate(alphas_per_pc, start=1)
@@ -197,5 +216,5 @@ if __name__ == "__main__":
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
     path_to_alphas_csv = Path('pipeline/ridge_find_alpha/results/alphas_per_pc.csv')
-    pre
+    predictor_scaler_path = Path('pipeline/ridge_find_alpha/results')
     main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)

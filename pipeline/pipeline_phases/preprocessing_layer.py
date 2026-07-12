@@ -19,7 +19,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 (Gaussian copulas, normalizing, standardizing, etc...)
 """
 
-def permute_rv(target,source1,source2,source1_perm=False,source2_perm=False,target_perm=False,rng_seed=56):
+def permute_rv(source1,source2,target,source1_perm=False,source2_perm=False,target_perm=False,rng_seed=56):
     """Permute the random variable rv according to the configuration provided in config.
     If rv is a tuple, all blocks are permuted with the same permutation.
     X is kept fixed, so any internal structure within X is preserved.
