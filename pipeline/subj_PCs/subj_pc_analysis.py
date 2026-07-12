@@ -240,7 +240,7 @@ def main(
 
     print(f"\n Fitting PCA on unique images")
     pca_results = pca_func(
-        mode = 'pca_by_variance' ,
+        mode = 'eigenvector_CV' ,
         data = data_split["unique_neural_data"],
         max_features=max_features,
         variance_threshold=variance_threshold
@@ -334,7 +334,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=90'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=100'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -342,5 +342,5 @@ if __name__ == "__main__":
         neural_data_path=subject_neural_data_path,
         variance_threshold=1.0,
         save_models_path=Path(save_path),
-        max_features = 90
+        max_features = 100
     )

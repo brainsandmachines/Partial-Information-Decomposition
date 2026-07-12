@@ -7,14 +7,32 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import RidgeCV
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
+from scipy.linalg import LinAlgWarning
+from sklearn.linear_model import Ridge
+from sklearn.pipeline import make_pipeline
 from pathlib import Path
 import sys
 import time
 import joblib
-from external.mayas_project.features_and_encoding.feat_ext_and_encoding import prepare_model_context
+repo_root = Path(__file__).resolve().parents[2]
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
 from pipeline.pipeline_utils import nsd_feature_extraction
 from pipeline.pipeline_phases.sources_target_features import prepare_target,prepare_sources
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
+
+repo_root = Path(__file__).resolve().parents[2]
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+from external.mayas_project.features_and_encoding.feat_ext_and_encoding import prepare_model_context
+
+import numpy as np
+
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 def find_alpha_per_pc(
     predictor: np.ndarray,

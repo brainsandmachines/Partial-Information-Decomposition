@@ -1,0 +1,14 @@
+------------------------------------
+Sun 12 Jul 2026 19:42:35 IDT
+SLURM_JOBID:		19334787
+SLURM_JOB_NODELIST:	ise-cpu-intl-02
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19334787
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu-intl-02.auth.ad.bgu.ac.il
+Job ID: 19334787
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
