@@ -174,7 +174,7 @@ def pca_func(data,mode:str='eigenvector_CV',max_features:int=None,variance_thres
 
     if mode == "eigenvector_CV":
         print("Running Eigenvector PCA with cross-validation")
-        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=50/checkpointmax=50.csv'
+        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=100/checkpointmax=100.csv'
         output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD',checkpoint_csv_path=csv_path)
     if mode == "missmda_CV":
         print("Running MissMDA PCA with cross-validation")

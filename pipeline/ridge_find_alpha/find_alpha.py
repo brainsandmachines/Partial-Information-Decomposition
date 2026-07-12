@@ -48,12 +48,13 @@ def find_alpha_per_pc(
         tuple containing the selected alphas, fitted multi-output pipelines,
         and the fitted predictor scaler shared by those pipelines.
     """
-
+    alphas = np.logspace(0, 14, 50)  # Candidate alphas for RidgeCV
+    print(f"Finding best ridge alphas for {target.shape[1]} target PCs using {predictor.shape[1]} features and {predictor.shape[0]} samples.")
     base_ridge = make_pipeline(
         StandardScaler(),
         RidgeCV(
-            alphas=np.logspace(-3, 3, 50),
-            cv=5,
+            alphas=alphas,
+            cv=9,
             scoring="r2",
             fit_intercept=True,
         ),

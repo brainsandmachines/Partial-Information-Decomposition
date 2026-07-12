@@ -35,3 +35,4 @@ Total number of layers: 152
 Processing layer: NormFreeBlock-16 from model: nf_resnet50_classification
 
 For model nf_resnet50_classification Layer NormFreeBlock-16: Extracting features for 9000 images in batches of 64...
+Feature extraction for model nf_resnet50_classification layer NormFreeBlock-16 completed in 733.80 seconds.
