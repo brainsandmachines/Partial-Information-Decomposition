@@ -154,6 +154,16 @@ File description: Create publication-friendly PID component matrices from the re
 |---|---|---|---|
 | `plot_pairwise_pid_matrices (line 12)` | csv_path: str \| Path, output_dir: str \| Path, *, model_order: list[str] \| None=None, value_format: str='.3f', cmap: str='viridis', figsize: tuple[float, float] \| None=None, dpi: int=300 | Annotated: `dict[str, Path]` | Validate ordered pair rows, construct directional unique-information and symmetric redundancy/synergy matrices, then save annotated PNG and CSV outputs. Plotting-specific; preserves the X1/unq1 and X2/unq2 convention from `run_pairwise_pid_pipeline`. |
 
+### `pipeline/ridge_find_alpha/find_alpha.py`
+
+File description: Find one model's ridge alpha separately for each target PCA component and save the compact result CSV.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `find_alpha_per_pc (line 18)` | predictor, target | `tuple[np.ndarray, MultiOutputRegressor]` | Fit independent five-fold `RidgeCV` estimators for target PC columns and return their selected alphas plus the fitted wrapper. Task-specific; rows must align across predictor and target. |
+| `load_and_apply_pca (line 47)` | data: np.ndarray, pca_path: str \| Path, scaler_path: str \| Path | Annotated: `np.ndarray` | Apply a saved training scaler followed by its paired PCA model without refitting. |
+| `main (line 77)` | source_name: str, path_to_results: str \| Path, pc_path: str \| Path, scaler_path: str \| Path, hdf_path: Path, pkl_info_path: Path, neural_data_path: Path, alphas_csv_path: str \| Path | `tuple[np.ndarray, MultiOutputRegressor]` | Extract aligned unique-image model features, project neural targets, fit per-PC ridge alphas, and overwrite a four-column `model_name`, `layer_index`, `pc_index`, `alpha` CSV using one-based PC indices. Task-specific. |
+
 ### `pipeline/subj_PCs/subj_pc_analysis.py`
 
 File description: Fit subject-level PCA on unique NSD images and evaluate retained components on shared held-out images.
