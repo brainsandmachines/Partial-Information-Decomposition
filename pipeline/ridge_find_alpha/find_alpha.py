@@ -34,48 +34,84 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
+import numpy as np
+
+from sklearn.linear_model import RidgeCV
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+
 def find_alpha_per_pc(
     predictor: np.ndarray,
     target: np.ndarray,
-) -> tuple[np.ndarray, MultiOutputRegressor, StandardScaler]:
+) -> tuple[np.ndarray, Pipeline, StandardScaler]:
     """Standardize predictors and find one ridge alpha per target PC.
 
     Inputs:
-        predictor: np.ndarray shaped (n_samples, n_features), model features.
-        target: np.ndarray shaped (n_samples, n_components), target PC scores.
+        predictor:
+            Array shaped (n_samples, n_features), containing model features.
+        target:
+            Array shaped (n_samples, n_components), containing target PC scores.
 
-    Output:
-        tuple containing the selected alphas, fitted multi-output pipelines,
-        and the fitted predictor scaler shared by those pipelines.
+    Outputs:
+        alphas_per_pc:
+            Array shaped (n_components,), containing one alpha per target PC.
+        ridge_model:
+            Fitted pipeline that predicts all target PCs simultaneously.
+        predictor_scaler:
+            Fitted StandardScaler used by the pipeline.
     """
-    alphas = np.logspace(0, 14, 50)  # Candidate alphas for RidgeCV
-    print(f"Finding best ridge alphas for {target.shape[1]} target PCs using {predictor.shape[1]} features and {predictor.shape[0]} samples.")
-    base_ridge = make_pipeline(
+    predictor = np.asarray(predictor, dtype=np.float64)
+    target = np.asarray(target, dtype=np.float64)
+
+    if predictor.ndim != 2:
+        raise ValueError("predictor must be a two-dimensional array.")
+
+    if target.ndim != 2:
+        raise ValueError("target must be a two-dimensional array.")
+
+    if predictor.shape[0] != target.shape[0]:
+        raise ValueError(
+            "predictor and target must have the same number of samples."
+        )
+
+    alphas = np.logspace(0, 14, 50)
+
+    print(
+        f"Finding best ridge alphas for {target.shape[1]} target PCs "
+        f"using {predictor.shape[1]} features and "
+        f"{predictor.shape[0]} samples."
+    )
+
+    ridge_model = make_pipeline(
         StandardScaler(),
         RidgeCV(
             alphas=alphas,
-            cv=9,
-            scoring="r2",
+            cv=None,
+            scoring=None,
             fit_intercept=True,
+            alpha_per_target=True,
+            gcv_mode="auto",
         ),
+        verbose=True,
     )
 
-    ridge_per_pc = MultiOutputRegressor(base_ridge)
-    ridge_per_pc.fit(predictor, target)
+    ridge_model.fit(predictor, target)
 
-    alphas_per_pc = np.array([
-        estimator.named_steps["ridgecv"].alpha_
-        for estimator in ridge_per_pc.estimators_
-    ])
+    ridge_cv = ridge_model.named_steps["ridgecv"]
 
-    predictor_scaler = ridge_per_pc.estimators_[0].named_steps[
-        "standardscaler"
-    ]
+    alphas_per_pc = np.asarray(
+        ridge_cv.alpha_,
+        dtype=np.float64,
+    )
 
-    assert alphas_per_pc.shape[0] == target.shape[1], "Number of alphas should match number of target PCs"
+    predictor_scaler = ridge_model.named_steps["standardscaler"]
 
-    return alphas_per_pc, ridge_per_pc, predictor_scaler
+    assert alphas_per_pc.shape == (target.shape[1],), (
+        "Number of selected alphas must match the number of target PCs."
+    )
 
+    return alphas_per_pc, ridge_model, predictor_scaler
 
 
 
@@ -215,6 +251,37 @@ def main(
             (source_name, int(layer_index), pc_index, float(alpha))
             for pc_index, alpha in enumerate(alphas_per_pc, start=1)
         )
+        print("\nSelected alpha and cross-validated R² for each PC:")
+
+    ridge_cv = ridge_model.named_steps["ridgecv"]
+    
+    alphas_per_pc = np.asarray(
+    ridge_cv.alpha_,
+    dtype=np.float64,
+    )
+
+    scores_per_pc = np.asarray(
+        ridge_cv.best_score_,
+        dtype=np.float64,
+    )
+
+    print("Finished finding best ridge alphas for each target PC ✅")
+    for pc_index, (alpha, score) in enumerate(
+        zip(alphas_per_pc, scores_per_pc),
+        start=1,
+    ):
+        print(
+            f"\nPC {pc_index:>3}: "
+            f"alpha = {alpha:.6g}, "
+            f"CV R² = {score:.6f}"
+        )
+
+    mean_score = float(np.mean(scores_per_pc))
+
+    print(f"\nMean cross-validated R² across PCs: {mean_score:.6f}")
+
+
+    print(f"\n======================================================================================")
 
     return alphas_per_pc, ridge_model
 
@@ -222,9 +289,18 @@ def main(
 
 if __name__ == "__main__":
 
-    source_name = 'nf_resnet50_classification'
-    
-    #Path to best layer results
+    model_list = ['nf_resnet50_classification','eca_nfnet_l0_classification',
+        'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
+        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
+        ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
+        'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
+        'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
+        'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
+        'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
+        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
+        ]
+        #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
     scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl')
@@ -234,6 +310,11 @@ if __name__ == "__main__":
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
-    path_to_alphas_csv = Path('pipeline/ridge_find_alpha/results/alphas_per_pc.csv')
-    predictor_scaler_path = Path('pipeline/ridge_find_alpha/results')
-    main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
+    path_to_alphas_csv = Path('pipeline/ridge_find_alpha/results/alphas_per_pc2.csv')
+    predictor_scaler_path = Path('pipeline/ridge_find_alpha/results/scalers')
+    for source_name in model_list:
+
+        print("\nChosen model:", source_name  )
+
+
+        main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)

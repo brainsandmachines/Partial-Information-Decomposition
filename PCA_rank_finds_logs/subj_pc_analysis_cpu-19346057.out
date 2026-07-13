@@ -1,0 +1,14 @@
+------------------------------------
+Mon 13 Jul 2026 09:50:39 IDT
+SLURM_JOBID:		19346057
+SLURM_JOB_NODELIST:	cs-cpu-10
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19346057
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: cs-cpu-10.auth.ad.bgu.ac.il
+Job ID: 19346057
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
