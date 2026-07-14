@@ -149,6 +149,126 @@ def load_and_apply_pca(
     return transformed_data
 
 
+def split_alphas_csv_by_model(
+    alphas_csv_path: str | Path,
+    output_dir: str | Path | None = None,
+) -> list[Path]:
+    """Split an aggregate per-PC alpha CSV into one NumPy file per model.
+
+    Inputs:
+        alphas_csv_path:
+            str or Path pointing to a CSV with the columns ``model_name``,
+            ``layer_index``, ``pc_index``, and ``alpha``.
+        output_dir:
+            str, Path, or None specifying the folder for the model files. When
+            None, a ``<source_csv_stem>_by_model`` folder is created beside the
+            source CSV.
+
+    Outputs:
+        list[Path]:
+            Paths to the created ``.npz`` files, ordered by each model's first
+            appearance in the source CSV. Every file contains ``alphas``,
+            ``pc_indices``, ``model_name``, and ``layer_index``.
+    """
+    source_path = Path(alphas_csv_path)
+    expected_header = ["model_name", "layer_index", "pc_index", "alpha"]
+    rows_by_model: dict[str, list[tuple[int, int, float]]] = {}
+
+    with source_path.open("r", newline="", encoding="utf-8") as csv_file:
+        reader = csv.reader(csv_file)
+        source_header = next(reader, None)
+
+        if source_header != expected_header:
+            raise ValueError(
+                f"Alpha CSV has an incompatible header: {source_header}. "
+                f"Expected: {expected_header}."
+            )
+
+        for row_number, row in enumerate(reader, start=2):
+            if len(row) != len(expected_header):
+                raise ValueError(
+                    f"Row {row_number} has {len(row)} columns; "
+                    f"expected {len(expected_header)}."
+                )
+
+            model_name = row[0].strip()
+            if not model_name:
+                raise ValueError(f"Row {row_number} has an empty model_name.")
+
+            try:
+                layer_index = int(row[1])
+                pc_index = int(row[2])
+                alpha = float(row[3])
+            except ValueError as error:
+                raise ValueError(
+                    f"Row {row_number} contains a non-numeric layer_index, "
+                    "pc_index, or alpha."
+                ) from error
+
+            rows_by_model.setdefault(model_name, []).append(
+                (layer_index, pc_index, alpha)
+            )
+
+    if not rows_by_model:
+        raise ValueError("Alpha CSV does not contain any model rows.")
+
+    output_folder = (
+        Path(output_dir)
+        if output_dir is not None
+        else source_path.with_name(f"{source_path.stem}_by_model")
+    )
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    output_paths = []
+    used_filenames = set()
+    for model_name, model_rows in rows_by_model.items():
+        safe_model_name = model_name.replace("/", "_").replace("\\", "_")
+        output_filename = f"{source_path.stem}_{safe_model_name}.npz"
+
+        if output_filename in used_filenames:
+            raise ValueError(
+                "Model names produce the same output filename after replacing "
+                f"path separators: {output_filename}."
+            )
+        used_filenames.add(output_filename)
+
+        layer_indices = {row[0] for row in model_rows}
+        if len(layer_indices) != 1:
+            raise ValueError(
+                f"Model {model_name!r} has multiple layer indices: "
+                f"{sorted(layer_indices)}."
+            )
+
+        source_pc_indices = np.asarray(
+            [row[1] for row in model_rows],
+            dtype=np.int64,
+        )
+        expected_pc_indices = np.arange(1, len(model_rows) + 1)
+        if not np.array_equal(source_pc_indices, expected_pc_indices):
+            raise ValueError(
+                f"Model {model_name!r} must have ordered, one-based PC indices."
+            )
+
+        alphas_per_pc = np.asarray(
+            [row[2] for row in model_rows],
+            dtype=np.float64,
+        )
+        source_name = model_name
+        layer_index = next(iter(layer_indices))
+        output_path = output_folder / output_filename
+        np.savez(
+            output_path,
+            alphas=np.asarray(alphas_per_pc, dtype=np.float64),
+            pc_indices=np.arange(1, len(alphas_per_pc) + 1),
+            model_name=str(source_name),
+            layer_index=int(layer_index),
+        )
+
+        output_paths.append(output_path)
+
+    return output_paths
+
+
 
 
 def main(
@@ -301,7 +421,7 @@ if __name__ == "__main__":
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
         ]
         #Path to best layer results
-    path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
+    '''path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
     scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl')
     pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl')
@@ -318,3 +438,7 @@ if __name__ == "__main__":
 
 
         main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
+    '''
+    csv_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/ridge_find_alpha/alphas2.0_per_pc.csv')
+    output_dir = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/ridge_find_alpha/models_dir')
+    split_alphas_csv_by_model(csv_path, output_dir)
