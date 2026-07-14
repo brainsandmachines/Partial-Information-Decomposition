@@ -1,0 +1,4 @@
+[2026-07-13T11:03:39.304] error: slurm_get_node_energy: Connection reset by peer
+[2026-07-13T11:03:39.305] error: _get_joules_task: can't get info from slurmd
+[2026-07-13T11:03:39.305] error: slurm_get_node_energy: Connection reset by peer
+[2026-07-13T11:03:39.305] error: _get_joules_task: can't get info from slurmd

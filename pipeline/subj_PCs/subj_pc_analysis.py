@@ -178,7 +178,7 @@ def pca_func(data,mode:str='eigenvector_CV',max_features:int=None,variance_thres
         output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD',checkpoint_csv_path=csv_path)
     if mode == "missmda_CV":
         print("Running MissMDA PCA with cross-validation")
-        output = estimate_ncp_pca(data,method_cv='kfold',ncp_max=max_features,method='EM')
+        output = estimate_ncp_pca(data,method_cv='Kfold',ncp_max=max_features,method='EM',verbose=True,p_na = 0.05,nbsim = 5)
     
     selected_n_components = output.selected_n_components
     
@@ -240,7 +240,7 @@ def main(
 
     print(f"\n Fitting PCA on unique images")
     pca_results = pca_func(
-        mode = 'eigenvector_CV' ,
+        mode = 'missmda_CV' ,
         data = data_split["unique_neural_data"],
         max_features=max_features,
         variance_threshold=variance_threshold
@@ -334,7 +334,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=100'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,

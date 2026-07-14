@@ -1,6 +1,6 @@
 ------------------------------------
-Thu 09 Jul 2026 18:35:26 IDT
-SLURM_JOBID:		19278788
+Mon 13 Jul 2026 20:09:48 IDT
+SLURM_JOBID:		19360009
 SLURM_JOB_NODELIST:	cs-cpu-07
 SLURM_SCRATCH_DIR:	
 Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
@@ -8,7 +8,7 @@ SLURM_GPU_INDEX:
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
 Running on host: cs-cpu-07
-Job ID: 19278788
+Job ID: 19360009
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
@@ -24,7 +24,4 @@ Number of projections for SRP: 7894
 Loaded subject subj01 with 9000 unique images and 1000 shared held-out images.
 
  Fitting PCA on unique images
-Running PCA by variance threshold
-PCA on unique data completed.
-PCA on shared held-out data completed.
-Held-out variance explained saved to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/pca_by_variance=60/subj01_heldout_pca_variance_explained.csv.
+Running MissMDA PCA with cross-validation

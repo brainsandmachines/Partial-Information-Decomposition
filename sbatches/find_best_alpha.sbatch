@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=120:00:00
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=48G
+#SBATCH --mem=128G
 ##SBATCH --qos=golan-neuro
 #SBATCH --job-name=find_best_alpha
 #SBATCH --output=//home/ohadshee/Desktop/Partial-Information-Decomposition/find_best_alpha_logs/%x-%j.out

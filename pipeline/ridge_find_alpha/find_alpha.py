@@ -75,7 +75,7 @@ def find_alpha_per_pc(
             "predictor and target must have the same number of samples."
         )
 
-    alphas = np.logspace(0, 14, 50)
+    alphas = np.logspace(4, 20, 50)
 
     print(
         f"Finding best ridge alphas for {target.shape[1]} target PCs "
@@ -83,12 +83,14 @@ def find_alpha_per_pc(
         f"{predictor.shape[0]} samples."
     )
 
+    print("Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.")
+
     ridge_model = make_pipeline(
         StandardScaler(),
         RidgeCV(
             alphas=alphas,
             cv=None,
-            scoring=None,
+            scoring="r2",
             fit_intercept=True,
             alpha_per_target=True,
             gcv_mode="auto",
@@ -206,7 +208,7 @@ def main(
     if layer_index is None:
         raise ValueError(f"No best layer found for model {source_name}. Please check the results CSV at {path_to_results}.")
 
-    features = nsd_feature_extraction(model_context,layer_index,unique_target_context,batch_size_process=64)
+    features = nsd_feature_extraction(model_context,layer_index,unique_target_context,batch_size_process=28)
 
     #Save memory
     del model_context
@@ -265,7 +267,7 @@ def main(
         dtype=np.float64,
     )
 
-    print("Finished finding best ridge alphas for each target PC ✅")
+    print("Finished finding best ridge alphas for each target PC.✅")
     for pc_index, (alpha, score) in enumerate(
         zip(alphas_per_pc, scores_per_pc),
         start=1,
@@ -289,9 +291,7 @@ def main(
 
 if __name__ == "__main__":
 
-    model_list = ['nf_resnet50_classification','eca_nfnet_l0_classification',
-        'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
-        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
+    model_list = ['xcit_nano_12_p8_224_classification'
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
         'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
         'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
@@ -310,8 +310,8 @@ if __name__ == "__main__":
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
-    path_to_alphas_csv = Path('pipeline/ridge_find_alpha/results/alphas_per_pc2.csv')
-    predictor_scaler_path = Path('pipeline/ridge_find_alpha/results/scalers')
+    path_to_alphas_csv = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
+    predictor_scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)')
     for source_name in model_list:
 
         print("\nChosen model:", source_name  )
