@@ -17,88 +17,23 @@ function that are already implemented will be imported from pipieline phases fol
 
 
 
-def load_target(target_kwargs):
-    """
-    Load the target data from the given path, PCA matrix and scaler and PCA data.
-    
-    Args:
-        target_kwargs (dict): A dictionary containing the keyword arguments for the target data.
-
-    Returns:
-        dict: A dictionary containing the loaded target PCA and scaler.
-    """
-
-
-    target_pca_path = target_kwargs['pca_path']
-    target_scaler_path = target_kwargs['scaler_path']
-
-    # Load the target PCA and scaler
-    target_pca = joblib.load(target_pca_path)
-    target_scaler = joblib.load(target_scaler_path)
-
-    hdf_path = target_kwargs['hdf_path']
-    pkl_info_path = target_kwargs['pkl_info_path']
-    neural_data_path = target_kwargs['neural_data_path']
-
-    # Boolean flag to determine if only shared images data or all images
-    only_shared = target_kwargs['only_shared']
-
-    target_context = prepare_target(hdf_path, pkl_info_path, neural_data_path)
-
-
-
-    #Load scaler:
-    scaler = joblib.load(target_scaler_path)
-
-    #Load PCA model: 
-    pca = joblib.load(target_pca_path)
-
-    neural_data = target_context["neural_data"]
-    # Scale the neural data
-    scaled_neural_data = scaler.transform(neural_data)
-
-    #PCA neural data
-    pca_neural_data = pca.transform(scaled_neural_data)
-
-    target_context['pca_target'] = pca_neural_data
-
-    
-    return target_context
-
-
-def load_source_context(source_kwargs):
-
-    source1_name = source_kwargs['source1_name']
-    source2_name = source_kwargs['source2_name']
-
-    sources_context = prepare_sources(source1_name, source2_name)
-
-    X1_context = sources_context['X1_context']
-    X2_context = sources_context['X2_context']
-
-
-    scaler_X1 = joblib.load(source_kwargs['source1_scaler_path'])
-    scaler_X2 = joblib.load(source_kwargs['source2_scaler_path'])
-
-
-    pass
-
-
 
 #Prepropessing function: Scaling the data
-def scale_func(source1,source2,target,preprocess_kwargs):
+def scale_func(source1,source2,target,source1_scaler_path,source2_scaler_path,target_scaler_path):
     """
     Scale the data using the provided scaler.
     
     Args:
-        data_kwargs (dict): A dictionary containing the data and scaler.
+        source1 (np.ndarray): The first source data.
+        source2 (np.ndarray): The second source data.
+        target (np.ndarray): The target data.
+        source1_scaler_path (str): The path to the scaler for the first source.
+        source2_scaler_path (str): The path to the scaler for the second source.
+        target_scaler_path (str): The path to the scaler for the target.
 
     Returns:
         np.ndarray: The scaled data.
     """
-    source1_scaler_path = preprocess_kwargs['source1_scaler_path']
-    source2_scaler_path = preprocess_kwargs['source2_scaler_path']
-    target_scaler_path = preprocess_kwargs['target_scaler_path']
 
     scaler_source1 = joblib.load(source1_scaler_path)
     scaler_source2 = joblib.load(source2_scaler_path)
@@ -112,8 +47,10 @@ def scale_func(source1,source2,target,preprocess_kwargs):
     return scaled_source1, scaled_source2, scaled_target
 
 
+
+       
 #Feature manipulation funtion: PCA target and ridge prediction from X1 and X2 to PCA(T) using the alphas per pc from the data
-def feature_manipulation_func(source1,source2,target,feature_manipulation_kwargs):
+def feature_manipulation_func(source1,source2,target,seed,source1_name,source2_name,pc_target_path,alphas_source1_path,alphas_source2_path,shared1000_subj):
     """
     Perform feature manipulation on the source and target data.
     
@@ -121,32 +58,56 @@ def feature_manipulation_func(source1,source2,target,feature_manipulation_kwargs
         source1 (np.ndarray): The first source data.
         source2 (np.ndarray): The second source data.
         target (np.ndarray): The target data.
-        feature_manipulation_kwargs (dict): A dictionary containing the keyword arguments for feature manipulation.
+        seed (int): The random seed for reproducibility.
+        source1_name (str): The name of the first source data.
+        source2_name (str): The name of the second source data.
+        pc_target_path (str): The path to the PCA target data.
+        alphas_source1_path (str): The path to the alphas for the first source.
+        alphas_source2_path (str): The path to the alphas for the second source.
+        shared1000_subj (np.ndarray): An array of shared subject IDs.
         """
     
-    seed = feature_manipulation_kwargs['seed']
-    pca_target_path = feature_manipulation_kwargs['pca_target_path']
-    alpahs_source1_path = feature_manipulation_kwargs['alphas_source1_path']
-    alphas_source2_path = feature_manipulation_kwargs['alphas_source2_path']
 
-    pca = joblib.load(pca_target_path)
+    pca = joblib.load(pc_target_path)
     
-    with np.load(alpahs_source1_path, allow_pickle=False) as alpha_data:
+    with np.load(alphas_source1_path, allow_pickle=False) as archive:
         alphas_source1 = np.asarray(
-            alpha_data["alphas"],
+            archive["alphas"],
             dtype=np.float64,
-        )
+        ).copy()
+
+        if source1_name != archive["model_name"]:
+            raise ValueError("Model name mismatch for source1.")
         
-    with np.load(alphas_source2_path, allow_pickle=False) as alpha_data:
+        pc_indices = np.asarray(archive["pc_indices"])
+
+        if not np.array_equal(
+            pc_indices,
+            np.arange(1, len(alphas_source1) + 1),
+        ):
+            raise ValueError("Alpha PC ordering is invalid.")
+
+    with np.load(alphas_source2_path, allow_pickle=False) as archive:
         alphas_source2 = np.asarray(
-            alpha_data["alphas"],
+            archive["alphas"],
             dtype=np.float64,
-        )
+        ).copy()
+
+        pc_indices = np.asarray(archive["pc_indices"])
+
+        if not np.array_equal(
+            pc_indices,
+            np.arange(1, len(alphas_source1) + 1),
+        ):
+            raise ValueError("Alpha PC ordering is invalid.")
+
+        if source2_name != archive["model_name"]:
+            raise ValueError("Model name mismatch for source2.")
 
     #PCA target data
     pca_target = pca.transform(target)
 
-    shared_ids = feature_manipulation_kwargs['shared1000_subj']
+    shared_ids = shared1000_subj
 
 
     pca_target_test = pca_target[shared_ids]
@@ -198,9 +159,3 @@ def feature_manipulation_func(source1,source2,target,feature_manipulation_kwargs
         raise ValueError("source2 contains NaN or infinite values.")
 
     return source1_pred, source2_pred, pca_target_test
-
-
-
-
-
-       

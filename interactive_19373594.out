@@ -1,0 +1,11 @@
+------------------------------------
+Tue 14 Jul 2026 18:26:56 IDT
+SLURM_JOBID:		19373594
+SLURM_JOB_NODELIST:	cs-cpu-06
+SLURM_SCRATCH_DIR:	
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Tue 14 Jul 2026 18:26:47 IDT
+ STARTING JOB WITH THE COMMAND:  sleep 600 
