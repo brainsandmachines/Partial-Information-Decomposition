@@ -6,12 +6,12 @@ from inspect import signature
 from pathlib import Path
 from typing import Any, Callable
 import numpy as np
-from pipeline.pipeline_phases.sources_target_features import feature_extraction, shared1000_subj_target
+from pipeline.pipeline_phases.sources_target_features import feature_extraction, shared1000_subj_target,prepare_target
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
-from pipeline.pipeline_phases.feature_manipulations import pca_projection
-from pipeline.pipeline_phases.preprocessing_layer import permute_rv,ridge_train_to_test_prediction
+from pipeline.pipeline_phases.feature_manipulations import pca_projection,feature_manipulation_ridge
+from pipeline.pipeline_phases.preprocessing_layer import permute_rv,ridge_train_to_test_prediction,scale_func
 PipelineFunction = Callable[..., Any]
 from pipeline.pipeline_phases.choosing_layer import voxel_best_layer
 
@@ -598,6 +598,7 @@ def ridge_preprocessing(source_1: Any, source_2: Any, target: Any,rng,test_size,
 
 COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     "nsd_sources": nsd_sources,
+    'prepare_target':prepare_target,
     "random_layer_selection": random_layer_selection_for_sources,
     "specific_layer_index": specific_layer_index,
     "specific_index_layer_selection": specific_layer_index,
@@ -609,5 +610,7 @@ COMMON_PIPELINE_STEP_FUNCTIONS: dict[str, PipelineFunction] = {
     'permute_rv': permute_rv,
     'ridge_train_to_test_prediction': ridge_train_to_test_prediction,
     'ridge_preprocessing': ridge_preprocessing,
-    '1000shared_target': shared1000_subj_target
+    '1000shared_target': shared1000_subj_target,
+    'feature_manipulation_ridge':feature_manipulation_ridge,
+    'scale_func':scale_func
 }

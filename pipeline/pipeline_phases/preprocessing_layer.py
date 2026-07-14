@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score, mean_squared_error
-
+import joblib
 
 
 """This file will contain the preprocessing layer of the pipeline. For example: 
@@ -215,10 +215,33 @@ def ridge_train_to_test_prediction(
 
 
 
-def ridge_pca_pipeline(data,model_path,adsf):
-    """This function 
-            """
+#Prepropessing function: Scaling the data
+def scale_func(source1,source2,target,source1_scaler_path,source2_scaler_path,target_scaler_path):
+    """
+    Scale the data using the provided scaler.
     
-    pass
+    Args:
+        source1 (np.ndarray): The first source data.
+        source2 (np.ndarray): The second source data.
+        target (np.ndarray): The target data.
+        source1_scaler_path (str): The path to the scaler for the first source.
+        source2_scaler_path (str): The path to the scaler for the second source.
+        target_scaler_path (str): The path to the scaler for the target.
+
+    Returns:
+        np.ndarray: The scaled data.
+    """
+
+    scaler_source1 = joblib.load(source1_scaler_path)
+    scaler_source2 = joblib.load(source2_scaler_path)
+    scaler_target = joblib.load(target_scaler_path)
+
+    # Scale the data
+    scaled_source1 = scaler_source1.transform(source1)
+    scaled_source2 = scaler_source2.transform(source2)
+    scaled_target = scaler_target.transform(target)
+
+    return scaled_source1, scaled_source2, scaled_target
+
 
     

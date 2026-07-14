@@ -58,7 +58,9 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> di
         }
 
     """
-    return prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
+    target_context = prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
+    target_context["target"] = target_context.pop('neural_data')  # Add 'target' key for compatibility with PID pipeline
+    return target_context
 
 
 def shared1000_subj_target(

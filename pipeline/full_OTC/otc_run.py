@@ -1,8 +1,11 @@
 """Run the full-OTC PID experiment from the YAML config beside this file."""
 
+from __future__ import annotations
 
 import sys
 from pathlib import Path
+
+import yaml
 
 root = Path(__file__).resolve().parents[2]
 if str(root) not in sys.path:
@@ -11,27 +14,30 @@ if str(root) not in sys.path:
 from pipeline.full_OTC.otc_experiment import run_otc_experiment
 
 
-from typing import Any
-
-import hydra
-from omegaconf import DictConfig, OmegaConf
-
-
-@hydra.main(
-    version_base=None,
-    config_path=".",
-    config_name="otc_config",
-)
-def main(cfg: DictConfig) -> None:
-    """Run the OTC experiment using the Hydra configuration."""
-
-    config: dict[str, Any] = OmegaConf.to_container(
-        cfg,
-        resolve=True,
-    )
-
-    results = run_otc_experiment(config)
-
+def make_str_as_path(config: dict[str, any]) -> dict[str, any]:
+    """Convert string paths in the config to Path objects."""
+    for key, value in config.items():
+        if isinstance(value, str) and (value.startswith("/") or value.startswith(".")):
+            config[key] = Path(value)
+        elif isinstance(value, dict):
+            config[key] = make_str_as_path(value)
+    return config
 
 if __name__ == "__main__":
-    main()
+    config_name = 'ridge_otc_config'
+    config_path = Path(__file__).with_name(f"{config_name}.yaml")
+
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+        if config_name == 'ridge_otc_config':
+            model_name_1 = config['sources_kwargs']['model_name_1']
+            model_name_2 = config['sources_kwargs']['model_name_2']
+
+            config['feature_manipulation_kwargs']['model_name_1'] = model_name_1
+            config['feature_manipulation_kwargs']['model_name_2'] = model_name_2
+            config['feature_manipulation_kwargs']['seed'] = config['pid_kwargs']['rng_seed'] 
+
+        config = make_str_as_path(config)
+        
+
+    results = run_otc_experiment(config)

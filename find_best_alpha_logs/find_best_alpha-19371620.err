@@ -2171,4 +2171,779 @@ WARNING:root:Ambiguous input axis in WindowAttention-22. Skipping...
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.38s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.36s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.34s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.16s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+WARNING:root:Ambiguous input axis in Conv2d-1. Skipping...
+WARNING:root:Ambiguous input axis in PixelEmbed-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-3. Skipping...
+WARNING:root:Ambiguous input axis in Linear-2. Skipping...
+WARNING:root:Ambiguous input axis in Linear-3. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-2. Skipping...
+WARNING:root:Ambiguous input axis in Linear-4. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-3. Skipping...
+WARNING:root:Ambiguous input axis in Attention-1. Skipping...
+WARNING:root:Ambiguous input axis in Identity-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-4. Skipping...
+WARNING:root:Ambiguous input axis in Linear-5. Skipping...
+WARNING:root:Ambiguous input axis in GELU-1. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-4. Skipping...
+WARNING:root:Ambiguous input axis in Identity-2. Skipping...
+WARNING:root:Ambiguous input axis in Linear-6. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-5. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-1. Skipping...
+WARNING:root:Ambiguous input axis in Identity-3. Skipping...
+WARNING:root:Ambiguous input axis in Block-1-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-9. Skipping...
+WARNING:root:Ambiguous input axis in Linear-13. Skipping...
+WARNING:root:Ambiguous input axis in Linear-14. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-10. Skipping...
+WARNING:root:Ambiguous input axis in Linear-15. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-11. Skipping...
+WARNING:root:Ambiguous input axis in Attention-3. Skipping...
+WARNING:root:Ambiguous input axis in Identity-7. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-10. Skipping...
+WARNING:root:Ambiguous input axis in Linear-16. Skipping...
+WARNING:root:Ambiguous input axis in GELU-3. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-12. Skipping...
+WARNING:root:Ambiguous input axis in Identity-8. Skipping...
+WARNING:root:Ambiguous input axis in Linear-17. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-13. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-3. Skipping...
+WARNING:root:Ambiguous input axis in Identity-9. Skipping...
+WARNING:root:Ambiguous input axis in Block-3-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-15. Skipping...
+WARNING:root:Ambiguous input axis in Linear-24. Skipping...
+WARNING:root:Ambiguous input axis in Linear-25. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-18. Skipping...
+WARNING:root:Ambiguous input axis in Linear-26. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-19. Skipping...
+WARNING:root:Ambiguous input axis in Attention-5. Skipping...
+WARNING:root:Ambiguous input axis in Identity-13. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-16. Skipping...
+WARNING:root:Ambiguous input axis in Linear-27. Skipping...
+WARNING:root:Ambiguous input axis in GELU-5. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-20. Skipping...
+WARNING:root:Ambiguous input axis in Identity-14. Skipping...
+WARNING:root:Ambiguous input axis in Linear-28. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-21. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-5. Skipping...
+WARNING:root:Ambiguous input axis in Identity-15. Skipping...
+WARNING:root:Ambiguous input axis in Block-5-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-21. Skipping...
+WARNING:root:Ambiguous input axis in Linear-35. Skipping...
+WARNING:root:Ambiguous input axis in Linear-36. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-26. Skipping...
+WARNING:root:Ambiguous input axis in Linear-37. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-27. Skipping...
+WARNING:root:Ambiguous input axis in Attention-7. Skipping...
+WARNING:root:Ambiguous input axis in Identity-19. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-22. Skipping...
+WARNING:root:Ambiguous input axis in Linear-38. Skipping...
+WARNING:root:Ambiguous input axis in GELU-7. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-28. Skipping...
+WARNING:root:Ambiguous input axis in Identity-20. Skipping...
+WARNING:root:Ambiguous input axis in Linear-39. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-29. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-7. Skipping...
+WARNING:root:Ambiguous input axis in Identity-21. Skipping...
+WARNING:root:Ambiguous input axis in Block-7-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-27. Skipping...
+WARNING:root:Ambiguous input axis in Linear-46. Skipping...
+WARNING:root:Ambiguous input axis in Linear-47. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-34. Skipping...
+WARNING:root:Ambiguous input axis in Linear-48. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-35. Skipping...
+WARNING:root:Ambiguous input axis in Attention-9. Skipping...
+WARNING:root:Ambiguous input axis in Identity-25. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-28. Skipping...
+WARNING:root:Ambiguous input axis in Linear-49. Skipping...
+WARNING:root:Ambiguous input axis in GELU-9. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-36. Skipping...
+WARNING:root:Ambiguous input axis in Identity-26. Skipping...
+WARNING:root:Ambiguous input axis in Linear-50. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-37. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-9. Skipping...
+WARNING:root:Ambiguous input axis in Identity-27. Skipping...
+WARNING:root:Ambiguous input axis in Block-9-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-33. Skipping...
+WARNING:root:Ambiguous input axis in Linear-57. Skipping...
+WARNING:root:Ambiguous input axis in Linear-58. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-42. Skipping...
+WARNING:root:Ambiguous input axis in Linear-59. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-43. Skipping...
+WARNING:root:Ambiguous input axis in Attention-11. Skipping...
+WARNING:root:Ambiguous input axis in Identity-31. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-34. Skipping...
+WARNING:root:Ambiguous input axis in Linear-60. Skipping...
+WARNING:root:Ambiguous input axis in GELU-11. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-44. Skipping...
+WARNING:root:Ambiguous input axis in Identity-32. Skipping...
+WARNING:root:Ambiguous input axis in Linear-61. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-45. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-11. Skipping...
+WARNING:root:Ambiguous input axis in Identity-33. Skipping...
+WARNING:root:Ambiguous input axis in Block-11-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-39. Skipping...
+WARNING:root:Ambiguous input axis in Linear-68. Skipping...
+WARNING:root:Ambiguous input axis in Linear-69. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-50. Skipping...
+WARNING:root:Ambiguous input axis in Linear-70. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-51. Skipping...
+WARNING:root:Ambiguous input axis in Attention-13. Skipping...
+WARNING:root:Ambiguous input axis in Identity-37. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-40. Skipping...
+WARNING:root:Ambiguous input axis in Linear-71. Skipping...
+WARNING:root:Ambiguous input axis in GELU-13. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-52. Skipping...
+WARNING:root:Ambiguous input axis in Identity-38. Skipping...
+WARNING:root:Ambiguous input axis in Linear-72. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-53. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-13. Skipping...
+WARNING:root:Ambiguous input axis in Identity-39. Skipping...
+WARNING:root:Ambiguous input axis in Block-13-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-45. Skipping...
+WARNING:root:Ambiguous input axis in Linear-79. Skipping...
+WARNING:root:Ambiguous input axis in Linear-80. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-58. Skipping...
+WARNING:root:Ambiguous input axis in Linear-81. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-59. Skipping...
+WARNING:root:Ambiguous input axis in Attention-15. Skipping...
+WARNING:root:Ambiguous input axis in Identity-43. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-46. Skipping...
+WARNING:root:Ambiguous input axis in Linear-82. Skipping...
+WARNING:root:Ambiguous input axis in GELU-15. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-60. Skipping...
+WARNING:root:Ambiguous input axis in Identity-44. Skipping...
+WARNING:root:Ambiguous input axis in Linear-83. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-61. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-15. Skipping...
+WARNING:root:Ambiguous input axis in Identity-45. Skipping...
+WARNING:root:Ambiguous input axis in Block-15-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-51. Skipping...
+WARNING:root:Ambiguous input axis in Linear-90. Skipping...
+WARNING:root:Ambiguous input axis in Linear-91. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-66. Skipping...
+WARNING:root:Ambiguous input axis in Linear-92. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-67. Skipping...
+WARNING:root:Ambiguous input axis in Attention-17. Skipping...
+WARNING:root:Ambiguous input axis in Identity-49. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-52. Skipping...
+WARNING:root:Ambiguous input axis in Linear-93. Skipping...
+WARNING:root:Ambiguous input axis in GELU-17. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-68. Skipping...
+WARNING:root:Ambiguous input axis in Identity-50. Skipping...
+WARNING:root:Ambiguous input axis in Linear-94. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-69. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-17. Skipping...
+WARNING:root:Ambiguous input axis in Identity-51. Skipping...
+WARNING:root:Ambiguous input axis in Block-17-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-57. Skipping...
+WARNING:root:Ambiguous input axis in Linear-101. Skipping...
+WARNING:root:Ambiguous input axis in Linear-102. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-74. Skipping...
+WARNING:root:Ambiguous input axis in Linear-103. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-75. Skipping...
+WARNING:root:Ambiguous input axis in Attention-19. Skipping...
+WARNING:root:Ambiguous input axis in Identity-55. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-58. Skipping...
+WARNING:root:Ambiguous input axis in Linear-104. Skipping...
+WARNING:root:Ambiguous input axis in GELU-19. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-76. Skipping...
+WARNING:root:Ambiguous input axis in Identity-56. Skipping...
+WARNING:root:Ambiguous input axis in Linear-105. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-77. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-19. Skipping...
+WARNING:root:Ambiguous input axis in Identity-57. Skipping...
+WARNING:root:Ambiguous input axis in Block-19-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-63. Skipping...
+WARNING:root:Ambiguous input axis in Linear-112. Skipping...
+WARNING:root:Ambiguous input axis in Linear-113. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-82. Skipping...
+WARNING:root:Ambiguous input axis in Linear-114. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-83. Skipping...
+WARNING:root:Ambiguous input axis in Attention-21. Skipping...
+WARNING:root:Ambiguous input axis in Identity-61. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-64. Skipping...
+WARNING:root:Ambiguous input axis in Linear-115. Skipping...
+WARNING:root:Ambiguous input axis in GELU-21. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-84. Skipping...
+WARNING:root:Ambiguous input axis in Identity-62. Skipping...
+WARNING:root:Ambiguous input axis in Linear-116. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-85. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-21. Skipping...
+WARNING:root:Ambiguous input axis in Identity-63. Skipping...
+WARNING:root:Ambiguous input axis in Block-21-1. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-69. Skipping...
+WARNING:root:Ambiguous input axis in Linear-123. Skipping...
+WARNING:root:Ambiguous input axis in Linear-124. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-90. Skipping...
+WARNING:root:Ambiguous input axis in Linear-125. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-91. Skipping...
+WARNING:root:Ambiguous input axis in Attention-23. Skipping...
+WARNING:root:Ambiguous input axis in Identity-67. Skipping...
+WARNING:root:Ambiguous input axis in LayerNorm-70. Skipping...
+WARNING:root:Ambiguous input axis in Linear-126. Skipping...
+WARNING:root:Ambiguous input axis in GELU-23. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-92. Skipping...
+WARNING:root:Ambiguous input axis in Identity-68. Skipping...
+WARNING:root:Ambiguous input axis in Linear-127. Skipping...
+WARNING:root:Ambiguous input axis in Dropout-93. Skipping...
+WARNING:root:Ambiguous input axis in Mlp-23. Skipping...
+WARNING:root:Ambiguous input axis in Identity-69. Skipping...
+WARNING:root:Ambiguous input axis in Block-23-1. Skipping...
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.26s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.26s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.98s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.98s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.15s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.00s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.00s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.00s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.00s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.94s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.98s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.98s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.95s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.28s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.29s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.13s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.13s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.10s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.10s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.11s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.11s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.11s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.11s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.11s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.11s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.09s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.09s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.07s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.07s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.10s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.10s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.05s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.05s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.04s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.04s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.03s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.03s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.06s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]

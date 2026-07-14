@@ -1,42 +1,45 @@
 functions:
-  target_extraction: 1000shared_target
+  target_extraction: prepare_target
   sources_extraction: nsd_sources
   choose_layer: overall_best_layer
   feature_extraction: nsd_feature_extraction
   preprocess: scale_func
-  feature_manipulation: feature_manipulation_ridge #pca_each_source
+  feature_manipulation: feature_manipulation_ridge 
   pid_calculation: pid_calc
   pid_report: print_pid_mi
 
 target_kwargs:
   #subj_id: subj01
-  pca_model_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_results/subj01_pca_model.pkl
-  scaler_model_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_results/subj01_scaler_model.pkl
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
   pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
   neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
   #n_images: 1000
 
 sources_kwargs:
-  model_name_1: RN50_clip
-  model_name_2: ghostnet_100_classification
+  model_name_1: convnext_base_classification
+  model_name_2: convnext_base_classification
 
 choose_layer_kwargs:
   path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
 
 
 feature_extraction_kwargs:
-  batch_size_process: 500
-  batch_size_dataloader: 500
+  model_name_1: convnext_base_classification
+  model_name_2: convnext_base_classification
+
+
+  
 
 preprocess_kwargs:
-  n_components_target : 100
-  test_size: 0.3
+  source1_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
+  source2_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
+  target_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl
+
 
 feature_manipulation_kwargs:
-  n_components_source_1: null #500 #20
-  n_components_source_2: null #500 #20
-  n_components_target: null #20 #20
+  pc_target_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl
+  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
+  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
 
 experiment_output_dir: /home/ohadshee/Desktop/Partial-Information-Decomposition/results/otc_experiments
 

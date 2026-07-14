@@ -50,7 +50,7 @@ def scale_func(source1,source2,target,source1_scaler_path,source2_scaler_path,ta
 
        
 #Feature manipulation funtion: PCA target and ridge prediction from X1 and X2 to PCA(T) using the alphas per pc from the data
-def feature_manipulation_func(source1,source2,target,seed,source1_name,source2_name,pc_target_path,alphas_source1_path,alphas_source2_path,shared1000_subj):
+def feature_manipulation_ridge(source1,source2,target,seed,source1_name,source2_name,pc_target_path,alphas_source1_path,alphas_source2_path,shared1000_subj):
     """
     Perform feature manipulation on the source and target data.
     
