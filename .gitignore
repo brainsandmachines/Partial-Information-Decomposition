@@ -20,4 +20,4 @@ flow_pid/
 pipeline/trash/
 subj01_results/
 pipeline/subj_PCs/saved_pcs/
-pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)
+pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/
