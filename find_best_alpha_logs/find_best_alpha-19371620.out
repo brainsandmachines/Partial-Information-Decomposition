@@ -499,3 +499,234 @@ Total number of layers: 326
 Processing layer: Linear-92 from model: swin_large_patch4_window7_224_classification
 
 For model swin_large_patch4_window7_224_classification Layer Linear-92: Extracting features for 9000 images in batches of 28...
+Feature extraction for model swin_large_patch4_window7_224_classification layer Linear-92 completed in 5609.45 seconds.
+Finding best ridge alphas for 98 target PCs using 225792 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] .... (step 1 of 2) Processing standardscaler, total=  13.7s
+[Pipeline] ........... (step 2 of 2) Processing ridgecv, total= 8.7min
+
+Selected alpha and cross-validated R² for each PC:
+Finished finding best ridge alphas for each target PC.✅
+
+PC   1: alpha = 1.9307e+06, CV R² = 0.226715
+
+PC   2: alpha = 429193, CV R² = 0.667810
+
+PC   3: alpha = 429193, CV R² = 0.690444
+
+PC   4: alpha = 429193, CV R² = 0.451037
+
+PC   5: alpha = 429193, CV R² = 0.498571
+
+PC   6: alpha = 429193, CV R² = 0.266764
+
+PC   7: alpha = 429193, CV R² = 0.451169
+
+PC   8: alpha = 910298, CV R² = 0.263766
+
+PC   9: alpha = 910298, CV R² = 0.192559
+
+PC  10: alpha = 910298, CV R² = 0.169878
+
+PC  11: alpha = 910298, CV R² = 0.388640
+
+PC  12: alpha = 1.9307e+06, CV R² = 0.140882
+
+PC  13: alpha = 910298, CV R² = 0.230216
+
+PC  14: alpha = 910298, CV R² = 0.247599
+
+PC  15: alpha = 910298, CV R² = 0.287937
+
+PC  16: alpha = 910298, CV R² = 0.237704
+
+PC  17: alpha = 910298, CV R² = 0.275613
+
+PC  18: alpha = 910298, CV R² = 0.160115
+
+PC  19: alpha = 910298, CV R² = 0.196230
+
+PC  20: alpha = 910298, CV R² = 0.203661
+
+PC  21: alpha = 1.9307e+06, CV R² = 0.120078
+
+PC  22: alpha = 1.9307e+06, CV R² = 0.088901
+
+PC  23: alpha = 1.9307e+06, CV R² = 0.047969
+
+PC  24: alpha = 1.9307e+06, CV R² = 0.098543
+
+PC  25: alpha = 910298, CV R² = 0.112456
+
+PC  26: alpha = 1.9307e+06, CV R² = 0.053081
+
+PC  27: alpha = 1.9307e+06, CV R² = 0.069269
+
+PC  28: alpha = 1.9307e+06, CV R² = 0.109866
+
+PC  29: alpha = 910298, CV R² = 0.111026
+
+PC  30: alpha = 1.9307e+06, CV R² = 0.041908
+
+PC  31: alpha = 1.9307e+06, CV R² = 0.058413
+
+PC  32: alpha = 910298, CV R² = 0.148770
+
+PC  33: alpha = 910298, CV R² = 0.181343
+
+PC  34: alpha = 1.9307e+06, CV R² = 0.076687
+
+PC  35: alpha = 910298, CV R² = 0.185256
+
+PC  36: alpha = 910298, CV R² = 0.117653
+
+PC  37: alpha = 1.9307e+06, CV R² = 0.055730
+
+PC  38: alpha = 910298, CV R² = 0.151809
+
+PC  39: alpha = 910298, CV R² = 0.108724
+
+PC  40: alpha = 1.9307e+06, CV R² = 0.067979
+
+PC  41: alpha = 910298, CV R² = 0.155450
+
+PC  42: alpha = 910298, CV R² = 0.116031
+
+PC  43: alpha = 1.9307e+06, CV R² = 0.076720
+
+PC  44: alpha = 910298, CV R² = 0.132938
+
+PC  45: alpha = 1.9307e+06, CV R² = 0.061937
+
+PC  46: alpha = 910298, CV R² = 0.219909
+
+PC  47: alpha = 1.9307e+06, CV R² = 0.075767
+
+PC  48: alpha = 910298, CV R² = 0.085679
+
+PC  49: alpha = 1.9307e+06, CV R² = 0.068530
+
+PC  50: alpha = 910298, CV R² = 0.099451
+
+PC  51: alpha = 910298, CV R² = 0.125430
+
+PC  52: alpha = 1.9307e+06, CV R² = 0.049157
+
+PC  53: alpha = 910298, CV R² = 0.147257
+
+PC  54: alpha = 1.9307e+06, CV R² = 0.104290
+
+PC  55: alpha = 1.9307e+06, CV R² = 0.066558
+
+PC  56: alpha = 910298, CV R² = 0.111656
+
+PC  57: alpha = 910298, CV R² = 0.171153
+
+PC  58: alpha = 1.9307e+06, CV R² = 0.079496
+
+PC  59: alpha = 1.9307e+06, CV R² = 0.095281
+
+PC  60: alpha = 910298, CV R² = 0.067349
+
+PC  61: alpha = 1.9307e+06, CV R² = 0.051063
+
+PC  62: alpha = 1.9307e+06, CV R² = 0.064698
+
+PC  63: alpha = 1.9307e+06, CV R² = 0.096937
+
+PC  64: alpha = 1.9307e+06, CV R² = 0.038758
+
+PC  65: alpha = 1.9307e+06, CV R² = 0.068442
+
+PC  66: alpha = 1.9307e+06, CV R² = 0.048914
+
+PC  67: alpha = 1.9307e+06, CV R² = 0.036298
+
+PC  68: alpha = 1.9307e+06, CV R² = 0.056382
+
+PC  69: alpha = 910298, CV R² = 0.068913
+
+PC  70: alpha = 1.9307e+06, CV R² = 0.073212
+
+PC  71: alpha = 1.9307e+06, CV R² = 0.046091
+
+PC  72: alpha = 1.9307e+06, CV R² = 0.044225
+
+PC  73: alpha = 1.9307e+06, CV R² = 0.045199
+
+PC  74: alpha = 1.9307e+06, CV R² = 0.050745
+
+PC  75: alpha = 1.9307e+06, CV R² = 0.068877
+
+PC  76: alpha = 4.09492e+06, CV R² = 0.023152
+
+PC  77: alpha = 1.9307e+06, CV R² = 0.050202
+
+PC  78: alpha = 1.9307e+06, CV R² = 0.028398
+
+PC  79: alpha = 1.9307e+06, CV R² = 0.070873
+
+PC  80: alpha = 1.9307e+06, CV R² = 0.060286
+
+PC  81: alpha = 1.9307e+06, CV R² = 0.048661
+
+PC  82: alpha = 910298, CV R² = 0.109301
+
+PC  83: alpha = 1.9307e+06, CV R² = 0.072851
+
+PC  84: alpha = 910298, CV R² = 0.094207
+
+PC  85: alpha = 1.9307e+06, CV R² = 0.050054
+
+PC  86: alpha = 1.9307e+06, CV R² = 0.025094
+
+PC  87: alpha = 910298, CV R² = 0.069244
+
+PC  88: alpha = 4.09492e+06, CV R² = 0.025106
+
+PC  89: alpha = 4.09492e+06, CV R² = 0.024327
+
+PC  90: alpha = 1.9307e+06, CV R² = 0.075448
+
+PC  91: alpha = 1.9307e+06, CV R² = 0.033293
+
+PC  92: alpha = 910298, CV R² = 0.074894
+
+PC  93: alpha = 1.9307e+06, CV R² = 0.052333
+
+PC  94: alpha = 1.9307e+06, CV R² = 0.018811
+
+PC  95: alpha = 1.9307e+06, CV R² = 0.048479
+
+PC  96: alpha = 1.9307e+06, CV R² = 0.033553
+
+PC  97: alpha = 1.9307e+06, CV R² = 0.020959
+
+PC  98: alpha = 1.9307e+06, CV R² = 0.053008
+
+Mean cross-validated R² across PCs: 0.126368
+
+======================================================================================
+
+Chosen model: jx_nest_tiny_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+Model options for jx_nest_tiny_classification: {'model_name': 'jx_nest_tiny', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('jx_nest_tiny', pretrained = True)"}
+Image transforms for jx_nest_tiny_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: jx_nest_tiny_classification
+Ordered layers from model: ['Conv2d-1', 'Identity-1', 'PatchEmbed-1', 'Identity-2', 'LayerNorm-1', 'Linear-1', 'Linear-2', 'Dropout-1', 'Attention-1', 'Identity-3', 'LayerNorm-2', 'Linear-3', 'GELU-1', 'Dropout-2', 'Identity-4', 'Linear-4', 'Dropout-3', 'Mlp-1', 'Identity-5', 'TransformerLayer-1', 'LayerNorm-3', 'Linear-5', 'Linear-6', 'Dropout-4', 'Attention-2', 'DropPath-1', 'LayerNorm-4', 'Linear-7', 'GELU-2', 'Dropout-5', 'Identity-6', 'Linear-8', 'Dropout-6', 'Mlp-2', 'DropPath-2', 'TransformerLayer-2', 'NestLevel-1', 'Conv2d-2', 'LayerNorm-5', 'MaxPool2dSame-1', 'ConvPool-1', 'LayerNorm-6', 'Linear-9', 'Linear-10', 'Dropout-7', 'Attention-3', 'DropPath-3', 'LayerNorm-7', 'Linear-11', 'GELU-3', 'Dropout-8', 'Identity-7', 'Linear-12', 'Dropout-9', 'Mlp-3', 'DropPath-4', 'TransformerLayer-3', 'LayerNorm-8', 'Linear-13', 'Linear-14', 'Dropout-10', 'Attention-4', 'DropPath-5', 'LayerNorm-9', 'Linear-15', 'GELU-4', 'Dropout-11', 'Identity-8', 'Linear-16', 'Dropout-12', 'Mlp-4', 'DropPath-6', 'TransformerLayer-4', 'NestLevel-2', 'Conv2d-3', 'LayerNorm-10', 'MaxPool2dSame-2', 'ConvPool-2', 'LayerNorm-11', 'Linear-17', 'Linear-18', 'Dropout-13', 'Attention-5', 'DropPath-7', 'LayerNorm-12', 'Linear-19', 'GELU-5', 'Dropout-14', 'Identity-9', 'Linear-20', 'Dropout-15', 'Mlp-5', 'DropPath-8', 'TransformerLayer-5', 'LayerNorm-13', 'Linear-21', 'Linear-22', 'Dropout-16', 'Attention-6', 'DropPath-9', 'LayerNorm-14', 'Linear-23', 'GELU-6', 'Dropout-17', 'Identity-10', 'Linear-24', 'Dropout-18', 'Mlp-6', 'DropPath-10', 'TransformerLayer-6', 'LayerNorm-15', 'Linear-25', 'Linear-26', 'Dropout-19', 'Attention-7', 'DropPath-11', 'LayerNorm-16', 'Linear-27', 'GELU-7', 'Dropout-20', 'Identity-11', 'Linear-28', 'Dropout-21', 'Mlp-7', 'DropPath-12', 'TransformerLayer-7', 'LayerNorm-17', 'Linear-29', 'Linear-30', 'Dropout-22', 'Attention-8', 'DropPath-13', 'LayerNorm-18', 'Linear-31', 'GELU-8', 'Dropout-23', 'Identity-12', 'Linear-32', 'Dropout-24', 'Mlp-8', 'DropPath-14', 'TransformerLayer-8', 'LayerNorm-19', 'Linear-33', 'Linear-34', 'Dropout-25', 'Attention-9', 'DropPath-15', 'LayerNorm-20', 'Linear-35', 'GELU-9', 'Dropout-26', 'Identity-13', 'Linear-36', 'Dropout-27', 'Mlp-9', 'DropPath-16', 'TransformerLayer-9', 'LayerNorm-21', 'Linear-37', 'Linear-38', 'Dropout-28', 'Attention-10', 'DropPath-17', 'LayerNorm-22', 'Linear-39', 'GELU-10', 'Dropout-29', 'Identity-14', 'Linear-40', 'Dropout-30', 'Mlp-10', 'DropPath-18', 'TransformerLayer-10', 'LayerNorm-23', 'Linear-41', 'Linear-42', 'Dropout-31', 'Attention-11', 'DropPath-19', 'LayerNorm-24', 'Linear-43', 'GELU-11', 'Dropout-32', 'Identity-15', 'Linear-44', 'Dropout-33', 'Mlp-11', 'DropPath-20', 'TransformerLayer-11', 'LayerNorm-25', 'Linear-45', 'Linear-46', 'Dropout-34', 'Attention-12', 'DropPath-21', 'LayerNorm-26', 'Linear-47', 'GELU-12', 'Dropout-35', 'Identity-16', 'Linear-48', 'Dropout-36', 'Mlp-12', 'DropPath-22', 'TransformerLayer-12', 'NestLevel-3', 'LayerNorm-27', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Dropout-37', 'Linear-49', 'Nest-4']
+Total number of layers: 214
+
+==================================================
+Processing layer: LayerNorm-20 from model: jx_nest_tiny_classification
+
+For model jx_nest_tiny_classification Layer LayerNorm-20: Extracting features for 9000 images in batches of 28...

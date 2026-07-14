@@ -130,8 +130,18 @@ def feature_manipulation_func(source1,source2,target,feature_manipulation_kwargs
     alphas_source2_path = feature_manipulation_kwargs['alphas_source2_path']
 
     pca = joblib.load(pca_target_path)
-    alphas_source1 = joblib.load(alpahs_source1_path)
-    alphas_source2 = joblib.load(alphas_source2_path)
+    
+    with np.load(alpahs_source1_path, allow_pickle=False) as alpha_data:
+        alphas_source1 = np.asarray(
+            alpha_data["alphas"],
+            dtype=np.float64,
+        )
+        
+    with np.load(alphas_source2_path, allow_pickle=False) as alpha_data:
+        alphas_source2 = np.asarray(
+            alpha_data["alphas"],
+            dtype=np.float64,
+        )
 
     #PCA target data
     pca_target = pca.transform(target)
