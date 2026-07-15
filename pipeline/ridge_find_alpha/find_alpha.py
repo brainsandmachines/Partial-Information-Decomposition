@@ -411,17 +411,13 @@ def main(
 
 if __name__ == "__main__":
 
-    model_list = ['xcit_nano_12_p8_224_classification'
-        ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
-        'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
-        'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
-        'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
+    model_list = ['coat_lite_tiny_classification','visformer_small_classification',
         'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
         ]
         #Path to best layer results
-    '''path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
+    path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
     scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl')
     pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl')
@@ -438,7 +434,7 @@ if __name__ == "__main__":
 
 
         main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
-    '''
+    
     csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
     output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas')
     split_alphas_csv_by_model(csv_path, output_dir)

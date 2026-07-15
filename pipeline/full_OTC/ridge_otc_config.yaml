@@ -16,8 +16,8 @@ target_kwargs:
   n_samples: null #400 is the samllest number with shared images
 
 sources_kwargs:
-  model_name_1: convnext_base_classification
-  model_name_2: convnext_base_classification
+  model_name_1: xcit_nano_12_p8_224_classification
+  model_name_2: resnet50_classification
 
 choose_layer_kwargs:
   path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
@@ -27,19 +27,40 @@ feature_extraction_kwargs:
   batch_size_process: 120
 
 
+models:
+  - nf_resnet50_classification
+  - eca_nfnet_l0_classification
+  - resnet50_classification
+  - semnasnet_100_classification
+  - cspresnet50_classification
+  - mobilenetv3_large_100_classification
+  - ghostnet_100_classification
+  - convnext_base_classification
+  - xcit_nano_12_p8_224_classification
+  - xcit_nano_12_p16_224_classification
+  - swin_large_patch4_window7_224_classification
+  - jx_nest_tiny_classification
+  - pit_ti_224_classification
+  - vit_base_patch32_224_classification
+  - vit_base_patch16_224_classification
+  - tnt_s_patch16_224_classification
+  - crossvit_base_240_classification
+  - deit_base_patch16_224_classification
+  - levit_128_classification
+
 
   
 
 preprocess_kwargs:
-  source1_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
-  source2_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
+  source1_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_xcit_nano_12_p8_224_classification_predictor_scaler.pkl
+  source2_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_xcit_nano_12_p16_224_classification_predictor_scaler.pkl
   target_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl
 
 
 feature_manipulation_kwargs:
   pc_target_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl
-  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_convnext_base_classification.npz
-  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_convnext_base_classification.npz
+  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_xcit_nano_12_p8_224_classification.npz
+  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_xcit_nano_12_p16_224_classification.npz
 
 experiment_output_dir: /home/ohadshee/Desktop/Partial-Information-Decomposition/results/otc_experiments
 

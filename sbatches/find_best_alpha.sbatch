@@ -4,8 +4,8 @@
 #SBATCH --mem=128G
 ##SBATCH --qos=golan-neuro
 #SBATCH --job-name=find_best_alpha
-#SBATCH --output=//home/ohadshee/Desktop/Partial-Information-Decomposition/find_best_alpha_logs/%x-%j.out
-#SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/find_best_alpha_logs/%x-%j.err
+#SBATCH --output=//home/ohadshee/Desktop/Partial-Information-Decomposition/logs/find_best_alpha_logs/%x-%j.out
+#SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/logs/find_best_alpha_logs/%x-%j.err
 
 set -euo pipefail
 
