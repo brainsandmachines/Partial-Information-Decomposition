@@ -39,5 +39,5 @@ if __name__ == "__main__":
 
         config = make_str_as_path(config)
         
-
+    print(f"\nRunning full-OTC PID experiment with config: {config_name}!!!")
     results = run_otc_experiment(config)

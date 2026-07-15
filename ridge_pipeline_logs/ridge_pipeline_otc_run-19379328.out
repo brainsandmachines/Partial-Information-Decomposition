@@ -1,0 +1,15 @@
+------------------------------------
+Wed 15 Jul 2026 11:04:58 IDT
+SLURM_JOBID:		19379328
+SLURM_JOB_NODELIST:	ise-cpu256-30
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19379328
+Allocated Resouces:	cpu - 4 / mem - 49152 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu256-30.auth.ad.bgu.ac.il
+Job ID: 19379328
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
