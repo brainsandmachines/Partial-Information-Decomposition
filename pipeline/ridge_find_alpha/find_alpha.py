@@ -439,6 +439,6 @@ if __name__ == "__main__":
 
         main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
     '''
-    csv_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/ridge_find_alpha/alphas2.0_per_pc.csv')
-    output_dir = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/ridge_find_alpha/models_dir')
+    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
+    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas')
     split_alphas_csv_by_model(csv_path, output_dir)
