@@ -402,7 +402,7 @@ def _prepare_ridge_prediction(
     Inputs:
         model_name: str identifying the model to preprocess.
         artifacts: RidgeModelArtifacts containing its layer, scaler, and alphas.
-        target_context: dict[str, Any] used by main-thread feature extraction.
+        target_context: dict[str, Any] used by aligned feature extraction.
         train_target: np.ndarray containing non-shared PCA target rows.
         shared_mask: np.ndarray selecting held-out shared rows.
         feature_extraction: Callable producing one model's aligned features.
@@ -519,19 +519,22 @@ def _iter_ridge_prediction_pairs(
                 if needed_model_name in prediction_cache:
                     continue
                 if prefetch_future is not None:
+                    if prefetched_model_name is None:
+                        raise RuntimeError(
+                            "A ridge prefetch future has no associated model name."
+                        )
+                    future_model_name = prefetched_model_name
                     wait_started_at = time.perf_counter()
                     try:
-                        prediction_cache[prefetched_model_name] = (
-                            prefetch_future.result()
-                        )
+                        prediction_cache[future_model_name] = prefetch_future.result()
                     except Exception as error:
                         raise RuntimeError(
                             "Prefetched ridge prediction failed for "
-                            f"{prefetched_model_name!r}."
+                            f"{future_model_name!r}."
                         ) from error
                     print(
                         f"Wait for prefetched ridge prediction "
-                        f"{prefetched_model_name}: "
+                        f"{future_model_name}: "
                         f"{time.perf_counter() - wait_started_at:.2f} seconds."
                     )
                     prefetch_future = None
@@ -549,7 +552,7 @@ def _iter_ridge_prediction_pairs(
                     seed=seed,
                 )
 
-            if executor is not None:
+            if executor is not None and prefetch_future is None:
                 for future_pair in pairs[pair_index + 1 :]:
                     next_model_name = next(
                         (

@@ -103,7 +103,7 @@ File description: Extract deterministic memory-safe model projections once per j
 
 ### `pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pairwise_utils.py`
 
-File description: Hold task-specific artifact validation, CSV resume, model lifecycle, and one-slot prefetch mechanics for the ridge pairwise PID runner.
+File description: Hold task-specific artifact validation, CSV resume, model lifecycle, and one-slot full-prediction prefetch mechanics for the ridge pairwise PID runner.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
@@ -118,8 +118,8 @@ File description: Hold task-specific artifact validation, CSV resume, model life
 | `_validate_model_artifacts (line 262)` | model_names: list[str], config: Mapping[str, Any], expected_target_dim: int | Annotated: `dict[str, RidgeModelArtifacts]` | Resolve best layers and validate all source scaler paths plus alpha model/layer/PC metadata before feature extraction. |
 | `_load_model_context (line 344)` | model_name: str | Annotated: `tuple[dict[str, Any], float]` | Load one DeepDive model context, discover its ordered layers, and report model-labelled timing and failures. |
 | `_release_model_context (line 372)` | model_context: dict[str, Any] \| None | Annotated: `None` | Clear one model context, collect unreachable objects, and release unused CUDA cache. |
-| `_cleanup_prefetch (line 389)` | executor: ThreadPoolExecutor \| None, future: Future[tuple[dict[str, Any], float]] \| None | Annotated: `None` | Cancel or join the one-slot loader and release any context returned by an unconsumed future. |
-| `_cache_ridge_predictions (line 416)` | model_names: list[str], artifacts_by_model: Mapping[str, RidgeModelArtifacts], target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], *, seed: int, prefetch_model_context: bool | Annotated: `dict[str, tuple[np.ndarray, int]]` | Extract each model on the main thread once, release it, optionally prefetch the next context during scaling/ridge, and retain only held-out predictions plus layer indexes. |
+| `_prepare_ridge_prediction (line 389)` | model_name: str, artifacts: RidgeModelArtifacts, target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], *, seed: int | Annotated: `tuple[np.ndarray, int]` | Load and validate one model context, extract its aligned features, release the model, apply its saved scaler, ridge-fit only non-shared rows, and return its held-out prediction plus selected layer. Task-specific and safe to run in the single background worker. |
+| `_iter_ridge_prediction_pairs (line 472)` | pairs: list[tuple[str, str]], artifacts_by_model: Mapping[str, RidgeModelArtifacts], target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], *, seed: int, prefetch_ridge_predictions: bool | Annotated: `Iterator[tuple[str, str, np.ndarray, int, np.ndarray, int]]` | Yield PID-ready ordered pairs from cached held-out predictions and, before each yield, submit the next unseen model's complete load/extract/scale/ridge preprocessing to one worker so it overlaps the caller's current PID calculation. |
 
 ### `pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py`
 
@@ -127,8 +127,8 @@ File description: Orchestrate prediction-level ridge PID by preparing the neural
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `run_pairwise_pid_pipeline (line 25)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scale and saved-PCA-project the target once, delegate validated model preprocessing, call configured PID as `(T, X1, X2)`, report, and checkpoint each successful unordered pair immediately. Shared rows are never used for ridge fitting. |
-| `main (line 196)` | No inputs | Annotated: `None` | Load the adjacent ridge YAML, validate its symmetric model list and output paths, run pairwise PID, and plot the exact CSV path returned by the runner. |
+| `run_pairwise_pid_pipeline (line 25)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scale and saved-PCA-project the target once, stream PID-ready cached predictions while the next needed model is fully preprocessed in one worker, call PID as `(T, X1, X2)`, and immediately checkpoint successful pairs. Shared rows are never used for ridge fitting. |
+| `main (line 212)` | No inputs | Annotated: `None` | Load the adjacent ridge YAML, validate its symmetric model list and output paths, run pairwise PID, and plot the exact CSV path returned by the runner. |
 
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 

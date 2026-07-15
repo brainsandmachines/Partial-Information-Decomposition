@@ -1270,6 +1270,7 @@ class _RunnerHarness:
         model_name = str(source_context["model_name"])
         assert layer_index == self.model_names.index(model_name)
         assert np.asarray(target_context["img_ids"]).shape == (6,)
+        self.hdf_file.close.assert_not_called()
         self.counts[f"extract:{model_name}"] += 1
         self.record_event("extract", model_name)
         return np.full((6, 3), self.model_values[model_name])
