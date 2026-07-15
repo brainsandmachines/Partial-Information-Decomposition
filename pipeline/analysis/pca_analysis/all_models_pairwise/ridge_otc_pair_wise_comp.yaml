@@ -4,53 +4,63 @@ functions:
   choose_layer: overall_best_layer
   feature_extraction: nsd_feature_extraction
   preprocess: scale_func
-  feature_manipulation: feature_manipulation_ridge 
+  feature_manipulation: feature_manipulation_ridge
   pid_calculation: pid_calc
   pid_report: print_pid_mi
 
+# Symmetric candidate list: every unfinished unordered pair is processed once.
+models:
+  - nf_resnet50_classification
+  - eca_nfnet_l0_classification
+  - resnet50_classification
+  - semnasnet_100_classification
+  - cspresnet50_classification
+  - mobilenetv3_large_100_classification
+  - ghostnet_100_classification
+  - convnext_base_classification
+  - xcit_nano_12_p8_224_classification
+  - xcit_nano_12_p16_224_classification
+
+metadata:
+  subj_id: subj01
+
+execution:
+  # While PID evaluates the current pair, fully preprocess the next needed model.
+  prefetch_ridge_predictions: true
+
 target_kwargs:
-  #subj_id: subj01
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
   pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
   neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
-  n_samples: null #400 is the samllest number with shared images
+  n_samples: null
 
 sources_kwargs:
+  # Retained for compatibility with the standard OTC config. The pairwise
+  # runner loads each required model directly from the models list above.
   model_name_1: convnext_base_classification
   model_name_2: convnext_base_classification
 
 choose_layer_kwargs:
-  path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
-
+  path_to_results: external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
 
 feature_extraction_kwargs:
   batch_size_process: 120
-
-
-
-  
+  batch_size_dataloader: 128
 
 preprocess_kwargs:
-  source1_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
-  source2_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
-  target_scaler_path : /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl
-
+  target_scaler_path: pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl
 
 feature_manipulation_kwargs:
-  pc_target_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl
-  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_convnext_base_classification.npz
-  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_convnext_base_classification.npz
+  pc_target_path: pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl
 
-experiment_output_dir: /home/ohadshee/Desktop/Partial-Information-Decomposition/results/otc_experiments
+artifact_templates:
+  source_scaler:
+    directory_template: pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)
+    filename_template: alphas2.0_per_pc_{safe_model_name}_predictor_scaler.pkl
+  ridge_alphas:
+    directory_template: pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)
+    filename_template: alphas2.0_per_pc_{safe_model_name}.npz
 
-hydra:
-  run:
-    dir: ${experiment_output_dir}/${sources_kwargs.model_name_1}_vs_${sources_kwargs.model_name_2}/${now:%Y-%m-%d_%H-%M-%S}
-
-  sweep:
-    dir: ${experiment_output_dir}/multirun/${now:%Y-%m-%d_%H-%M-%S}
-    subdir: ${hydra.job.num}_${sources_kwargs.model_name_1}_vs_${sources_kwargs.model_name_2}
-    
 pid_kwargs:
   method: tilde
   rng_seed: 88
@@ -59,3 +69,7 @@ pid_kwargs:
     bias_correction: true
 
 report_kwargs: {}
+
+output:
+  csv_path: pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+  plot_dir: pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_figures_ridge_pca

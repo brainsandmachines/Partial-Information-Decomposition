@@ -101,6 +101,35 @@ File description: Extract deterministic memory-safe model projections once per j
 | `extract_model_projection (line 105)` | model_name: str, target_context: dict[str, Any], choose_layer_kwargs: dict[str, Any], feature_extraction_kwargs: dict[str, Any], n_components: int, random_state: int | Annotated: `tuple[np.ndarray, int]` | Extract one selected model layer in bounded batches, optionally apply deterministic SRP, discard raw batches, and return the final PCA projection plus layer index. A null SRP component setting uses the JL dimension from target_context; an integer overrides it. With SRP disabled, the full raw-width intermediate is retained until PCA. |
 | `run_pairwise_pid_pipeline (line 210)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Project the target once, retain only final model PCA arrays in an in-memory per-job cache, compute each unordered PID pair, and checkpoint successful rows to CSV. |
 
+### `pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pairwise_utils.py`
+
+File description: Hold task-specific artifact validation, CSV resume, model lifecycle, and one-slot prefetch mechanics for the ridge pairwise PID runner.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `RidgeModelArtifacts class (line 59)` | model_name: str, layer_index: int, scaler_path: Path, alphas_path: Path, alphas: np.ndarray | `RidgeModelArtifacts` | Immutable task-specific record for one model's validated best layer, predictor scaler, alpha archive, and per-target-PC alpha vector. |
+| `to_deepdive_model_name (line 80)` | model_name: str | Annotated: `str` | Convert stored CLIP aliases at the DeepDive loading boundary while keeping artifact/result names unchanged. |
+| `safe_model_name (line 96)` | model_name: str | Annotated: `str` | Replace forward and backward path separators exactly as ridge artifact generation does. |
+| `_resolve_project_path (line 109)` | path_value: str \| Path | Annotated: `Path` | Resolve repository-relative configuration paths from the checkout root while preserving absolute paths. |
+| `_load_or_create_checkpoint (line 125)` | output_path: Path | Annotated: `pd.DataFrame` | Load the exact 19-column resume CSV or create an empty checkpoint with that schema. Task-specific. |
+| `_unfinished_unordered_pairs (line 156)` | source_1_names: list[str], source_2_names: list[str], existing_results: pd.DataFrame | Annotated: `list[tuple[str, str]]` | Remove self-pairs, completed pairs, and reverse duplicates before expensive loading while preserving the first X1/X2 orientation. |
+| `_required_models (line 192)` | pairs: list[tuple[str, str]] | Annotated: `list[str]` | De-duplicate models from unfinished pairs in first-use order. |
+| `_model_artifact_path (line 212)` | artifact_config: Mapping[str, Any], model_name: str, artifact_label: str | Annotated: `Path` | Fill model/safe-model templates, resolve them from the checkout root, and require the resulting artifact file. |
+| `_validate_model_artifacts (line 262)` | model_names: list[str], config: Mapping[str, Any], expected_target_dim: int | Annotated: `dict[str, RidgeModelArtifacts]` | Resolve best layers and validate all source scaler paths plus alpha model/layer/PC metadata before feature extraction. |
+| `_load_model_context (line 344)` | model_name: str | Annotated: `tuple[dict[str, Any], float]` | Load one DeepDive model context, discover its ordered layers, and report model-labelled timing and failures. |
+| `_release_model_context (line 372)` | model_context: dict[str, Any] \| None | Annotated: `None` | Clear one model context, collect unreachable objects, and release unused CUDA cache. |
+| `_cleanup_prefetch (line 389)` | executor: ThreadPoolExecutor \| None, future: Future[tuple[dict[str, Any], float]] \| None | Annotated: `None` | Cancel or join the one-slot loader and release any context returned by an unconsumed future. |
+| `_cache_ridge_predictions (line 416)` | model_names: list[str], artifacts_by_model: Mapping[str, RidgeModelArtifacts], target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], *, seed: int, prefetch_model_context: bool | Annotated: `dict[str, tuple[np.ndarray, int]]` | Extract each model on the main thread once, release it, optionally prefetch the next context during scaling/ridge, and retain only held-out predictions plus layer indexes. |
+
+### `pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py`
+
+File description: Orchestrate prediction-level ridge PID by preparing the neural target once, caching one held-out prediction per required model, and immediately checkpointing unfinished unordered pairs.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `run_pairwise_pid_pipeline (line 25)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Scale and saved-PCA-project the target once, delegate validated model preprocessing, call configured PID as `(T, X1, X2)`, report, and checkpoint each successful unordered pair immediately. Shared rows are never used for ridge fitting. |
+| `main (line 196)` | No inputs | Annotated: `None` | Load the adjacent ridge YAML, validate its symmetric model list and output paths, run pairwise PID, and plot the exact CSV path returned by the runner. |
+
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 
 File description: Python module for pca as function-related project logic.
@@ -232,6 +261,10 @@ File description: Python module for feature manipulations-related project logic.
 | `pca_projection (line 20)` | features, n_components | `ft_reduced` | Apply PCA projection to reduce dimensionality of features. |
 | `jl_projection (line 38)` | features, n_samples, eps=0.1, jl_dim=None | `ft_reduced` | Apply Johnson-Lindenstrauss projection to reduce dimensionality of features. |
 | `cca_projection (line 71)` | features1, features2, n_components | tuple of 2 values | Apply Canonical Correlation Analysis (CCA) to find linear combinations of two sets of features that are maximally correlated. |
+| `prepare_ridge_target (line 106)` | target: np.ndarray, target_context: Mapping[str, Any], pc_target_path: str \| Path | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray]` | Transform an already-scaled neural target with its saved PCA, then return non-shared training scores, shared held-out scores, and a copied aligned Boolean mask. Does not fit PCA. |
+| `load_ridge_alphas (line 185)` | alphas_path: str \| Path, *, model_name: str, expected_target_dim: int, expected_layer_index: int \| None=None | Annotated: `np.ndarray` | Load one model's alpha archive and validate required fields, exact model/layer metadata, finite nonnegative values, and ordered one-based target-PC indexes. |
+| `ridge_predict_shared (line 310)` | source: np.ndarray, train_target: np.ndarray, shared_mask: np.ndarray, alphas: np.ndarray, *, seed: int | Annotated: `np.ndarray` | Fit multi-output ridge only on non-shared scaled source rows and return finite shared-row predictions in target-PC space, preserving a singleton target axis. Prediction-level PID helper. |
+| `feature_manipulation_ridge (line 413)` | source1: np.ndarray, source2: np.ndarray, target: np.ndarray, target_context: Mapping[str, Any], seed: int, model_name_1: str, model_name_2: str, pc_target_path: str \| Path, alphas_source1_path: str \| Path, alphas_source2_path: str \| Path | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray]` | Backward-compatible grouped ridge manipulation composed from the single-target and single-source helpers; returns held-out X1 prediction, X2 prediction, and measured target in that order. |
 
 ### `pipeline/pipeline_phases/mi_statistics.py`
 
@@ -245,7 +278,10 @@ File description: Python module for mi statistics-related project logic.
 
 File description: Python module for preprocessing layer-related project logic.
 
-No functions or methods defined in this file.
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `apply_saved_scaler (line 218)` | data: np.ndarray, scaler_path: str \| Path | Annotated: `np.ndarray` | Validate a real finite 2D sample matrix, transform it with one fitted scaler artifact, and require the scaler to preserve the complete input shape. General reusable preprocessing helper. |
+| `scale_func (line 262)` | source1: np.ndarray, source2: np.ndarray, target: np.ndarray, source1_scaler_path: str \| Path, source2_scaler_path: str \| Path, target_scaler_path: str \| Path | Annotated: `tuple[np.ndarray, np.ndarray, np.ndarray]` | Backward-compatible grouped scaler that delegates once per X1, X2, and target array and returns them in the same order. |
 
 ### `pipeline/pipeline_phases/report_results.py`
 

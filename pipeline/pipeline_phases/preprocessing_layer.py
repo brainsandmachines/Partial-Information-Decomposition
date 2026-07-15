@@ -215,33 +215,75 @@ def ridge_train_to_test_prediction(
 
 
 
-#Prepropessing function: Scaling the data
-def scale_func(source1,source2,target,source1_scaler_path,source2_scaler_path,target_scaler_path):
-    """
-    Scale the data using the provided scaler.
-    
+def apply_saved_scaler(
+    data: np.ndarray,
+    scaler_path: str | Path,
+) -> np.ndarray:
+    """Transform an array with a previously fitted scaler.
+
     Args:
-        source1 (np.ndarray): The first source data.
-        source2 (np.ndarray): The second source data.
-        target (np.ndarray): The target data.
-        source1_scaler_path (str): The path to the scaler for the first source.
-        source2_scaler_path (str): The path to the scaler for the second source.
-        target_scaler_path (str): The path to the scaler for the target.
+        data: NumPy array whose rows are samples and columns are features.
+        scaler_path: String or ``Path`` pointing to a joblib-serialized scaler
+            that provides a ``transform`` method compatible with ``data``.
 
     Returns:
-        np.ndarray: The scaled data.
+        NumPy array containing the scaler-transformed samples.
     """
 
-    scaler_source1 = joblib.load(source1_scaler_path)
-    scaler_source2 = joblib.load(source2_scaler_path)
-    scaler_target = joblib.load(target_scaler_path)
+    data_array = np.asarray(data)
+    if data_array.ndim != 2:
+        raise ValueError("data must be a two-dimensional array.")
+    if data_array.shape[0] == 0 or data_array.shape[1] == 0:
+        raise ValueError("data must contain at least one sample and feature.")
+    if not np.issubdtype(data_array.dtype, np.number) or np.iscomplexobj(data_array):
+        raise TypeError("data must contain real numeric values.")
+    if not np.isfinite(data_array).all():
+        raise ValueError("data contains NaN or infinite values.")
 
-    # Scale the data
-    scaled_source1 = scaler_source1.transform(source1)
-    scaled_source2 = scaler_source2.transform(source2)
-    scaled_target = scaler_target.transform(target)
+    scaler = joblib.load(Path(scaler_path))
+    if not callable(getattr(scaler, "transform", None)):
+        raise TypeError("The saved scaler artifact must provide a transform method.")
+
+    scaled_data = np.asarray(scaler.transform(data_array))
+    if scaled_data.ndim != 2 or scaled_data.shape != data_array.shape:
+        raise ValueError(
+            "The saved scaler must preserve the two-dimensional input shape: "
+            f"expected {data_array.shape}, found {scaled_data.shape}."
+        )
+    if not np.issubdtype(scaled_data.dtype, np.number) or np.iscomplexobj(scaled_data):
+        raise TypeError("The saved scaler must return real numeric values.")
+    if not np.isfinite(scaled_data).all():
+        raise ValueError("Scaled data contains NaN or infinite values.")
+
+    return scaled_data
+
+
+# Preprocessing function: Scaling the data
+def scale_func(
+    source1: np.ndarray,
+    source2: np.ndarray,
+    target: np.ndarray,
+    source1_scaler_path: str | Path,
+    source2_scaler_path: str | Path,
+    target_scaler_path: str | Path,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Scale two sources and a target with their saved fitted scalers.
+
+    Args:
+        source1: NumPy array containing the first source samples.
+        source2: NumPy array containing the second source samples.
+        target: NumPy array containing the target samples.
+        source1_scaler_path: String or ``Path`` to the first source scaler.
+        source2_scaler_path: String or ``Path`` to the second source scaler.
+        target_scaler_path: String or ``Path`` to the target scaler.
+
+    Returns:
+        Tuple containing the scaled first source, second source, and target in
+        the same order as the inputs.
+    """
+
+    scaled_source1 = apply_saved_scaler(source1, source1_scaler_path)
+    scaled_source2 = apply_saved_scaler(source2, source2_scaler_path)
+    scaled_target = apply_saved_scaler(target, target_scaler_path)
 
     return scaled_source1, scaled_source2, scaled_target
-
-
-    
