@@ -20,6 +20,15 @@ models:
   - convnext_base_classification
   - xcit_nano_12_p8_224_classification
   - xcit_nano_12_p16_224_classification
+  - swin_large_patch4_window7_224_classification
+  - jx_nest_tiny_classification
+  - pit_ti_224_classification
+  - vit_base_patch32_224_classification
+  - vit_base_patch16_224_classification
+  - tnt_s_patch16_224_classification
+  - crossvit_base_240_classification
+  - deit_base_patch16_224_classification
+  - levit_128_classification
 
 metadata:
   subj_id: subj01
@@ -58,7 +67,7 @@ artifact_templates:
     directory_template: pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)
     filename_template: alphas2.0_per_pc_{safe_model_name}_predictor_scaler.pkl
   ridge_alphas:
-    directory_template: pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)
+    directory_template: pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas
     filename_template: alphas2.0_per_pc_{safe_model_name}.npz
 
 pid_kwargs:

@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.analysis.pca_analysis.unique_search_pca import run_pid_pc_subset_search
+from pipeline.analysis.pca_analysis.unique_search_outputs.unique_search_pca import run_pid_pc_subset_search
 from pipeline.full_OTC.otc_experiment import PIPELINE_STEP_FUNCTIONS
 from pipeline.pipeline_utils import (
     pid_calc_adapter,

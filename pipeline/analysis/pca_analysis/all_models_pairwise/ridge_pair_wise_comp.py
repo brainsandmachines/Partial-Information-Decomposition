@@ -219,8 +219,8 @@ def main() -> None:
         None. CSV checkpoints and heatmaps are written to configured paths.
     """
 
-    config_path = Path(__file__).with_name("ridge_otc_pair_wise_comp.yaml")
-    with config_path.open("r", encoding="utf-8") as config_file:
+    config_path = "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_otc_pair_wise_comp.yaml"
+    with open(config_path, "r", encoding="utf-8") as config_file:
         otc_config = yaml.safe_load(config_file)
 
     configured_models = otc_config.get("models")

@@ -59,6 +59,9 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path,n_samp
         }
 
     """
+    hdf_path = Path(hdf_path)
+    pkl_info_path = Path(pkl_info_path)
+    neural_data_path = Path(neural_data_path)
     target_context = prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
     target_context["target"] = target_context.pop('neural_data')  # Add 'target' key for compatibility with PID pipeline
     if n_samples is not None:
