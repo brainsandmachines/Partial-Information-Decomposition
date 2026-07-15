@@ -39,12 +39,13 @@ def prepare_sources(model_name_1:str,model_name_2:str) -> dict[str, dict]:
 
 
 
-def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> dict:
+def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path,n_samples:int=None) -> dict:
     """Prepare target for feature extraction. 
     Inputs:
         hdf_path: path to hdf file containing neural data
         pkl_info_path: path to pkl file containing info about the neural data
         neural_data_path: path to the directory containing the neural data
+        n_samples: int, number of samples to extract
 
     Outputs: 
         per_subject_context = {
@@ -60,6 +61,12 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> di
     """
     target_context = prepare_subject_context(hdf_path,pkl_info_path,neural_data_path)
     target_context["target"] = target_context.pop('neural_data')  # Add 'target' key for compatibility with PID pipeline
+    if n_samples is not None:
+        print(f"NOTE! n_samples is not None, truncating target and image_ids_for_subj to n_sample:{n_samples}")
+        target_context["target"] = target_context["target"][:n_samples]
+        target_context["image_ids_for_subj"] = target_context["image_ids_for_subj"][:n_samples]
+        target_context["shared1000_subj"] = target_context["shared1000_subj"][:n_samples]
+    
     return target_context
 
 

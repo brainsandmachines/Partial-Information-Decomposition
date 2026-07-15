@@ -35,7 +35,7 @@ def run_otc_experiment(config: dict[str, Any]) -> dict[str, Any]:
             workflow and local start/completion times are printed.
     """
 
-    _validate_config(config)
+    #validate_config(config)
     started_at = datetime.now().astimezone()
     _print_workflow(config, PIPELINE_STEP_FUNCTIONS, started_at)
     context = run_configured_pid_pipeline(

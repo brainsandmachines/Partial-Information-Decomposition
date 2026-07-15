@@ -13,7 +13,7 @@ target_kwargs:
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
   pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
   neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
-  #n_images: 1000
+  n_samples: 400 #400 is the samllest number with shared images
 
 sources_kwargs:
   model_name_1: convnext_base_classification
@@ -24,8 +24,8 @@ choose_layer_kwargs:
 
 
 feature_extraction_kwargs:
-  model_name_1: convnext_base_classification
-  model_name_2: convnext_base_classification
+  batch_size_process: 120
+
 
 
   
@@ -37,9 +37,9 @@ preprocess_kwargs:
 
 
 feature_manipulation_kwargs:
-  pc_target_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl
-  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
-  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc_convnext_base_classification_predictor_scaler.pkl
+  pc_target_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl
+  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_convnext_base_classification.npz
+  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_convnext_base_classification.npz
 
 experiment_output_dir: /home/ohadshee/Desktop/Partial-Information-Decomposition/results/otc_experiments
 

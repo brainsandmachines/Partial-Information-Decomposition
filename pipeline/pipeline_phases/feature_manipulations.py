@@ -122,7 +122,7 @@ def feature_manipulation_ridge(source1,source2,target,target_context,seed,model_
 
     pca = joblib.load(pc_target_path)
     
-    with np.load(alphas_source1_path, allow_pickle=False) as archive:
+    with np.load(alphas_source1_path, allow_pickle=True) as archive:
         alphas_source1 = np.asarray(
             archive["alphas"],
             dtype=np.float64,

@@ -185,7 +185,6 @@ class PIDPipeline:
                 source_1,
                 source_2,
                 target,
-                target_context=target_context,
                 **(preprocess_kwargs or {}),
             )
     
@@ -194,6 +193,7 @@ class PIDPipeline:
            source_1,source_2,target = self.functions.feature_manipulation(source_1,
                 source_2,
                 target,
+                target_context=target_context,
                 **(feature_manipulation_kwargs or {}),
             )
 
