@@ -82,9 +82,9 @@ def find_alpha_per_pc(
 
     ridge_cv = ridge_model.named_steps["ridgecv"]
 
-    alphas_per_pc = np.asarray(
-        ridge_cv.alpha_,
-        dtype=np.float64,
+
+    alphas_per_pc = np.atleast_1d(
+    np.asarray(ridge_cv.alpha_, dtype=np.float64)
     )
 
     assert alphas_per_pc.shape == (target.shape[1],), (

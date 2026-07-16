@@ -53,6 +53,6 @@ pid_kwargs:
   rng_seed: 88
   config:
     device: cuda
-    bias_correction: true
-
+    bias_correction: false
+    
 report_kwargs: {}

@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 360, in <module>
+    hdf_path=stimulus_hdf_path,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 268, in main
+    mode=pca_mode,
+              ^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 190, in pca_func
+    data_array,
+         ^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/Simulations/PCA_rank/eigenvector_pca.py", line 369, in eigenvector_pca_cv
+    sample_press = _eigenvector_pca_cv_sample_press(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/Simulations/PCA_rank/eigenvector_pca.py", line 266, in _eigenvector_pca_cv_sample_press
+    print(f"Processing component {f} of {max_components}...✅")
+OSError: [Errno 116] Stale file handle

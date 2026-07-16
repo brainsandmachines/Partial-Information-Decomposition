@@ -2,3 +2,19 @@
 [2026-07-13T11:03:39.305] error: _get_joules_task: can't get info from slurmd
 [2026-07-13T11:03:39.305] error: slurm_get_node_energy: Connection reset by peer
 [2026-07-13T11:03:39.305] error: _get_joules_task: can't get info from slurmd
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 338, in <module>
+    "saved_paths": saved_paths,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 242, in main
+    model and held-out variance CSV. When None, nothing is written.
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 178, in pca_func
+    max_features = data_array.shape[1] - 1
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/Simulations/PCA_rank/eigenvector_pca.py", line 369, in eigenvector_pca_cv
+    sample_press = _eigenvector_pca_cv_sample_press(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/Simulations/PCA_rank/eigenvector_pca.py", line 266, in _eigenvector_pca_cv_sample_press
+    print(f"Processing component {f} of {max_components}...✅")
+OSError: [Errno 116] Stale file handle
