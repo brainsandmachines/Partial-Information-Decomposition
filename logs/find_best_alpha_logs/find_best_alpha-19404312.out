@@ -276,3 +276,451 @@ Feature extraction for model visformer_small_classification layer BatchNorm2d-21
 Finding best ridge alphas for 98 target PCs using 37632 features and 9000 samples.
 Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
 [Pipeline] .... (step 1 of 2) Processing standardscaler, total=   2.3s
+[Pipeline] ........... (step 2 of 2) Processing ridgecv, total= 2.5min
+
+Selected alpha and cross-validated R² for each PC:
+Finished finding best ridge alphas for each target PC.✅
+
+PC   1: alpha = 202359, CV R² = 0.211048
+
+PC   2: alpha = 95409.5, CV R² = 0.628154
+
+PC   3: alpha = 95409.5, CV R² = 0.665779
+
+PC   4: alpha = 95409.5, CV R² = 0.426000
+
+PC   5: alpha = 95409.5, CV R² = 0.506885
+
+PC   6: alpha = 202359, CV R² = 0.234455
+
+PC   7: alpha = 95409.5, CV R² = 0.434284
+
+PC   8: alpha = 202359, CV R² = 0.249630
+
+PC   9: alpha = 202359, CV R² = 0.178416
+
+PC  10: alpha = 202359, CV R² = 0.156671
+
+PC  11: alpha = 95409.5, CV R² = 0.370909
+
+PC  12: alpha = 202359, CV R² = 0.133273
+
+PC  13: alpha = 202359, CV R² = 0.220930
+
+PC  14: alpha = 202359, CV R² = 0.237379
+
+PC  15: alpha = 202359, CV R² = 0.267155
+
+PC  16: alpha = 202359, CV R² = 0.218589
+
+PC  17: alpha = 202359, CV R² = 0.267173
+
+PC  18: alpha = 202359, CV R² = 0.148251
+
+PC  19: alpha = 202359, CV R² = 0.180255
+
+PC  20: alpha = 202359, CV R² = 0.183213
+
+PC  21: alpha = 202359, CV R² = 0.112555
+
+PC  22: alpha = 429193, CV R² = 0.074569
+
+PC  23: alpha = 429193, CV R² = 0.039028
+
+PC  24: alpha = 202359, CV R² = 0.109902
+
+PC  25: alpha = 202359, CV R² = 0.090664
+
+PC  26: alpha = 429193, CV R² = 0.047091
+
+PC  27: alpha = 429193, CV R² = 0.062192
+
+PC  28: alpha = 202359, CV R² = 0.093258
+
+PC  29: alpha = 202359, CV R² = 0.118523
+
+PC  30: alpha = 429193, CV R² = 0.036711
+
+PC  31: alpha = 429193, CV R² = 0.052158
+
+PC  32: alpha = 202359, CV R² = 0.137999
+
+PC  33: alpha = 202359, CV R² = 0.164223
+
+PC  34: alpha = 202359, CV R² = 0.072470
+
+PC  35: alpha = 95409.5, CV R² = 0.182192
+
+PC  36: alpha = 202359, CV R² = 0.126115
+
+PC  37: alpha = 429193, CV R² = 0.049140
+
+PC  38: alpha = 202359, CV R² = 0.148055
+
+PC  39: alpha = 202359, CV R² = 0.106981
+
+PC  40: alpha = 429193, CV R² = 0.059871
+
+PC  41: alpha = 202359, CV R² = 0.151333
+
+PC  42: alpha = 202359, CV R² = 0.108268
+
+PC  43: alpha = 202359, CV R² = 0.074086
+
+PC  44: alpha = 202359, CV R² = 0.120577
+
+PC  45: alpha = 202359, CV R² = 0.059752
+
+PC  46: alpha = 202359, CV R² = 0.200472
+
+PC  47: alpha = 202359, CV R² = 0.073372
+
+PC  48: alpha = 202359, CV R² = 0.081413
+
+PC  49: alpha = 429193, CV R² = 0.067860
+
+PC  50: alpha = 202359, CV R² = 0.097531
+
+PC  51: alpha = 202359, CV R² = 0.118979
+
+PC  52: alpha = 429193, CV R² = 0.044973
+
+PC  53: alpha = 202359, CV R² = 0.135166
+
+PC  54: alpha = 202359, CV R² = 0.102553
+
+PC  55: alpha = 429193, CV R² = 0.048841
+
+PC  56: alpha = 202359, CV R² = 0.105169
+
+PC  57: alpha = 202359, CV R² = 0.166186
+
+PC  58: alpha = 202359, CV R² = 0.063421
+
+PC  59: alpha = 202359, CV R² = 0.097416
+
+PC  60: alpha = 202359, CV R² = 0.060268
+
+PC  61: alpha = 429193, CV R² = 0.048916
+
+PC  62: alpha = 429193, CV R² = 0.052824
+
+PC  63: alpha = 202359, CV R² = 0.081280
+
+PC  64: alpha = 429193, CV R² = 0.033417
+
+PC  65: alpha = 202359, CV R² = 0.066005
+
+PC  66: alpha = 429193, CV R² = 0.042798
+
+PC  67: alpha = 429193, CV R² = 0.034185
+
+PC  68: alpha = 429193, CV R² = 0.060260
+
+PC  69: alpha = 202359, CV R² = 0.067001
+
+PC  70: alpha = 202359, CV R² = 0.072270
+
+PC  71: alpha = 429193, CV R² = 0.045894
+
+PC  72: alpha = 429193, CV R² = 0.042319
+
+PC  73: alpha = 429193, CV R² = 0.043113
+
+PC  74: alpha = 429193, CV R² = 0.051419
+
+PC  75: alpha = 202359, CV R² = 0.069611
+
+PC  76: alpha = 429193, CV R² = 0.022988
+
+PC  77: alpha = 429193, CV R² = 0.047029
+
+PC  78: alpha = 429193, CV R² = 0.027799
+
+PC  79: alpha = 429193, CV R² = 0.068955
+
+PC  80: alpha = 429193, CV R² = 0.050607
+
+PC  81: alpha = 429193, CV R² = 0.045694
+
+PC  82: alpha = 202359, CV R² = 0.092483
+
+PC  83: alpha = 202359, CV R² = 0.070011
+
+PC  84: alpha = 202359, CV R² = 0.091615
+
+PC  85: alpha = 429193, CV R² = 0.050121
+
+PC  86: alpha = 429193, CV R² = 0.028991
+
+PC  87: alpha = 202359, CV R² = 0.068857
+
+PC  88: alpha = 429193, CV R² = 0.025480
+
+PC  89: alpha = 429193, CV R² = 0.024034
+
+PC  90: alpha = 202359, CV R² = 0.073237
+
+PC  91: alpha = 429193, CV R² = 0.034893
+
+PC  92: alpha = 202359, CV R² = 0.070705
+
+PC  93: alpha = 429193, CV R² = 0.041891
+
+PC  94: alpha = 429193, CV R² = 0.022162
+
+PC  95: alpha = 202359, CV R² = 0.049354
+
+PC  96: alpha = 429193, CV R² = 0.032154
+
+PC  97: alpha = 429193, CV R² = 0.027436
+
+PC  98: alpha = 202359, CV R² = 0.053717
+
+Mean cross-validated R² across PCs: 0.119503
+
+======================================================================================
+
+Chosen model: convit_base_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for convit_base_classification: {'model_name': 'convit_base', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('convit_base', pretrained = True)"}
+Image transforms for convit_base_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: convit_base_classification
+Ordered layers from model: ['Conv2d-1', 'Identity-1', 'PatchEmbed-1', 'Dropout-1', 'LayerNorm-1', 'Linear-1', 'Linear-2', 'Dropout-2', 'Linear-3', 'Linear-4', 'Dropout-3', 'GPSA-1', 'Identity-2', 'LayerNorm-2', 'Linear-5', 'GELU-1', 'Dropout-4', 'Identity-3', 'Linear-6', 'Dropout-5', 'Mlp-1', 'Identity-4', 'Block-1', 'LayerNorm-3', 'Linear-7', 'Linear-8', 'Dropout-6', 'Linear-9', 'Linear-10', 'Dropout-7', 'GPSA-2', 'Identity-5', 'LayerNorm-4', 'Linear-11', 'GELU-2', 'Dropout-8', 'Identity-6', 'Linear-12', 'Dropout-9', 'Mlp-2', 'Identity-7', 'Block-2', 'LayerNorm-5', 'Linear-13', 'Linear-14', 'Dropout-10', 'Linear-15', 'Linear-16', 'Dropout-11', 'GPSA-3', 'Identity-8', 'LayerNorm-6', 'Linear-17', 'GELU-3', 'Dropout-12', 'Identity-9', 'Linear-18', 'Dropout-13', 'Mlp-3', 'Identity-10', 'Block-3', 'LayerNorm-7', 'Linear-19', 'Linear-20', 'Dropout-14', 'Linear-21', 'Linear-22', 'Dropout-15', 'GPSA-4', 'Identity-11', 'LayerNorm-8', 'Linear-23', 'GELU-4', 'Dropout-16', 'Identity-12', 'Linear-24', 'Dropout-17', 'Mlp-4', 'Identity-13', 'Block-4', 'LayerNorm-9', 'Linear-25', 'Linear-26', 'Dropout-18', 'Linear-27', 'Linear-28', 'Dropout-19', 'GPSA-5', 'Identity-14', 'LayerNorm-10', 'Linear-29', 'GELU-5', 'Dropout-20', 'Identity-15', 'Linear-30', 'Dropout-21', 'Mlp-5', 'Identity-16', 'Block-5', 'LayerNorm-11', 'Linear-31', 'Linear-32', 'Dropout-22', 'Linear-33', 'Linear-34', 'Dropout-23', 'GPSA-6', 'Identity-17', 'LayerNorm-12', 'Linear-35', 'GELU-6', 'Dropout-24', 'Identity-18', 'Linear-36', 'Dropout-25', 'Mlp-6', 'Identity-19', 'Block-6', 'LayerNorm-13', 'Linear-37', 'Linear-38', 'Dropout-26', 'Linear-39', 'Linear-40', 'Dropout-27', 'GPSA-7', 'Identity-20', 'LayerNorm-14', 'Linear-41', 'GELU-7', 'Dropout-28', 'Identity-21', 'Linear-42', 'Dropout-29', 'Mlp-7', 'Identity-22', 'Block-7', 'LayerNorm-15', 'Linear-43', 'Linear-44', 'Dropout-30', 'Linear-45', 'Linear-46', 'Dropout-31', 'GPSA-8', 'Identity-23', 'LayerNorm-16', 'Linear-47', 'GELU-8', 'Dropout-32', 'Identity-24', 'Linear-48', 'Dropout-33', 'Mlp-8', 'Identity-25', 'Block-8', 'LayerNorm-17', 'Linear-49', 'Linear-50', 'Dropout-34', 'Linear-51', 'Linear-52', 'Dropout-35', 'GPSA-9', 'Identity-26', 'LayerNorm-18', 'Linear-53', 'GELU-9', 'Dropout-36', 'Identity-27', 'Linear-54', 'Dropout-37', 'Mlp-9', 'Identity-28', 'Block-9', 'LayerNorm-19', 'Linear-55', 'Linear-56', 'Dropout-38', 'Linear-57', 'Linear-58', 'Dropout-39', 'GPSA-10', 'Identity-29', 'LayerNorm-20', 'Linear-59', 'GELU-10', 'Dropout-40', 'Identity-30', 'Linear-60', 'Dropout-41', 'Mlp-10', 'Identity-31', 'Block-10', 'LayerNorm-21', 'Linear-61', 'Dropout-42', 'Linear-62', 'Dropout-43', 'MHSA-1', 'Identity-32', 'LayerNorm-22', 'Linear-63', 'GELU-11', 'Dropout-44', 'Identity-33', 'Linear-64', 'Dropout-45', 'Mlp-11', 'Identity-34', 'Block-11', 'LayerNorm-23', 'Linear-65', 'Dropout-46', 'Linear-66', 'Dropout-47', 'MHSA-2', 'Identity-35', 'LayerNorm-24', 'Linear-67', 'GELU-12', 'Dropout-48', 'Identity-36', 'Linear-68', 'Dropout-49', 'Mlp-12', 'Identity-37', 'Block-12', 'LayerNorm-25', 'Dropout-50', 'Linear-69', 'ConVit-1']
+Total number of layers: 232
+
+==================================================
+Processing layer: LayerNorm-22 from model: convit_base_classification
+
+For model convit_base_classification Layer LayerNorm-22: Extracting features for 9000 images in batches of 28...
+Feature extraction for model convit_base_classification layer LayerNorm-22 completed in 2959.03 seconds.
+Finding best ridge alphas for 98 target PCs using 151296 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] .... (step 1 of 2) Processing standardscaler, total=   9.0s
+[Pipeline] ........... (step 2 of 2) Processing ridgecv, total= 6.3min
+
+Selected alpha and cross-validated R² for each PC:
+Finished finding best ridge alphas for each target PC.✅
+
+PC   1: alpha = 429193, CV R² = 0.215244
+
+PC   2: alpha = 202359, CV R² = 0.627383
+
+PC   3: alpha = 95409.5, CV R² = 0.665740
+
+PC   4: alpha = 202359, CV R² = 0.426485
+
+PC   5: alpha = 95409.5, CV R² = 0.497032
+
+PC   6: alpha = 202359, CV R² = 0.241776
+
+PC   7: alpha = 202359, CV R² = 0.419290
+
+PC   8: alpha = 429193, CV R² = 0.252869
+
+PC   9: alpha = 429193, CV R² = 0.182446
+
+PC  10: alpha = 429193, CV R² = 0.154392
+
+PC  11: alpha = 202359, CV R² = 0.357333
+
+PC  12: alpha = 429193, CV R² = 0.130598
+
+PC  13: alpha = 429193, CV R² = 0.212071
+
+PC  14: alpha = 429193, CV R² = 0.234460
+
+PC  15: alpha = 429193, CV R² = 0.263496
+
+PC  16: alpha = 429193, CV R² = 0.219184
+
+PC  17: alpha = 202359, CV R² = 0.257099
+
+PC  18: alpha = 429193, CV R² = 0.139103
+
+PC  19: alpha = 429193, CV R² = 0.177094
+
+PC  20: alpha = 202359, CV R² = 0.187947
+
+PC  21: alpha = 429193, CV R² = 0.117450
+
+PC  22: alpha = 429193, CV R² = 0.080776
+
+PC  23: alpha = 910298, CV R² = 0.040966
+
+PC  24: alpha = 429193, CV R² = 0.111437
+
+PC  25: alpha = 429193, CV R² = 0.098330
+
+PC  26: alpha = 910298, CV R² = 0.044315
+
+PC  27: alpha = 910298, CV R² = 0.060793
+
+PC  28: alpha = 429193, CV R² = 0.093810
+
+PC  29: alpha = 429193, CV R² = 0.115857
+
+PC  30: alpha = 910298, CV R² = 0.041891
+
+PC  31: alpha = 429193, CV R² = 0.052208
+
+PC  32: alpha = 429193, CV R² = 0.137244
+
+PC  33: alpha = 202359, CV R² = 0.167223
+
+PC  34: alpha = 429193, CV R² = 0.069146
+
+PC  35: alpha = 202359, CV R² = 0.177875
+
+PC  36: alpha = 429193, CV R² = 0.115373
+
+PC  37: alpha = 910298, CV R² = 0.047223
+
+PC  38: alpha = 429193, CV R² = 0.136247
+
+PC  39: alpha = 429193, CV R² = 0.105430
+
+PC  40: alpha = 429193, CV R² = 0.063240
+
+PC  41: alpha = 202359, CV R² = 0.141251
+
+PC  42: alpha = 429193, CV R² = 0.101861
+
+PC  43: alpha = 429193, CV R² = 0.071711
+
+PC  44: alpha = 429193, CV R² = 0.115006
+
+PC  45: alpha = 429193, CV R² = 0.057542
+
+PC  46: alpha = 202359, CV R² = 0.185206
+
+PC  47: alpha = 429193, CV R² = 0.068363
+
+PC  48: alpha = 429193, CV R² = 0.080720
+
+PC  49: alpha = 429193, CV R² = 0.069502
+
+PC  50: alpha = 429193, CV R² = 0.095401
+
+PC  51: alpha = 429193, CV R² = 0.115620
+
+PC  52: alpha = 429193, CV R² = 0.048035
+
+PC  53: alpha = 429193, CV R² = 0.133132
+
+PC  54: alpha = 429193, CV R² = 0.093308
+
+PC  55: alpha = 910298, CV R² = 0.049903
+
+PC  56: alpha = 429193, CV R² = 0.095211
+
+PC  57: alpha = 202359, CV R² = 0.162251
+
+PC  58: alpha = 429193, CV R² = 0.062268
+
+PC  59: alpha = 429193, CV R² = 0.084803
+
+PC  60: alpha = 429193, CV R² = 0.057880
+
+PC  61: alpha = 910298, CV R² = 0.044396
+
+PC  62: alpha = 429193, CV R² = 0.056329
+
+PC  63: alpha = 429193, CV R² = 0.083279
+
+PC  64: alpha = 910298, CV R² = 0.032957
+
+PC  65: alpha = 429193, CV R² = 0.060112
+
+PC  66: alpha = 910298, CV R² = 0.042323
+
+PC  67: alpha = 910298, CV R² = 0.034214
+
+PC  68: alpha = 910298, CV R² = 0.054784
+
+PC  69: alpha = 429193, CV R² = 0.063761
+
+PC  70: alpha = 429193, CV R² = 0.076963
+
+PC  71: alpha = 429193, CV R² = 0.045408
+
+PC  72: alpha = 429193, CV R² = 0.045423
+
+PC  73: alpha = 910298, CV R² = 0.043511
+
+PC  74: alpha = 910298, CV R² = 0.051252
+
+PC  75: alpha = 429193, CV R² = 0.070721
+
+PC  76: alpha = 910298, CV R² = 0.023658
+
+PC  77: alpha = 910298, CV R² = 0.048862
+
+PC  78: alpha = 910298, CV R² = 0.026941
+
+PC  79: alpha = 429193, CV R² = 0.068948
+
+PC  80: alpha = 429193, CV R² = 0.051032
+
+PC  81: alpha = 429193, CV R² = 0.047949
+
+PC  82: alpha = 429193, CV R² = 0.099747
+
+PC  83: alpha = 429193, CV R² = 0.071798
+
+PC  84: alpha = 429193, CV R² = 0.093023
+
+PC  85: alpha = 910298, CV R² = 0.047012
+
+PC  86: alpha = 910298, CV R² = 0.024578
+
+PC  87: alpha = 429193, CV R² = 0.065696
+
+PC  88: alpha = 910298, CV R² = 0.022044
+
+PC  89: alpha = 910298, CV R² = 0.025011
+
+PC  90: alpha = 429193, CV R² = 0.078424
+
+PC  91: alpha = 910298, CV R² = 0.032929
+
+PC  92: alpha = 429193, CV R² = 0.065368
+
+PC  93: alpha = 910298, CV R² = 0.039649
+
+PC  94: alpha = 910298, CV R² = 0.020265
+
+PC  95: alpha = 429193, CV R² = 0.050775
+
+PC  96: alpha = 910298, CV R² = 0.034758
+
+PC  97: alpha = 910298, CV R² = 0.025187
+
+PC  98: alpha = 429193, CV R² = 0.047873
+
+Mean cross-validated R² across PCs: 0.117794
+
+======================================================================================
+
+Chosen model: ViT-B_32_clip
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
