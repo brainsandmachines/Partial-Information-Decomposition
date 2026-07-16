@@ -23,6 +23,14 @@ def make_str_as_path(config: dict[str, any]) -> dict[str, any]:
             config[key] = make_str_as_path(value)
     return config
 
+def check_path_exists(config: dict[str, any]) -> None:
+    """Check if the paths in the config exist."""
+    for key, value in config.items():
+        if isinstance(value, Path) and not value.exists():
+            raise FileNotFoundError(f"Path {value} does not exist.")
+        elif isinstance(value, dict):
+            check_path_exists(value)
+
 if __name__ == "__main__":
     config_name = 'ridge_otc_config'
     config_path = Path(__file__).with_name(f"{config_name}.yaml")
@@ -38,6 +46,6 @@ if __name__ == "__main__":
             config['feature_manipulation_kwargs']['seed'] = config['pid_kwargs']['rng_seed'] 
 
         config = make_str_as_path(config)
-        
+        check_path_exists(config)
     print(f"\nRunning full-OTC PID experiment with config: {config_name}!!!")
     results = run_otc_experiment(config)

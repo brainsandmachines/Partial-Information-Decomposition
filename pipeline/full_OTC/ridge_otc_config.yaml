@@ -59,8 +59,8 @@ preprocess_kwargs:
 
 feature_manipulation_kwargs:
   pc_target_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl
-  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_xcit_nano_12_p8_224_classification.npz
-  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/models_dir/alphas2.0_per_pc_xcit_nano_12_p16_224_classification.npz
+  alphas_source1_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas/alphas2.0_per_pc_xcit_nano_12_p8_224_classification.npz
+  alphas_source2_path: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas/alphas2.0_per_pc_xcit_nano_12_p16_224_classification.npz
 
 experiment_output_dir: /home/ohadshee/Desktop/Partial-Information-Decomposition/results/otc_experiments
 

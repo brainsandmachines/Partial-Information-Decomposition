@@ -311,11 +311,11 @@ def main(
     unique_target_context["image_ids_for_subj"] = np.asarray(
     target["image_ids_for_subj"])[unique_mask]
 
-    unique_target_context["neural_data"] = np.asarray(
-    target["neural_data"])[unique_mask]
+    unique_target_context["target"] = np.asarray(
+    target["target"])[unique_mask]
 
 
-    pca_target = load_and_apply_pca(unique_target_context["neural_data"], pc_path, scaler_path)
+    pca_target = load_and_apply_pca(unique_target_context["target"], pc_path, scaler_path)
 
     #Save memory 
     del target 
@@ -411,6 +411,14 @@ def main(
 
 if __name__ == "__main__":
 
+    def check_path_exists(config: dict[str, any]) -> None:
+        """Check if the paths in the config exist."""
+        for key, value in config.items():
+            if isinstance(value, Path) and not value.exists():
+                raise FileNotFoundError(f"Path {value} does not exist.")
+            elif isinstance(value, dict):
+                check_path_exists(value)
+
     model_list = ['coat_lite_tiny_classification','visformer_small_classification',
         'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
@@ -428,6 +436,25 @@ if __name__ == "__main__":
 
     path_to_alphas_csv = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
     predictor_scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)')
+    
+    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
+    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas')
+        
+    path_config = {
+        "path_to_results": path_to_results,
+        "scaler_path": scaler_path,
+        "pc_path": pc_path,
+        "hdf_path": hdf_path,
+        "pkl_info_path": pkl_info_path,
+        "neural_data_path": neural_data_path,
+        "path_to_alphas_csv": path_to_alphas_csv,
+        "predictor_scaler_path": predictor_scaler_path,
+        "csv_path": csv_path,
+        "output_dir": output_dir
+    }
+    
+    check_path_exists(path_config)
+    
     for source_name in model_list:
 
         print("\nChosen model:", source_name  )
@@ -435,6 +462,5 @@ if __name__ == "__main__":
 
         main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
     
-    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
-    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas')
+
     split_alphas_csv_by_model(csv_path, output_dir)
