@@ -1,9 +1,0 @@
-------------------------------------
-Tue 07 Jul 2026 09:21:23 IDT
-SLURM_JOBID:		19114662
-SLURM_JOB_NODELIST:	ise-cpu-intl-09
-SLURM_SCRATCH_DIR:	
-Allocated Resouces:	cpu - 4 / mem - 16384 MB / gpu - 
-SLURM_GPU_INDEX:	
-Running as ohadshee from golan.neuro account with normal QOS
-------------------------------------

@@ -410,14 +410,14 @@ if __name__ == "__main__":
         #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
-    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100_no_variance_standardization/subj01_pca_model.pkl')
+    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl')
     
     hdf_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5')
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
-    alphas_csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/no_variance_standardization/alphas2.0_per_pc.csv')
-    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/no_variance_standardization/alphas')
+    alphas_csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results2/all_models_alphas.csv')
+    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results2/alphas_')
         
     path_config = {
         "path_to_results": path_to_results,

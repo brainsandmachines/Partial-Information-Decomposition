@@ -155,7 +155,6 @@ def pca_func(
     data: np.ndarray,
     mode: str = "eigenvector_CV",
     max_features: int | None = None,
-    variance_threshold: float = 0.99,
 ) -> dict[str, Any]:
     """Select a component count and fit centered, unstandardized PCA.
 
@@ -181,12 +180,12 @@ def pca_func(
         print("Running PCA by variance threshold")
         return pca_by_variance(
             data_array,
-            variance_threshold=variance_threshold,
+            variance_threshold=max_features,
         )
 
     if mode == "eigenvector_CV":
-        print("Running Eigenvector PCA with cross-validation")
-        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=100/checkpointmax=100.csv'
+        print("\nRunning Eigenvector PCA with cross-validation!!!")
+        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200.csv'
         output = eigenvector_pca_cv(
             data_array,
             max_components=max_features,
@@ -269,7 +268,6 @@ def main(
         mode=pca_mode,
         data=data_split["unique_neural_data"],
         max_features=max_features,
-        variance_threshold=variance_threshold,
     )
 
     heldout_scores = heldout_pca(
@@ -356,7 +354,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100_no_variance_standardization'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -364,6 +362,6 @@ if __name__ == "__main__":
         neural_data_path=subject_neural_data_path,
         variance_threshold=1.0,
         save_models_path=Path(save_path),
-        max_features=100,
-        pca_mode="missmda_CV",
+        max_features=200,
+        pca_mode="pca_by_variance",
     )

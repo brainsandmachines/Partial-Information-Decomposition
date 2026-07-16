@@ -964,3 +964,163 @@ Mutual Information Results:
   bi_mi_1: 14.274800874637695
   bi_mi_2: 11.638209367553007
 Completed PID for pair: semnasnet_100_classification, xcit_nano_12_p8_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 12.666525950471172
+  unq1: 1.6082749241665226
+  unq2: 0.0
+  syn: 1.0078508013068905
+Mutual Information Results:
+  tri_mi: 15.282651675944585
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 12.666525950471172
+Completed PID for pair: semnasnet_100_classification, xcit_nano_12_p16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.274800874637695
+  unq1: 0.0
+  unq2: 1.7430338227746809
+  syn: 0.8015029212431983
+Mutual Information Results:
+  tri_mi: 16.819337618655574
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 16.017834697412376
+Completed PID for pair: semnasnet_100_classification, swin_large_patch4_window7_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.274800874637695
+  unq1: 0.0
+  unq2: 1.4840849484050231
+  syn: 1.2702242250678708
+Mutual Information Results:
+  tri_mi: 17.02911004811059
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 15.758885823042718
+Completed PID for pair: semnasnet_100_classification, jx_nest_tiny_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.274800874637695
+  unq1: 0.0
+  unq2: 0.015431722605807607
+  syn: 1.644601312987163
+Mutual Information Results:
+  tri_mi: 15.934833910230665
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 14.290232597243502
+Completed PID for pair: semnasnet_100_classification, pit_ti_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.586018298855532
+  unq1: 0.6887825757821631
+  unq2: 0.0
+  syn: 1.7290388898837143
+Mutual Information Results:
+  tri_mi: 16.00383976452141
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 13.586018298855532
+Completed PID for pair: semnasnet_100_classification, vit_base_patch32_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.274800874637695
+  unq1: 0.0
+  unq2: 0.525238583894339
+  syn: 1.7703759355067064
+Mutual Information Results:
+  tri_mi: 16.57041539403874
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 14.800039458532034
+Completed PID for pair: semnasnet_100_classification, vit_base_patch16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.937536280274653
+  unq1: 0.3372645943630417
+  unq2: 0.0
+  syn: 1.7925715967976394
+Mutual Information Results:
+  tri_mi: 16.067372471435334
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 13.937536280274653
+Completed PID for pair: semnasnet_100_classification, tnt_s_patch16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.274800874637695
+  unq1: 0.0
+  unq2: 1.432962969845196
+  syn: 1.208744468005925
+Mutual Information Results:
+  tri_mi: 16.916508312488816
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 15.70776384448289
+Completed PID for pair: semnasnet_100_classification, crossvit_base_240_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.274800874637695
+  unq1: 0.0
+  unq2: 1.2515408048831453
+  syn: 1.2583501827077228
+Mutual Information Results:
+  tri_mi: 16.784691862228563
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 15.52634167952084
+Completed PID for pair: semnasnet_100_classification, deit_base_patch16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.499539677848347
+  unq1: 0.7752611967893479
+  unq2: 0.0
+  syn: 1.251087353066854
+Mutual Information Results:
+  tri_mi: 15.525888227704549
+  bi_mi_1: 14.274800874637695
+  bi_mi_2: 13.499539677848347
+Completed PID for pair: semnasnet_100_classification, levit_128_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.148621652329805
+  unq1: 0.0
+  unq2: 0.24987109776151684
+  syn: 1.2036299721449382
+Mutual Information Results:
+  tri_mi: 15.60212272223626
+  bi_mi_1: 14.148621652329805
+  bi_mi_2: 14.398492750091322
+Completed PID for pair: cspresnet50_classification, mobilenetv3_large_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.623027293820545
+  unq1: 0.5255943585092595
+  unq2: 0.0
+  syn: 1.240417151792574
+Mutual Information Results:
+  tri_mi: 15.389038804122379
+  bi_mi_1: 14.148621652329805
+  bi_mi_2: 13.623027293820545
+Completed PID for pair: cspresnet50_classification, ghostnet_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.148621652329805
+  unq1: 0.0
+  unq2: 2.6178456422552294
+  syn: 0.6212614203367508
+Mutual Information Results:
+  tri_mi: 17.387728714921785
+  bi_mi_1: 14.148621652329805
+  bi_mi_2: 16.766467294585034
+Completed PID for pair: cspresnet50_classification, convnext_base_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 11.638209367553007
+  unq1: 2.5104122847767982
+  unq2: 0.0
+  syn: 1.179764953824396
+Mutual Information Results:
+  tri_mi: 15.3283866061542
+  bi_mi_1: 14.148621652329805
+  bi_mi_2: 11.638209367553007
+Completed PID for pair: cspresnet50_classification, xcit_nano_12_p8_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 12.666525950471172
+  unq1: 1.4820957018586327
+  unq2: 0.0
+  syn: 1.0711891409970313
+Mutual Information Results:
+  tri_mi: 15.219810793326836
+  bi_mi_1: 14.148621652329805
+  bi_mi_2: 12.666525950471172
+Completed PID for pair: cspresnet50_classification, xcit_nano_12_p16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 14.148621652329805
+  unq1: 0.0
+  unq2: 1.8692130450825708
+  syn: 0.9022268854527411
+Mutual Information Results:
+  tri_mi: 16.920061582865117
+  bi_mi_1: 14.148621652329805
+  bi_mi_2: 16.017834697412376
+Completed PID for pair: cspresnet50_classification, swin_large_patch4_window7_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
