@@ -1,4 +1,4 @@
-"""Plot held-out explained variance from subject-level PCA analysis."""
+"""Plot subject-level PCA variance and pairwise unique information."""
 
 from __future__ import annotations
 
@@ -7,6 +7,121 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+
+def plot_cumulative_unique_information(
+    csv_path: str | Path,
+    output_path: str | Path | None = None,
+    *,
+    model_1_column: str = "model_1",
+    model_2_column: str = "model_2",
+    unique_1_column: str = "unq1",
+    unique_2_column: str = "unq2",
+    dpi: int = 300,
+) -> Path:
+    """Plot cumulative pairwise unique information for each model.
+
+    Inputs:
+        csv_path: str or Path, path to a pairwise PID results CSV. Each row
+            must associate ``unique_1_column`` with ``model_1_column`` and
+            ``unique_2_column`` with ``model_2_column``.
+        output_path: str, Path, or None, destination image path. When None,
+            save beside the CSV with a ``_cumulative_unique_information.png``
+            suffix.
+        model_1_column: str, column containing the source-1 model names.
+        model_2_column: str, column containing the source-2 model names.
+        unique_1_column: str, column containing source-1 unique information.
+        unique_2_column: str, column containing source-2 unique information.
+        dpi: int, resolution of the saved image.
+
+    Output:
+        figure_path: Path, location of the saved bar graph. Bars contain the
+            sum of each model's unique information across all of its pairwise
+            comparisons and are ordered from highest to lowest.
+    """
+
+    pairwise_csv_path = Path(csv_path)
+    pairwise_table = pd.read_csv(pairwise_csv_path)
+    required_columns = {
+        model_1_column,
+        model_2_column,
+        unique_1_column,
+        unique_2_column,
+    }
+    missing_columns = required_columns.difference(pairwise_table.columns)
+    if missing_columns:
+        raise ValueError(
+            "Pairwise PID CSV is missing required columns: "
+            f"{sorted(missing_columns)}"
+        )
+    if pairwise_table.empty:
+        raise ValueError("Pairwise PID CSV contains no model comparisons.")
+    if pairwise_table[[model_1_column, model_2_column]].isna().any().any():
+        raise ValueError("Model-name columns cannot contain missing values.")
+
+    unique_1 = pd.to_numeric(
+        pairwise_table[unique_1_column],
+        errors="raise",
+    ).to_numpy(dtype=float)
+    unique_2 = pd.to_numeric(
+        pairwise_table[unique_2_column],
+        errors="raise",
+    ).to_numpy(dtype=float)
+    if not np.all(np.isfinite(unique_1)) or not np.all(np.isfinite(unique_2)):
+        raise ValueError("Unique-information values must be finite.")
+
+    model_contributions = pd.DataFrame(
+        {
+            "model": pd.concat(
+                [
+                    pairwise_table[model_1_column],
+                    pairwise_table[model_2_column],
+                ],
+                ignore_index=True,
+            ),
+            "unique_information": np.concatenate([unique_1, unique_2]),
+        }
+    )
+    cumulative_unique = (
+        model_contributions.groupby("model", as_index=False, sort=False)[
+            "unique_information"
+        ]
+        .sum()
+        .sort_values(
+            ["unique_information", "model"],
+            ascending=[False, True],
+            kind="stable",
+        )
+    )
+
+    figure_width = min(24.0, max(8.0, 0.55 * len(cumulative_unique)))
+    figure, axis = plt.subplots(
+        figsize=(figure_width, 6.0),
+        constrained_layout=True,
+    )
+    axis.bar(
+        cumulative_unique["model"],
+        cumulative_unique["unique_information"],
+        color="#4C72B0",
+        alpha=0.85,
+    )
+    axis.set_xlabel("Model")
+    axis.set_ylabel("Cumulative unique information")
+    axis.set_title("Cumulative unique information by model")
+    axis.tick_params(axis="x", labelrotation=90)
+    axis.grid(axis="y", alpha=0.3)
+
+    figure_path = (
+        Path(output_path)
+        if output_path is not None
+        else pairwise_csv_path.with_name(
+            f"{pairwise_csv_path.stem}_cumulative_unique_information.png"
+        )
+    )
+    figure_path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(figure_path, dpi=dpi, bbox_inches="tight")
+    plt.close(figure)
+    return figure_path
 
 
 def plot_heldout_variance_explained(
@@ -245,13 +360,19 @@ def plot_heldout_variance_explained(
 
 
 if __name__ == "__main__":
-    plot_heldout_variance_explained(
-        variance_csv_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_results/subj01_heldout_pca_variance_explained.csv",
-        output_path="/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj01_heldout_pca_variance_explained.png",
-        show_cumulative=False,
-        show_training=False,
-        plot_training_minus_heldout=False,
-        separate_panels=True,
-        dpi=600,
-        number_of_pcs=300,
-    )
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_srp/pairwise_pid_results_srp_pca.csv"
+    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_srp/srp_comulative_sum.png"
+    
+    # plot_heldout_variance_explained(
+    #     variance_csv_path=csv_path,
+    #     output_path=out_path,
+    #     show_cumulative=False,
+    #     show_training=False,
+    #     plot_training_minus_heldout=False,
+    #     separate_panels=True,
+    #     dpi=600,
+    #     number_of_pcs=300,
+    # )
+
+
+    plot_cumulative_unique_information(csv_path=csv_path, output_path=out_path)
