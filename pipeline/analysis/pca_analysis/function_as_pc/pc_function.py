@@ -93,6 +93,7 @@ def pc_function_analysis(
     pkl_info_path: str | Path,
     neural_data_path: str | Path,
     results_dir: str | Path | None = None,
+    plot_dir: str | Path | None = None,
 ) -> dict[str, dict[str, dict[int, dict[str, Any]]]]:
     """Calculate PID and MI for each model pair and cumulative target-PC count.
 
@@ -108,6 +109,8 @@ def pc_function_analysis(
         neural_data_path: str or Path pointing to the neural response data.
         results_dir: str, Path, or None. When provided, one pickle is saved
             after completing each model pair.
+        plot_dir: str, Path, or None. When provided, the absolute and
+            normalized plots are saved immediately after each model pair.
 
     Outputs:
         dict nested as ``model_1 -> model_2 -> number_of_target_pcs``. Each
@@ -190,6 +193,15 @@ def pc_function_analysis(
             results[model_1][model_2] = pair_results
             if results_dir is not None:
                 _save_pair_results(pair_results, model_1, model_2, results_dir)
+            if plot_dir is not None:
+                absolute_path, normalized_path = plot_pid_mi_as_function_of_pcs(
+                    pair_results=pair_results,
+                    model_1_name=model_1,
+                    model_2_name=model_2,
+                    output_dir=plot_dir,
+                )
+                print(f"Saved absolute plot: {absolute_path}")
+                print(f"Saved normalized plot: {normalized_path}")
 
     return results
 
@@ -236,7 +248,7 @@ def main() -> None:
         config["functions"],
         PIPELINE_STEP_FUNCTIONS,
     )
-    results = pc_function_analysis(
+    pc_function_analysis(
         config=config,
         functions=functions,
         model1_name=config["model1_name"],
@@ -246,18 +258,8 @@ def main() -> None:
         pkl_info_path=configured_paths["pkl_info_path"],
         neural_data_path=configured_paths["neural_data_path"],
         results_dir=configured_paths["results_dir"],
+        plot_dir=configured_paths["plot_dir"],
     )
-
-    for model_1, model_2_results in results.items():
-        for model_2, pair_results in model_2_results.items():
-            absolute_path, normalized_path = plot_pid_mi_as_function_of_pcs(
-                pair_results=pair_results,
-                model_1_name=model_1,
-                model_2_name=model_2,
-                output_dir=configured_paths["plot_dir"],
-            )
-            print(f"Saved absolute plot: {absolute_path}")
-            print(f"Saved normalized plot: {normalized_path}")
 
 
 if __name__ == "__main__":
