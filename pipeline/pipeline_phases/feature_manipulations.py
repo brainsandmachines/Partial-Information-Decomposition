@@ -113,8 +113,9 @@ def prepare_ridge_target(
     Inputs:
         target:
             np.ndarray with shape ``(n_samples, n_target_features)``. The
-            target must already be scaled with the scaler used to fit the
-            saved PCA model.
+            target must use the same feature units used to fit the saved PCA.
+            The no-variance-standardization ridge pipeline passes raw neural
+            responses; the saved PCA applies its fitted training mean.
         target_context:
             Mapping[str, Any] containing a one-dimensional Boolean
             ``shared1000_subj`` mask aligned with the target rows. ``True``
@@ -323,8 +324,9 @@ def ridge_predict_shared(
     Inputs:
         source:
             np.ndarray with shape ``(n_samples, n_source_features)``. Rows
-            must follow the same sample order as ``shared_mask`` and the array
-            must already be scaled.
+            must follow the same sample order as ``shared_mask``. This helper
+            performs no variance standardization and uses the caller-provided
+            feature units directly.
         train_target:
             np.ndarray with shape ``(n_train, n_target_components)`` containing
             PCA target scores for rows where ``shared_mask`` is False.
@@ -430,13 +432,15 @@ def feature_manipulation_ridge(
     Inputs:
         source1:
             np.ndarray with shape ``(n_samples, n_source1_features)``. The
-            first model features must already be scaled.
+            first model features in caller-provided units. This function does
+            not standardize feature variances.
         source2:
             np.ndarray with shape ``(n_samples, n_source2_features)``. The
-            second model features must already be scaled.
+            second model features in caller-provided units. This function does
+            not standardize feature variances.
         target:
             np.ndarray with shape ``(n_samples, n_target_features)``. The
-            neural target must already be scaled.
+            neural target in the same feature units used to fit the saved PCA.
         target_context:
             Mapping[str, Any] containing the Boolean ``shared1000_subj`` mask
             that identifies held-out rows.

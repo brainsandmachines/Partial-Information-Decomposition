@@ -17,7 +17,6 @@ if str(repo_root) not in sys.path:
 from pipeline.analysis.pca_analysis.all_models_pairwise import ridge_pairwise_utils
 from pipeline.full_OTC import otc_experiment
 from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
-from pipeline.pipeline_phases.preprocessing_layer import apply_saved_scaler
 from pipeline.pipeline_utils import resolve_pipeline_function
 from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
 
@@ -73,23 +72,14 @@ def run_pairwise_pid_pipeline(
     if feature_extraction is None or pid_calculation is None:
         raise RuntimeError("Required configured pipeline functions did not resolve.")
 
-    preprocess_kwargs = config.get("preprocess_kwargs", {})
     feature_manipulation_kwargs = config.get("feature_manipulation_kwargs", {})
-    target_scaler_path = ridge_pairwise_utils._resolve_project_path(
-        preprocess_kwargs["target_scaler_path"]
-    )
     pc_target_path = ridge_pairwise_utils._resolve_project_path(
         feature_manipulation_kwargs["pc_target_path"]
     )
-    for artifact_label, artifact_path in (
-        ("target scaler", target_scaler_path),
-        ("target PCA", pc_target_path),
-    ):
-        if not artifact_path.is_file():
-            raise FileNotFoundError(
-                f"Configured {artifact_label} artifact does not exist: "
-                f"{artifact_path}"
-            )
+    if not pc_target_path.is_file():
+        raise FileNotFoundError(
+            f"Configured target PCA artifact does not exist: {pc_target_path}"
+        )
 
     pid_kwargs = dict(config.get("pid_kwargs", {}))
     seed = int(pid_kwargs.get("rng_seed", 56))
@@ -113,18 +103,15 @@ def run_pairwise_pid_pipeline(
     try:
         if "target" not in target_context:
             raise ValueError("Target extraction context is missing the 'target' array.")
-        scaled_target = apply_saved_scaler(
-            np.asarray(target_context["target"]),
-            target_scaler_path,
-        )
+        raw_target = np.asarray(target_context["target"])
         target_context.pop("target", None)
         target_context.pop("neural_data", None)
         train_target, test_target, shared_mask = prepare_ridge_target(
-            scaled_target,
+            raw_target,
             target_context,
             pc_target_path,
         )
-        del scaled_target
+        del raw_target
         artifacts_by_model = ridge_pairwise_utils._validate_model_artifacts(
             required_models,
             config,
@@ -219,8 +206,8 @@ def main() -> None:
         None. CSV checkpoints and heatmaps are written to configured paths.
     """
 
-    config_path = "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_otc_pair_wise_comp.yaml"
-    with open(config_path, "r", encoding="utf-8") as config_file:
+    config_path = Path(__file__).with_name("ridge_otc_pair_wise_comp.yaml")
+    with config_path.open("r", encoding="utf-8") as config_file:
         otc_config = yaml.safe_load(config_file)
 
     configured_models = otc_config.get("models")

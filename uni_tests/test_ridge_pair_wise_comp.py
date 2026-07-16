@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import sys
 import threading
 from collections import Counter
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 from unittest.mock import Mock
 
@@ -14,12 +16,19 @@ import pandas as pd
 import pytest
 from sklearn.decomposition import PCA
 from sklearn.linear_model import Ridge
-from sklearn.preprocessing import StandardScaler
 
 from pipeline.analysis.pca_analysis.all_models_pairwise import ridge_pair_wise_comp
 from pipeline.analysis.pca_analysis.all_models_pairwise import ridge_pairwise_utils
+from pipeline.ridge_find_alpha import find_alpha
 from pipeline.pipeline_phases import feature_manipulations
-from pipeline.pipeline_phases import preprocessing_layer
+
+_missmda_stub = ModuleType("library_wrappers.missmda_ncp")
+_missmda_stub.estimate_ncp_pca = Mock(  # type: ignore[attr-defined]
+    side_effect=RuntimeError("missMDA must be mocked in unit tests.")
+)
+sys.modules.setdefault("library_wrappers.missmda_ncp", _missmda_stub)
+
+from pipeline.subj_PCs import subj_pc_analysis
 
 
 def _write_alpha_archive(
@@ -55,173 +64,108 @@ def _write_alpha_archive(
     return path
 
 
-def test_apply_saved_scaler_matches_serialized_scaler_and_validates_input(
-    tmp_path: Path,
-) -> None:
-    """Check saved-scaler transformation and rejection of invalid source arrays.
+def test_target_pca_centers_raw_data_without_variance_standardization() -> None:
+    """Check target PCA uses raw feature scales while retaining mean-centering.
 
     Inputs:
-        tmp_path: Path provided by pytest for serialized scaler artifacts.
+        None.
 
     Outputs:
-        None. Assertions validate the transformed values and input errors.
+        None. Assertions compare the helper with direct scikit-learn PCA on the
+        unstandardized input and verify that no scaler artifact is returned.
     """
 
-    fit_data = np.array(
+    target = np.array(
         [
-            [1.0, 10.0, -3.0],
-            [2.0, 12.0, 1.0],
-            [5.0, 14.0, 5.0],
-            [8.0, 20.0, 9.0],
+            [1.0, 100.0, 0.01],
+            [2.0, 250.0, 0.04],
+            [4.0, 450.0, 0.02],
+            [8.0, 900.0, 0.08],
         ]
     )
-    data = np.array([[3.0, 11.0, 2.0], [7.0, 18.0, 8.0]])
-    scaler = StandardScaler().fit(fit_data)
-    scaler_path = tmp_path / "source_scaler.pkl"
-    joblib.dump(scaler, scaler_path)
+    expected_pca = PCA(n_components=None, svd_solver="full")
+    expected_scores = expected_pca.fit_transform(target)
 
-    actual = preprocessing_layer.apply_saved_scaler(data, scaler_path)
+    result = subj_pc_analysis.pca_by_variance(target, variance_threshold=1.0)
 
-    np.testing.assert_allclose(actual, scaler.transform(data))
-    with pytest.raises(ValueError, match="two-dimensional"):
-        preprocessing_layer.apply_saved_scaler(np.array([1.0, 2.0]), scaler_path)
-    with pytest.raises(ValueError, match="at least one sample and feature"):
-        preprocessing_layer.apply_saved_scaler(np.empty((0, 3)), scaler_path)
-    with pytest.raises(TypeError, match="real numeric"):
-        preprocessing_layer.apply_saved_scaler(
-            np.array([["not", "numeric"]], dtype=object),
-            scaler_path,
-        )
-    with pytest.raises(TypeError, match="real numeric"):
-        preprocessing_layer.apply_saved_scaler(
-            np.array([[1.0 + 2.0j, 3.0 + 0.0j]]),
-            scaler_path,
-        )
-    with pytest.raises(ValueError, match="NaN or infinite"):
-        preprocessing_layer.apply_saved_scaler(
-            np.array([[1.0, np.nan, 2.0]]),
-            scaler_path,
-        )
-
-    invalid_artifact_path = tmp_path / "invalid_scaler.pkl"
-    joblib.dump({"transform": "not callable"}, invalid_artifact_path)
-    with pytest.raises(TypeError, match="provide a transform method"):
-        preprocessing_layer.apply_saved_scaler(data, invalid_artifact_path)
+    np.testing.assert_allclose(result["pca"].mean_, target.mean(axis=0))
+    np.testing.assert_allclose(result["transformed_data"], expected_scores)
+    assert "scaler" not in result
 
 
-@pytest.mark.parametrize(
-    ("transformed", "expected_error", "message"),
-    [
-        pytest.param(
-            np.ones(2),
-            ValueError,
-            "two-dimensional",
-            id="one-dimensional-output",
-        ),
-        pytest.param(
-            np.ones((3, 2)),
-            ValueError,
-            "preserve the two-dimensional input shape",
-            id="changed-sample-count",
-        ),
-        pytest.param(
-            np.ones((2, 1)),
-            ValueError,
-            "preserve the two-dimensional input shape",
-            id="changed-feature-count",
-        ),
-        pytest.param(
-            np.array(
-                [[1.0 + 1.0j, 2.0 + 0.0j], [3.0 + 0.0j, 4.0 + 0.0j]]
-            ),
-            TypeError,
-            "real numeric",
-            id="complex-output",
-        ),
-        pytest.param(
-            np.array([[1.0, 2.0], [np.inf, 4.0]]),
-            ValueError,
-            "NaN or infinite",
-            id="nonfinite-output",
-        ),
-    ],
-)
-def test_apply_saved_scaler_validates_transform_output(
-    transformed: np.ndarray,
-    expected_error: type[Exception],
-    message: str,
+def test_missmda_selection_explicitly_disables_variance_standardization(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Check validation of arrays returned by a serialized scaler.
+    """Check missMDA selects components with ``scale=False`` before raw PCA.
 
     Inputs:
-        transformed: np.ndarray returned by the mocked scaler transform.
-        expected_error: Exception type required for the invalid output.
-        message: str expected in the validation error message.
-        monkeypatch: pytest.MonkeyPatch used to replace artifact loading.
+        monkeypatch: pytest.MonkeyPatch replacing the external selector with a
+            deterministic call recorder.
 
     Outputs:
-        None. Assertions validate rejection of malformed scaler output.
+        None. Assertions cover the selector flag and the fitted PCA mean.
     """
 
-    scaler = Mock()
-    scaler.transform.return_value = transformed
-    monkeypatch.setattr(
-        preprocessing_layer.joblib,
-        "load",
-        Mock(return_value=scaler),
+    target = np.array(
+        [
+            [1.0, 100.0, 0.01],
+            [2.0, 250.0, 0.04],
+            [4.0, 450.0, 0.02],
+            [8.0, 900.0, 0.08],
+        ]
     )
+    selector = Mock(return_value={"ncp": 2, "criterion": {}})
+    monkeypatch.setattr(subj_pc_analysis, "estimate_ncp_pca", selector)
 
-    with pytest.raises(expected_error, match=message):
-        preprocessing_layer.apply_saved_scaler(
-            np.array([[1.0, 2.0], [3.0, 4.0]]),
-            "unused.pkl",
-        )
-
-
-def test_scale_func_delegates_three_transformations_in_input_order(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Check backward-compatible scaling delegates once per ordered input.
-
-    Inputs:
-        tmp_path: Path provided by pytest for three scaler artifacts.
-        monkeypatch: pytest.MonkeyPatch used to spy on the reusable helper.
-
-    Outputs:
-        None. Assertions validate delegation count, order, and values.
-    """
-
-    source1 = np.array([[1.0, 3.0], [2.0, 8.0], [4.0, 10.0]])
-    source2 = np.array([[10.0], [13.0], [19.0]])
-    target = np.array([[2.0, 5.0], [7.0, 11.0], [17.0, 23.0]])
-    arrays = (source1, source2, target)
-    paths = tuple(tmp_path / name for name in ("source1.pkl", "source2.pkl", "target.pkl"))
-    scalers = (
-        StandardScaler().fit(np.array([[0.0, 0.0], [2.0, 4.0], [6.0, 12.0]])),
-        StandardScaler().fit(np.array([[2.0], [8.0], [14.0]])),
-        StandardScaler().fit(np.array([[1.0, 2.0], [4.0, 8.0], [10.0, 20.0]])),
-    )
-    for scaler, path in zip(scalers, paths, strict=True):
-        joblib.dump(scaler, path)
-
-    scaler_spy = Mock(wraps=preprocessing_layer.apply_saved_scaler)
-    monkeypatch.setattr(preprocessing_layer, "apply_saved_scaler", scaler_spy)
-
-    actual = preprocessing_layer.scale_func(
-        source1,
-        source2,
+    result = subj_pc_analysis.pca_func(
         target,
-        paths[0],
-        paths[1],
-        paths[2],
+        mode="missmda_CV",
+        max_features=2,
     )
 
-    assert scaler_spy.call_count == 3
-    assert [call.args[1] for call in scaler_spy.call_args_list] == list(paths)
-    for actual_array, input_array, scaler in zip(actual, arrays, scalers, strict=True):
-        np.testing.assert_allclose(actual_array, scaler.transform(input_array))
+    assert selector.call_args.kwargs["scale"] is False
+    np.testing.assert_allclose(result["pca"].mean_, target.mean(axis=0))
+    assert "scaler" not in result
+
+
+def test_alpha_search_and_saved_pca_use_raw_unstandardized_arrays(
+    tmp_path: Path,
+) -> None:
+    """Check alpha search has no scaler step and saved PCA transforms raw data.
+
+    Inputs:
+        tmp_path: Path provided by pytest for the centered PCA artifact.
+
+    Outputs:
+        None. Assertions cover the raw-input ridge pipeline and direct PCA
+        transformation without an intermediate variance scaler.
+    """
+
+    predictor = np.array(
+        [
+            [1.0, 10.0, 0.1],
+            [2.0, 30.0, 0.2],
+            [3.0, 20.0, 0.4],
+            [5.0, 80.0, 0.8],
+            [8.0, 50.0, 1.6],
+            [13.0, 130.0, 3.2],
+        ]
+    )
+    target = np.column_stack(
+        (predictor[:, 0] + predictor[:, 2], predictor[:, 1] - predictor[:, 0])
+    )
+
+    alphas, ridge_pipeline = find_alpha.find_alpha_per_pc(predictor, target)
+
+    assert alphas.shape == (target.shape[1],)
+    assert list(ridge_pipeline.named_steps) == ["ridgecv"]
+    assert ridge_pipeline.predict(predictor).shape == target.shape
+
+    target_pca = PCA(n_components=2, svd_solver="full").fit(target)
+    target_pca_path = tmp_path / "target_pca.pkl"
+    joblib.dump(target_pca, target_pca_path)
+    transformed = find_alpha.load_and_apply_pca(target, target_pca_path)
+    np.testing.assert_allclose(transformed, target_pca.transform(target))
 
 
 def test_prepare_ridge_target_projects_once_and_preserves_held_out_order(
@@ -907,22 +851,16 @@ class _RunnerHarness:
         self.shared_mask = np.array([False, False, False, False, True, True])
         self.test_target = np.array([[40.0, 41.0], [50.0, 51.0]])
 
-        self.target_scaler_path = tmp_path / "target_scaler.pkl"
         self.target_pca_path = tmp_path / "target_pca.pkl"
         self.layer_results_path = tmp_path / "best_layers.csv"
-        self.target_scaler_path.touch()
         self.target_pca_path.touch()
         self.layer_results_path.touch()
         self.artifact_dir = tmp_path / "model_artifacts"
         self.artifact_dir.mkdir()
-        self.source_scaler_paths: dict[str, Path] = {}
         for model_name in self.model_names:
             safe_name = ridge_pairwise_utils.safe_model_name(model_name)
-            scaler_path = self.artifact_dir / f"{safe_name}.scaler"
             alpha_path = self.artifact_dir / f"{safe_name}.alphas"
-            scaler_path.touch()
             alpha_path.touch()
-            self.source_scaler_paths[model_name] = scaler_path
 
         self.config: dict[str, Any] = {
             "functions": {
@@ -938,17 +876,10 @@ class _RunnerHarness:
                 "path_to_results": str(self.layer_results_path)
             },
             "feature_extraction_kwargs": {"batch_size_process": 2},
-            "preprocess_kwargs": {
-                "target_scaler_path": str(self.target_scaler_path)
-            },
             "feature_manipulation_kwargs": {
                 "pc_target_path": str(self.target_pca_path)
             },
             "artifact_templates": {
-                "source_scaler": {
-                    "directory_template": str(self.artifact_dir),
-                    "filename_template": "{safe_model_name}.scaler",
-                },
                 "ridge_alphas": {
                     "directory_template": str(self.artifact_dir),
                     "filename_template": "{safe_model_name}.alphas",
@@ -976,16 +907,6 @@ class _RunnerHarness:
             ridge_pairwise_utils,
             "load_ridge_alphas",
             self.load_ridge_alphas,
-        )
-        monkeypatch.setattr(
-            ridge_pair_wise_comp,
-            "apply_saved_scaler",
-            self.apply_saved_scaler,
-        )
-        monkeypatch.setattr(
-            ridge_pairwise_utils,
-            "apply_saved_scaler",
-            self.apply_saved_scaler,
         )
         monkeypatch.setattr(
             ridge_pair_wise_comp,
@@ -1122,45 +1043,16 @@ class _RunnerHarness:
         self.counts[f"alphas:{model_name}"] += 1
         return np.full(expected_target_dim, self.model_values[model_name])
 
-    def apply_saved_scaler(
-        self,
-        data: np.ndarray,
-        scaler_path: str | Path,
-    ) -> np.ndarray:
-        """Return a copied numeric array and count target/source transforms.
-
-        Inputs:
-            data: np.ndarray containing target or one model's raw features.
-            scaler_path: str or Path identifying the serialized scaler artifact.
-
-        Outputs:
-            np.ndarray copy of ``data`` suitable for deterministic downstream use.
-        """
-
-        resolved_path = Path(scaler_path)
-        assert resolved_path.is_file()
-        if resolved_path == self.target_scaler_path:
-            self.counts["scale_target"] += 1
-        else:
-            matched_models = [
-                model_name
-                for model_name, source_path in self.source_scaler_paths.items()
-                if source_path == resolved_path
-            ]
-            assert len(matched_models) == 1
-            self.counts[f"scale_source:{matched_models[0]}"] += 1
-        return np.asarray(data, dtype=float).copy()
-
     def prepare_ridge_target(
         self,
         target: np.ndarray,
         target_context: dict[str, Any],
         pc_target_path: str | Path,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Split one already-scaled target into synthetic train/test PC arrays.
+        """Split one raw target into synthetic train/test PC arrays.
 
         Inputs:
-            target: np.ndarray containing all six scaled target rows.
+            target: np.ndarray containing all six unstandardized target rows.
             target_context: dict[str, Any] containing the shared-image mask.
             pc_target_path: str or Path to the empty target-PCA artifact.
 
@@ -1169,7 +1061,10 @@ class _RunnerHarness:
         """
 
         assert Path(pc_target_path) == self.target_pca_path
-        assert np.asarray(target).shape == (6, 3)
+        np.testing.assert_array_equal(
+            target,
+            np.arange(18.0).reshape(6, 3),
+        )
         np.testing.assert_array_equal(
             target_context["shared1000_subj"],
             self.shared_mask,
@@ -1287,7 +1182,7 @@ class _RunnerHarness:
         """Return held-out model-coded predictions with optional failure overlap.
 
         Inputs:
-            source: np.ndarray containing all scaled model feature rows.
+            source: np.ndarray containing all unstandardized model feature rows.
             train_target: np.ndarray containing non-shared target PC rows.
             shared_mask: np.ndarray selecting held-out rows.
             alphas: np.ndarray whose first value identifies the synthetic model.
@@ -1300,12 +1195,15 @@ class _RunnerHarness:
             RuntimeError: On the first call when ``fail_stage`` is ``ridge``.
         """
 
-        del source
         assert seed == 73
         np.testing.assert_array_equal(shared_mask, self.shared_mask)
         model_value = float(np.asarray(alphas)[0])
         model_name = next(
             name for name, value in self.model_values.items() if value == model_value
+        )
+        np.testing.assert_array_equal(
+            source,
+            np.full((6, 3), model_value),
         )
         self.counts[f"ridge:{model_name}"] += 1
 
@@ -1475,14 +1373,12 @@ def test_pairwise_runner_prefetches_full_prediction_during_pid(
 
     assert returned_path == csv_path
     assert harness.counts["target_extraction"] == 1
-    assert harness.counts["scale_target"] == 1
     assert harness.counts["prepare_target"] == 1
     for model_name in models:
         assert harness.counts[f"layer:{model_name}"] == 1
         assert harness.counts[f"alphas:{model_name}"] == 1
         assert harness.counts[f"load:{model_name}"] == 1
         assert harness.counts[f"extract:{model_name}"] == 1
-        assert harness.counts[f"scale_source:{model_name}"] == 1
         assert harness.counts[f"ridge:{model_name}"] == 1
     assert harness.counts["pid"] == 3
     assert harness.counts["report"] == 3

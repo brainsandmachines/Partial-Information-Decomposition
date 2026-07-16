@@ -22,7 +22,6 @@ from pipeline.pipeline_phases.feature_manipulations import (
     load_ridge_alphas,
     ridge_predict_shared,
 )
-from pipeline.pipeline_phases.preprocessing_layer import apply_saved_scaler
 
 
 repo_root = Path(__file__).resolve().parents[4]
@@ -57,12 +56,11 @@ PAIRWISE_RESULT_COLUMNS: list[str] = [
 
 @dataclass(frozen=True)
 class RidgeModelArtifacts:
-    """Store one model's validated layer, scaler, and ridge-alpha artifacts.
+    """Store one model's validated layer and ridge-alpha artifact.
 
     Inputs:
         model_name: str identifier used by artifacts and pairwise results.
         layer_index: int selected model-layer index.
-        scaler_path: Path to the fitted predictor scaler.
         alphas_path: Path to the per-target-PC alpha archive.
         alphas: np.ndarray containing one validated alpha per target PC.
 
@@ -72,7 +70,6 @@ class RidgeModelArtifacts:
 
     model_name: str
     layer_index: int
-    scaler_path: Path
     alphas_path: Path
     alphas: np.ndarray
 
@@ -282,11 +279,10 @@ def _validate_model_artifacts(
     artifact_configs = config.get("artifact_templates")
     if not isinstance(artifact_configs, Mapping):
         raise ValueError("Config must contain an 'artifact_templates' mapping.")
-    scaler_config = artifact_configs.get("source_scaler")
     alphas_config = artifact_configs.get("ridge_alphas")
-    if not isinstance(scaler_config, Mapping) or not isinstance(alphas_config, Mapping):
+    if not isinstance(alphas_config, Mapping):
         raise ValueError(
-            "artifact_templates must define source_scaler and ridge_alphas mappings."
+            "artifact_templates must define a ridge_alphas mapping."
         )
 
     choose_layer_kwargs = config.get("choose_layer_kwargs", {})
@@ -314,11 +310,6 @@ def _validate_model_artifacts(
                 f"got {layer_index}."
             )
 
-        scaler_path = _model_artifact_path(
-            scaler_config,
-            model_name,
-            "source scaler",
-        )
         alphas_path = _model_artifact_path(
             alphas_config,
             model_name,
@@ -333,7 +324,6 @@ def _validate_model_artifacts(
         artifacts_by_model[model_name] = RidgeModelArtifacts(
             model_name=model_name,
             layer_index=layer_index,
-            scaler_path=scaler_path,
             alphas_path=alphas_path,
             alphas=alphas,
         )
@@ -401,7 +391,8 @@ def _prepare_ridge_prediction(
 
     Inputs:
         model_name: str identifying the model to preprocess.
-        artifacts: RidgeModelArtifacts containing its layer, scaler, and alphas.
+        artifacts: RidgeModelArtifacts containing its layer and raw-feature
+            ridge alphas.
         target_context: dict[str, Any] used by aligned feature extraction.
         train_target: np.ndarray containing non-shared PCA target rows.
         shared_mask: np.ndarray selecting held-out shared rows.
@@ -415,7 +406,7 @@ def _prepare_ridge_prediction(
     Raises:
         RuntimeError: If model loading fails.
         ValueError: If a selected model layer is unavailable.
-        Exception: Propagates extraction, scaling, and ridge failures after cleanup.
+        Exception: Propagates extraction and ridge failures after cleanup.
     """
 
     current_context: dict[str, Any] | None = None
@@ -445,15 +436,9 @@ def _prepare_ridge_prediction(
         _release_model_context(current_context)
 
     ridge_started_at = time.perf_counter()
-    scaled_features: Any = None
     try:
-        scaled_features = apply_saved_scaler(
-            np.asarray(raw_features),
-            artifacts.scaler_path,
-        )
-        raw_features = None
         prediction = ridge_predict_shared(
-            scaled_features,
+            np.asarray(raw_features),
             train_target,
             shared_mask,
             artifacts.alphas,
@@ -461,9 +446,8 @@ def _prepare_ridge_prediction(
         )
     finally:
         raw_features = None
-        scaled_features = None
     print(
-        f"Scaling and ridge processing for {model_name}: "
+        f"Ridge fitting and held-out prediction for {model_name}: "
         f"{time.perf_counter() - ridge_started_at:.2f} seconds."
     )
     return np.asarray(prediction), artifacts.layer_index
@@ -496,8 +480,9 @@ def _iter_ridge_prediction_pairs(
 
     Outputs:
         Iterator yielding model names, predictions, and layers for each PID pair.
-        The next unseen model is loaded, extracted, scaled, and ridged in the
-        background while the caller evaluates the currently yielded pair.
+        The next unseen model is loaded, extracted, and ridged without variance
+        standardization in the background while the caller evaluates the
+        currently yielded pair.
 
     Raises:
         RuntimeError: If a background model-preprocessing task fails.

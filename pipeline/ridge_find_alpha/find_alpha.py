@@ -1,51 +1,32 @@
+from __future__ import annotations
+
 import csv
-
-import numpy as np
-from sklearn.linear_model import RidgeCV
-from sklearn.model_selection import KFold
-from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import RidgeCV
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.preprocessing import StandardScaler
-from scipy.linalg import LinAlgWarning
-from sklearn.linear_model import Ridge
-from sklearn.pipeline import make_pipeline
-from pathlib import Path
 import sys
-import time
+from pathlib import Path
+from typing import Any
+
 import joblib
-repo_root = Path(__file__).resolve().parents[2]
-if str(repo_root) not in sys.path:
-    sys.path.insert(0, str(repo_root))
-from pipeline.pipeline_utils import nsd_feature_extraction
-from pipeline.pipeline_phases.sources_target_features import prepare_target,prepare_sources
-from pipeline.pipeline_phases.choosing_layer import overall_best_layer
-
-repo_root = Path(__file__).resolve().parents[2]
-if str(repo_root) not in sys.path:
-    sys.path.insert(0, str(repo_root))
-from external.mayas_project.features_and_encoding.feat_ext_and_encoding import prepare_model_context
-
 import numpy as np
-
-from sklearn.linear_model import Ridge
-from sklearn.model_selection import GridSearchCV, KFold
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-
-import numpy as np
-
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.preprocessing import StandardScaler
+
+repo_root = Path(__file__).resolve().parents[2]
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+
+from external.mayas_project.features_and_encoding.feat_ext_and_encoding import (
+    prepare_model_context,
+)
+from pipeline.pipeline_phases.choosing_layer import overall_best_layer
+from pipeline.pipeline_phases.sources_target_features import prepare_target
+from pipeline.pipeline_utils import nsd_feature_extraction
 
 
 def find_alpha_per_pc(
     predictor: np.ndarray,
     target: np.ndarray,
-) -> tuple[np.ndarray, Pipeline, StandardScaler]:
-    """Standardize predictors and find one ridge alpha per target PC.
+) -> tuple[np.ndarray, Pipeline]:
+    """Find one ridge alpha per target PC without variance standardization.
 
     Inputs:
         predictor:
@@ -57,9 +38,9 @@ def find_alpha_per_pc(
         alphas_per_pc:
             Array shaped (n_components,), containing one alpha per target PC.
         ridge_model:
-            Fitted pipeline that predicts all target PCs simultaneously.
-        predictor_scaler:
-            Fitted StandardScaler used by the pipeline.
+            Fitted raw-input pipeline that predicts all target PCs
+            simultaneously. Ridge fits an intercept, but predictor columns are
+            not divided by their standard deviations.
     """
     predictor = np.asarray(predictor, dtype=np.float64)
     target = np.asarray(target, dtype=np.float64)
@@ -86,11 +67,10 @@ def find_alpha_per_pc(
     print("Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.")
 
     ridge_model = make_pipeline(
-        StandardScaler(), #We dont need standardization for ridge regression because we divide by the variance
         RidgeCV(
             alphas=alphas,
             cv=None,
-            scoring="r2", #mse-none
+            scoring=None, #mse-none
             fit_intercept=True,
             alpha_per_target=True,
             gcv_mode="auto",
@@ -107,13 +87,11 @@ def find_alpha_per_pc(
         dtype=np.float64,
     )
 
-    predictor_scaler = ridge_model.named_steps["standardscaler"]
-
     assert alphas_per_pc.shape == (target.shape[1],), (
         "Number of selected alphas must match the number of target PCs."
     )
 
-    return alphas_per_pc, ridge_model, predictor_scaler
+    return alphas_per_pc, ridge_model
 
 
 
@@ -124,27 +102,21 @@ def find_alpha_per_pc(
 def load_and_apply_pca(
     data: np.ndarray,
     pca_path: str | Path,
-    scaler_path: str | Path,
 ) -> np.ndarray:
-    """Scale data and transform it using a subject's fitted PCA model.
+    """Transform raw neural data with a saved centered PCA model.
 
-    Args:
+    Inputs:
         data: A 2D array shaped (n_samples, n_features). Its columns must match
-            the features and ordering used when fitting the scaler and PCA.
-        pca_path: Path to the saved PCA model.
-        scaler_path: Path to the saved scaler model.
+            the raw, unstandardized feature ordering used to fit PCA.
+        pca_path: str or Path to the saved centered PCA model.
 
-    Returns:
+    Outputs:
         A 2D array shaped (n_samples, n_components) containing PCA scores.
+        PCA applies its fitted training mean but no variance standardization.
     """
     pca_path = Path(pca_path)
-    scaler_path = Path(scaler_path)
-
-    scaler = joblib.load(scaler_path)
     pca = joblib.load(pca_path)
-
-    scaled_data = scaler.transform(data)
-    transformed_data = pca.transform(scaled_data)
+    transformed_data = pca.transform(np.asarray(data))
 
     return transformed_data
 
@@ -275,33 +247,27 @@ def main(
     source_name: str,
     path_to_results: str | Path,
     pc_path: str | Path,
-    scaler_path: str | Path,
-    hdf_path: Path,
-    pkl_info_path: Path,
-    neural_data_path: Path,
+    hdf_path: str | Path,
+    pkl_info_path: str | Path,
+    neural_data_path: str | Path,
     alphas_csv_path: str | Path,
-    predictor_scaler_path: str | Path | None = None,
-) -> tuple[np.ndarray, MultiOutputRegressor]:
-    """Find per-PC ridge alphas and save model, layer, and PC indexes.
+) -> tuple[np.ndarray, Pipeline]:
+    """Find raw-feature ridge alphas and save model/layer/PC metadata.
 
     Inputs:
         source_name: str, model name stored in every CSV row.
         path_to_results: str or Path, best-layer results CSV.
-        pc_path: str or Path, fitted PCA model.
-        scaler_path: str or Path, fitted scaler model.
-        hdf_path: Path, NSD stimulus HDF5 file.
-        pkl_info_path: Path, NSD stimulus-information pickle.
-        neural_data_path: Path, subject neural-data path.
+        pc_path: str or Path, PCA fitted directly on raw neural responses.
+        hdf_path: str or Path, NSD stimulus HDF5 file.
+        pkl_info_path: str or Path, NSD stimulus-information pickle.
+        neural_data_path: str or Path, subject neural-data path.
         alphas_csv_path: str or Path, destination CSV file.
-        predictor_scaler_path: str, Path, or None, saved predictor scaler path.
-            When None, save it beside the alpha CSV using a model-specific
-            filename so runs for different models do not overwrite each other.
 
-    Output:
-        tuple, per-PC alpha array and fitted multi-output ridge model.
+    Outputs:
+        tuple[np.ndarray, Pipeline] containing the per-PC alpha vector and the
+        fitted raw-input RidgeCV pipeline. No target or predictor variance
     """
 
-    # Prepare the target using the loaded scaler
     target = prepare_target(hdf_path, pkl_info_path, neural_data_path)
 
     unique_mask = ~np.asarray(target["shared1000_subj"], dtype=bool)
@@ -315,7 +281,10 @@ def main(
     target["target"])[unique_mask]
 
 
-    pca_target = load_and_apply_pca(unique_target_context["target"], pc_path, scaler_path)
+    pca_target = load_and_apply_pca(
+        unique_target_context["target"],
+        pc_path,
+    )
 
     #Save memory 
     del target 
@@ -335,23 +304,13 @@ def main(
 
 
     # Find the best ridge alpha for each target PC
-    alphas_per_pc, ridge_model, predictor_scaler = find_alpha_per_pc(
+    alphas_per_pc, ridge_model = find_alpha_per_pc(
         features,
         pca_target,
     )
 
     output_path = Path(alphas_csv_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    safe_source_name = str(source_name).replace("/", "_").replace("\\", "_")
-    scaler_output_path = (
-        Path(predictor_scaler_path)
-        if predictor_scaler_path is not None
-        else output_path.with_name(
-            f"{output_path.stem}_{safe_source_name}_predictor_scaler.pkl"
-        )
-    )
-    scaler_output_path.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(predictor_scaler, scaler_output_path)
 
     csv_header = ["model_name", "layer_index", "pc_index", "alpha"]
     csv_has_content = output_path.is_file() and output_path.stat().st_size > 0
@@ -373,7 +332,7 @@ def main(
             (source_name, int(layer_index), pc_index, float(alpha))
             for pc_index, alpha in enumerate(alphas_per_pc, start=1)
         )
-        print("\nSelected alpha and cross-validated R² for each PC:")
+        print("\nSelected alpha and cross-validation score for each PC:")
 
     ridge_cv = ridge_model.named_steps["ridgecv"]
     
@@ -395,12 +354,12 @@ def main(
         print(
             f"\nPC {pc_index:>3}: "
             f"alpha = {alpha:.6g}, "
-            f"CV R² = {score:.6f}"
+            f"CV score = {score:.6f}"
         )
 
     mean_score = float(np.mean(scores_per_pc))
 
-    print(f"\nMean cross-validated R² across PCs: {mean_score:.6f}")
+    print(f"\nMean cross-validation score across PCs: {mean_score:.6f}")
 
 
     print(f"\n======================================================================================")
@@ -411,46 +370,61 @@ def main(
 
 if __name__ == "__main__":
 
-    def check_path_exists(config: dict[str, any]) -> None:
-        """Check if the paths in the config exist."""
+    def check_path_exists(config: dict[str, Any]) -> None:
+        """Require every configured input path before alpha generation.
+
+        Inputs:
+            config: dict[str, Any] containing input Paths or nested mappings.
+
+        Outputs:
+            None. Missing input paths raise ``FileNotFoundError``.
+        """
+
         for key, value in config.items():
             if isinstance(value, Path) and not value.exists():
                 raise FileNotFoundError(f"Path {value} does not exist.")
             elif isinstance(value, dict):
                 check_path_exists(value)
 
-    model_list = ['coat_lite_tiny_classification','visformer_small_classification',
-        'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
-        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
-        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
-        ]
+    model_list = [
+        "nf_resnet50_classification",
+        "eca_nfnet_l0_classification",
+        "resnet50_classification",
+        "semnasnet_100_classification",
+        "cspresnet50_classification",
+        "mobilenetv3_large_100_classification",
+        "ghostnet_100_classification",
+        "convnext_base_classification",
+        "xcit_nano_12_p8_224_classification",
+        "xcit_nano_12_p16_224_classification",
+        "swin_large_patch4_window7_224_classification",
+        "jx_nest_tiny_classification",
+        "pit_ti_224_classification",
+        "vit_base_patch32_224_classification",
+        "vit_base_patch16_224_classification",
+        "tnt_s_patch16_224_classification",
+        "crossvit_base_240_classification",
+        "deit_base_patch16_224_classification",
+        "levit_128_classification",
+    ]
         #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
-    scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_scaler_model.pkl')
-    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/pca_by_variance=60/subj01_pca_model.pkl')
+    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100_no_variance_standardization/subj01_pca_model.pkl')
     
     hdf_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5')
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
-    path_to_alphas_csv = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
-    predictor_scaler_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)')
-    
-    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas2.0_per_pc.csv')
-    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/scalers_alphalog(5,20)/alphas')
+    alphas_csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/no_variance_standardization/alphas2.0_per_pc.csv')
+    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results/no_variance_standardization/alphas')
         
     path_config = {
         "path_to_results": path_to_results,
-        "scaler_path": scaler_path,
         "pc_path": pc_path,
         "hdf_path": hdf_path,
         "pkl_info_path": pkl_info_path,
         "neural_data_path": neural_data_path,
-        "path_to_alphas_csv": path_to_alphas_csv,
-        "predictor_scaler_path": predictor_scaler_path,
-        "csv_path": csv_path,
-        "output_dir": output_dir
     }
     
     check_path_exists(path_config)
@@ -460,7 +434,15 @@ if __name__ == "__main__":
         print("\nChosen model:", source_name  )
 
 
-        main(source_name,path_to_results,pc_path,scaler_path,hdf_path,pkl_info_path,neural_data_path,path_to_alphas_csv)
+        main(
+            source_name,
+            path_to_results,
+            pc_path,
+            hdf_path,
+            pkl_info_path,
+            neural_data_path,
+            alphas_csv_path,
+        )
     
 
-    split_alphas_csv_by_model(csv_path, output_dir)
+    split_alphas_csv_by_model(alphas_csv_path, output_dir)

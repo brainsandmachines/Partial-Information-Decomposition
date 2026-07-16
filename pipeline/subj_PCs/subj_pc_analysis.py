@@ -10,7 +10,6 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 
 repo_root = Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
@@ -56,7 +55,7 @@ def split_unique_shared(
         Path(neural_data_path),
     )
     shared_mask = np.asarray(target_data["shared1000_subj"], dtype=bool)
-    neural_data = np.asarray(target_data["neural_data"])
+    neural_data = np.asarray(target_data["target"])
     image_ids = np.asarray(target_data["image_ids_for_subj"])
 
     if neural_data.ndim != 2:
@@ -92,7 +91,7 @@ def pca_by_variance(
     neural_data: np.ndarray,
     variance_threshold: float = 0.99,
 ) -> dict[str, Any]:
-    """Fit standardized PCA retaining a requested training-variance fraction.
+    """Fit centered PCA without per-feature variance standardization.
 
     Inputs:
         neural_data: np.ndarray of shape (n_samples, n_features), training
@@ -101,9 +100,10 @@ def pca_by_variance(
             that the retained components should explain.
 
     Output:
-        pca_results: dict[str, Any], containing the fitted PCA model under
-            ``pca``, fitted StandardScaler under ``scaler``, projected training
-            samples under ``transformed_data``, and ``variance_threshold``.
+        pca_results: dict[str, Any] containing the fitted PCA model under
+            ``pca``, projected training samples under ``transformed_data``, and
+            ``variance_threshold``. Scikit-learn PCA mean-centers columns but
+            the input columns are not divided by their standard deviations.
     """
 
     neural_array = np.asarray(neural_data)
@@ -114,18 +114,12 @@ def pca_by_variance(
         )
     if neural_array.shape[0] < 2 or neural_array.shape[1] < 1:
         raise ValueError("PCA requires at least two samples and one feature.")
-
-
-    scaler = StandardScaler()
-    neural_data_scaled = scaler.fit_transform(neural_array)
-
     pca_components = None if variance_threshold == 1.0 else variance_threshold
     pca_model = PCA(n_components=pca_components, svd_solver="full")
-    transformed_data = pca_model.fit_transform(neural_data_scaled)
+    transformed_data = pca_model.fit_transform(neural_array)
 
     return {
         "pca": pca_model,
-        "scaler": scaler,
         "transformed_data": transformed_data,
         "variance_threshold": variance_threshold,
     }
@@ -133,14 +127,12 @@ def pca_by_variance(
 
 def heldout_pca(
     pca_model: PCA,
-    scaler_model: StandardScaler,
     heldout_data: np.ndarray,
 ) -> np.ndarray:
-    """Project held-out neural responses with fitted training transformations.
+    """Project raw held-out responses with a fitted centered PCA model.
 
     Inputs:
         pca_model: PCA, fitted PCA model learned from the training data.
-        scaler_model: StandardScaler, fitted scaler learned from training data.
         heldout_data: np.ndarray of shape (n_samples, n_features), held-out
             neural responses with the same feature order as the training data.
 
@@ -156,40 +148,73 @@ def heldout_pca(
             f"but received {heldout_array.shape}."
         )
 
-    heldout_data_scaled = scaler_model.transform(heldout_array)
-    return pca_model.transform(heldout_data_scaled)
+    return pca_model.transform(heldout_array)
 
 
-def pca_func(data,mode:str='eigenvector_CV',max_features:int=None,variance_threshold:float=0.99):
-    """The function that chooses which PCA function to run based on the mode.
+def pca_func(
+    data: np.ndarray,
+    mode: str = "eigenvector_CV",
+    max_features: int | None = None,
+    variance_threshold: float = 0.99,
+) -> dict[str, Any]:
+    """Select a component count and fit centered, unstandardized PCA.
+
     Inputs:
-        mode: str, the mode of PCA to run. For now the options are: 
-        pca_by_variance, rowwise_CV, eigenvector_CV and missmda_CV"""
-    
+        data: np.ndarray with samples in rows and neural features in columns.
+        mode: str selecting ``pca_by_variance``, ``eigenvector_CV``, or
+            ``missmda_CV``.
+        max_features: int or None limiting candidate PCA components.
+        variance_threshold: float training-variance fraction used by
+            ``pca_by_variance``.
+
+    Outputs:
+        dict[str, Any] containing the fitted centered PCA, unstandardized
+        training scores, and component-selection metadata.
+    """
+
+    data_array = np.asarray(data)
+    if data_array.ndim != 2:
+        raise ValueError("data must be a two-dimensional array.")
     if max_features is None:
-        max_features = data.shape[1]-1
+        max_features = data_array.shape[1] - 1
     if mode == "pca_by_variance":
         print("Running PCA by variance threshold")
-        return pca_by_variance(data,variance_threshold=variance_threshold)
+        return pca_by_variance(
+            data_array,
+            variance_threshold=variance_threshold,
+        )
 
     if mode == "eigenvector_CV":
         print("Running Eigenvector PCA with cross-validation")
         csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/eigenvector_max=100/checkpointmax=100.csv'
-        output = eigenvector_pca_cv(data,max_components=max_features,method_pca = 'SVD',checkpoint_csv_path=csv_path)
-    if mode == "missmda_CV":
+        output = eigenvector_pca_cv(
+            data_array,
+            max_components=max_features,
+            method_pca="SVD",
+            checkpoint_csv_path=csv_path,
+        )
+        selected_n_components = int(output.selected_n_components)
+    elif mode == "missmda_CV":
         print("Running MissMDA PCA with cross-validation")
-        output = estimate_ncp_pca(data,method_cv='Kfold',ncp_max=max_features,method='EM',verbose=True,p_na = 0.05,nbsim = 5)
-    
-    selected_n_components = output.selected_n_components
-    
-    scaler = StandardScaler()
-    neural_data_scaled = scaler.fit_transform(data)
+        output = estimate_ncp_pca(
+            data_array,
+            method_cv="Kfold",
+            ncp_max=max_features,
+            method="EM",
+            scale=False,
+            verbose=True,
+            p_na=0.05,
+            nbsim=5,
+        )
+        selected_n_components = int(output["ncp"])
+    else:
+        raise ValueError(f"Unsupported PCA mode: {mode!r}.")
+
     pca_model = PCA(n_components=selected_n_components, svd_solver="full")
-    transformed_data = pca_model.fit_transform(neural_data_scaled)
-    
+    transformed_data = pca_model.fit_transform(data_array)
+
     return {
         "pca": pca_model,
-        "scaler": scaler,
         "transformed_data": transformed_data,
         "selected_n_components": selected_n_components,
     }
@@ -203,8 +228,9 @@ def main(
     variance_threshold: float = 0.99,
     save_models_path: str | Path | None = None,
     max_features: int | None = None,
+    pca_mode: str = "missmda_CV",
 ) -> dict[str, Any]:
-    """Fit PCA on unique images and measure each PC on shared held-out data.
+    """Fit centered unstandardized PCA and evaluate shared held-out data.
 
     Inputs:
         subj_id: str, subject identifier used in saved filenames.
@@ -214,18 +240,18 @@ def main(
         variance_threshold: float in (0, 1], training variance fraction used to
             choose the number of retained PCs.
         save_models_path: str, Path, or None, output directory for the PCA
-            model, scaler, and held-out variance CSV. When None, nothing is
-            written to disk.
+            model and held-out variance CSV. When None, nothing is written.
         max_features: int or None, maximum number of features to use for PCA.
+        pca_mode: str component-selection method passed to ``pca_func``.
 
     Output:
         results: dict[str, Any], containing the fitted models, unique and
             held-out PC scores, held-out variance table, and optional saved
             file paths.
 
-    Held-out explained-variance ratios use the total sample variance of the
-    held-out data after applying the training scaler as their denominator.
-    PC indices in the saved table are one-based.
+    Held-out explained-variance ratios use the total raw held-out sample
+    variance as their denominator. PCA still applies its fitted training mean;
+    no column is divided by its standard deviation. PC indexes are one-based.
     """
 
     data_split = split_unique_shared(
@@ -240,30 +266,29 @@ def main(
 
     print(f"\n Fitting PCA on unique images")
     pca_results = pca_func(
-        mode = 'missmda_CV' ,
-        data = data_split["unique_neural_data"],
+        mode=pca_mode,
+        data=data_split["unique_neural_data"],
         max_features=max_features,
-        variance_threshold=variance_threshold
+        variance_threshold=variance_threshold,
     )
-    
+
     heldout_scores = heldout_pca(
         pca_results["pca"],
-        pca_results["scaler"],
-        data_split["shared_neural_data"],)
+        data_split["shared_neural_data"],
+    )
 
     if heldout_scores.shape[0] < 2:
         raise ValueError(
             "At least two shared held-out samples are required to estimate "
             "explained variance.")
 
-    heldout_scaled = pca_results["scaler"].transform(
-        data_split["shared_neural_data"])
-    
     heldout_total_variance = float(
-        np.var(heldout_scaled, axis=0, ddof=1).sum())
+        np.var(data_split["shared_neural_data"], axis=0, ddof=1).sum()
+    )
     if not np.isfinite(heldout_total_variance) or heldout_total_variance <= 0.0:
         raise ValueError(
-            "Held-out standardized data must have positive finite variance.")
+            "Held-out data must have positive finite total variance."
+        )
 
     heldout_component_variance = np.var(heldout_scores, axis=0, ddof=1)
     heldout_explained_ratio = (
@@ -292,13 +317,11 @@ def main(
         output_dir.mkdir(parents=True, exist_ok=True)
         saved_paths = {
             "pca_model": output_dir / f"{subj_id}_pca_model.pkl",
-            "scaler_model": output_dir / f"{subj_id}_scaler_model.pkl",
             "heldout_variance_csv": (
                 output_dir / f"{subj_id}_heldout_pca_variance_explained.csv"
             ),
         }
         joblib.dump(pca_results["pca"], saved_paths["pca_model"])
-        joblib.dump(pca_results["scaler"], saved_paths["scaler_model"])
         variance_table.to_csv(saved_paths["heldout_variance_csv"], index=False)
 
     print("PCA on unique data completed.")
@@ -311,7 +334,6 @@ def main(
 
     return {
         "pca_model": pca_results["pca"],
-        "scaler_model": pca_results["scaler"],
         "unique_pca_scores": pca_results["transformed_data"],
         "heldout_pca_scores": heldout_scores,
         "heldout_variance_explained": variance_table,
@@ -334,7 +356,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100_no_variance_standardization'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -342,5 +364,6 @@ if __name__ == "__main__":
         neural_data_path=subject_neural_data_path,
         variance_threshold=1.0,
         save_models_path=Path(save_path),
-        max_features = 100
+        max_features=100,
+        pca_mode="missmda_CV",
     )

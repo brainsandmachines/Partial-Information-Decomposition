@@ -10,41 +10,17 @@ from sklearn.linear_model import Ridge
 
 
 
-"""This file will contain the functions to create the PID pipeline
-after loading PCA components for the the target. Scaling and Ridge predictions from X1 X2 -> PCA(T) and then PID pipeline  
-function that are already implemented will be imported from pipieline phases folder.
+"""This file contains legacy helpers for the ridge PID pipeline.
+
+The target is projected by a centered PCA and ridge predicts PCA(T) from X1
+and X2 in their original feature units. No variance standardization is applied.
+Functions already implemented are imported from the pipeline phases folder.
 """
 
 
 
 
-#Prepropessing function: Scaling the data
-def scale_func(source1,source2,target,source1_scaler_path,source2_scaler_path,target_scaler_path):
-    """
-    Scale the data using the provided scaler.
-    
-    Args:
-        source1 (np.ndarray): The first source data.
-        source2 (np.ndarray): The second source data.
-        target (np.ndarray): The target data.
-        source1_scaler_path (str): The path to the scaler for the first source.
-        source2_scaler_path (str): The path to the scaler for the second source.
-        target_scaler_path (str): The path to the scaler for the target.
 
-    Returns:
-        np.ndarray: The scaled data.
-    """
-
-    scaler_source1 = joblib.load(source1_scaler_path)
-    scaler_source2 = joblib.load(source2_scaler_path)
-    scaler_target = joblib.load(target_scaler_path)
-
-    # Scale the data
-    scaled_source1 = scaler_source1.transform(source1)
-    scaled_source2 = scaler_source2.transform(source2)
-    scaled_target = scaler_target.transform(target)
-
-    return scaled_source1, scaled_source2, scaled_target
 
 
 
