@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import yaml
 
 
 repo_root = Path(__file__).resolve().parents[4]
@@ -15,9 +16,17 @@ if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
 from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
+from pipeline.analysis.pca_analysis.function_as_pc.plot_pc_results import (
+    plot_pid_mi_as_function_of_pcs,
+)
+from pipeline.full_OTC.otc_experiment import PIPELINE_STEP_FUNCTIONS
 from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
 from pipeline.pipeline_phases.sources_target_features import prepare_target
+from pipeline.pipeline_utils import pipeline_functions_from_config
 from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
+
+
+DEFAULT_CONFIG_PATH = Path(__file__).with_name("pc_function_config.yaml")
 
 
 def _prepare_source_for_pid(
@@ -183,3 +192,73 @@ def pc_function_analysis(
                 _save_pair_results(pair_results, model_1, model_2, results_dir)
 
     return results
+
+
+def main() -> None:
+    """Load the PC-function YAML, run all model pairs, and save their plots.
+
+    Inputs:
+        None. The function loads ``pc_function_config.yaml`` beside this
+        module.
+
+    Outputs:
+        None. The function saves one result pickle and two plot files for each
+        configured model pair.
+    """
+
+    with DEFAULT_CONFIG_PATH.open("r", encoding="utf-8") as config_file:
+        config = yaml.safe_load(config_file)
+
+    configured_paths = {}
+    for path_key in (
+        "pc_path",
+        "hdf_path",
+        "pkl_info_path",
+        "neural_data_path",
+        "results_dir",
+        "plot_dir",
+    ):
+        configured_path = Path(config[path_key]).expanduser()
+        configured_paths[path_key] = (
+            configured_path
+            if configured_path.is_absolute()
+            else repo_root / configured_path
+        )
+
+    layer_results_path = Path(
+        config["choose_layer_kwargs"]["path_to_results"]
+    ).expanduser()
+    if not layer_results_path.is_absolute():
+        layer_results_path = repo_root / layer_results_path
+    config["choose_layer_kwargs"]["path_to_results"] = layer_results_path
+
+    functions = pipeline_functions_from_config(
+        config["functions"],
+        PIPELINE_STEP_FUNCTIONS,
+    )
+    results = pc_function_analysis(
+        config=config,
+        functions=functions,
+        model1_name=config["model1_name"],
+        model2_name=config["model2_name"],
+        pc_path=configured_paths["pc_path"],
+        hdf_path=configured_paths["hdf_path"],
+        pkl_info_path=configured_paths["pkl_info_path"],
+        neural_data_path=configured_paths["neural_data_path"],
+        results_dir=configured_paths["results_dir"],
+    )
+
+    for model_1, model_2_results in results.items():
+        for model_2, pair_results in model_2_results.items():
+            absolute_path, normalized_path = plot_pid_mi_as_function_of_pcs(
+                pair_results=pair_results,
+                model_1_name=model_1,
+                model_2_name=model_2,
+                output_dir=configured_paths["plot_dir"],
+            )
+            print(f"Saved absolute plot: {absolute_path}")
+            print(f"Saved normalized plot: {normalized_path}")
+
+
+if __name__ == "__main__":
+    main()

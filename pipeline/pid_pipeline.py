@@ -103,7 +103,6 @@ class PIDPipeline:
         
         updated_kwargs = {**kwargs, "rng": rng}
         return updated_kwargs
-    
 
     def run(
         self,
@@ -162,7 +161,7 @@ class PIDPipeline:
 
         source_1_raw = self.functions.feature_extraction(
             sources["X1"],
-            selected_layers["X1"],
+                ["X1"],
             target_context,
             **(feature_extraction_kwargs or {}),
         )
