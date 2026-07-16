@@ -844,3 +844,63 @@ Mutual Information Results:
   bi_mi_1: 13.42784316372568
   bi_mi_2: 15.758885823042718
 Completed PID for pair: resnet50_classification, jx_nest_tiny_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.42784316372568
+  unq1: 0.0
+  unq2: 0.8623894335178228
+  syn: 1.0725306779635702
+Mutual Information Results:
+  tri_mi: 15.362763275207072
+  bi_mi_1: 13.42784316372568
+  bi_mi_2: 14.290232597243502
+Completed PID for pair: resnet50_classification, pit_ti_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.42784316372568
+  unq1: 0.0
+  unq2: 0.15817513512985215
+  syn: 1.7456166460189735
+Mutual Information Results:
+  tri_mi: 15.331634944874505
+  bi_mi_1: 13.42784316372568
+  bi_mi_2: 13.586018298855532
+Completed PID for pair: resnet50_classification, vit_base_patch32_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.42784316372568
+  unq1: 0.0
+  unq2: 1.3721962948063542
+  syn: 1.1249818607647128
+Mutual Information Results:
+  tri_mi: 15.925021319296746
+  bi_mi_1: 13.42784316372568
+  bi_mi_2: 14.800039458532034
+Completed PID for pair: resnet50_classification, vit_base_patch16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.42784316372568
+  unq1: 0.0
+  unq2: 0.5096931165489735
+  syn: 1.7424469173196009
+Mutual Information Results:
+  tri_mi: 15.679983197594254
+  bi_mi_1: 13.42784316372568
+  bi_mi_2: 13.937536280274653
+Completed PID for pair: resnet50_classification, tnt_s_patch16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.42784316372568
+  unq1: 0.0
+  unq2: 2.279920680757211
+  syn: 0.7517173515338911
+Mutual Information Results:
+  tri_mi: 16.45948119601678
+  bi_mi_1: 13.42784316372568
+  bi_mi_2: 15.70776384448289
+Completed PID for pair: resnet50_classification, crossvit_base_240_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv
+PID Results:
+  red: 13.42784316372568
+  unq1: 0.0
+  unq2: 2.0984985157951606
+  syn: 0.7787123461913055
+Mutual Information Results:
+  tri_mi: 16.305054025712145
+  bi_mi_1: 13.42784316372568
+  bi_mi_2: 15.52634167952084
+Completed PID for pair: resnet50_classification, deit_base_patch16_224_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv

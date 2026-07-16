@@ -1,0 +1,278 @@
+------------------------------------
+Thu 16 Jul 2026 11:25:06 IDT
+SLURM_JOBID:		19404312
+SLURM_JOB_NODELIST:	ise-cpu256-02
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19404312
+Allocated Resouces:	cpu - 4 / mem - 131072 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu256-02.auth.ad.bgu.ac.il
+Job ID: 19404312
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu
+
+Chosen model: coat_lite_tiny_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for coat_lite_tiny_classification: {'model_name': 'coat_lite_tiny', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('coat_lite_tiny', pretrained = True)"}
+Image transforms for coat_lite_tiny_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: coat_lite_tiny_classification
+Ordered layers from model: ['Conv2d-1', 'LayerNorm-1', 'PatchEmbed-1', 'Conv2d-2', 'Conv2d-3', 'Conv2d-4', 'ConvPosEnc-1', 'ConvPosEnc-2', 'ConvPosEnc-3', 'LayerNorm-2', 'Linear-1', 'Conv2d-5', 'Conv2d-6', 'Conv2d-7', 'Conv2d-8', 'Conv2d-9', 'Conv2d-10', 'Conv2d-11', 'Conv2d-12', 'Conv2d-13', 'ConvRelPosEnc-1', 'ConvRelPosEnc-2', 'ConvRelPosEnc-3', 'Linear-2', 'Dropout-1', 'FactorAttnConvRelPosEnc-1', 'Identity-1', 'LayerNorm-3', 'Linear-3', 'GELU-1', 'Dropout-2', 'Identity-2', 'Linear-4', 'Dropout-3', 'Mlp-1', 'Identity-3', 'SerialBlock-1', 'Conv2d-14', 'Conv2d-15', 'Conv2d-16', 'ConvPosEnc-4', 'ConvPosEnc-5', 'ConvPosEnc-6', 'LayerNorm-4', 'Linear-5', 'Conv2d-17', 'Conv2d-18', 'Conv2d-19', 'Conv2d-20', 'Conv2d-21', 'Conv2d-22', 'Conv2d-23', 'Conv2d-24', 'Conv2d-25', 'ConvRelPosEnc-5', 'ConvRelPosEnc-6', 'ConvRelPosEnc-7', 'Linear-6', 'Dropout-4', 'FactorAttnConvRelPosEnc-2', 'Identity-4', 'LayerNorm-5', 'Linear-7', 'GELU-2', 'Dropout-5', 'Identity-5', 'Linear-8', 'Dropout-6', 'Mlp-2', 'Identity-6', 'SerialBlock-2', 'Conv2d-26', 'LayerNorm-6', 'PatchEmbed-2', 'Conv2d-27', 'Conv2d-28', 'Conv2d-29', 'ConvPosEnc-7', 'ConvPosEnc-8', 'ConvPosEnc-9', 'LayerNorm-7', 'Linear-9', 'Conv2d-30', 'Conv2d-31', 'Conv2d-32', 'Conv2d-33', 'Conv2d-34', 'Conv2d-35', 'Conv2d-36', 'Conv2d-37', 'Conv2d-38', 'ConvRelPosEnc-9', 'ConvRelPosEnc-10', 'ConvRelPosEnc-11', 'Linear-10', 'Dropout-7', 'FactorAttnConvRelPosEnc-3', 'Identity-7', 'LayerNorm-8', 'Linear-11', 'GELU-3', 'Dropout-8', 'Identity-8', 'Linear-12', 'Dropout-9', 'Mlp-3', 'Identity-9', 'SerialBlock-3', 'Conv2d-39', 'Conv2d-40', 'Conv2d-41', 'ConvPosEnc-10', 'ConvPosEnc-11', 'ConvPosEnc-12', 'LayerNorm-9', 'Linear-13', 'Conv2d-42', 'Conv2d-43', 'Conv2d-44', 'Conv2d-45', 'Conv2d-46', 'Conv2d-47', 'Conv2d-48', 'Conv2d-49', 'Conv2d-50', 'ConvRelPosEnc-13', 'ConvRelPosEnc-14', 'ConvRelPosEnc-15', 'Linear-14', 'Dropout-10', 'FactorAttnConvRelPosEnc-4', 'Identity-10', 'LayerNorm-10', 'Linear-15', 'GELU-4', 'Dropout-11', 'Identity-11', 'Linear-16', 'Dropout-12', 'Mlp-4', 'Identity-12', 'SerialBlock-4', 'Conv2d-51', 'LayerNorm-11', 'PatchEmbed-3', 'Conv2d-52', 'Conv2d-53', 'Conv2d-54', 'ConvPosEnc-13', 'ConvPosEnc-14', 'ConvPosEnc-15', 'LayerNorm-12', 'Linear-17', 'Conv2d-55', 'Conv2d-56', 'Conv2d-57', 'Conv2d-58', 'Conv2d-59', 'Conv2d-60', 'Conv2d-61', 'Conv2d-62', 'Conv2d-63', 'ConvRelPosEnc-17', 'ConvRelPosEnc-18', 'ConvRelPosEnc-19', 'Linear-18', 'Dropout-13', 'FactorAttnConvRelPosEnc-5', 'Identity-13', 'LayerNorm-13', 'Linear-19', 'GELU-5', 'Dropout-14', 'Identity-14', 'Linear-20', 'Dropout-15', 'Mlp-5', 'Identity-15', 'SerialBlock-5', 'Conv2d-64', 'Conv2d-65', 'Conv2d-66', 'ConvPosEnc-16', 'ConvPosEnc-17', 'ConvPosEnc-18', 'LayerNorm-14', 'Linear-21', 'Conv2d-67', 'Conv2d-68', 'Conv2d-69', 'Conv2d-70', 'Conv2d-71', 'Conv2d-72', 'Conv2d-73', 'Conv2d-74', 'Conv2d-75', 'ConvRelPosEnc-21', 'ConvRelPosEnc-22', 'ConvRelPosEnc-23', 'Linear-22', 'Dropout-16', 'FactorAttnConvRelPosEnc-6', 'Identity-16', 'LayerNorm-15', 'Linear-23', 'GELU-6', 'Dropout-17', 'Identity-17', 'Linear-24', 'Dropout-18', 'Mlp-6', 'Identity-18', 'SerialBlock-6', 'Conv2d-76', 'LayerNorm-16', 'PatchEmbed-4', 'Conv2d-77', 'Conv2d-78', 'Conv2d-79', 'ConvPosEnc-19', 'ConvPosEnc-20', 'ConvPosEnc-21', 'LayerNorm-17', 'Linear-25', 'Conv2d-80', 'Conv2d-81', 'Conv2d-82', 'Conv2d-83', 'Conv2d-84', 'Conv2d-85', 'Conv2d-86', 'Conv2d-87', 'Conv2d-88', 'ConvRelPosEnc-25', 'ConvRelPosEnc-26', 'ConvRelPosEnc-27', 'Linear-26', 'Dropout-19', 'FactorAttnConvRelPosEnc-7', 'Identity-19', 'LayerNorm-18', 'Linear-27', 'GELU-7', 'Dropout-20', 'Identity-20', 'Linear-28', 'Dropout-21', 'Mlp-7', 'Identity-21', 'SerialBlock-7', 'Conv2d-89', 'Conv2d-90', 'Conv2d-91', 'ConvPosEnc-22', 'ConvPosEnc-23', 'ConvPosEnc-24', 'LayerNorm-19', 'Linear-29', 'Conv2d-92', 'Conv2d-93', 'Conv2d-94', 'Conv2d-95', 'Conv2d-96', 'Conv2d-97', 'Conv2d-98', 'Conv2d-99', 'Conv2d-100', 'ConvRelPosEnc-29', 'ConvRelPosEnc-30', 'ConvRelPosEnc-31', 'Linear-30', 'Dropout-22', 'FactorAttnConvRelPosEnc-8', 'Identity-22', 'LayerNorm-20', 'Linear-31', 'GELU-8', 'Dropout-23', 'Identity-23', 'Linear-32', 'Dropout-24', 'Mlp-8', 'Identity-24', 'SerialBlock-8', 'LayerNorm-21', 'Dropout-25', 'Linear-33', 'CoaT-1']
+Total number of layers: 288
+
+==================================================
+Processing layer: ConvPosEnc-19 from model: coat_lite_tiny_classification
+
+For model coat_lite_tiny_classification Layer ConvPosEnc-19: Extracting features for 9000 images in batches of 28...
+Feature extraction for model coat_lite_tiny_classification layer ConvPosEnc-19 completed in 492.06 seconds.
+Finding best ridge alphas for 98 target PCs using 16000 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] .... (step 1 of 2) Processing standardscaler, total=   1.0s
+[Pipeline] ........... (step 2 of 2) Processing ridgecv, total= 1.8min
+
+Selected alpha and cross-validated R² for each PC:
+Finished finding best ridge alphas for each target PC.✅
+
+PC   1: alpha = 95409.5, CV R² = 0.198088
+
+PC   2: alpha = 44984.3, CV R² = 0.595692
+
+PC   3: alpha = 44984.3, CV R² = 0.641146
+
+PC   4: alpha = 44984.3, CV R² = 0.407830
+
+PC   5: alpha = 44984.3, CV R² = 0.485403
+
+PC   6: alpha = 95409.5, CV R² = 0.215899
+
+PC   7: alpha = 44984.3, CV R² = 0.405744
+
+PC   8: alpha = 95409.5, CV R² = 0.241286
+
+PC   9: alpha = 95409.5, CV R² = 0.169607
+
+PC  10: alpha = 95409.5, CV R² = 0.145487
+
+PC  11: alpha = 44984.3, CV R² = 0.353293
+
+PC  12: alpha = 95409.5, CV R² = 0.120523
+
+PC  13: alpha = 95409.5, CV R² = 0.213641
+
+PC  14: alpha = 95409.5, CV R² = 0.221672
+
+PC  15: alpha = 95409.5, CV R² = 0.265209
+
+PC  16: alpha = 95409.5, CV R² = 0.203671
+
+PC  17: alpha = 95409.5, CV R² = 0.246742
+
+PC  18: alpha = 95409.5, CV R² = 0.136647
+
+PC  19: alpha = 95409.5, CV R² = 0.165877
+
+PC  20: alpha = 95409.5, CV R² = 0.168776
+
+PC  21: alpha = 95409.5, CV R² = 0.102604
+
+PC  22: alpha = 202359, CV R² = 0.068584
+
+PC  23: alpha = 202359, CV R² = 0.035267
+
+PC  24: alpha = 95409.5, CV R² = 0.101083
+
+PC  25: alpha = 202359, CV R² = 0.081799
+
+PC  26: alpha = 202359, CV R² = 0.041537
+
+PC  27: alpha = 202359, CV R² = 0.053657
+
+PC  28: alpha = 95409.5, CV R² = 0.081678
+
+PC  29: alpha = 95409.5, CV R² = 0.103753
+
+PC  30: alpha = 202359, CV R² = 0.037508
+
+PC  31: alpha = 202359, CV R² = 0.046639
+
+PC  32: alpha = 95409.5, CV R² = 0.128721
+
+PC  33: alpha = 95409.5, CV R² = 0.151416
+
+PC  34: alpha = 202359, CV R² = 0.064232
+
+PC  35: alpha = 95409.5, CV R² = 0.164791
+
+PC  36: alpha = 95409.5, CV R² = 0.115402
+
+PC  37: alpha = 202359, CV R² = 0.043340
+
+PC  38: alpha = 95409.5, CV R² = 0.133483
+
+PC  39: alpha = 95409.5, CV R² = 0.098036
+
+PC  40: alpha = 202359, CV R² = 0.056968
+
+PC  41: alpha = 95409.5, CV R² = 0.136824
+
+PC  42: alpha = 95409.5, CV R² = 0.091434
+
+PC  43: alpha = 95409.5, CV R² = 0.066256
+
+PC  44: alpha = 95409.5, CV R² = 0.107027
+
+PC  45: alpha = 95409.5, CV R² = 0.051331
+
+PC  46: alpha = 95409.5, CV R² = 0.184374
+
+PC  47: alpha = 95409.5, CV R² = 0.058316
+
+PC  48: alpha = 95409.5, CV R² = 0.070000
+
+PC  49: alpha = 95409.5, CV R² = 0.057446
+
+PC  50: alpha = 95409.5, CV R² = 0.089427
+
+PC  51: alpha = 95409.5, CV R² = 0.110531
+
+PC  52: alpha = 202359, CV R² = 0.042956
+
+PC  53: alpha = 95409.5, CV R² = 0.129249
+
+PC  54: alpha = 95409.5, CV R² = 0.087601
+
+PC  55: alpha = 202359, CV R² = 0.039052
+
+PC  56: alpha = 95409.5, CV R² = 0.094560
+
+PC  57: alpha = 95409.5, CV R² = 0.150436
+
+PC  58: alpha = 202359, CV R² = 0.057501
+
+PC  59: alpha = 95409.5, CV R² = 0.089643
+
+PC  60: alpha = 95409.5, CV R² = 0.058372
+
+PC  61: alpha = 202359, CV R² = 0.046615
+
+PC  62: alpha = 202359, CV R² = 0.044426
+
+PC  63: alpha = 95409.5, CV R² = 0.068944
+
+PC  64: alpha = 202359, CV R² = 0.029837
+
+PC  65: alpha = 202359, CV R² = 0.052022
+
+PC  66: alpha = 95409.5, CV R² = 0.043519
+
+PC  67: alpha = 202359, CV R² = 0.032094
+
+PC  68: alpha = 202359, CV R² = 0.054320
+
+PC  69: alpha = 95409.5, CV R² = 0.058616
+
+PC  70: alpha = 95409.5, CV R² = 0.065273
+
+PC  71: alpha = 202359, CV R² = 0.039273
+
+PC  72: alpha = 202359, CV R² = 0.033284
+
+PC  73: alpha = 202359, CV R² = 0.039768
+
+PC  74: alpha = 202359, CV R² = 0.047257
+
+PC  75: alpha = 95409.5, CV R² = 0.063916
+
+PC  76: alpha = 202359, CV R² = 0.020094
+
+PC  77: alpha = 202359, CV R² = 0.038959
+
+PC  78: alpha = 202359, CV R² = 0.021833
+
+PC  79: alpha = 202359, CV R² = 0.064510
+
+PC  80: alpha = 202359, CV R² = 0.044740
+
+PC  81: alpha = 202359, CV R² = 0.039261
+
+PC  82: alpha = 95409.5, CV R² = 0.087053
+
+PC  83: alpha = 202359, CV R² = 0.062705
+
+PC  84: alpha = 95409.5, CV R² = 0.084220
+
+PC  85: alpha = 202359, CV R² = 0.042009
+
+PC  86: alpha = 202359, CV R² = 0.020962
+
+PC  87: alpha = 95409.5, CV R² = 0.059317
+
+PC  88: alpha = 202359, CV R² = 0.024410
+
+PC  89: alpha = 202359, CV R² = 0.018106
+
+PC  90: alpha = 95409.5, CV R² = 0.067679
+
+PC  91: alpha = 202359, CV R² = 0.033229
+
+PC  92: alpha = 95409.5, CV R² = 0.060158
+
+PC  93: alpha = 202359, CV R² = 0.035397
+
+PC  94: alpha = 202359, CV R² = 0.016419
+
+PC  95: alpha = 95409.5, CV R² = 0.041274
+
+PC  96: alpha = 202359, CV R² = 0.030909
+
+PC  97: alpha = 202359, CV R² = 0.027287
+
+PC  98: alpha = 95409.5, CV R² = 0.045776
+
+Mean cross-validated R² across PCs: 0.110108
+
+======================================================================================
+
+Chosen model: visformer_small_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for visformer_small_classification: {'model_name': 'visformer_small', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('visformer_small', pretrained = True)"}
+Image transforms for visformer_small_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: visformer_small_classification
+Ordered layers from model: ['Conv2d-1', 'BatchNorm2d-1', 'ReLU-1', 'Conv2d-2', 'BatchNorm2d-2', 'PatchEmbed-1', 'Dropout-1', 'BatchNorm2d-3', 'Conv2d-3', 'GELU-1', 'Dropout-2', 'Conv2d-4', 'GELU-2', 'Conv2d-5', 'Dropout-3', 'SpatialMlp-1', 'Identity-1', 'Block-1', 'BatchNorm2d-4', 'Conv2d-6', 'GELU-3', 'Dropout-4', 'Conv2d-7', 'GELU-4', 'Conv2d-8', 'Dropout-5', 'SpatialMlp-2', 'Identity-2', 'Block-2', 'BatchNorm2d-5', 'Conv2d-9', 'GELU-5', 'Dropout-6', 'Conv2d-10', 'GELU-6', 'Conv2d-11', 'Dropout-7', 'SpatialMlp-3', 'Identity-3', 'Block-3', 'BatchNorm2d-6', 'Conv2d-12', 'GELU-7', 'Dropout-8', 'Conv2d-13', 'GELU-8', 'Conv2d-14', 'Dropout-9', 'SpatialMlp-4', 'Identity-4', 'Block-4', 'BatchNorm2d-7', 'Conv2d-15', 'GELU-9', 'Dropout-10', 'Conv2d-16', 'GELU-10', 'Conv2d-17', 'Dropout-11', 'SpatialMlp-5', 'Identity-5', 'Block-5', 'BatchNorm2d-8', 'Conv2d-18', 'GELU-11', 'Dropout-12', 'Conv2d-19', 'GELU-12', 'Conv2d-20', 'Dropout-13', 'SpatialMlp-6', 'Identity-6', 'Block-6', 'BatchNorm2d-9', 'Conv2d-21', 'GELU-13', 'Dropout-14', 'Conv2d-22', 'GELU-14', 'Conv2d-23', 'Dropout-15', 'SpatialMlp-7', 'Identity-7', 'Block-7', 'Conv2d-24', 'BatchNorm2d-10', 'PatchEmbed-2', 'Dropout-16', 'BatchNorm2d-11', 'Conv2d-25', 'Dropout-17', 'Conv2d-26', 'Dropout-18', 'Attention-1', 'Identity-8', 'BatchNorm2d-12', 'Conv2d-27', 'GELU-15', 'Dropout-19', 'Conv2d-28', 'Dropout-20', 'SpatialMlp-8', 'Identity-9', 'Block-8', 'BatchNorm2d-13', 'Conv2d-29', 'Dropout-21', 'Conv2d-30', 'Dropout-22', 'Attention-2', 'Identity-10', 'BatchNorm2d-14', 'Conv2d-31', 'GELU-16', 'Dropout-23', 'Conv2d-32', 'Dropout-24', 'SpatialMlp-9', 'Identity-11', 'Block-9', 'BatchNorm2d-15', 'Conv2d-33', 'Dropout-25', 'Conv2d-34', 'Dropout-26', 'Attention-3', 'Identity-12', 'BatchNorm2d-16', 'Conv2d-35', 'GELU-17', 'Dropout-27', 'Conv2d-36', 'Dropout-28', 'SpatialMlp-10', 'Identity-13', 'Block-10', 'BatchNorm2d-17', 'Conv2d-37', 'Dropout-29', 'Conv2d-38', 'Dropout-30', 'Attention-4', 'Identity-14', 'BatchNorm2d-18', 'Conv2d-39', 'GELU-18', 'Dropout-31', 'Conv2d-40', 'Dropout-32', 'SpatialMlp-11', 'Identity-15', 'Block-11', 'Conv2d-41', 'BatchNorm2d-19', 'PatchEmbed-3', 'Dropout-33', 'BatchNorm2d-20', 'Conv2d-42', 'Dropout-34', 'Conv2d-43', 'Dropout-35', 'Attention-5', 'Identity-16', 'BatchNorm2d-21', 'Conv2d-44', 'GELU-19', 'Dropout-36', 'Conv2d-45', 'Dropout-37', 'SpatialMlp-12', 'Identity-17', 'Block-12', 'BatchNorm2d-22', 'Conv2d-46', 'Dropout-38', 'Conv2d-47', 'Dropout-39', 'Attention-6', 'Identity-18', 'BatchNorm2d-23', 'Conv2d-48', 'GELU-20', 'Dropout-40', 'Conv2d-49', 'Dropout-41', 'SpatialMlp-13', 'Identity-19', 'Block-13', 'BatchNorm2d-24', 'Conv2d-50', 'Dropout-42', 'Conv2d-51', 'Dropout-43', 'Attention-7', 'Identity-20', 'BatchNorm2d-25', 'Conv2d-52', 'GELU-21', 'Dropout-44', 'Conv2d-53', 'Dropout-45', 'SpatialMlp-14', 'Identity-21', 'Block-14', 'BatchNorm2d-26', 'Conv2d-54', 'Dropout-46', 'Conv2d-55', 'Dropout-47', 'Attention-8', 'Identity-22', 'BatchNorm2d-27', 'Conv2d-56', 'GELU-22', 'Dropout-48', 'Conv2d-57', 'Dropout-49', 'SpatialMlp-15', 'Identity-23', 'Block-15', 'BatchNorm2d-28', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Dropout-50', 'Linear-1', 'Visformer-1']
+Total number of layers: 227
+
+==================================================
+Processing layer: BatchNorm2d-21 from model: visformer_small_classification
+
+For model visformer_small_classification Layer BatchNorm2d-21: Extracting features for 9000 images in batches of 28...
+Feature extraction for model visformer_small_classification layer BatchNorm2d-21 completed in 712.60 seconds.
+Finding best ridge alphas for 98 target PCs using 37632 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] .... (step 1 of 2) Processing standardscaler, total=   2.3s

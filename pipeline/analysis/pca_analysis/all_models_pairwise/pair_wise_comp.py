@@ -27,7 +27,7 @@ from pipeline.full_OTC import otc_experiment
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.sources_target_features import batching
 from pipeline.pipeline_utils import resolve_pipeline_function
-from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
+from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
 
 
 DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {

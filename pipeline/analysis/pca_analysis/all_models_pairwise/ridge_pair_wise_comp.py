@@ -19,7 +19,7 @@ from pipeline.full_OTC import otc_experiment
 from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
 from pipeline.pipeline_phases.preprocessing_layer import apply_saved_scaler
 from pipeline.pipeline_utils import resolve_pipeline_function
-from pipeline.plotting.pairwise_pid_heatmaps import plot_pairwise_pid_matrices
+from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
 
 
 def run_pairwise_pid_pipeline(

@@ -225,6 +225,14 @@ def plot_pairwise_pid_matrices(
     return figure_paths
 
 
+
+def comulative_sum(array: np.ndarray) -> np.ndarray:
+    """Return the cumulative sum of a 1D array, ignoring NaN values.
+
+    Inputs:
+        array: np.ndarray, 1D array of numeric values."""
+
+
 if __name__ == "__main__":
     plot_pairwise_pid_matrices(
         csv_path="path/to/pairwise_pid_results.csv",
