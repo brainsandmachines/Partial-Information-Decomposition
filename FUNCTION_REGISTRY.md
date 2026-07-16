@@ -130,6 +130,24 @@ File description: Orchestrate prediction-level ridge PID by preparing the neural
 | `run_pairwise_pid_pipeline (line 24)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Annotated: `Path` | Saved-PCA-project the raw target once, stream PID-ready cached predictions while the next needed model is extracted and ridged in one worker, call PID as `(T, X1, X2)`, and immediately checkpoint successful pairs. PCA mean-centers the target; neither target nor model columns are variance-standardized, and shared rows are never used for ridge fitting. |
 | `main (line 199)` | No inputs | Annotated: `None` | Load the adjacent ridge YAML, validate its symmetric model list and output paths, run pairwise PID, and plot the exact CSV path returned by the runner. |
 
+### `pipeline/analysis/pca_analysis/function_as_pc/pc_function.py`
+
+File description: Calculate and optionally save PID and mutual information for every cumulative target-PC count and model pair.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `_prepare_source_for_pid (line 23)` | source: np.ndarray, train_target: np.ndarray, shared_mask: np.ndarray, ridge: bool | Annotated: `np.ndarray` | Return held-out source features directly, or fit ridge on non-shared rows after the caller has selected the current cumulative target-PC subset and return held-out predictions for exactly that subset. Task-specific; no variance standardization is added here. |
+| `_save_pair_results (line 49)` | pair_results: dict[int, dict[str, Any]], model_1: str, model_2: str, results_dir: str \| Path | Annotated: `Path` | Pickle one model pair's complete cumulative target-PC PID/MI result mapping using filesystem-safe model names. Task-specific. |
+| `pc_function_analysis (line 77)` | config: dict[str, Any], functions: PIDPipelineFunctions, model1_name: list[str], model2_name: list[str], pc_path: str \| Path, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, results_dir: str \| Path \| None=None | Annotated: `dict[str, dict[str, dict[int, dict[str, Any]]]]` | Prepare the target and raw sources, then for each cumulative target-PC count first select those target PCs, fit both ridge models specifically to that subset, predict held-out rows, and calculate PID/MI. Return results as model 1 -> model 2 -> PC count and optionally save one pickle per pair. |
+
+### `pipeline/analysis/pca_analysis/function_as_pc/plot_pc_results.py`
+
+File description: Plot all PID atoms and mutual-information values against cumulative target-PC count for one model pair.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `plot_pid_mi_as_function_of_pcs (line 25)` | pair_results: dict[int, dict[str, Any]], model_1_name: str, model_2_name: str, output_dir: str \| Path | Annotated: `tuple[Path, Path]` | Save one two-panel absolute-value figure in bits and one two-panel figure in which every PID and MI series is divided pointwise by trivariate MI; returns the two PNG paths. Plotting-specific. |
+
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 
 File description: Python module for pca as function-related project logic.

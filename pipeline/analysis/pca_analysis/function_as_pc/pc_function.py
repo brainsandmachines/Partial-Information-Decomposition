@@ -1,107 +1,185 @@
-import numpy as np 
-import torch
-from pathlib import Path
+"""Calculate PID and mutual information as target PCs are accumulated."""
+
+from __future__ import annotations
+
+import pickle
 import sys
+from pathlib import Path
 from typing import Any
-import yaml
-root = Path(__file__).resolve().parents[3]
-if str(root) not in sys.path:
-    sys.path.insert(0, str(root))
 
-from full_OTC.otc_experiment import run_otc_experiment
-from pipeline_phases.sources_target_features import prepare_sources, prepare_target
-from pipeline_phases.feature_manipulations import prepare_ridge_target,ridge_predict_shared
-from pipeline.pid_pipeline import PIDPipeline
+import numpy as np
+
+
+repo_root = Path(__file__).resolve().parents[4]
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+
+from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
+from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
+from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
-from sklearn.linear_model import Ridge
 
 
+def _prepare_source_for_pid(
+    source: np.ndarray,
+    train_target: np.ndarray,
+    shared_mask: np.ndarray,
+    ridge: bool,
+) -> np.ndarray:
+    """Prepare one model source for PID on the held-out shared images.
+
+    Inputs:
+        source: np.ndarray with model features for every image.
+        train_target: np.ndarray with target-PC scores for non-shared images.
+        shared_mask: np.ndarray selecting the held-out shared images.
+        ridge: bool indicating whether to predict target PCs with ridge.
+
+    Outputs:
+        np.ndarray containing held-out ridge predictions when ``ridge`` is
+        true, or held-out source features otherwise.
+    """
+
+    if not ridge:
+        return source[shared_mask]
+
+    _, ridge_model = find_alpha_per_pc(source[~shared_mask], train_target)
+    return ridge_model.predict(source[shared_mask])
 
 
+def _save_pair_results(
+    pair_results: dict[int, dict[str, Any]],
+    model_1: str,
+    model_2: str,
+    results_dir: str | Path,
+) -> Path:
+    """Save the PC-dependent PID and MI results for one model pair.
+
+    Inputs:
+        pair_results: dict mapping target-PC counts to PID/MI result dicts.
+        model_1: str containing the first model name.
+        model_2: str containing the second model name.
+        results_dir: str or Path naming the output directory.
+
+    Outputs:
+        Path to the written pickle file.
+    """
+
+    output_dir = Path(results_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    safe_model_1 = model_1.replace("/", "_").replace("\\", "_")
+    safe_model_2 = model_2.replace("/", "_").replace("\\", "_")
+    output_path = output_dir / f"{safe_model_1}__{safe_model_2}_pc_results.pkl"
+    with output_path.open("wb") as results_file:
+        pickle.dump(pair_results, results_file)
+    return output_path
 
 
+def pc_function_analysis(
+    config: dict[str, Any],
+    functions: PIDPipelineFunctions,
+    model1_name: list[str],
+    model2_name: list[str],
+    pc_path: str | Path,
+    hdf_path: str | Path,
+    pkl_info_path: str | Path,
+    neural_data_path: str | Path,
+    results_dir: str | Path | None = None,
+) -> dict[str, dict[str, dict[int, dict[str, Any]]]]:
+    """Calculate PID and MI for each model pair and cumulative target-PC count.
 
-def pc_function_analysis(config,functions:dict,model1_name:list,model2_name:list,pc_path:Path,hdf_path:Path,pkl_info_path:Path,neural_data_path:Path) -> dict[str, Any]:
+    Inputs:
+        config: dict containing layer, feature-extraction, ridge, and PID kwargs.
+        functions: PIDPipelineFunctions containing the configured layer,
+            feature-extraction, source-extraction, and PID callables.
+        model1_name: list[str] containing the first-source model names.
+        model2_name: list[str] containing the second-source model names.
+        pc_path: str or Path pointing to the fitted target PCA model.
+        hdf_path: str or Path pointing to the NSD stimulus HDF5 file.
+        pkl_info_path: str or Path pointing to the NSD metadata pickle.
+        neural_data_path: str or Path pointing to the neural response data.
+        results_dir: str, Path, or None. When provided, one pickle is saved
+            after completing each model pair.
 
+    Outputs:
+        dict nested as ``model_1 -> model_2 -> number_of_target_pcs``. Each
+        PC-count entry contains the complete PID result with ``pid`` and
+        ``mi`` dictionaries.
+    """
 
-
-
-
-
-
-    #Load data
-    target_context = prepare_target(hdf_path, pkl_info_path, neural_data_path)
-    shared_maked = target_context['shared1000_subj']
-    unique_masked = ~shared_maked
-    #Devide data into shared and unique components
-    unique_neural,shared_neural,_ = prepare_ridge_target(target_context['neural_data'],target_context,pc_path)
-
-    
+    target_context = prepare_target(
+        Path(hdf_path),
+        Path(pkl_info_path),
+        Path(neural_data_path),
+    )
+    train_target, shared_target, shared_mask = prepare_ridge_target(
+        target_context["target"],
+        target_context,
+        pc_path,
+    )
     pipeline = PIDPipeline(functions)
-    
+    ridge = config["feature_manipulation_kwargs"]["ridge"]
+    feature_kwargs = config.get("feature_extraction_kwargs", {})
+    results: dict[str, dict[str, dict[int, dict[str, Any]]]] = {}
+
     for model_1 in model1_name:
-        print(f"\nRunning PID with Source 1: {model_1} 😀")
-        source1_raw = None
+        print(f"\nRunning target-PC analysis with Source 1: {model_1} 😀")
+        results[model_1] = {}
+        source_1_raw = None
+
         for model_2 in model2_name:
-            sources = prepare_sources(model_1,model_2,target_context,pc_path)
-            sources_layer = pipeline.functions.choose_layer(sources, **(config['choose_layer_kwargs'] or {}))['X1']
+            sources = pipeline.functions.sources_extraction(
+                model_name_1=model_1,
+                model_name_2=model_2,
+            )
+            selected_layers = pipeline.functions.choose_layer(
+                sources,
+                **(config.get("choose_layer_kwargs") or {}),
+            )
 
-            if source1_raw is None:
-                source1_raw = pipeline.functions.feature_extraction(
+            if source_1_raw is None:
+                source_1_raw = pipeline.functions.feature_extraction(
                     sources["X1"],
-                    sources_layer["X1"],
+                    selected_layers["X1"],
                     target_context,
-                    config['feature_extraction_kwargs']['target_context'],
+                    **feature_kwargs,
                 )
 
-            source2_raw = pipeline.functions.feature_extraction(
+            source_2_raw = pipeline.functions.feature_extraction(
                 sources["X2"],
-                sources_layer["X2"],
+                selected_layers["X2"],
                 target_context,
-                config['feature_extraction_kwargs']['target_context'])
-            
-            source1_shared = source1_raw[shared_maked]
-            source2_shared = source2_raw[shared_maked]
+                **feature_kwargs,
+            )
+            pair_results: dict[int, dict[str, Any]] = {}
 
-            source1_unique = source1_raw[unique_masked]
-            source2_unique = source2_raw[unique_masked]
-            for f in len(range(shared_neural.shape[1])):
-                print(f"Running PID with Source 1: {model_1} and Source 2: {model_2} for PC {f} 😀")
-                target_f = shared_neural[:,f]
-                ridge = config['feature_manipulation_kwargs']['ridge']
-
-                if ridge:
-                    print(f"Running Ridge Regression for PC {f} 😀")
-                    _, source1_model = find_alpha_per_pc(
-                        source1_shared,
-                        target_f)
-                    _, source2_model = find_alpha_per_pc(
-                        source2_shared,
-                        target_f)
-                    
-                    source_1_pred = source1_model.predict(source1_raw)
-                    source_2_pred = source2_model.predict(source2_raw)
-
-                else:
-                    source_1_pred = source1_unique
-                    source_2_pred = source2_unique
-
-                pid_results = pipeline.functions.pid_calculation(
-                    target_f,
-                    source_1_pred,
-                    source_2_pred,
-                    **(config['pid_kwargs'] or {}),
+            for number_of_pcs in range(1, shared_target.shape[1] + 1):
+                selected_train_target = train_target[:, :number_of_pcs]
+                selected_shared_target = shared_target[:, :number_of_pcs]
+                print(
+                    f"Selecting the first {number_of_pcs} target PCs, fitting "
+                    f"ridge, and running PID for {model_1} and {model_2} 😀"
+                )
+                source_1_for_pid = _prepare_source_for_pid(
+                    source_1_raw,
+                    selected_train_target,
+                    shared_mask,
+                    ridge,
+                )
+                source_2_for_pid = _prepare_source_for_pid(
+                    source_2_raw,
+                    selected_train_target,
+                    shared_mask,
+                    ridge,
+                )
+                pair_results[number_of_pcs] = pipeline.functions.pid_calculation(
+                    selected_shared_target,
+                    source_1_for_pid,
+                    source_2_for_pid,
+                    **(config.get("pid_kwargs") or {}),
                 )
 
-            
-            
+            results[model_1][model_2] = pair_results
+            if results_dir is not None:
+                _save_pair_results(pair_results, model_1, model_2, results_dir)
 
-            
-            
-
-
-
-    
-
-    
-
+    return results
