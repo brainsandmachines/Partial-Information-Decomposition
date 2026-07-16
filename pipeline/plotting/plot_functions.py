@@ -234,7 +234,12 @@ def comulative_sum(array: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
+
+
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv"
+    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/ridge_heatmap.png"
+    
     plot_pairwise_pid_matrices(
-        csv_path="path/to/pairwise_pid_results.csv",
-        output_dir="path/to/figures",
+        csv_path=csv_path,
+        output_dir=out_path,
     )

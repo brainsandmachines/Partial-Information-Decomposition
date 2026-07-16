@@ -360,8 +360,8 @@ def plot_heldout_variance_explained(
 
 
 if __name__ == "__main__":
-    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_srp/pairwise_pid_results_srp_pca.csv"
-    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_srp/srp_comulative_sum.png"
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv"
+    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pca_cumulative_unique_information.png"
     
     # plot_heldout_variance_explained(
     #     variance_csv_path=csv_path,

@@ -86,11 +86,11 @@ def find_alpha_per_pc(
     print("Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.")
 
     ridge_model = make_pipeline(
-        StandardScaler(),
+        StandardScaler(), #We dont need standardization for ridge regression because we divide by the variance
         RidgeCV(
             alphas=alphas,
             cv=None,
-            scoring="r2",
+            scoring="r2", #mse-none
             fit_intercept=True,
             alpha_per_target=True,
             gcv_mode="auto",
