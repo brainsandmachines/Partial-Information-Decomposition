@@ -20,7 +20,7 @@ from pipeline.analysis.pca_analysis.function_as_pc.plot_pc_results import (
     plot_pid_mi_as_function_of_pcs,
 )
 from pipeline.full_OTC.otc_experiment import PIPELINE_STEP_FUNCTIONS
-from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
+from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target,pca_source
 from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import pipeline_functions_from_config
 from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
@@ -49,7 +49,8 @@ def _prepare_source_for_pid(
     """
 
     if not ridge:
-        return source[shared_mask]
+        return pca_source(source,shared_mask,train_target.shape[1])
+        
 
     _, ridge_model = find_alpha_per_pc(source[~shared_mask], train_target)
     return ridge_model.predict(source[shared_mask])

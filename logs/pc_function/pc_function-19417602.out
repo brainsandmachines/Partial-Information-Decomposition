@@ -1,14 +1,14 @@
 ------------------------------------
-Thu 16 Jul 2026 18:09:36 IDT
-SLURM_JOBID:		19411167
-SLURM_JOB_NODELIST:	ise-cpu-intl-19
+Fri 17 Jul 2026 00:47:25 IDT
+SLURM_JOBID:		19417602
+SLURM_JOB_NODELIST:	ise-cpu128-03
 SLURM_SCRATCH_DIR:	
 Allocated Resouces:	cpu - 4 / mem - 49152 MB / gpu - 
 SLURM_GPU_INDEX:	
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
-Running on host: ise-cpu-intl-19.auth.ad.bgu.ac.il
-Job ID: 19411167
+Running on host: ise-cpu128-03.auth.ad.bgu.ac.il
+Job ID: 19417602
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
@@ -29,7 +29,7 @@ Model options for RN50_clip: {'model_name': 'RN50', 'train_type': 'clip', 'train
 Image transforms for RN50_clip: Compose(
     Resize(size=224, interpolation=bicubic, max_size=None, antialias=True)
     CenterCrop(size=(224, 224))
-    <function _convert_image_to_rgb at 0x7f26cc2deca0>
+    <function _convert_image_to_rgb at 0x7f7fa4322d40>
     ToTensor()
     Normalize(mean=(0.48145466, 0.4578275, 0.40821073), std=(0.26862954, 0.26130258, 0.27577711))
 )
@@ -50,14 +50,3 @@ Total number of layers: 320
 Processing layer: Conv2d-51 from model: RN50_clip
 
 For model RN50_clip Layer Conv2d-51: Extracting features for 10000 images in batches of 120...
-Feature extraction for model RN50_clip layer Conv2d-51 completed in 1526.31 seconds.
-
-==================================================
-Processing layer: BatchNorm2d-77 from model: ghostnet_100_classification
-
-For model ghostnet_100_classification Layer BatchNorm2d-77: Extracting features for 10000 images in batches of 120...
-Feature extraction for model ghostnet_100_classification layer BatchNorm2d-77 completed in 265.44 seconds.
-Selecting the first 1 target PCs, fitting ridge, and running PID for RN50_clip and ghostnet_100_classification 😀
-Finding best ridge alphas for 1 target PCs using 25088 features and 9000 samples.
-Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
-[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 2.8min

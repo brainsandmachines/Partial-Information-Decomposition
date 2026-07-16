@@ -1,14 +1,14 @@
 ------------------------------------
-Mon 13 Jul 2026 20:09:48 IDT
-SLURM_JOBID:		19360009
-SLURM_JOB_NODELIST:	cs-cpu-07
+Fri 17 Jul 2026 00:03:35 IDT
+SLURM_JOBID:		19417324
+SLURM_JOB_NODELIST:	ise-cpu-intl-12
 SLURM_SCRATCH_DIR:	
 Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
 SLURM_GPU_INDEX:	
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
-Running on host: cs-cpu-07
-Job ID: 19360009
+Running on host: ise-cpu-intl-12.auth.ad.bgu.ac.il
+Job ID: 19417324
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
@@ -21,8 +21,21 @@ Neural data shape: (10000, 8088)
 Image IDs shape: (10000,)
 Number of voxels: 8088
 Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
 Loaded subject subj01 with 9000 unique images and 1000 shared held-out images.
 
  Fitting PCA on unique images
-Running MissMDA PCA with cross-validation
-  |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%
+
+Running Eigenvector PCA with cross-validation!!!
+Using default PCA fitting function (SVD)!!!
+Processing sample 1 of 9000...
+Processing component 10 of 150...✅
+Processing component 20 of 150...✅
+Processing component 30 of 150...✅
+Processing component 40 of 150...✅
+Processing component 50 of 150...✅
+Processing component 60 of 150...✅
+Processing component 70 of 150...✅
+Processing component 80 of 150...✅
+Processing component 90 of 150...✅

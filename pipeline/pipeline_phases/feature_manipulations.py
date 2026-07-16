@@ -497,3 +497,16 @@ def feature_manipulation_ridge(
     )
 
     return source1_prediction, source2_prediction, test_target
+
+
+def pca_source(source,shared_mask,max_features):
+    """Train PCA on source features and return the held-out source features projected onto the PCA space.
+    """
+
+
+    source_shared = source[shared_mask]
+    source_train = source[~shared_mask]
+    pca = PCA(n_components=max_features,svd_solver='full')
+    model = pca.fit(source_train)
+    source_shared_pca = model.transform(source_shared)
+    return source_shared_pca
