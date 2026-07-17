@@ -50,3 +50,83 @@ Total number of layers: 175
 Processing layer: Conv2d-51 from model: RN50_clip
 
 For model RN50_clip Layer Conv2d-51: Extracting features for 10000 images in batches of 120...
+Feature extraction for model RN50_clip layer Conv2d-51 completed in 1044.96 seconds.
+
+==================================================
+Processing layer: Conv2d-51 from model: ResNet50-SimCLR_selfsupervised
+
+For model ResNet50-SimCLR_selfsupervised Layer Conv2d-51: Extracting features for 10000 images in batches of 120...
+Feature extraction for model ResNet50-SimCLR_selfsupervised layer Conv2d-51 completed in 755.55 seconds.
+Selecting the first 1 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 2 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 3 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 4 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 5 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 6 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 7 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 8 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 9 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 10 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 11 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 12 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 13 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 14 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 15 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 16 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 17 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 18 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 19 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 20 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 21 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 22 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 23 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 24 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 25 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 26 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 27 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 28 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 29 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 30 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 31 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 32 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 33 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 34 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 35 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 36 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 37 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 38 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 39 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 40 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 41 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 42 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 43 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 44 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 45 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 46 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 47 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 48 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 49 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 50 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 51 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 52 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 53 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 54 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 55 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 56 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 57 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 58 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 59 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 60 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 61 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 62 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 63 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 64 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 65 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 66 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 67 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 68 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 69 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 70 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 71 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 72 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Selecting the first 73 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀

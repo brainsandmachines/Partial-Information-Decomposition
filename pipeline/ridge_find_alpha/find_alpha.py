@@ -20,13 +20,13 @@ from external.mayas_project.features_and_encoding.feat_ext_and_encoding import (
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import nsd_feature_extraction
-
+from pipeline.analysis.anlysis_utils import to_deepdive_model_name
 
 def find_alpha_per_pc(
     predictor: np.ndarray,
     target: np.ndarray,
 ) -> tuple[np.ndarray, Pipeline]:
-    """Find one ridge alpha per target PC without variance standardization.
+    """Find one ridge alpha per target PC.
 
     Inputs:
         predictor:
@@ -39,8 +39,7 @@ def find_alpha_per_pc(
             Array shaped (n_components,), containing one alpha per target PC.
         ridge_model:
             Fitted raw-input pipeline that predicts all target PCs
-            simultaneously. Ridge fits an intercept, but predictor columns are
-            not divided by their standard deviations.
+            simultaneously. Ridge fits an intercept,
     """
     predictor = np.asarray(predictor, dtype=np.float64)
     target = np.asarray(target, dtype=np.float64)
@@ -102,6 +101,7 @@ def find_alpha_per_pc(
 def load_and_apply_pca(
     data: np.ndarray,
     pca_path: str | Path,
+    n_pcs: int | None = None
 ) -> np.ndarray:
     """Transform raw neural data with a saved centered PCA model.
 
@@ -117,6 +117,16 @@ def load_and_apply_pca(
     pca_path = Path(pca_path)
     pca = joblib.load(pca_path)
     transformed_data = pca.transform(np.asarray(data))
+    print(f"Transformed data shape: {transformed_data.shape}")
+    if n_pcs is not None:
+        if n_pcs > transformed_data.shape[1]:
+            raise ValueError(
+                f"Requested {n_pcs} PCs, but PCA only has "
+                f"{transformed_data.shape[1]} components."
+            )
+        transformed_data = transformed_data[:, :n_pcs]
+
+        print(f"Transformed data shape after truncion: {transformed_data.shape}")
 
     return transformed_data
 
@@ -251,6 +261,7 @@ def main(
     pkl_info_path: str | Path,
     neural_data_path: str | Path,
     alphas_csv_path: str | Path,
+    n_pcs: int | None = None,
 ) -> tuple[np.ndarray, Pipeline]:
     """Find raw-feature ridge alphas and save model/layer/PC metadata.
 
@@ -284,6 +295,7 @@ def main(
     pca_target = load_and_apply_pca(
         unique_target_context["target"],
         pc_path,
+        n_pcs=n_pcs
     )
 
     #Save memory 
@@ -386,28 +398,24 @@ if __name__ == "__main__":
             elif isinstance(value, dict):
                 check_path_exists(value)
 
-    model_list = [
-        "nf_resnet50_classification",
-        "eca_nfnet_l0_classification",
-        "resnet50_classification",
-        "semnasnet_100_classification",
-        "cspresnet50_classification",
-        "mobilenetv3_large_100_classification",
-        "ghostnet_100_classification",
-        "convnext_base_classification",
-        "xcit_nano_12_p8_224_classification",
-        "xcit_nano_12_p16_224_classification",
-        "swin_large_patch4_window7_224_classification",
-        "jx_nest_tiny_classification",
-        "pit_ti_224_classification",
-        "vit_base_patch32_224_classification",
-        "vit_base_patch16_224_classification",
-        "tnt_s_patch16_224_classification",
-        "crossvit_base_240_classification",
-        "deit_base_patch16_224_classification",
-        "levit_128_classification",
-    ]
-        #Path to best layer results
+    DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
+    "ViT-B_32_clip": "ViT-B/32_clip",
+    "ViT-L_14_clip": "ViT-L/14_clip",
+}
+    model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
+        'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
+        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
+        ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
+        'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
+        'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
+        'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
+        'convit_base_classification','RN50_clip','RN101_clip',
+        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-B_32_clip','ViT-L_14_clip'
+        ]
+    
+
+    #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
     pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl')
@@ -429,8 +437,8 @@ if __name__ == "__main__":
     
     check_path_exists(path_config)
     
-    for source_name in model_list:
-
+    for source_name in model_1_names:
+        source_name = to_deepdive_model_name(source_name)
         print("\nChosen model:", source_name  )
 
 
