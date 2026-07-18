@@ -48,3 +48,15 @@ Total number of layers: 185
 Processing layer: Conv2d-26 from model: convnext_base_classification
 
 For model convnext_base_classification Layer Conv2d-26: Extracting features for 10000 images in batches of 120...
+Feature extraction for model convnext_base_classification layer Conv2d-26 completed in 3359.10 seconds.
+
+==================================================
+Processing layer: AvgPool2d-3 from model: eca_nfnet_l0_classification
+
+For model eca_nfnet_l0_classification Layer AvgPool2d-3: Extracting features for 10000 images in batches of 120...
+Feature extraction for model eca_nfnet_l0_classification layer AvgPool2d-3 completed in 1346.30 seconds.
+
+Running target-PC analysis with Source 1: convnext_base_classification and Source 2: eca_nfnet_l0_classification 😀
+Selecting the first 1 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+
+Calculating PID using Flow...

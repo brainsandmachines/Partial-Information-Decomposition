@@ -1,7 +1,0 @@
-Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.36s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.36s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.71s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.71s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.30s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.30s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.80s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.80s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.84s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:28<00:00, 28.84s/it]
-Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s][2026-07-18T18:13:29.495] error: *** JOB 19440980 ON ise-cpu256-10 CANCELLED AT 2026-07-18T18:13:29 DUE to SIGNAL Terminated ***
