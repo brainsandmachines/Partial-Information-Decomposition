@@ -29,20 +29,30 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
 
 
     assert method is not None, "Please specify a method for PID calculation (e.g., 'idep', 'idep_tilde'...etc)"
+    dx1 = sources[0].shape[1]
+    dx2 = sources[1].shape[1]
+    dt = target[0].shape[1]
+    config['dx1'] = dx1
+    config['dx2'] = dx2
+    config['dt'] = dt
     if on_rvs is not None:
         print("\nApplying on_rvs transformation to sources...")
         sources = on_rvs(sources)
     
     if method == "idep":
+        print("\nCalculating PID using Idep...")
         pid,mi = pid_idep_wrapper(config,sources,target,covariance=covariance,rng=rng,on_rvs=on_rvs)
 
     elif method == "tilde":
+        print("\nCalculating PID using Tilde...")
         pid, mi = pid_tilde_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
     
     elif method == "delta":
+        print("\nCalculating PID using Delta...")
         pid, mi = delta_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
     
     elif method in ("flow", "flow_pid"):
+        print("\nCalculating PID using Flow...")
         pid, mi = flow_pid_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
     else:
         raise ValueError("Unsupported method specified")
@@ -223,8 +233,8 @@ def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tenso
                     x,
                     y,
                     n_flows=config.get('n_flows', 3),
-                    n_epochs=config.get('n_epochs', 250),
-                    batch_size=config.get('batch_size', 64),
+                    n_epochs=config.get('n_epochs', 50),
+                    batch_size=config.get('batch_size', 128),
                     lr=config.get('lr', 2e-4),
                     encoder=None,
                     verbose=config.get('verbose', False),

@@ -165,6 +165,10 @@ def pc_function_analysis(
             )
             pair_results: dict[int, dict[str, Any]] = {}
 
+            print(
+                f"\nRunning target-PC analysis with Source 1: {model_1} and "
+                f"Source 2: {model_2} 😀")
+
             for number_of_pcs in range(1, shared_target.shape[1] + 1):
                 selected_train_target = train_target[:, :number_of_pcs]
                 selected_shared_target = shared_target[:, :number_of_pcs]
