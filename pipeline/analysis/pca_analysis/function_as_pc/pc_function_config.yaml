@@ -34,11 +34,11 @@ feature_extraction_kwargs:
 # For each cumulative target-PC count, ridge is fitted only after those target
 # PCs have been selected.
 feature_manipulation_kwargs:
-  ridge: false
+  ridge: true
 
 pid_kwargs:
-  method: flow
-  rng_seed: 88
+  method: idep
+  rng_seed: 39
   config:
     device: cuda
     bias_correction: true
@@ -46,5 +46,5 @@ pid_kwargs:
 # pc_function_analysis writes one pickle per pair to results_dir when it is
 # passed config["results_dir"]. plot_pid_mi_as_function_of_pcs writes both the
 # absolute and normalized PNGs to plot_dir.
-results_dir: pipeline/analysis/pca_analysis/function_as_pc/results/flow_no_ridge_covnext_base_classification_eca_nfnet_l0_classification
-plot_dir: pipeline/analysis/pca_analysis/function_as_pc/plots/flow_no_ridge_covnext_base_classification_eca_nfnet_l0_classification
+results_dir: pipeline/analysis/pca_analysis/function_as_pc/results/idep_with_ridge_covnext_base_classification_eca_nfnet_l0_classification
+plot_dir: pipeline/analysis/pca_analysis/function_as_pc/plots/idep_with_ridge_covnext_base_classification_eca_nfnet_l0_classification

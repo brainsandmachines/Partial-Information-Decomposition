@@ -1267,3 +1267,59 @@ Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
 [Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
 Finding best ridge alphas for 173 target PCs using 25088 features and 9000 samples.
 Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Selecting the first 174 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 174 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 174 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Selecting the first 175 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 175 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 175 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Selecting the first 176 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 176 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 176 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Selecting the first 177 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 177 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 177 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Selecting the first 178 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 178 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 178 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Selecting the first 179 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 179 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 179 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Selecting the first 180 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 180 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 180 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Selecting the first 181 target PCs, fitting ridge, and running PID for RN50_clip and ResNet50-SimCLR_selfsupervised 😀
+Finding best ridge alphas for 181 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 181 target PCs using 25088 features and 9000 samples.
+Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.

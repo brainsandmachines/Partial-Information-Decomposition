@@ -173,8 +173,8 @@ def pc_function_analysis(
                 selected_train_target = train_target[:, :number_of_pcs]
                 selected_shared_target = shared_target[:, :number_of_pcs]
                 print(
-                    f"Selecting the first {number_of_pcs} target PCs, fitting "
-                    f"ridge, and running PID for {model_1} and {model_2} 😀"
+                    f"Selecting the first {number_of_pcs} target PCs "
+                    f"and running PID for {model_1} and {model_2} 😀"
                 )
                 source_1_for_pid = _prepare_source_for_pid(
                     source_1_raw,
