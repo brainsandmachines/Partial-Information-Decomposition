@@ -188,6 +188,8 @@ def pc_function_analysis(
                     shared_mask,
                     ridge,
                 )
+                print(f"Source 1 shape: {source_1_for_pid.shape}, Source 2 shape: {source_2_for_pid.shape}")
+                print(f"Shared target shape: {selected_shared_target.shape}")
                 pair_results[number_of_pcs] = pipeline.functions.pid_calculation(
                     selected_shared_target,
                     source_1_for_pid,

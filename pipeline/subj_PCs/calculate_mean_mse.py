@@ -25,7 +25,7 @@ def report_top_minimal_mean(mean_mse_dict: dict[int, float], top_n: int = 5) -> 
         print(f"PC {pc}: Mean MSE = {mse}")
 
 if __name__ == "__main__":
-    csv_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max=100/checkpoint.csv")
-    max_pcs = 100  # Set the maximum number of principal components
+    csv_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max=200/checkpoint.csv")
+    max_pcs = 200  # Set the maximum number of principal components
     mean_mse_dict = calculate_mean_mse(csv_path, max_pcs)
     report_top_minimal_mean(mean_mse_dict, top_n=10)
