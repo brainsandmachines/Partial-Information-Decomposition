@@ -147,7 +147,8 @@ File description: Plot all PID atoms and mutual-information values against cumul
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `plot_pid_mi_as_function_of_pcs (line 25)` | pair_results: dict[int, dict[str, Any]], model_1_name: str, model_2_name: str, output_dir: str \| Path | Annotated: `tuple[Path, Path]` | Save one two-panel absolute-value figure in bits and one two-panel figure in which every PID and MI series is divided pointwise by trivariate MI; returns the two PNG paths. Plotting-specific. |
+| `plot_pc_results_from_pickle (line 26)` | pkl_path: str \| Path, model_name: str, output_dir: str \| Path, name: str \| None=None | Annotated: `tuple[Path, Path]` | Load a trusted cumulative target-PC result pickle, split the two source names at `__`, and call the core plotting function. The optional name is added to figure titles and filenames. Plotting-specific. |
+| `plot_pid_mi_as_function_of_pcs (line 73)` | pair_results: dict[int, dict[str, Any]], model_1_name: str, model_2_name: str, output_dir: str \| Path, name: str \| None=None | Annotated: `tuple[Path, Path]` | Save one two-panel absolute-value figure in bits and one trivariate-MI-normalized figure, use target-PC ticks at exact 20-PC intervals, and annotate each unique-information legend entry with its displayed minimum, maximum, and corresponding PC counts. The optional name is added to figure titles and filenames; returns the two PNG paths. Plotting-specific. |
 
 ### `pipeline/analysis/pca_analysis/pca_as_function.py`
 
