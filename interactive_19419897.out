@@ -9,3 +9,4 @@ Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
 Fri 17 Jul 2026 10:02:44 IDT
  STARTING JOB WITH THE COMMAND:  sleep 600 
+[2026-07-17T10:53:26.095] error: *** JOB 19419897 ON ise-cpu-intl-25 CANCELLED AT 2026-07-17T10:53:26 DUE to SIGNAL Terminated ***

@@ -55,7 +55,7 @@ def find_alpha_per_pc(
             "predictor and target must have the same number of samples."
         )
 
-    alphas = np.logspace(4, 20, 50)
+    alphas = np.logspace(1, 20, 100)
 
     print(
         f"Finding best ridge alphas for {target.shape[1]} target PCs "
@@ -63,7 +63,7 @@ def find_alpha_per_pc(
         f"{predictor.shape[0]} samples."
     )
 
-    print("Using alphas: 10^4 to 10^20, 50 values spaced logarithmically.")
+    print("Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.")
 
     ridge_model = make_pipeline(
         RidgeCV(
@@ -414,7 +414,7 @@ if __name__ == "__main__":
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-B_32_clip','ViT-L_14_clip'
         ]
     
-
+    n_pcs = 90  # Number of principal components to use for ridge regression
     #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
@@ -424,8 +424,8 @@ if __name__ == "__main__":
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
-    alphas_csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results2/all_models_alphas.csv')
-    output_dir = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results2/alphas_')
+    alphas_csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results3/pcs{n_pcs}_all_models_alphas.csv')
+    output_dir = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results3/pcs{n_pcs}_alphas_')
         
     path_config = {
         "path_to_results": path_to_results,
@@ -450,6 +450,7 @@ if __name__ == "__main__":
             pkl_info_path,
             neural_data_path,
             alphas_csv_path,
+            n_pcs = n_pcs
         )
     
 
