@@ -119,6 +119,13 @@ def pc_function_analysis(
         PC-count entry contains the complete PID result with ``pid`` and
         ``mi`` dictionaries.
     """
+    print(f"\nBias correction is set to: {config['pid_kwargs']['config']['bias_correction']}")
+    print(f"Ridge is set to: {config['feature_manipulation_kwargs']['ridge']}")
+    print(f"Results will be saved to: {results_dir}")
+    print(f"Plots will be saved to: {plot_dir}")
+    print(f"Target PCA model will be loaded from: {pc_path}\n")
+
+
 
     target_context = prepare_target(
         Path(hdf_path),
@@ -264,6 +271,25 @@ def main() -> None:
         config["functions"],
         PIPELINE_STEP_FUNCTIONS,
     )
+
+    print(f"\n Starting Experiment: {config['experiment_name']}")
+    #Create directories according ot bias correction and ridge settings
+    if config["pid_kwargs"]["config"]["bias_correction"]:
+        if config["feature_manipulation_kwargs"]["ridge"]:
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"R_B_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"R_B_tilde_{config['model1_name']}_{config['model2_name' ]}"
+        else:
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_B_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_B_tilde_{config['model1_name']}_{config['model2_name']}"
+    else:
+        if config["feature_manipulation_kwargs"]["ridge"]:
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"R_NB_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"R_NB_tilde_{config['model1_name']}_{config['model2_name']}"
+        else:
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_NB_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_NB_tilde_{config['model1_name']}_{config['model2_name']}"
+
+        
     pc_function_analysis(
         config=config,
         functions=functions,

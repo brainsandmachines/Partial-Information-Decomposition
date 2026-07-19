@@ -1,19 +1,28 @@
 ------------------------------------
-Sat 18 Jul 2026 18:14:36 IDT
-SLURM_JOBID:		19441036
-SLURM_JOB_NODELIST:	ise-cpu256-01
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/19441036
+Sun 19 Jul 2026 15:48:27 IDT
+SLURM_JOBID:		19451192
+SLURM_JOB_NODELIST:	ise-cpu128-13
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19451192
 Allocated Resouces:	cpu - 4 / mem - 49152 MB / gpu - 
 SLURM_GPU_INDEX:	
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
-Running on host: ise-cpu256-01.auth.ad.bgu.ac.il
-Job ID: 19441036
+Running on host: ise-cpu128-13.auth.ad.bgu.ac.il
+Job ID: 19451192
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
 Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
 Using device: cpu
+
+ Starting Experiment: Ridge_Bias_True_False
+
+Bias correction is set to: True
+Ridge is set to: True
+Results will be saved to: pipeline/analysis/pca_analysis/function_as_pc/results/Ridge_Bias_True_False/R_B_tilde_['convnext_base_classification']_['eca_nfnet_l0_classification']
+Plots will be saved to: pipeline/analysis/pca_analysis/function_as_pc/plots/Ridge_Bias_True_False/R_B_tilde_['convnext_base_classification']_['eca_nfnet_l0_classification']
+Target PCA model will be loaded from: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl
+
 Number of images: 73000
 Image shape: (425, 425, 3), dtype: uint8
 nsdID shape: (73000,), Shared1000 shape: (73000,)
@@ -48,172 +57,3 @@ Total number of layers: 185
 Processing layer: Conv2d-26 from model: convnext_base_classification
 
 For model convnext_base_classification Layer Conv2d-26: Extracting features for 10000 images in batches of 120...
-Feature extraction for model convnext_base_classification layer Conv2d-26 completed in 2555.23 seconds.
-
-==================================================
-Processing layer: AvgPool2d-3 from model: eca_nfnet_l0_classification
-
-For model eca_nfnet_l0_classification Layer AvgPool2d-3: Extracting features for 10000 images in batches of 120...
-Feature extraction for model eca_nfnet_l0_classification layer AvgPool2d-3 completed in 758.71 seconds.
-
-Running target-PC analysis with Source 1: convnext_base_classification and Source 2: eca_nfnet_l0_classification 😀
-Selecting the first 1 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 2 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 3 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 4 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 5 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 6 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 7 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 8 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 9 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 10 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 11 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 12 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 13 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 14 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 15 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 16 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 17 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 18 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 19 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 20 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 21 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 22 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 23 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 24 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 25 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 26 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 27 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 28 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 29 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 30 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 31 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 32 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 33 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 34 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 35 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 36 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 37 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 38 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 39 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 40 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 41 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 42 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 43 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 44 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 45 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 46 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 47 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 48 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 49 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 50 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 51 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 52 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 53 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
-
-Calculating PID using Tilde...
-Selecting the first 54 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀

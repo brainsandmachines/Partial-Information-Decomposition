@@ -46,5 +46,6 @@ pid_kwargs:
 # pc_function_analysis writes one pickle per pair to results_dir when it is
 # passed config["results_dir"]. plot_pid_mi_as_function_of_pcs writes both the
 # absolute and normalized PNGs to plot_dir.
-results_dir: pipeline/analysis/pca_analysis/function_as_pc/results/bias_corr_tilde_with_ridge_covnext_base_classification_eca_nfnet_l0_classification
-plot_dir: pipeline/analysis/pca_analysis/function_as_pc/plots/bias_corr_tilde_with_ridge_covnext_base_classification_eca_nfnet_l0_classification
+results_dir: pipeline/analysis/pca_analysis/function_as_pc/results/Ridge_Bias_True_False
+plot_dir: pipeline/analysis/pca_analysis/function_as_pc/plots/Ridge_Bias_True_False
+experiment_name: Ridge_Bias_True_False

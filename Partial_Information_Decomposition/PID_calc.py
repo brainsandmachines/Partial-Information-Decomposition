@@ -38,7 +38,12 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
     if on_rvs is not None:
         print("\nApplying on_rvs transformation to sources...")
         sources = on_rvs(sources)
-    
+
+
+    if not config['bias_correction']:
+        print(f"\nWARNING: Bias correction is disabled:{config['bias_correction']} for PID calculation.")
+    else: 
+        print(f"\nBias correction is enabled for PID calculation:{config['bias_correction']}.")
     if method == "idep":
         print("\nCalculating PID using Idep...")
         pid,mi = pid_idep_wrapper(config,sources,target,covariance=covariance,rng=rng,on_rvs=on_rvs)

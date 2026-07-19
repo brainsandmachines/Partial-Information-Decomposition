@@ -1,0 +1,5 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [01:07<00:00, 67.85s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [01:07<00:00, 67.86s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [01:07<00:00, 67.86s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [01:07<00:00, 67.87s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [01:07<00:00, 67.56s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [01:07<00:00, 67.57s/it]
+Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [01:08<00:00, 68.21s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [01:08<00:00, 68.22s/it]
