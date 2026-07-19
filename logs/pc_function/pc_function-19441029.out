@@ -303,3 +303,450 @@ Calculating PID using Tilde...
 Selecting the first 28 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
 Finding best ridge alphas for 28 target PCs using 100352 features and 9000 samples.
 Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Finding best ridge alphas for 28 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 29 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 29 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Finding best ridge alphas for 29 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+
+Calculating PID using Tilde...
+Selecting the first 30 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 30 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Finding best ridge alphas for 30 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+
+Calculating PID using Tilde...
+Selecting the first 31 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 31 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Finding best ridge alphas for 31 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+
+Calculating PID using Tilde...
+Selecting the first 32 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 32 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Finding best ridge alphas for 32 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+
+Calculating PID using Tilde...
+Selecting the first 33 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 33 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 33 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+
+Calculating PID using Tilde...
+Selecting the first 34 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 34 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Finding best ridge alphas for 34 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+
+Calculating PID using Tilde...
+Selecting the first 35 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 35 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 35 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+
+Calculating PID using Tilde...
+Selecting the first 36 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 36 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 36 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+
+Calculating PID using Tilde...
+Selecting the first 37 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 37 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Finding best ridge alphas for 37 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+
+Calculating PID using Tilde...
+Selecting the first 38 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 38 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Finding best ridge alphas for 38 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+
+Calculating PID using Tilde...
+Selecting the first 39 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 39 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.6min
+Finding best ridge alphas for 39 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+
+Calculating PID using Tilde...
+Selecting the first 40 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 40 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Finding best ridge alphas for 40 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+
+Calculating PID using Tilde...
+Selecting the first 41 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 41 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 41 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+
+Calculating PID using Tilde...
+Selecting the first 42 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 42 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Finding best ridge alphas for 42 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 43 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 43 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 43 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+
+Calculating PID using Tilde...
+Selecting the first 44 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 44 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Finding best ridge alphas for 44 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+
+Calculating PID using Tilde...
+Selecting the first 45 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 45 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Finding best ridge alphas for 45 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+
+Calculating PID using Tilde...
+Selecting the first 46 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 46 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 46 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+
+Calculating PID using Tilde...
+Selecting the first 47 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 47 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.6min
+Finding best ridge alphas for 47 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+
+Calculating PID using Tilde...
+Selecting the first 48 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 48 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 48 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+
+Calculating PID using Tilde...
+Selecting the first 49 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 49 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Finding best ridge alphas for 49 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+
+Calculating PID using Tilde...
+Selecting the first 50 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 50 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 50 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+
+Calculating PID using Tilde...
+Selecting the first 51 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 51 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 51 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+
+Calculating PID using Tilde...
+Selecting the first 52 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 52 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Finding best ridge alphas for 52 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+
+Calculating PID using Tilde...
+Selecting the first 53 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 53 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Finding best ridge alphas for 53 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+
+Calculating PID using Tilde...
+Selecting the first 54 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 54 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.8min
+Finding best ridge alphas for 54 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 55 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 55 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 55 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+
+Calculating PID using Tilde...
+Selecting the first 56 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 56 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Finding best ridge alphas for 56 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+
+Calculating PID using Tilde...
+Selecting the first 57 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 57 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Finding best ridge alphas for 57 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+
+Calculating PID using Tilde...
+Selecting the first 58 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 58 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.6min
+Finding best ridge alphas for 58 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+
+Calculating PID using Tilde...
+Selecting the first 59 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 59 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 59 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+
+Calculating PID using Tilde...
+Selecting the first 60 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 60 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.3min
+Finding best ridge alphas for 60 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+
+Calculating PID using Tilde...
+Selecting the first 61 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 61 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Finding best ridge alphas for 61 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+
+Calculating PID using Tilde...
+Selecting the first 62 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 62 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 62 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+
+Calculating PID using Tilde...
+Selecting the first 63 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 63 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.4min
+Finding best ridge alphas for 63 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 64 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 64 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 64 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 65 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 65 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.5min
+Finding best ridge alphas for 65 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 66 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 66 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 66 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+
+Calculating PID using Tilde...
+Selecting the first 67 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 67 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.6min
+Finding best ridge alphas for 67 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 68 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 68 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.3min
+Finding best ridge alphas for 68 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 69 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 69 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Finding best ridge alphas for 69 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 70 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 70 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 70 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 71 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 71 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 71 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 72 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 72 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 72 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 73 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 73 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 73 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+
+Calculating PID using Tilde...
+Selecting the first 74 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 74 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 74 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 75 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 75 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Finding best ridge alphas for 75 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+
+Calculating PID using Tilde...
+Selecting the first 76 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 76 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 76 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+
+Calculating PID using Tilde...
+Selecting the first 77 target PCs, fitting ridge, and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 77 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 77 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+
+Calculating PID using Tilde...
