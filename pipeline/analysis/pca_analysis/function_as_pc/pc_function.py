@@ -22,6 +22,7 @@ from pipeline.analysis.pca_analysis.function_as_pc.plot_pc_results import (
 from pipeline.full_OTC.otc_experiment import PIPELINE_STEP_FUNCTIONS
 from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target,pca_source
 from pipeline.pipeline_phases.sources_target_features import prepare_target
+from pipeline.pipeline_phases.report_results import print_pid_mi
 from pipeline.pipeline_utils import pipeline_functions_from_config
 from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
 
@@ -190,12 +191,20 @@ def pc_function_analysis(
                 )
                 print(f"Source 1 shape: {source_1_for_pid.shape}, Source 2 shape: {source_2_for_pid.shape}")
                 print(f"Shared target shape: {selected_shared_target.shape}")
-                pair_results[number_of_pcs] = pipeline.functions.pid_calculation(
+                pid_results = pipeline.functions.pid_calculation(
                     selected_shared_target,
                     source_1_for_pid,
                     source_2_for_pid,
                     **(config.get("pid_kwargs") or {}),
                 )
+
+                pair_results[number_of_pcs] = pid_results
+
+                print(
+                    f"\nResults after selecting the first {number_of_pcs} "
+                    "target PCs:"
+                )
+                print_pid_mi(pid_results["pid"], pid_results["mi"])
 
             results[model_1][model_2] = pair_results
             if results_dir is not None:
