@@ -184,13 +184,13 @@ def plot_pid_mi_as_function_of_pcs(
 
 if __name__ == "__main__":
     model1_name = "RN50_clip"
-    model2_name = "ghostnet_100_classification"
+    model2_name = "ResNet50-SimCLR_selfsupervised"
     model_pair_name = f"{model1_name}__{model2_name}"
-    pickle_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/function_as_pc/results/RN50_clip_ghostnet_100_classification/ridge/RN50_clip__ghostnet_100_classification_pc_results.pkl")
-    output_dir = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/function_as_pc/plots/RN50_clip_ghostnet_100_classification/ridge_RN50_clip_ghostnet_100_classification.png")
+    pickle_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/function_as_pc/results/NORIDGE_RN50_clip_ResNet50-SimCLR_selfsupervised/RN50_clip__ResNet50-SimCLR_selfsupervised_pc_results.pkl")
+    output_dir = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/function_as_pc/plots/RN50_clip_ResNet50-SimCLR_selfsupervised/no_ridge_RN50_clip_ResNet50-SimCLR_selfsupervised.png")
     plot_pc_results_from_pickle(
         pkl_path=pickle_path,
         model_name=model_pair_name,
         output_dir=output_dir,
-        name = "Ridge_RN50_clip vs ghostnet_100_classification"
+        name = "No_Ridge_RN50_clip vs ResNet50-SimCLR_selfsupervised"
     )
