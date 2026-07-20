@@ -32,8 +32,8 @@ from Simulations.evil_twin.evil_twin_pid_batch_utils import (
 # Edit only this dictionary to configure the experiment.
 CONFIG = {
     "seeds": [0],
-    "n_samples": 10000,
-    "dimension": 50,
+    "n_samples": 1000,
+    "dimension": 100,
     "methods": ("idep", "tilde"),
     "bias_correction": False,
     "device": "cpu",

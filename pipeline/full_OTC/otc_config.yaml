@@ -3,7 +3,7 @@ functions:
   sources_extraction: nsd_sources
   choose_layer: overall_best_layer
   feature_extraction: nsd_feature_extraction
-  preprocess: scale_func
+  preprocess: null
   feature_manipulation: feature_manipulation_ridge #pca_each_source
   pid_calculation: pid_calc
   pid_report: print_pid_mi
