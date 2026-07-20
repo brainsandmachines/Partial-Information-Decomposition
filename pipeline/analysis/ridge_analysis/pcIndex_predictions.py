@@ -1,8 +1,12 @@
-import numpy as np
-import torch 
-from pathlib import Path
-from scipy.stats import pearsonr
+from __future__ import annotations
+
+import csv
 import sys
+from pathlib import Path
+
+import numpy as np
+from scipy.stats import pearsonr
+
 repo_root = Path(__file__).resolve().parents[3]
 external_root = repo_root / "external"
 for path in (repo_root, external_root):
@@ -10,108 +14,158 @@ for path in (repo_root, external_root):
     if path_str not in sys.path:
         sys.path.insert(0, path_str)
 
-        
-from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
+from external.mayas_project.features_and_encoding.feat_ext_and_encoding import (
+    prepare_model_context,
+)
+from pipeline.analysis.anlysis_utils import (
+    _prepare_source_for_pid,
+    to_deepdive_model_name,
+)
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
+from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
 from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import nsd_feature_extraction
-from pipeline.analysis.anlysis_utils import _prepare_source_for_pid
-from external.mayas_project.features_and_encoding.feat_ext_and_encoding import prepare_model_context
 
 
+pc_path = repo_root / "pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl"
+hdf_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5")
+pkl_info_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl")
+neural_data_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr")
+path_to_results = repo_root / "external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv"
 
 
+def each_pc_index_pred(
+    model_name: str,
+    n_pcs: list[int],
+    pc_path: str | Path,
+    hdf_path: str | Path,
+    pkl_info_path: str | Path,
+    neural_data_path: str | Path,
+) -> tuple[np.ndarray, int]:
+    """Predict individual target PCs from one model's selected layer.
 
+    Inputs:
+        model_name: str model identifier from the best-layer CSV.
+        n_pcs: list[int] of zero-based target-PC indexes to predict.
+        pc_path: str or Path to the fitted target PCA model.
+        hdf_path: str or Path to the NSD stimulus HDF5 file.
+        pkl_info_path: str or Path to the NSD stimulus-information pickle.
+        neural_data_path: str or Path to the subject neural-data Zarr store.
 
-# Target data and the saved PCA used to order/select the target PCs.
-pc_path= Path("pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl")
-hdf_path= Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5")
-pkl_info_path= Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl")
-neural_data_path= Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr")
-
-
-
-
-
-
-def each_pc_index_pred(model_name,n_pcs,pc_path, hdf_path, pkl_info_path, neural_data_path):
-    """This function runs ridge regression on each PC of the target data, after loading the model and extracting
-    the best layer features. It returns the correlation between the predicted and actual PC values for each PC.
-    Args:
-        model_name (str): The name of the model to be used for feature extraction.
-        n_pcs (list): A list of integers representing the indices of the PCs to be analyzed.
-        pc_path (Path): Path to the saved PCA model.
-        hdf_path (Path): Path to the HDF5 file containing the stimuli.
-        pkl_info_path (Path): Path to the pickle file containing stimulus information.
-        neural_data_path (Path): Path to the Zarr file containing neural data.
-    Returns:
-        correlations (np.ndarray): An array of correlation values between the predicted and actual PC values for each PC.
+    Outputs:
+        tuple[np.ndarray, int] containing correlations in ``n_pcs`` order and
+        the selected model-layer index.
     """
-
-    target_context = prepare_target(
-        Path(hdf_path),
-        Path(pkl_info_path),
-        Path(neural_data_path),
-    )
-
-    #Split the data into train and test sets, and PCA the target data accoring to already existing pca model.
+    target_context = prepare_target(Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
     train_target, shared_target, shared_mask = prepare_ridge_target(
-        target_context["target"],
-        target_context,
-        pc_path,
+        target_context["target"], target_context, pc_path
     )
+    if any(pc_index < 0 or pc_index >= train_target.shape[1] for pc_index in n_pcs):
+        raise IndexError(f"PC indexes must be between 0 and {train_target.shape[1] - 1}.")
 
+    layer_index = overall_best_layer(model_name, path_to_results=str(path_to_results))["l"]
+    if layer_index is None:
+        raise ValueError(f"No best layer found for model {model_name!r}.")
+    source_context = prepare_model_context(to_deepdive_model_name(model_name))
+    print(f"Starting to extract features for {model_name} at layer {layer_index}")
+    features = nsd_feature_extraction(source_context, layer_index, target_context=target_context)
 
-    # Prepare the source data for the two models
-    source_context = prepare_model_context(model_name)
-
-    
-    path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
-    #Layers
-    layer1 = overall_best_layer(model_name,path_to_results = path_to_results)
-    print(f"Starting to extract features for {model_name} at layer {layer1['l']}")
-    features1 = nsd_feature_extraction(source_context, layer1['l'],target_context=target_context)
-
-    correlations = np.full(n_pcs, np.nan)
-    
+    correlations = np.full(len(n_pcs), np.nan, dtype=float)
     print(f"Running analysis for {len(n_pcs)} PCs")
-    for f in range(len(n_pcs)):
-        n_pc = n_pcs[f]
-        print(f"Running analysis for {n_pc} PCs")
-        # Prepare the source data for the two models
-        #Extract just one PC from the target data for the current iteration
-        pc_train_target = train_target[:,n_pc]
-
-        pc_test_target = shared_target[:,n_pc]
-        # Predict the target PCs on the shared images using ridge regression for both models
-        source_pred = _prepare_source_for_pid(features1, pc_train_target, shared_mask, ridge=True)
-
-        if np.std(pc_train_target) > 0 and np.std(source_pred) > 0:
-            correlations[n_pc] = pearsonr(pc_test_target, source_pred).statistic
-
-    return correlations
+    for result_index, pc_index in enumerate(n_pcs):
+        print(f"Running analysis for PC index {pc_index}")
+        pc_train_target = train_target[:, [pc_index]]  # (n_train, n_pcs) -> (n_train, 1)
+        pc_test_target = shared_target[:, pc_index]  # (n_shared, n_pcs) -> (n_shared,)
+        source_pred = np.asarray(
+            _prepare_source_for_pid(features, pc_train_target, shared_mask, ridge=True)
+        ).reshape(-1)  # (n_shared, 1) -> (n_shared,)
+        if np.std(pc_test_target) > 0 and np.std(source_pred) > 0:
+            correlations[result_index] = pearsonr(pc_test_target, source_pred).statistic
+    return correlations, int(layer_index)
 
 
-def save_correlations_to_csv(correlations, output_path):
-    """Saves the correlations array to a CSV file.
-    Args:
-        correlations (np.ndarray): An array of correlation values.
-        output_path (Path): The path where the CSV file will be saved.
+def save_correlations_to_csv(
+    correlations: np.ndarray,
+    model_name: str,
+    layer_index: int,
+    pc_indexes: list[int],
+    output_path: str | Path,
+) -> Path:
+    """Append one completed model's per-PC correlations to a checkpoint CSV.
+
+    Inputs:
+        correlations: np.ndarray with one correlation per requested PC.
+        model_name: str model identifier used as the resume key.
+        layer_index: int selected model-layer index.
+        pc_indexes: list[int] of zero-based PC indexes matching correlations.
+        output_path: str or Path to the checkpoint CSV.
+
+    Outputs:
+        Path to the updated checkpoint CSV.
     """
-    np.savetxt(output_path, correlations, delimiter=",")
-    print(f"Correlations saved to {output_path}")
+    correlations = np.asarray(correlations, dtype=float).reshape(-1)
+    if correlations.size != len(pc_indexes):
+        raise ValueError("correlations and pc_indexes must have the same length.")
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in pc_indexes)]
+    has_content = output_path.is_file() and output_path.stat().st_size > 0
+    if has_content:
+        with output_path.open("r", newline="", encoding="utf-8") as csv_file:
+            if next(csv.reader(csv_file), None) != header:
+                raise ValueError(f"Existing checkpoint has an incompatible header: {output_path}")
+    with output_path.open("a" if has_content else "w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        if not has_content:
+            writer.writerow(header)
+        writer.writerow([model_name, int(layer_index), *correlations.tolist()])
+    print(f"Saved {model_name} correlations to {output_path}")
+    return output_path
 
 
+def main() -> None:
+    """Run every best-layer model and resume from a per-model CSV checkpoint.
 
-def main():
-    model_name = 'RN50_clip'
-    n_pcs = list(range(200))  # Analyze the first 200 PCs
-    correlations = each_pc_index_pred(model_name, n_pcs, pc_path, hdf_path, pkl_info_path, neural_data_path)
-    print("Correlations between predicted and actual PC values for each PC:")
-    print(correlations)
-    output_path = Path("correlations_per_pc.csv")
-    save_correlations_to_csv(correlations, output_path)
+    Inputs:
+        None.
 
+    Outputs:
+        None. Saves one CSV row immediately after each completed model.
+    """
+    n_pcs = list(range(200))
+    output_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/ridge_analysis')
+
+    model_names =  ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
+        'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
+        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
+        ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
+        'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
+        'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
+        'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
+        'convit_base_classification','RN50_clip','RN101_clip',
+        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-L_14_clip','ViT-B_32_clip'
+        ] #dino_resnet50_selfsupervised, dino_vitb16_selfsupervised - missing
+
+    header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in n_pcs)]
+    completed_models: set[str] = set()
+    if output_path.is_file() and output_path.stat().st_size > 0:
+        with output_path.open("r", newline="", encoding="utf-8") as csv_file:
+            reader = csv.DictReader(csv_file)
+            if reader.fieldnames != header:
+                raise ValueError(f"Existing checkpoint has an incompatible header: {output_path}")
+            completed_models = {row["model_name"].strip() for row in reader if row["model_name"].strip()}
+
+    for model_name in model_names:
+        if model_name in completed_models:
+            print(f"Skipping completed model: {model_name}")
+            continue
+        print(f"Starting model: {model_name}")
+        correlations, layer_index = each_pc_index_pred(
+            model_name, n_pcs, pc_path, hdf_path, pkl_info_path, neural_data_path
+        )
+        save_correlations_to_csv(correlations, model_name, layer_index, n_pcs, output_path)
+        completed_models.add(model_name)
 
 
 if __name__ == "__main__":

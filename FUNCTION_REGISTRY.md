@@ -195,6 +195,14 @@ File description: Search source-1 PCA component subsets for source-1 unique PID 
 | `_append_csv_row (line 383)` | path: str \| Path \| None, subset: tuple[int, ...], start: float, status: str, *, cmi_score: float \| None=None, row: dict[str, Any] \| None=None | Annotated: `None` | Append one compact row to a CSV file, creating the header when needed. |
 | `_toy_pid (line 425)` | target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, **pid_kwargs: Any | Annotated: `dict[str, dict[str, float]]` | Return a tiny Gaussian-CMI-based PID-like result for local smoke runs. |
 
+### `pipeline/analysis/ridge_analysis/pcIndex_predictions.py`
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `each_pc_index_pred (line 37)` | model_name: str, n_pcs: list[int], pc_path: str \| Path, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path | Annotated: `tuple[np.ndarray, int]` | Task-specific zero-based per-PC ridge prediction using `_prepare_source_for_pid`; return held-out correlations and the selected layer index. |
+| `save_correlations_to_csv (line 87)` | correlations: np.ndarray, model_name: str, layer_index: int, pc_indexes: list[int], output_path: str \| Path | Annotated: `Path` | Append exactly one completed model row to the validated task-specific per-PC checkpoint CSV. |
+| `main (line 126)` | No inputs | Annotated: `None` | Run every model listed by the best-layer CSV, skipping checkpointed models and saving each newly completed model immediately. Task-specific runner. |
+
 ### `pipeline/plotting/pairwise_pid_heatmaps.py`
 
 File description: Create publication-friendly PID component matrices from the resumable pairwise OTC CSV.
