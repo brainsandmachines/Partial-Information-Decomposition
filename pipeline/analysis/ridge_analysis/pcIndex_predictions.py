@@ -1,25 +1,23 @@
 import numpy as np
 import torch 
-from pipeline.full_OTC.otc_experiment import PIPELINE_STEP_FUNCTIONS
-from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target,pca_source
-from pipeline.pipeline_phases.choosing_layer import overall_best_layer
-from pipeline.pipeline_phases.sources_target_features import prepare_sources, prepare_target
-from pipeline.pipeline_phases.report_results import print_pid_mi
-from pipeline.pipeline_utils import nsd_feature_extraction, nsd_sources, pipeline_functions_from_config
-from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
 from pathlib import Path
-from pipeline.analysis.anlysis_utils import _prepare_source_for_pid
 from scipy.stats import pearsonr
 import sys
-
-repo_root = Path(__file__).resolve().parents[1]
+repo_root = Path(__file__).resolve().parents[3]
 external_root = repo_root / "external"
 for path in (repo_root, external_root):
     path_str = str(path)
     if path_str not in sys.path:
         sys.path.insert(0, path_str)
 
+        
+from pipeline.pipeline_phases.feature_manipulations import prepare_ridge_target
+from pipeline.pipeline_phases.choosing_layer import overall_best_layer
+from pipeline.pipeline_phases.sources_target_features import prepare_target
+from pipeline.pipeline_utils import nsd_feature_extraction
+from pipeline.analysis.anlysis_utils import _prepare_source_for_pid
 from external.mayas_project.features_and_encoding.feat_ext_and_encoding import prepare_model_context
+
 
 
 
@@ -68,13 +66,15 @@ def each_pc_index_pred(model_name,n_pcs,pc_path, hdf_path, pkl_info_path, neural
     source_context = prepare_model_context(model_name)
 
     
-    path_to_results = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
+    path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     #Layers
     layer1 = overall_best_layer(model_name,path_to_results = path_to_results)
-    
-    features1 = nsd_feature_extraction(source_context, layer1['l'], layer1,target_context=target_context)
+    print(f"Starting to extract features for {model_name} at layer {layer1['l']}")
+    features1 = nsd_feature_extraction(source_context, layer1['l'],target_context=target_context)
 
     correlations = np.full(n_pcs, np.nan)
+    
+    print(f"Running analysis for {len(n_pcs)} PCs")
     for f in range(len(n_pcs)):
         n_pc = n_pcs[f]
         print(f"Running analysis for {n_pc} PCs")
@@ -92,6 +92,16 @@ def each_pc_index_pred(model_name,n_pcs,pc_path, hdf_path, pkl_info_path, neural
     return correlations
 
 
+def save_correlations_to_csv(correlations, output_path):
+    """Saves the correlations array to a CSV file.
+    Args:
+        correlations (np.ndarray): An array of correlation values.
+        output_path (Path): The path where the CSV file will be saved.
+    """
+    np.savetxt(output_path, correlations, delimiter=",")
+    print(f"Correlations saved to {output_path}")
+
+
 
 def main():
     model_name = 'RN50_clip'
@@ -99,3 +109,10 @@ def main():
     correlations = each_pc_index_pred(model_name, n_pcs, pc_path, hdf_path, pkl_info_path, neural_data_path)
     print("Correlations between predicted and actual PC values for each PC:")
     print(correlations)
+    output_path = Path("correlations_per_pc.csv")
+    save_correlations_to_csv(correlations, output_path)
+
+
+
+if __name__ == "__main__":
+    main()

@@ -59,3 +59,1759 @@ Total number of layers: 387
 Processing layer: Conv2d-26 from model: convnext_base_classification
 
 For model convnext_base_classification Layer Conv2d-26: Extracting features for 10000 images in batches of 120...
+Feature extraction for model convnext_base_classification layer Conv2d-26 completed in 2909.26 seconds.
+
+==================================================
+Processing layer: Conv2d-102 from model: RN101_clip
+
+For model RN101_clip Layer Conv2d-102: Extracting features for 10000 images in batches of 120...
+Feature extraction for model RN101_clip layer Conv2d-102 completed in 1425.87 seconds.
+
+Running target-PC analysis with Source 1: convnext_base_classification and Source 2: RN101_clip 😀
+Selecting the first 1 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 1), Source 2 shape: (1000, 1)
+Shared target shape: (1000, 1)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 1 target PCs:
+PID Results:
+  red: 0.007340030688604102
+  unq1: 0.0
+  unq2: 0.03474644932190147
+  syn: 0.0
+Mutual Information Results:
+  tri_mi: 0.04208648001050557
+  bi_mi_1: 0.007340030688604099
+  bi_mi_2: 0.04208648001050557
+Selecting the first 2 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 2), Source 2 shape: (1000, 2)
+Shared target shape: (1000, 2)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 2 target PCs:
+PID Results:
+  red: 0.12675384533155276
+  unq1: 0.48925373819990664
+  unq2: 0.00015460332327743576
+  syn: 0.19801663732600705
+Mutual Information Results:
+  tri_mi: 0.8141788241807438
+  bi_mi_1: 0.6160075835314593
+  bi_mi_2: 0.12690844865483014
+Selecting the first 3 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 3), Source 2 shape: (1000, 3)
+Shared target shape: (1000, 3)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 3 target PCs:
+PID Results:
+  red: 0.6934366295890844
+  unq1: 0.3829516856857278
+  unq2: 0.0
+  syn: 0.07926036317683272
+Mutual Information Results:
+  tri_mi: 1.1556486784516449
+  bi_mi_1: 1.0763883152748122
+  bi_mi_2: 0.6934366295890844
+Selecting the first 4 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 4), Source 2 shape: (1000, 4)
+Shared target shape: (1000, 4)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 4 target PCs:
+PID Results:
+  red: 1.2186520899777484
+  unq1: 0.3058067658123873
+  unq2: 0.07546595304054882
+  syn: 0.09820957058634261
+Mutual Information Results:
+  tri_mi: 1.6981343794170274
+  bi_mi_1: 1.524458855790136
+  bi_mi_2: 1.2941180430182975
+Selecting the first 5 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 5), Source 2 shape: (1000, 5)
+Shared target shape: (1000, 5)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 5 target PCs:
+PID Results:
+  red: 1.4219302407969057
+  unq1: 0.45001748262566155
+  unq2: 0.03693795294266966
+  syn: 0.16156900011423891
+Mutual Information Results:
+  tri_mi: 2.070454676479476
+  bi_mi_1: 1.8719477234225672
+  bi_mi_2: 1.4588681937395753
+Selecting the first 6 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 6), Source 2 shape: (1000, 6)
+Shared target shape: (1000, 6)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 6 target PCs:
+PID Results:
+  red: 1.6463277147734492
+  unq1: 0.40563962836827017
+  unq2: 0.07310382266913296
+  syn: 0.15063924492429814
+Mutual Information Results:
+  tri_mi: 2.2757104107351505
+  bi_mi_1: 2.0519673431417194
+  bi_mi_2: 1.7194315374425821
+Selecting the first 7 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 7), Source 2 shape: (1000, 7)
+Shared target shape: (1000, 7)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 7 target PCs:
+PID Results:
+  red: 1.8690597716066248
+  unq1: 0.37313780936960095
+  unq2: 0.04479530249275454
+  syn: 0.16226934918892333
+Mutual Information Results:
+  tri_mi: 2.4492622326579037
+  bi_mi_1: 2.242197580976226
+  bi_mi_2: 1.9138550740993794
+Selecting the first 8 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 8), Source 2 shape: (1000, 8)
+Shared target shape: (1000, 8)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 8 target PCs:
+PID Results:
+  red: 2.037856227257387
+  unq1: 0.284858400391653
+  unq2: 0.0792075944495152
+  syn: 0.1906513401973693
+Mutual Information Results:
+  tri_mi: 2.592573562295924
+  bi_mi_1: 2.3227146276490394
+  bi_mi_2: 2.1170638217069015
+Selecting the first 9 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 9), Source 2 shape: (1000, 9)
+Shared target shape: (1000, 9)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 9 target PCs:
+PID Results:
+  red: 2.2010155110046172
+  unq1: 0.247519985432735
+  unq2: 0.11962370524953236
+  syn: 0.17206197793804456
+Mutual Information Results:
+  tri_mi: 2.740221179624929
+  bi_mi_1: 2.4485354964373522
+  bi_mi_2: 2.3206392162541496
+Selecting the first 10 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 10), Source 2 shape: (1000, 10)
+Shared target shape: (1000, 10)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 10 target PCs:
+PID Results:
+  red: 2.305574310065943
+  unq1: 0.2515218736793723
+  unq2: 0.2080872666423086
+  syn: 0.17018173283554683
+Mutual Information Results:
+  tri_mi: 2.935365183223171
+  bi_mi_1: 2.5570961837453154
+  bi_mi_2: 2.5136615767082517
+Selecting the first 11 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 11), Source 2 shape: (1000, 11)
+Shared target shape: (1000, 11)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 11 target PCs:
+PID Results:
+  red: 2.5493866034256842
+  unq1: 0.3282175231027198
+  unq2: 0.24711567045464866
+  syn: 0.198477605887867
+Mutual Information Results:
+  tri_mi: 3.32319740287092
+  bi_mi_1: 2.8776041265284045
+  bi_mi_2: 2.7965022738803333
+Selecting the first 12 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 12), Source 2 shape: (1000, 12)
+Shared target shape: (1000, 12)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 12 target PCs:
+PID Results:
+  red: 2.8435429469655795
+  unq1: 0.39083886970796833
+  unq2: 0.3979380865303863
+  syn: 0.19344120746583782
+Mutual Information Results:
+  tri_mi: 3.825761110669772
+  bi_mi_1: 3.234381816673548
+  bi_mi_2: 3.241481033495966
+Selecting the first 13 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 13), Source 2 shape: (1000, 13)
+Shared target shape: (1000, 13)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 13 target PCs:
+PID Results:
+  red: 3.0052332193001874
+  unq1: 0.36636325526616753
+  unq2: 0.4588003167658541
+  syn: 0.2304070765995716
+Mutual Information Results:
+  tri_mi: 4.060803867931781
+  bi_mi_1: 3.371596474566355
+  bi_mi_2: 3.4640335360660415
+Selecting the first 14 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 14), Source 2 shape: (1000, 14)
+Shared target shape: (1000, 14)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 14 target PCs:
+PID Results:
+  red: 3.125302140312443
+  unq1: 0.36701464965055086
+  unq2: 0.5199959576569779
+  syn: 0.26180192366129607
+Mutual Information Results:
+  tri_mi: 4.274114671281268
+  bi_mi_1: 3.492316789962994
+  bi_mi_2: 3.645298097969421
+Selecting the first 15 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 15), Source 2 shape: (1000, 15)
+Shared target shape: (1000, 15)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 15 target PCs:
+PID Results:
+  red: 3.388099639058214
+  unq1: 0.3504368711402397
+  unq2: 0.5008756387935418
+  syn: 0.2842380019217634
+Mutual Information Results:
+  tri_mi: 4.523650150913759
+  bi_mi_1: 3.7385365101984536
+  bi_mi_2: 3.8889752778517557
+Selecting the first 16 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 16), Source 2 shape: (1000, 16)
+Shared target shape: (1000, 16)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 16 target PCs:
+PID Results:
+  red: 3.5847507954390183
+  unq1: 0.36769016517715514
+  unq2: 0.4359189788694131
+  syn: 0.31649758629803504
+Mutual Information Results:
+  tri_mi: 4.704857525783622
+  bi_mi_1: 3.9524409606161734
+  bi_mi_2: 4.020669774308431
+Selecting the first 17 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 17), Source 2 shape: (1000, 17)
+Shared target shape: (1000, 17)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 17 target PCs:
+PID Results:
+  red: 3.8649300427824187
+  unq1: 0.3266757716272828
+  unq2: 0.30953342311405674
+  syn: 0.35345468370276123
+Mutual Information Results:
+  tri_mi: 4.85459392122652
+  bi_mi_1: 4.191605814409702
+  bi_mi_2: 4.174463465896476
+Selecting the first 18 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 18), Source 2 shape: (1000, 18)
+Shared target shape: (1000, 18)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 18 target PCs:
+PID Results:
+  red: 4.075384544917281
+  unq1: 0.28872831395296394
+  unq2: 0.2194178843109862
+  syn: 0.36892471924745074
+Mutual Information Results:
+  tri_mi: 4.9524554624286825
+  bi_mi_1: 4.364112858870246
+  bi_mi_2: 4.294802429228268
+Selecting the first 19 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 19), Source 2 shape: (1000, 19)
+Shared target shape: (1000, 19)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 19 target PCs:
+PID Results:
+  red: 4.243333359338761
+  unq1: 0.2944811377547749
+  unq2: 0.19187179580362024
+  syn: 0.37731252083422895
+Mutual Information Results:
+  tri_mi: 5.106998813731385
+  bi_mi_1: 4.537814497093536
+  bi_mi_2: 4.4352051551423815
+Selecting the first 20 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 20), Source 2 shape: (1000, 20)
+Shared target shape: (1000, 20)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 20 target PCs:
+PID Results:
+  red: 4.316451728558011
+  unq1: 0.311275025315104
+  unq2: 0.16596975742160147
+  syn: 0.39513495788188546
+Mutual Information Results:
+  tri_mi: 5.188831469176601
+  bi_mi_1: 4.627726753873114
+  bi_mi_2: 4.482421485979612
+Selecting the first 21 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 21), Source 2 shape: (1000, 21)
+Shared target shape: (1000, 21)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 21 target PCs:
+PID Results:
+  red: 4.454956723154847
+  unq1: 0.356649305366572
+  unq2: 0.12114612364098765
+  syn: 0.4378763334500171
+Mutual Information Results:
+  tri_mi: 5.370628485612425
+  bi_mi_1: 4.81160602852142
+  bi_mi_2: 4.576102846795836
+Selecting the first 22 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 22), Source 2 shape: (1000, 22)
+Shared target shape: (1000, 22)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 22 target PCs:
+PID Results:
+  red: 4.614953701162095
+  unq1: 0.3744372844849204
+  unq2: 0.1295668455387995
+  syn: 0.4332543639501063
+Mutual Information Results:
+  tri_mi: 5.552212195135922
+  bi_mi_1: 4.989390985647016
+  bi_mi_2: 4.744520546700895
+Selecting the first 23 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 23), Source 2 shape: (1000, 23)
+Shared target shape: (1000, 23)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 23 target PCs:
+PID Results:
+  red: 4.757683540960697
+  unq1: 0.4036016613741831
+  unq2: 0.12278501374416173
+  syn: 0.4286972429721958
+Mutual Information Results:
+  tri_mi: 5.712767459051238
+  bi_mi_1: 5.161285202334881
+  bi_mi_2: 4.880468554704859
+Selecting the first 24 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 24), Source 2 shape: (1000, 24)
+Shared target shape: (1000, 24)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 24 target PCs:
+PID Results:
+  red: 4.8494253723860465
+  unq1: 0.3901870303918207
+  unq2: 0.11507396939467718
+  syn: 0.43891155458839304
+Mutual Information Results:
+  tri_mi: 5.793597926760938
+  bi_mi_1: 5.239612402777868
+  bi_mi_2: 4.964499341780725
+Selecting the first 25 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 25), Source 2 shape: (1000, 25)
+Shared target shape: (1000, 25)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 25 target PCs:
+PID Results:
+  red: 4.986016385724801
+  unq1: 0.3485652858492836
+  unq2: 0.14332596185336755
+  syn: 0.4815158456001605
+Mutual Information Results:
+  tri_mi: 5.9594234790276115
+  bi_mi_1: 5.3345816715740835
+  bi_mi_2: 5.129342347578167
+Selecting the first 26 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 26), Source 2 shape: (1000, 26)
+Shared target shape: (1000, 26)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 26 target PCs:
+PID Results:
+  red: 5.0594990093949415
+  unq1: 0.3483668282260375
+  unq2: 0.16625544837620954
+  syn: 0.4986927876183289
+Mutual Information Results:
+  tri_mi: 6.072814073615518
+  bi_mi_1: 5.40786583762098
+  bi_mi_2: 5.225754457771152
+Selecting the first 27 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 27), Source 2 shape: (1000, 27)
+Shared target shape: (1000, 27)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 27 target PCs:
+PID Results:
+  red: 5.219065277019713
+  unq1: 0.3399633501602972
+  unq2: 0.1699282466555756
+  syn: 0.5000480284393349
+Mutual Information Results:
+  tri_mi: 6.22900490227492
+  bi_mi_1: 5.55902862718001
+  bi_mi_2: 5.388993523675288
+Selecting the first 28 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 28), Source 2 shape: (1000, 28)
+Shared target shape: (1000, 28)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 28 target PCs:
+PID Results:
+  red: 5.322967246301471
+  unq1: 0.33690186796638066
+  unq2: 0.1274200736883655
+  syn: 0.5234144961518501
+Mutual Information Results:
+  tri_mi: 6.310703684108068
+  bi_mi_1: 5.6598691142678526
+  bi_mi_2: 5.450387319989837
+Selecting the first 29 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 29), Source 2 shape: (1000, 29)
+Shared target shape: (1000, 29)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 29 target PCs:
+PID Results:
+  red: 5.41187539231861
+  unq1: 0.38021510028475625
+  unq2: 0.10396888260309112
+  syn: 0.5647637305072148
+Mutual Information Results:
+  tri_mi: 6.460823105713672
+  bi_mi_1: 5.792090492603366
+  bi_mi_2: 5.515844274921701
+Selecting the first 30 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 30), Source 2 shape: (1000, 30)
+Shared target shape: (1000, 30)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 30 target PCs:
+PID Results:
+  red: 5.542022250584838
+  unq1: 0.3669329544521762
+  unq2: 0.12138547197390714
+  syn: 0.5989639997705636
+Mutual Information Results:
+  tri_mi: 6.629304676781485
+  bi_mi_1: 5.908955205037015
+  bi_mi_2: 5.663407722558746
+Selecting the first 31 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 31), Source 2 shape: (1000, 31)
+Shared target shape: (1000, 31)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 31 target PCs:
+PID Results:
+  red: 5.677504656328013
+  unq1: 0.36089674965284324
+  unq2: 0.12093086869274572
+  syn: 0.6471565713654499
+Mutual Information Results:
+  tri_mi: 6.806488846039052
+  bi_mi_1: 6.038401405980856
+  bi_mi_2: 5.798435525020759
+Selecting the first 32 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 32), Source 2 shape: (1000, 32)
+Shared target shape: (1000, 32)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 32 target PCs:
+PID Results:
+  red: 5.807854160513096
+  unq1: 0.361302895929847
+  unq2: 0.12568627997039084
+  syn: 0.6670064890144314
+Mutual Information Results:
+  tri_mi: 6.961849825427765
+  bi_mi_1: 6.169157056442943
+  bi_mi_2: 5.933540440483487
+Selecting the first 33 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 33), Source 2 shape: (1000, 33)
+Shared target shape: (1000, 33)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 33 target PCs:
+PID Results:
+  red: 5.917881277666266
+  unq1: 0.36422468709785427
+  unq2: 0.10876964236346875
+  syn: 0.6921772012587084
+Mutual Information Results:
+  tri_mi: 7.083052808386297
+  bi_mi_1: 6.28210596476412
+  bi_mi_2: 6.026650920029734
+Selecting the first 34 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 34), Source 2 shape: (1000, 34)
+Shared target shape: (1000, 34)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 34 target PCs:
+PID Results:
+  red: 5.9749166333886965
+  unq1: 0.3611562390911818
+  unq2: 0.11401347637502735
+  syn: 0.7180910240739795
+Mutual Information Results:
+  tri_mi: 7.168177372928884
+  bi_mi_1: 6.336072872479877
+  bi_mi_2: 6.088930109763723
+Selecting the first 35 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 35), Source 2 shape: (1000, 35)
+Shared target shape: (1000, 35)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 35 target PCs:
+PID Results:
+  red: 6.123652039582206
+  unq1: 0.3890580696401367
+  unq2: 0.09310364918721525
+  syn: 0.759361831608806
+Mutual Information Results:
+  tri_mi: 7.365175590018365
+  bi_mi_1: 6.512710109222343
+  bi_mi_2: 6.216755688769422
+Selecting the first 36 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 36), Source 2 shape: (1000, 36)
+Shared target shape: (1000, 36)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 36 target PCs:
+PID Results:
+  red: 6.192848387217991
+  unq1: 0.4173395059875258
+  unq2: 0.08275886976383351
+  syn: 0.7932970534016661
+Mutual Information Results:
+  tri_mi: 7.486243816371017
+  bi_mi_1: 6.610187893205517
+  bi_mi_2: 6.275607256981825
+Selecting the first 37 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 37), Source 2 shape: (1000, 37)
+Shared target shape: (1000, 37)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 37 target PCs:
+PID Results:
+  red: 6.2829496900179835
+  unq1: 0.44110283374805537
+  unq2: 0.04554796909079872
+  syn: 0.8294397273279523
+Mutual Information Results:
+  tri_mi: 7.59904022018479
+  bi_mi_1: 6.724052523766039
+  bi_mi_2: 6.328497659108782
+Selecting the first 38 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 38), Source 2 shape: (1000, 38)
+Shared target shape: (1000, 38)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 38 target PCs:
+PID Results:
+  red: 6.432948119860914
+  unq1: 0.42598671102095587
+  unq2: 0.043608427282530116
+  syn: 0.872210707678625
+Mutual Information Results:
+  tri_mi: 7.774753965843025
+  bi_mi_1: 6.85893483088187
+  bi_mi_2: 6.476556547143444
+Selecting the first 39 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 39), Source 2 shape: (1000, 39)
+Shared target shape: (1000, 39)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 39 target PCs:
+PID Results:
+  red: 6.525133377724162
+  unq1: 0.46503537434397124
+  unq2: 0.04376209811724685
+  syn: 0.8735873043037392
+Mutual Information Results:
+  tri_mi: 7.907518154489119
+  bi_mi_1: 6.990168752068133
+  bi_mi_2: 6.568895475841408
+Selecting the first 40 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 40), Source 2 shape: (1000, 40)
+Shared target shape: (1000, 40)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 40 target PCs:
+PID Results:
+  red: 6.6324910380226445
+  unq1: 0.4718170570679785
+  unq2: 0.04302263920516758
+  syn: 0.9095128848037621
+Mutual Information Results:
+  tri_mi: 8.056843619099553
+  bi_mi_1: 7.104308095090623
+  bi_mi_2: 6.675513677227812
+Selecting the first 41 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 41), Source 2 shape: (1000, 41)
+Shared target shape: (1000, 41)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 41 target PCs:
+PID Results:
+  red: 6.756903939855178
+  unq1: 0.47127263960754995
+  unq2: 0.04656544172854993
+  syn: 0.9291503403382393
+Mutual Information Results:
+  tri_mi: 8.203892361529517
+  bi_mi_1: 7.228176579462728
+  bi_mi_2: 6.803469381583728
+Selecting the first 42 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 42), Source 2 shape: (1000, 42)
+Shared target shape: (1000, 42)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 42 target PCs:
+PID Results:
+  red: 6.915280216223779
+  unq1: 0.5007795622259632
+  unq2: 0.051253704247429255
+  syn: 0.9644502857081303
+Mutual Information Results:
+  tri_mi: 8.431763768405302
+  bi_mi_1: 7.416059778449743
+  bi_mi_2: 6.966533920471209
+Selecting the first 43 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 43), Source 2 shape: (1000, 43)
+Shared target shape: (1000, 43)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 43 target PCs:
+PID Results:
+  red: 7.029518195759885
+  unq1: 0.4827472024566033
+  unq2: 0.0417646661209643
+  syn: 0.9950694211139224
+Mutual Information Results:
+  tri_mi: 8.549099485451375
+  bi_mi_1: 7.512265398216488
+  bi_mi_2: 7.071282861880849
+Selecting the first 44 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 44), Source 2 shape: (1000, 44)
+Shared target shape: (1000, 44)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 44 target PCs:
+PID Results:
+  red: 7.139542314788322
+  unq1: 0.4763567528227224
+  unq2: 0.01307191056773327
+  syn: 1.0247374978203503
+Mutual Information Results:
+  tri_mi: 8.653708475999128
+  bi_mi_1: 7.6158990676110445
+  bi_mi_2: 7.152614225356055
+Selecting the first 45 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 45), Source 2 shape: (1000, 45)
+Shared target shape: (1000, 45)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 45 target PCs:
+PID Results:
+  red: 7.244665934800372
+  unq1: 0.483289387127531
+  unq2: 0.0
+  syn: 1.0322397995301031
+Mutual Information Results:
+  tri_mi: 8.760195121458006
+  bi_mi_1: 7.727955321927903
+  bi_mi_2: 7.244665934800372
+Selecting the first 46 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 46), Source 2 shape: (1000, 46)
+Shared target shape: (1000, 46)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 46 target PCs:
+PID Results:
+  red: 7.340215930004099
+  unq1: 0.4684278436057756
+  unq2: 0.0
+  syn: 1.0571714135807309
+Mutual Information Results:
+  tri_mi: 8.865815187190606
+  bi_mi_1: 7.808643773609875
+  bi_mi_2: 7.340215930004099
+Selecting the first 47 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 47), Source 2 shape: (1000, 47)
+Shared target shape: (1000, 47)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 47 target PCs:
+PID Results:
+  red: 7.507489926428213
+  unq1: 0.4431593355107424
+  unq2: 0.0
+  syn: 1.0595259817702543
+Mutual Information Results:
+  tri_mi: 9.01017524370921
+  bi_mi_1: 7.950649261938955
+  bi_mi_2: 7.507489926428213
+Selecting the first 48 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 48), Source 2 shape: (1000, 48)
+Shared target shape: (1000, 48)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 48 target PCs:
+PID Results:
+  red: 7.622175001341223
+  unq1: 0.47285092250736227
+  unq2: 0.0
+  syn: 1.0567408455706282
+Mutual Information Results:
+  tri_mi: 9.151766769419213
+  bi_mi_1: 8.095025923848585
+  bi_mi_2: 7.622175001341223
+Selecting the first 49 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 49), Source 2 shape: (1000, 49)
+Shared target shape: (1000, 49)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 49 target PCs:
+PID Results:
+  red: 7.74661350038644
+  unq1: 0.4782869455502805
+  unq2: 0.0
+  syn: 1.0644582351595133
+Mutual Information Results:
+  tri_mi: 9.289358681096234
+  bi_mi_1: 8.22490044593672
+  bi_mi_2: 7.74661350038644
+Selecting the first 50 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 50), Source 2 shape: (1000, 50)
+Shared target shape: (1000, 50)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 50 target PCs:
+PID Results:
+  red: 7.853382227407533
+  unq1: 0.46988336160000177
+  unq2: 0.0
+  syn: 1.0833761412968972
+Mutual Information Results:
+  tri_mi: 9.40664173030443
+  bi_mi_1: 8.323265589007534
+  bi_mi_2: 7.853382227407532
+Selecting the first 51 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 51), Source 2 shape: (1000, 51)
+Shared target shape: (1000, 51)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 51 target PCs:
+PID Results:
+  red: 7.985603570630367
+  unq1: 0.4859287535075598
+  unq2: 0.0
+  syn: 1.0978739109557534
+Mutual Information Results:
+  tri_mi: 9.569406235093679
+  bi_mi_1: 8.471532324137925
+  bi_mi_2: 7.985603570630365
+Selecting the first 52 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 52), Source 2 shape: (1000, 52)
+Shared target shape: (1000, 52)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 52 target PCs:
+PID Results:
+  red: 8.036134867805822
+  unq1: 0.49346094450149103
+  unq2: 0.0
+  syn: 1.0966270007439132
+Mutual Information Results:
+  tri_mi: 9.626222813051225
+  bi_mi_1: 8.529595812307312
+  bi_mi_2: 8.03613486780582
+Selecting the first 53 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 53), Source 2 shape: (1000, 53)
+Shared target shape: (1000, 53)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 53 target PCs:
+PID Results:
+  red: 8.13824115439752
+  unq1: 0.4589528037062358
+  unq2: 0.0
+  syn: 1.1297887507419286
+Mutual Information Results:
+  tri_mi: 9.726982708845684
+  bi_mi_1: 8.597193958103755
+  bi_mi_2: 8.13824115439752
+Selecting the first 54 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 54), Source 2 shape: (1000, 54)
+Shared target shape: (1000, 54)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 54 target PCs:
+PID Results:
+  red: 8.222483083169916
+  unq1: 0.472835327617382
+  unq2: 0.0
+  syn: 1.1317726321825319
+Mutual Information Results:
+  tri_mi: 9.82709104296983
+  bi_mi_1: 8.695318410787298
+  bi_mi_2: 8.222483083169916
+Selecting the first 55 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 55), Source 2 shape: (1000, 55)
+Shared target shape: (1000, 55)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 55 target PCs:
+PID Results:
+  red: 8.342419404157809
+  unq1: 0.49132013445980505
+  unq2: 0.0
+  syn: 1.1498143069331928
+Mutual Information Results:
+  tri_mi: 9.983553845550807
+  bi_mi_1: 8.833739538617614
+  bi_mi_2: 8.342419404157809
+Selecting the first 56 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 56), Source 2 shape: (1000, 56)
+Shared target shape: (1000, 56)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 56 target PCs:
+PID Results:
+  red: 8.473841400537568
+  unq1: 0.49298328701330973
+  unq2: 0.0
+  syn: 1.193027981612369
+Mutual Information Results:
+  tri_mi: 10.159852669163246
+  bi_mi_1: 8.966824687550877
+  bi_mi_2: 8.473841400537568
+Selecting the first 57 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 57), Source 2 shape: (1000, 57)
+Shared target shape: (1000, 57)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 57 target PCs:
+PID Results:
+  red: 8.637810978997807
+  unq1: 0.43704567764515545
+  unq2: 0.0
+  syn: 1.2663979420543061
+Mutual Information Results:
+  tri_mi: 10.341254598697269
+  bi_mi_1: 9.074856656642963
+  bi_mi_2: 8.637810978997807
+Selecting the first 58 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 58), Source 2 shape: (1000, 58)
+Shared target shape: (1000, 58)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 58 target PCs:
+PID Results:
+  red: 8.768582196203743
+  unq1: 0.45814345906247134
+  unq2: 0.0
+  syn: 1.2509797075680211
+Mutual Information Results:
+  tri_mi: 10.477705362834238
+  bi_mi_1: 9.226725655266216
+  bi_mi_2: 8.768582196203745
+Selecting the first 59 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 59), Source 2 shape: (1000, 59)
+Shared target shape: (1000, 59)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 59 target PCs:
+PID Results:
+  red: 8.84750195317027
+  unq1: 0.4759373649473311
+  unq2: 0.0
+  syn: 1.2445942873637623
+Mutual Information Results:
+  tri_mi: 10.568033605481363
+  bi_mi_1: 9.3234393181176
+  bi_mi_2: 8.84750195317027
+Selecting the first 60 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 60), Source 2 shape: (1000, 60)
+Shared target shape: (1000, 60)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 60 target PCs:
+PID Results:
+  red: 8.89534100923236
+  unq1: 0.5064392227150503
+  unq2: 0.0
+  syn: 1.226456064893675
+Mutual Information Results:
+  tri_mi: 10.628236296841088
+  bi_mi_1: 9.401780231947413
+  bi_mi_2: 8.895341009232363
+Selecting the first 61 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 61), Source 2 shape: (1000, 61)
+Shared target shape: (1000, 61)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 61 target PCs:
+PID Results:
+  red: 8.99926863171206
+  unq1: 0.47763152480303717
+  unq2: 0.0
+  syn: 1.2470189175972202
+Mutual Information Results:
+  tri_mi: 10.723919074112317
+  bi_mi_1: 9.476900156515097
+  bi_mi_2: 8.99926863171206
+Selecting the first 62 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 62), Source 2 shape: (1000, 62)
+Shared target shape: (1000, 62)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 62 target PCs:
+PID Results:
+  red: 9.163800519831552
+  unq1: 0.4880669861048652
+  unq2: 0.0
+  syn: 1.2605679931191673
+Mutual Information Results:
+  tri_mi: 10.912435499055585
+  bi_mi_1: 9.651867505936417
+  bi_mi_2: 9.163800519831552
+Selecting the first 63 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 63), Source 2 shape: (1000, 63)
+Shared target shape: (1000, 63)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 63 target PCs:
+PID Results:
+  red: 9.260061812011754
+  unq1: 0.5046493735127022
+  unq2: 0.0
+  syn: 1.2810645532665195
+Mutual Information Results:
+  tri_mi: 11.045775738790976
+  bi_mi_1: 9.764711185524456
+  bi_mi_2: 9.260061812011754
+Selecting the first 64 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 64), Source 2 shape: (1000, 64)
+Shared target shape: (1000, 64)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 64 target PCs:
+PID Results:
+  red: 9.346125913312878
+  unq1: 0.532532655286527
+  unq2: 0.0
+  syn: 1.2997225620660906
+Mutual Information Results:
+  tri_mi: 11.178381130665496
+  bi_mi_1: 9.878658568599405
+  bi_mi_2: 9.346125913312878
+Selecting the first 65 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 65), Source 2 shape: (1000, 65)
+Shared target shape: (1000, 65)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 65 target PCs:
+PID Results:
+  red: 9.562603404813526
+  unq1: 0.5354222623750289
+  unq2: 0.0
+  syn: 1.2976171639250076
+Mutual Information Results:
+  tri_mi: 11.395642831113562
+  bi_mi_1: 10.098025667188555
+  bi_mi_2: 9.562603404813526
+Selecting the first 66 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 66), Source 2 shape: (1000, 66)
+Shared target shape: (1000, 66)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 66 target PCs:
+PID Results:
+  red: 9.616608128988121
+  unq1: 0.5425280050596104
+  unq2: 0.0
+  syn: 1.2701793048541532
+Mutual Information Results:
+  tri_mi: 11.429315438901886
+  bi_mi_1: 10.159136134047733
+  bi_mi_2: 9.616608128988123
+Selecting the first 67 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 67), Source 2 shape: (1000, 67)
+Shared target shape: (1000, 67)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 67 target PCs:
+PID Results:
+  red: 9.675726419982333
+  unq1: 0.546186849245009
+  unq2: 0.0
+  syn: 1.2752885603736708
+Mutual Information Results:
+  tri_mi: 11.497201829601014
+  bi_mi_1: 10.221913269227343
+  bi_mi_2: 9.675726419982334
+Selecting the first 68 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 68), Source 2 shape: (1000, 68)
+Shared target shape: (1000, 68)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 68 target PCs:
+PID Results:
+  red: 9.722341162352716
+  unq1: 0.5598006266666307
+  unq2: 0.0
+  syn: 1.2679261891154834
+Mutual Information Results:
+  tri_mi: 11.550067978134829
+  bi_mi_1: 10.282141789019345
+  bi_mi_2: 9.722341162352715
+Selecting the first 69 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 69), Source 2 shape: (1000, 69)
+Shared target shape: (1000, 69)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 69 target PCs:
+PID Results:
+  red: 9.752133507907859
+  unq1: 0.5926602439604558
+  unq2: 0.0
+  syn: 1.2487776225887721
+Mutual Information Results:
+  tri_mi: 11.593571374457087
+  bi_mi_1: 10.344793751868314
+  bi_mi_2: 9.752133507907859
+Selecting the first 70 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 70), Source 2 shape: (1000, 70)
+Shared target shape: (1000, 70)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 70 target PCs:
+PID Results:
+  red: 9.820130619414439
+  unq1: 0.5928140180184478
+  unq2: 0.0
+  syn: 1.2408863248358522
+Mutual Information Results:
+  tri_mi: 11.653830962268739
+  bi_mi_1: 10.412944637432886
+  bi_mi_2: 9.820130619414439
+Selecting the first 71 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 71), Source 2 shape: (1000, 71)
+Shared target shape: (1000, 71)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 71 target PCs:
+PID Results:
+  red: 9.926079004970916
+  unq1: 0.6008540090445162
+  unq2: 0.0
+  syn: 1.2700735030188692
+Mutual Information Results:
+  tri_mi: 11.797006517034303
+  bi_mi_1: 10.526933014015434
+  bi_mi_2: 9.926079004970918
+Selecting the first 72 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 72), Source 2 shape: (1000, 72)
+Shared target shape: (1000, 72)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 72 target PCs:
+PID Results:
+  red: 10.004262912031606
+  unq1: 0.6300222925345835
+  unq2: 0.0
+  syn: 1.2782351865483772
+Mutual Information Results:
+  tri_mi: 11.912520391114567
+  bi_mi_1: 10.63428520456619
+  bi_mi_2: 10.004262912031606
+Selecting the first 73 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 73), Source 2 shape: (1000, 73)
+Shared target shape: (1000, 73)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 73 target PCs:
+PID Results:
+  red: 10.124860852095171
+  unq1: 0.6158035933538528
+  unq2: 0.0
+  syn: 1.2989813209404417
+Mutual Information Results:
+  tri_mi: 12.039645766389466
+  bi_mi_1: 10.740664445449024
+  bi_mi_2: 10.124860852095171
+Selecting the first 74 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 74), Source 2 shape: (1000, 74)
+Shared target shape: (1000, 74)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 74 target PCs:
+PID Results:
+  red: 10.173870735148803
+  unq1: 0.6593870796852386
+  unq2: 0.0
+  syn: 1.3085171828655646
+Mutual Information Results:
+  tri_mi: 12.141774997699606
+  bi_mi_1: 10.833257814834042
+  bi_mi_2: 10.173870735148803
+Selecting the first 75 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 75), Source 2 shape: (1000, 75)
+Shared target shape: (1000, 75)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 75 target PCs:
+PID Results:
+  red: 10.227258204842393
+  unq1: 0.650091515126995
+  unq2: 0.0
+  syn: 1.3222061323887022
+Mutual Information Results:
+  tri_mi: 12.19955585235809
+  bi_mi_1: 10.877349719969388
+  bi_mi_2: 10.227258204842393
+Selecting the first 76 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 76), Source 2 shape: (1000, 76)
+Shared target shape: (1000, 76)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 76 target PCs:
+PID Results:
+  red: 10.348099494135173
+  unq1: 0.6626536839974015
+  unq2: 0.0
+  syn: 1.3369852780913352
+Mutual Information Results:
+  tri_mi: 12.34773845622391
+  bi_mi_1: 11.010753178132575
+  bi_mi_2: 10.348099494135173
+Selecting the first 77 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 77), Source 2 shape: (1000, 77)
+Shared target shape: (1000, 77)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 77 target PCs:
+PID Results:
+  red: 10.420617800813694
+  unq1: 0.6845736838294094
+  unq2: 0.0
+  syn: 1.36721031211475
+Mutual Information Results:
+  tri_mi: 12.472401796757854
+  bi_mi_1: 11.105191484643104
+  bi_mi_2: 10.420617800813694
+Selecting the first 78 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 78), Source 2 shape: (1000, 78)
+Shared target shape: (1000, 78)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 78 target PCs:
+PID Results:
+  red: 10.499165373485475
+  unq1: 0.6768008702393207
+  unq2: 0.0
+  syn: 1.3915313526929651
+Mutual Information Results:
+  tri_mi: 12.567497596417759
+  bi_mi_1: 11.175966243724794
+  bi_mi_2: 10.499165373485473
+Selecting the first 79 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 79), Source 2 shape: (1000, 79)
+Shared target shape: (1000, 79)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 79 target PCs:
+PID Results:
+  red: 10.560515246106036
+  unq1: 0.678830183725804
+  unq2: 0.0
+  syn: 1.401720869803846
+Mutual Information Results:
+  tri_mi: 12.641066299635686
+  bi_mi_1: 11.23934542983184
+  bi_mi_2: 10.560515246106036
+Selecting the first 80 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 80), Source 2 shape: (1000, 80)
+Shared target shape: (1000, 80)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 80 target PCs:
+PID Results:
+  red: 10.598208516161609
+  unq1: 0.6906732404720586
+  unq2: 0.0
+  syn: 1.403144059114009
+Mutual Information Results:
+  tri_mi: 12.692025815747677
+  bi_mi_1: 11.288881756633668
+  bi_mi_2: 10.598208516161609
+Selecting the first 81 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 81), Source 2 shape: (1000, 81)
+Shared target shape: (1000, 81)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 81 target PCs:
+PID Results:
+  red: 10.673690058211953
+  unq1: 0.7150327554994043
+  unq2: 0.0
+  syn: 1.384019363994799
+Mutual Information Results:
+  tri_mi: 12.772742177706156
+  bi_mi_1: 11.388722813711357
+  bi_mi_2: 10.673690058211953
+Selecting the first 82 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 82), Source 2 shape: (1000, 82)
+Shared target shape: (1000, 82)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 82 target PCs:
+PID Results:
+  red: 10.725634871454083
+  unq1: 0.7355712774927525
+  unq2: 0.0
+  syn: 1.3712443820874505
+Mutual Information Results:
+  tri_mi: 12.832450531034286
+  bi_mi_1: 11.461206148946836
+  bi_mi_2: 10.725634871454083
+Selecting the first 83 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 83), Source 2 shape: (1000, 83)
+Shared target shape: (1000, 83)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 83 target PCs:
+PID Results:
+  red: 10.782194288177458
+  unq1: 0.7329941837789526
+  unq2: 0.0
+  syn: 1.403413417480328
+Mutual Information Results:
+  tri_mi: 12.918601889436738
+  bi_mi_1: 11.51518847195641
+  bi_mi_2: 10.782194288177458
+Selecting the first 84 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 84), Source 2 shape: (1000, 84)
+Shared target shape: (1000, 84)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 84 target PCs:
+PID Results:
+  red: 10.903696876793258
+  unq1: 0.6771357736420711
+  unq2: 0.0
+  syn: 1.4393164648320216
+Mutual Information Results:
+  tri_mi: 13.020149115267351
+  bi_mi_1: 11.58083265043533
+  bi_mi_2: 10.903696876793258
+Selecting the first 85 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 85), Source 2 shape: (1000, 85)
+Shared target shape: (1000, 85)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 85 target PCs:
+PID Results:
+  red: 11.017679606398495
+  unq1: 0.6698758565064722
+  unq2: 0.0
+  syn: 1.4608895877298202
+Mutual Information Results:
+  tri_mi: 13.148445050634788
+  bi_mi_1: 11.687555462904967
+  bi_mi_2: 11.017679606398495
+Selecting the first 86 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 86), Source 2 shape: (1000, 86)
+Shared target shape: (1000, 86)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 86 target PCs:
+PID Results:
+  red: 11.054709827502368
+  unq1: 0.7310730367411331
+  unq2: 0.0
+  syn: 1.4661885866173865
+Mutual Information Results:
+  tri_mi: 13.251971450860887
+  bi_mi_1: 11.785782864243501
+  bi_mi_2: 11.054709827502368
+Selecting the first 87 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 87), Source 2 shape: (1000, 87)
+Shared target shape: (1000, 87)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 87 target PCs:
+PID Results:
+  red: 11.10226761123976
+  unq1: 0.7607426397842403
+  unq2: 0.0
+  syn: 1.4638566403972408
+Mutual Information Results:
+  tri_mi: 13.326866891421242
+  bi_mi_1: 11.863010251024
+  bi_mi_2: 11.10226761123976
+Selecting the first 88 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 88), Source 2 shape: (1000, 88)
+Shared target shape: (1000, 88)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 88 target PCs:
+PID Results:
+  red: 11.231379790051854
+  unq1: 0.7114116343134249
+  unq2: 0.0
+  syn: 1.518231132219821
+Mutual Information Results:
+  tri_mi: 13.4610225565851
+  bi_mi_1: 11.942791424365279
+  bi_mi_2: 11.231379790051854
+Selecting the first 89 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 89), Source 2 shape: (1000, 89)
+Shared target shape: (1000, 89)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 89 target PCs:
+PID Results:
+  red: 11.298992840992863
+  unq1: 0.750690157617143
+  unq2: 0.0
+  syn: 1.4886562763736162
+Mutual Information Results:
+  tri_mi: 13.538339274983622
+  bi_mi_1: 12.049682998610006
+  bi_mi_2: 11.298992840992863
+Selecting the first 90 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 90), Source 2 shape: (1000, 90)
+Shared target shape: (1000, 90)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 90 target PCs:
+PID Results:
+  red: 11.364020430898465
+  unq1: 0.7786088672017577
+  unq2: 0.0
+  syn: 1.4986712284604575
+Mutual Information Results:
+  tri_mi: 13.64130052656068
+  bi_mi_1: 12.142629298100223
+  bi_mi_2: 11.364020430898465
+Selecting the first 91 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 91), Source 2 shape: (1000, 91)
+Shared target shape: (1000, 91)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 91 target PCs:
+PID Results:
+  red: 11.40928948648546
+  unq1: 0.7748028186191789
+  unq2: 0.0
+  syn: 1.4853193648475145
+Mutual Information Results:
+  tri_mi: 13.669411669952153
+  bi_mi_1: 12.184092305104638
+  bi_mi_2: 11.40928948648546
+Selecting the first 92 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 92), Source 2 shape: (1000, 92)
+Shared target shape: (1000, 92)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 92 target PCs:
+PID Results:
+  red: 11.506259563713652
+  unq1: 0.7820728462548736
+  unq2: 0.0
+  syn: 1.492224508342094
+Mutual Information Results:
+  tri_mi: 13.78055691831062
+  bi_mi_1: 12.288332409968525
+  bi_mi_2: 11.506259563713652
+Selecting the first 93 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 93), Source 2 shape: (1000, 93)
+Shared target shape: (1000, 93)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 93 target PCs:
+PID Results:
+  red: 11.570817407823942
+  unq1: 0.753680734855589
+  unq2: 0.0
+  syn: 1.5012301956743919
+Mutual Information Results:
+  tri_mi: 13.825728338353922
+  bi_mi_1: 12.32449814267953
+  bi_mi_2: 11.570817407823942
+Selecting the first 94 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 94), Source 2 shape: (1000, 94)
+Shared target shape: (1000, 94)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 94 target PCs:
+PID Results:
+  red: 11.621825327829086
+  unq1: 0.7942498027665295
+  unq2: 0.0
+  syn: 1.539278667776994
+Mutual Information Results:
+  tri_mi: 13.95535379837261
+  bi_mi_1: 12.416075130595615
+  bi_mi_2: 11.621825327829086
+Selecting the first 95 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 95), Source 2 shape: (1000, 95)
+Shared target shape: (1000, 95)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 95 target PCs:
+PID Results:
+  red: 11.669811333805061
+  unq1: 0.8265294472333906
+  unq2: 0.0
+  syn: 1.5644181090785132
+Mutual Information Results:
+  tri_mi: 14.060758890116965
+  bi_mi_1: 12.496340781038452
+  bi_mi_2: 11.669811333805061
+Selecting the first 96 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 96), Source 2 shape: (1000, 96)
+Shared target shape: (1000, 96)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 96 target PCs:
+PID Results:
+  red: 11.727074189432894
+  unq1: 0.8076655913267032
+  unq2: 0.0
+  syn: 1.5656114031679955
+Mutual Information Results:
+  tri_mi: 14.100351183927593
+  bi_mi_1: 12.534739780759597
+  bi_mi_2: 11.727074189432894
+Selecting the first 97 target PCs and running PID for convnext_base_classification and RN101_clip 😀
+Source 1 shape: (1000, 97), Source 2 shape: (1000, 97)
+Shared target shape: (1000, 97)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 97 target PCs:
+PID Results:
+  red: 11.860655602076227
+  unq1: 0.7988510002937517
+  unq2: 0.0
+  syn: 1.5798455378864222
+Mutual Information Results:
+  tri_mi: 14.2393521402564
+  bi_mi_1: 12.659506602369978
+  bi_mi_2: 11.860655602076227
+Selecting the first 98 target PCs and running PID for convnext_base_classification and RN101_clip 😀

@@ -1,6 +1,5 @@
 
 from pipeline.pipeline_phases.feature_manipulations import pca_source
-from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
 import numpy as np
 
 DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
@@ -28,7 +27,6 @@ def to_deepdive_model_name(model_name: str) -> str:
     return deepdive_model_name
 
 
-
 def _prepare_source_for_pid(
     source: np.ndarray,
     train_target: np.ndarray,
@@ -49,8 +47,12 @@ def _prepare_source_for_pid(
     """
 
     if not ridge:
-        return pca_source(source,shared_mask,train_target.shape[1])
-        
+        return pca_source(source, shared_mask, train_target.shape[1])
+
+    from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
 
     _, ridge_model = find_alpha_per_pc(source[~shared_mask], train_target)
     return ridge_model.predict(source[shared_mask])
+
+
+

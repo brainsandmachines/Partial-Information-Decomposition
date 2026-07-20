@@ -268,7 +268,7 @@ def nsd_feature_extraction(
     source_context: dict[str, Any],
     layer_index: int,
     target_context: dict[str, Any],
-    batch_size_process: int,
+    batch_size_process: int = 128,
     batch_size_dataloader: int = 128,
 ) -> Any:
     """Extract features for one NSD source and selected layer.
