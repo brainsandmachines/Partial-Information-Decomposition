@@ -1,0 +1,181 @@
+------------------------------------
+Mon 20 Jul 2026 14:10:22 IDT
+SLURM_JOBID:		19459553
+SLURM_JOB_NODELIST:	ise-cpu256-16
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19459553
+Allocated Resouces:	cpu - 4 / mem - 49152 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu256-16.auth.ad.bgu.ac.il
+Job ID: 19459553
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu
+Starting model: nf_resnet50_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for nf_resnet50_classification: {'model_name': 'nf_resnet50', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('nf_resnet50', pretrained = True)"}
+Image transforms for nf_resnet50_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: nf_resnet50_classification
+Ordered layers from model: ['ScaledStdConv2d-1', 'MaxPool2d-1', 'ReLU-1', 'Identity-1', 'ScaledStdConv2d-2', 'DownsampleAvg-1', 'ScaledStdConv2d-3', 'ReLU-2', 'ScaledStdConv2d-4', 'ReLU-3', 'ScaledStdConv2d-5', 'Identity-2', 'NormFreeBlock-1', 'ReLU-4', 'ScaledStdConv2d-6', 'ReLU-5', 'ScaledStdConv2d-7', 'ReLU-6', 'ScaledStdConv2d-8', 'Identity-3', 'NormFreeBlock-2', 'ReLU-7', 'ScaledStdConv2d-9', 'ReLU-8', 'ScaledStdConv2d-10', 'ReLU-9', 'ScaledStdConv2d-11', 'Identity-4', 'NormFreeBlock-3', 'ReLU-10', 'AvgPool2d-1', 'ScaledStdConv2d-12', 'DownsampleAvg-2', 'ScaledStdConv2d-13', 'ReLU-11', 'ScaledStdConv2d-14', 'ReLU-12', 'ScaledStdConv2d-15', 'Identity-5', 'NormFreeBlock-4', 'ReLU-13', 'ScaledStdConv2d-16', 'ReLU-14', 'ScaledStdConv2d-17', 'ReLU-15', 'ScaledStdConv2d-18', 'Identity-6', 'NormFreeBlock-5', 'ReLU-16', 'ScaledStdConv2d-19', 'ReLU-17', 'ScaledStdConv2d-20', 'ReLU-18', 'ScaledStdConv2d-21', 'Identity-7', 'NormFreeBlock-6', 'ReLU-19', 'ScaledStdConv2d-22', 'ReLU-20', 'ScaledStdConv2d-23', 'ReLU-21', 'ScaledStdConv2d-24', 'Identity-8', 'NormFreeBlock-7', 'ReLU-22', 'AvgPool2d-2', 'ScaledStdConv2d-25', 'DownsampleAvg-3', 'ScaledStdConv2d-26', 'ReLU-23', 'ScaledStdConv2d-27', 'ReLU-24', 'ScaledStdConv2d-28', 'Identity-9', 'NormFreeBlock-8', 'ReLU-25', 'ScaledStdConv2d-29', 'ReLU-26', 'ScaledStdConv2d-30', 'ReLU-27', 'ScaledStdConv2d-31', 'Identity-10', 'NormFreeBlock-9', 'ReLU-28', 'ScaledStdConv2d-32', 'ReLU-29', 'ScaledStdConv2d-33', 'ReLU-30', 'ScaledStdConv2d-34', 'Identity-11', 'NormFreeBlock-10', 'ReLU-31', 'ScaledStdConv2d-35', 'ReLU-32', 'ScaledStdConv2d-36', 'ReLU-33', 'ScaledStdConv2d-37', 'Identity-12', 'NormFreeBlock-11', 'ReLU-34', 'ScaledStdConv2d-38', 'ReLU-35', 'ScaledStdConv2d-39', 'ReLU-36', 'ScaledStdConv2d-40', 'Identity-13', 'NormFreeBlock-12', 'ReLU-37', 'ScaledStdConv2d-41', 'ReLU-38', 'ScaledStdConv2d-42', 'ReLU-39', 'ScaledStdConv2d-43', 'Identity-14', 'NormFreeBlock-13', 'ReLU-40', 'AvgPool2d-3', 'ScaledStdConv2d-44', 'DownsampleAvg-4', 'ScaledStdConv2d-45', 'ReLU-41', 'ScaledStdConv2d-46', 'ReLU-42', 'ScaledStdConv2d-47', 'Identity-15', 'NormFreeBlock-14', 'ReLU-43', 'ScaledStdConv2d-48', 'ReLU-44', 'ScaledStdConv2d-49', 'ReLU-45', 'ScaledStdConv2d-50', 'Identity-16', 'NormFreeBlock-15', 'ReLU-46', 'ScaledStdConv2d-51', 'ReLU-47', 'ScaledStdConv2d-52', 'ReLU-48', 'ScaledStdConv2d-53', 'Identity-17', 'NormFreeBlock-16', 'Identity-18', 'ReLU-49', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Dropout-1', 'Linear-1', 'Identity-19', 'ClassifierHead-1', 'NormFreeNet-1']
+Total number of layers: 152
+Starting to extract features for nf_resnet50_classification at layer 141
+
+==================================================
+Processing layer: NormFreeBlock-16 from model: nf_resnet50_classification
+
+For model nf_resnet50_classification Layer NormFreeBlock-16: Extracting features for 10000 images in batches of 128...
+Feature extraction for model nf_resnet50_classification layer NormFreeBlock-16 completed in 974.74 seconds.
+Running analysis for 100 PCs
+Running analysis for PC index 0
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 0 correlation: 0.4507
+Running analysis for PC index 1
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 1 correlation: 0.8247
+Running analysis for PC index 2
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 2 correlation: 0.7351
+Running analysis for PC index 3
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 3 correlation: 0.7315
+Running analysis for PC index 4
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+PC index 4 correlation: 0.6938
+Running analysis for PC index 5
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+PC index 5 correlation: 0.5053
+Running analysis for PC index 6
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+PC index 6 correlation: 0.4639
+Running analysis for PC index 7
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+PC index 7 correlation: 0.2064
+Running analysis for PC index 8
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 8 correlation: 0.5040
+Running analysis for PC index 9
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 9 correlation: 0.5043
+Running analysis for PC index 10
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 10 correlation: 0.4310
+Running analysis for PC index 11
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 11 correlation: 0.7217
+Running analysis for PC index 12
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 12 correlation: 0.3331
+Running analysis for PC index 13
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 13 correlation: 0.4297
+Running analysis for PC index 14
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 14 correlation: 0.4831
+Running analysis for PC index 15
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 15 correlation: 0.3428
+Running analysis for PC index 16
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 16 correlation: 0.3634
+Running analysis for PC index 17
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+PC index 17 correlation: 0.1918
+Running analysis for PC index 18
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 18 correlation: 0.4100
+Running analysis for PC index 19
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 19 correlation: 0.3248
+Running analysis for PC index 20
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+PC index 20 correlation: 0.3790
+Running analysis for PC index 21
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+PC index 21 correlation: 0.3663
+Running analysis for PC index 22
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+PC index 22 correlation: 0.3474
+Running analysis for PC index 23
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+PC index 23 correlation: 0.2597
+Running analysis for PC index 24
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.3min
+PC index 24 correlation: 0.4052
+Running analysis for PC index 25
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.2min
+PC index 25 correlation: 0.2391
+Running analysis for PC index 26
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.1min
+PC index 26 correlation: 0.3681
+Running analysis for PC index 27
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.

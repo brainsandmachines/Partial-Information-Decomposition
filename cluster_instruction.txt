@@ -9,3 +9,7 @@ sinteractive --gpu 1  --qos golan-neuro --part rtx_pro_6000
 
 asking for cpu:
 sinteractive --gpu 0 --cpu 4 --mem 24 --time 0-2:00:00
+
+
+sickit-learn older version:
+1.7.1

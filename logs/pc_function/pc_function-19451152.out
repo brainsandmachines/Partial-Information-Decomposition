@@ -1057,3 +1057,129 @@ Mutual Information Results:
   bi_mi_1: 11.14534479359945
   bi_mi_2: 11.165577610057369
 Selecting the first 56 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 56), Source 2 shape: (1000, 56)
+Shared target shape: (1000, 56)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 56 target PCs:
+PID Results:
+  red: 9.499047586443696
+  unq1: 1.866797547450897
+  unq2: 1.9203734568587958
+  syn: 1.9440380421260883
+Mutual Information Results:
+  tri_mi: 15.23025663287948
+  bi_mi_1: 11.365845133894595
+  bi_mi_2: 11.419421043302494
+Selecting the first 57 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 57), Source 2 shape: (1000, 57)
+Shared target shape: (1000, 57)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 57 target PCs:
+PID Results:
+  red: 9.665005962635439
+  unq1: 1.8980085465091356
+  unq2: 1.9847436737449655
+  syn: 1.9930122019553096
+Mutual Information Results:
+  tri_mi: 15.54077038484485
+  bi_mi_1: 11.563014509144574
+  bi_mi_2: 11.649749636380404
+Selecting the first 58 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 58), Source 2 shape: (1000, 58)
+Shared target shape: (1000, 58)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 58 target PCs:
+PID Results:
+  red: 9.828228083627275
+  unq1: 1.9775207260750616
+  unq2: 2.031183996333052
+  syn: 2.049104215139801
+Mutual Information Results:
+  tri_mi: 15.886037021175191
+  bi_mi_1: 11.805748809702338
+  bi_mi_2: 11.859412079960329
+Selecting the first 59 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 59), Source 2 shape: (1000, 59)
+Shared target shape: (1000, 59)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 59 target PCs:
+PID Results:
+  red: 9.947971441695318
+  unq1: 2.047089942654665
+  unq2: 2.063670242599981
+  syn: 2.094250879152666
+Mutual Information Results:
+  tri_mi: 16.152982506102628
+  bi_mi_1: 11.995061384349981
+  bi_mi_2: 12.011641684295297
+Selecting the first 60 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 60), Source 2 shape: (1000, 60)
+Shared target shape: (1000, 60)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 60 target PCs:
+PID Results:
+  red: 10.07610486563
+  unq1: 2.0916353093043707
+  unq2: 2.1413900018751004
+  syn: 2.148765685528936
+Mutual Information Results:
+  tri_mi: 16.457895862338408
+  bi_mi_1: 12.167740174934371
+  bi_mi_2: 12.217494867505101
+Selecting the first 61 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 61), Source 2 shape: (1000, 61)
+Shared target shape: (1000, 61)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 61 target PCs:
+PID Results:
+  red: 10.199434190974303
+  unq1: 2.139509211613383
+  unq2: 2.198532588014178
+  syn: 2.2350236543303534
+Mutual Information Results:
+  tri_mi: 16.772499644932218
+  bi_mi_1: 12.338943402587686
+  bi_mi_2: 12.397966778988481
+Selecting the first 62 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Source 1 shape: (1000, 62), Source 2 shape: (1000, 62)
+Shared target shape: (1000, 62)
+
+WARNING: Bias correction is disabled:False for PID calculation.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 62 target PCs:
+PID Results:
+  red: 10.417328473280067
+  unq1: 2.1944120318921385
+  unq2: 2.237069467974502
+  syn: 2.2835207918517693
+Mutual Information Results:
+  tri_mi: 17.132330764998475
+  bi_mi_1: 12.611740505172204
+  bi_mi_2: 12.654397941254567
+Selecting the first 63 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀

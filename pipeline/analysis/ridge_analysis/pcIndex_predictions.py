@@ -27,7 +27,7 @@ from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import nsd_feature_extraction
 
 
-pc_path = repo_root / "pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl"
+pc_path = Path("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl")
 hdf_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5")
 pkl_info_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl")
 neural_data_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr")
@@ -80,7 +80,12 @@ def each_pc_index_pred(
             _prepare_source_for_pid(features, pc_train_target, shared_mask, ridge=True)
         ).reshape(-1)  # (n_shared, 1) -> (n_shared,)
         if np.std(pc_test_target) > 0 and np.std(source_pred) > 0:
-            correlations[result_index] = pearsonr(pc_test_target, source_pred).statistic
+            corr = pearsonr(pc_test_target, source_pred).statistic
+            print(f"PC index {pc_index} correlation: {corr:.4f}")
+            correlations[result_index] = corr
+        else:
+            print(f"PC index {pc_index} correlation: NaN (zero variance in target or prediction)")
+            correlations[result_index] = np.nan
     return correlations, int(layer_index)
 
 
@@ -119,7 +124,7 @@ def save_correlations_to_csv(
         if not has_content:
             writer.writerow(header)
         writer.writerow([model_name, int(layer_index), *correlations.tolist()])
-    print(f"Saved {model_name} correlations to {output_path}")
+    print(f"Saved {model_name} correlations to {output_path} 😀")
     return output_path
 
 
@@ -132,8 +137,8 @@ def main() -> None:
     Outputs:
         None. Saves one CSV row immediately after each completed model.
     """
-    n_pcs = list(range(200))
-    output_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/ridge_analysis')
+    
+    
 
     model_names =  ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
@@ -147,6 +152,9 @@ def main() -> None:
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-L_14_clip','ViT-B_32_clip'
         ] #dino_resnet50_selfsupervised, dino_vitb16_selfsupervised - missing
 
+    n_pcs = list(range(10))  # zero-based PC indexes to predict
+    output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/{max(n_pcs)+1}_pcs_correlations_by_model.csv')
+    print("Results will be saved to:\n", output_path)
     header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in n_pcs)]
     completed_models: set[str] = set()
     if output_path.is_file() and output_path.stat().st_size > 0:

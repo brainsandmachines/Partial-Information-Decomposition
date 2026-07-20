@@ -4,7 +4,7 @@ import csv
 import sys
 from pathlib import Path
 from typing import Any
-
+import torch
 import joblib
 import numpy as np
 from sklearn.linear_model import RidgeCV
@@ -21,28 +21,39 @@ from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import nsd_feature_extraction
 from pipeline.analysis.anlysis_utils import to_deepdive_model_name
+import os
+os.environ["SCIPY_ARRAY_API"] = "1"
+from sklearn import config_context
+
+
 
 def find_alpha_per_pc(
     predictor: np.ndarray,
     target: np.ndarray,
+    device: str | None = "cuda",
 ) -> tuple[np.ndarray, Pipeline]:
-    """Find one ridge alpha per target PC.
+    """Find one ridge alpha per target PC."""
 
-    Inputs:
-        predictor:
-            Array shaped (n_samples, n_features), containing model features.
-        target:
-            Array shaped (n_samples, n_components), containing target PC scores.
+    use_gpu = torch.cuda.is_available() and device == "cuda"
 
-    Outputs:
-        alphas_per_pc:
-            Array shaped (n_components,), containing one alpha per target PC.
-        ridge_model:
-            Fitted raw-input pipeline that predicts all target PCs
-            simultaneously. Ridge fits an intercept,
-    """
-    predictor = np.asarray(predictor, dtype=np.float64)
-    target = np.asarray(target, dtype=np.float64)
+    if use_gpu:
+        print("NOTE: Using GPU for ridge regression.")
+
+        predictor = torch.as_tensor(
+            predictor,
+            dtype=torch.float64,
+            device="cuda",
+        )
+        target = torch.as_tensor(
+            target,
+            dtype=torch.float64,
+            device="cuda",
+        )
+    else:
+        print("NOTE: Using CPU for ridge regression.")
+
+        predictor = np.asarray(predictor, dtype=np.float64)
+        target = np.asarray(target, dtype=np.float64)
 
     if predictor.ndim != 2:
         raise ValueError("predictor must be a two-dimensional array.")
@@ -55,21 +66,13 @@ def find_alpha_per_pc(
             "predictor and target must have the same number of samples."
         )
 
-    alphas = np.logspace(1, 20, 100)
-
-    print(
-        f"Finding best ridge alphas for {target.shape[1]} target PCs "
-        f"using {predictor.shape[1]} features and "
-        f"{predictor.shape[0]} samples."
-    )
-
-    print("Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.")
+    alphas = np.logspace(1, 15, 50)
 
     ridge_model = make_pipeline(
         RidgeCV(
             alphas=alphas,
             cv=None,
-            scoring=None, #mse-none
+            scoring=None,
             fit_intercept=True,
             alpha_per_target=True,
             gcv_mode="auto",
@@ -77,21 +80,35 @@ def find_alpha_per_pc(
         verbose=True,
     )
 
-    ridge_model.fit(predictor, target)
+    if use_gpu:
+        with config_context(array_api_dispatch=True):
+            ridge_model.fit(predictor, target)
+    else:
+        ridge_model.fit(predictor, target)
 
     ridge_cv = ridge_model.named_steps["ridgecv"]
 
+    if isinstance(ridge_cv.alpha_, torch.Tensor):
+        alphas_per_pc = (
+            ridge_cv.alpha_
+            .detach()
+            .cpu()
+            .numpy()
+            .astype(np.float64, copy=False)
+        )
+    else:
+        alphas_per_pc = np.asarray(
+            ridge_cv.alpha_,
+            dtype=np.float64,
+        )
 
-    alphas_per_pc = np.atleast_1d(
-    np.asarray(ridge_cv.alpha_, dtype=np.float64)
-    )
+    alphas_per_pc = np.atleast_1d(alphas_per_pc)
 
     assert alphas_per_pc.shape == (target.shape[1],), (
         "Number of selected alphas must match the number of target PCs."
     )
 
     return alphas_per_pc, ridge_model
-
 
 
 
@@ -414,7 +431,7 @@ if __name__ == "__main__":
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-B_32_clip','ViT-L_14_clip'
         ]
     
-    n_pcs = 90  # Number of principal components to use for ridge regression
+    n_pcs = 20  # Number of principal components to use for ridge regression
     #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
@@ -425,7 +442,7 @@ if __name__ == "__main__":
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
     alphas_csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results3/pcs{n_pcs}_all_models_alphas.csv')
-    output_dir = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results3/pcs{n_pcs}_alphas_')
+    output_dir = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/results3/pcs{n_pcs}_alphas_by_model.csv')
         
     path_config = {
         "path_to_results": path_to_results,
