@@ -4,6 +4,7 @@
 #SBATCH --partition=rtx6000
 #SBATCH --qos=golan-neuro
 #SBATCH --job-name=GPU_PC_INDEX_ANALYSIS
+#SBATCH --mem=48G
 #SBATCH --output=//home/ohadshee/Desktop/Partial-Information-Decomposition/logs/PC_index_analysis_logs/%x-%j.out
 #SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/logs/PC_index_analysis_logs/%x-%j.err
 
