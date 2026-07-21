@@ -49,8 +49,11 @@ def find_alpha_per_pc(
             dtype=torch.float64,
             device="cuda",
         )
+        fit_intercept = False
+        print("Warning: RidgeCV with fit_intercept=False please center data before using this function. If you want to use fit_intercept=True, please set device=None or device='cpu'.")
     else:
         print("NOTE: Using CPU for ridge regression.")
+        fit_intercept = True
 
         predictor = np.asarray(predictor, dtype=np.float64)
         target = np.asarray(target, dtype=np.float64)
@@ -66,31 +69,30 @@ def find_alpha_per_pc(
             "predictor and target must have the same number of samples."
         )
 
-    alphas = np.logspace(1, 15, 50)
+    alphas = np.logspace(1, 20, 100)
 
-    ridge_model = make_pipeline(
-        RidgeCV(
+    ridge_model = RidgeCV(
             alphas=alphas,
             cv=None,
             scoring=None,
-            fit_intercept=True,
+            fit_intercept=fit_intercept,
             alpha_per_target=True,
-            gcv_mode="auto",
-        ),
-        verbose=True,
-    )
+            gcv_mode="auto",)
+
+
 
     if use_gpu:
+        print("\nPredictor device:", predictor.device)
+        print("Target device:", target.device)
+        print("Alphas device:", alphas.device)
         with config_context(array_api_dispatch=True):
             ridge_model.fit(predictor, target)
     else:
         ridge_model.fit(predictor, target)
 
-    ridge_cv = ridge_model.named_steps["ridgecv"]
-
-    if isinstance(ridge_cv.alpha_, torch.Tensor):
+    if isinstance(ridge_model.alpha_, torch.Tensor):
         alphas_per_pc = (
-            ridge_cv.alpha_
+            ridge_model.alpha_
             .detach()
             .cpu()
             .numpy()
@@ -98,7 +100,7 @@ def find_alpha_per_pc(
         )
     else:
         alphas_per_pc = np.asarray(
-            ridge_cv.alpha_,
+            ridge_model.alpha_,
             dtype=np.float64,
         )
 

@@ -1,4 +1,8 @@
 
+import torch
+
+import torch
+
 from pipeline.pipeline_phases.feature_manipulations import pca_source
 import numpy as np
 
@@ -52,6 +56,30 @@ def _prepare_source_for_pid(
     from pipeline.ridge_find_alpha.find_alpha import find_alpha_per_pc
 
     _, ridge_model = find_alpha_per_pc(source[~shared_mask], train_target)
+
+
+    if isinstance(ridge_model.coef_, torch.Tensor):
+        ridge_model.coef_ = (
+            ridge_model.coef_
+            .detach()
+            .cpu()
+            .numpy()
+        )
+
+    if isinstance(ridge_model.intercept_, torch.Tensor):
+        ridge_model.intercept_ = (
+            ridge_model.intercept_
+            .detach()
+            .cpu()
+            .numpy()
+        )
+    if isinstance(ridge_model.alpha_, torch.Tensor):
+        ridge_model.alpha_ = (
+            ridge_model.alpha_
+            .detach()
+            .cpu()
+            .numpy()
+        )
     return ridge_model.predict(source[shared_mask])
 
 

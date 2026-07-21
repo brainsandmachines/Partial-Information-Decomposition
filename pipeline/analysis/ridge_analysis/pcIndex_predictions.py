@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from scipy.stats import pearsonr
+import torch
 
 repo_root = Path(__file__).resolve().parents[3]
 external_root = repo_root / "external"
@@ -56,6 +57,9 @@ def each_pc_index_pred(
         tuple[np.ndarray, int] containing correlations in ``n_pcs`` order and
         the selected model-layer index.
     """
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    use_gpu = torch.cuda.is_available() and device == "cuda"
     target_context = prepare_target(Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
     train_target, shared_target, shared_mask = prepare_ridge_target(
         target_context["target"], target_context, pc_path
@@ -70,12 +74,40 @@ def each_pc_index_pred(
     print(f"Starting to extract features for {model_name} at layer {layer_index}")
     features = nsd_feature_extraction(source_context, layer_index, target_context=target_context)
 
+    if use_gpu:
+        features_shared = features[shared_mask]
+        features_train = features[~shared_mask]
+
+        features_train_mean = np.mean(features_train, axis=0, keepdims=True)
+        features_train -= features_train_mean
+        features_shared -= features_train_mean
+
+        features[~shared_mask] = features_train
+        features[shared_mask] = features_shared
+
+    print(f"\nFeatures shape: {features.shape}, Train target shape: {train_target.shape}, Shared target shape: {shared_target.shape}")
+    print(f"Running ridge regression for {len(n_pcs)} PCs on model {model_name} at layer {layer_index}")
+
     correlations = np.full(len(n_pcs), np.nan, dtype=float)
     print(f"Running analysis for {len(n_pcs)} PCs")
     for result_index, pc_index in enumerate(n_pcs):
         print(f"Running analysis for PC index {pc_index}")
-        pc_train_target = train_target[:, [pc_index]]  # (n_train, n_pcs) -> (n_train, 1)
-        pc_test_target = shared_target[:, pc_index]  # (n_shared, n_pcs) -> (n_shared,)
+        pc_train_target = train_target[:, [pc_index]]
+        pc_test_target = shared_target[:, pc_index]
+
+        if use_gpu:
+            print("Centering data before using scikit-learn on GPU")
+
+            pc_train_target_mean = np.mean(
+                pc_train_target,
+                axis=0,
+                keepdims=True,
+            )
+
+            pc_train_target = (pc_train_target - pc_train_target_mean)
+
+            pc_test_target = (pc_test_target - pc_train_target_mean.item())
+
         source_pred = np.asarray(
             _prepare_source_for_pid(features, pc_train_target, shared_mask, ridge=True)
         ).reshape(-1)  # (n_shared, 1) -> (n_shared,)
@@ -152,8 +184,8 @@ def main() -> None:
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-L_14_clip','ViT-B_32_clip'
         ] #dino_resnet50_selfsupervised, dino_vitb16_selfsupervised - missing
 
-    n_pcs = list(range(10))  # zero-based PC indexes to predict
-    output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/{max(n_pcs)+1}_pcs_correlations_by_model.csv')
+    n_pcs = list(range(200))  # zero-based PC indexes to predict
+    output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/alpha(1,50,100)_GPU_{max(n_pcs)+1}_pcs_correlations_by_model.csv')
     print("Results will be saved to:\n", output_path)
     header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in n_pcs)]
     completed_models: set[str] = set()

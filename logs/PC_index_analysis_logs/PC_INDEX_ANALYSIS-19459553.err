@@ -78,3 +78,23 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:11<00:00, 11.15s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:11<00:00, 11.15s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:11<00:00, 11.13s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:11<00:00, 11.13s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.33s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:01<00:00,  1.33s/it]
+[2026-07-20T18:51:52.085] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-07-20T18:51:52.086] error: _get_joules_task: can't get info from slurmd
+[2026-07-20T18:52:22.116] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-07-20T18:52:22.116] error: _get_joules_task: can't get info from slurmd
+[2026-07-20T18:53:52.076] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-07-20T18:53:52.076] error: _get_joules_task: can't get info from slurmd
+[2026-07-20T18:54:22.107] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-07-20T18:54:22.107] error: _get_joules_task: can't get info from slurmd
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/pcIndex_predictions.py", line 178, in <module>
+    ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
+^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/pcIndex_predictions.py", line 173, in main
+    
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/pcIndex_predictions.py", line 122, in save_correlations_to_csv
+    
+  File "/home/ohadshee/.conda/envs/pid_env/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IsADirectoryError: [Errno 21] Is a directory: '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis'

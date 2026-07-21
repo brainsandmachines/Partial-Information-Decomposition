@@ -1,0 +1,41 @@
+------------------------------------
+Tue 21 Jul 2026 08:50:33 IDT
+SLURM_JOBID:		19468221
+SLURM_JOB_NODELIST:	cs-6000-02
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19468221
+Allocated Resouces:	cpu - 8 / mem -  MB / gpu - 1
+SLURM_GPU_INDEX:	4
+Running as ohadshee from golan.neuro account with golan-neuro QOS
+------------------------------------
+Running on host: cs-6000-02.auth.ad.bgu.ac.il
+Job ID: 19468221
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cuda
+Results will be saved to:
+ /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/alpha(1,50,100)_GPU_200_pcs_correlations_by_model.csv
+Skipping completed model: nf_resnet50_classification
+Skipping completed model: hardcorenas_f_classification
+Skipping completed model: eca_nfnet_l0_classification
+Skipping completed model: resnet50_classification
+Skipping completed model: semnasnet_100_classification
+Skipping completed model: cspresnet50_classification
+Skipping completed model: mobilenetv3_large_100_classification
+Skipping completed model: ghostnet_100_classification
+Skipping completed model: convnext_base_classification
+Starting model: xcit_nano_12_p8_224_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for xcit_nano_12_p8_224_classification: {'model_name': 'xcit_nano_12_p8_224', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('xcit_nano_12_p8_224', pretrained = True)"}
+Image transforms for xcit_nano_12_p8_224_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: xcit_nano_12_p8_224_classification

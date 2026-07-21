@@ -9,3 +9,4 @@ Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
 Mon 20 Jul 2026 13:19:59 IDT
  STARTING JOB WITH THE COMMAND:  sleep 600 
+[2026-07-20T17:20:20.017] error: *** JOB 19459097 ON cs-cpu-11 CANCELLED AT 2026-07-20T17:20:20 DUE TO TIME LIMIT ***
