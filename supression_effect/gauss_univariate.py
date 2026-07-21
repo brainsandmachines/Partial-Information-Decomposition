@@ -10,7 +10,7 @@ sys.path.append(str(root))
 from examples.toy_example import run_all_methods,run_experiment,commonality_analysis
 from Partial_Information_Decomposition.Idep.Idep_univariabe_gauss import Idep_univariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
-from utils import Tee
+from my_utils import Tee
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
 

@@ -7,7 +7,7 @@ import numpy as np
 from library_wrappers.missmda_ncp import estimate_ncp_pca
 from time import perf_counter
 
-from utils import Tee
+from my_utils import Tee
 
 
 def run_simulation(

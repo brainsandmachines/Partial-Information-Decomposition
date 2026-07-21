@@ -18,7 +18,7 @@ from encoding_model.suppression_core import *
 from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from encoding_model.encoding_utils import get_specific_roi_fmri
 from Partial_Information_Decomposition.PID_util import *
-from utils import (
+from my_utils import (
     run_multi_seed_experiment,
     append_seed_run_checkpoint,
     get_seed_runs_csv_path,

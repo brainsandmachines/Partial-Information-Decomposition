@@ -11,7 +11,7 @@ import sys
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from encoding_model.algoanut_data import argObj, load_data_algonauts  
-from utils import check_file_exists, create_permuation,Tee,meta_exists
+from my_utils import check_file_exists, create_permuation,Tee,meta_exists
 from typing import Optional
 from encoding_model.fmri_model import encoding_model
 from encoding_model.encoding_utils import split_dataset, visualize_encdoing_accuaracy,fmri_data_loader,save_model,compute_r2,compute_ols_cv_r2,compute_ridge_cv_r2

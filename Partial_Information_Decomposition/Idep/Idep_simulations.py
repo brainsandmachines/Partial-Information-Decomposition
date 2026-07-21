@@ -10,7 +10,7 @@ sys.path.append(str(root))
 from PID_calc import pid_calc
 from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import make_random_true_cov
 from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import already_exists_in_csv, make_pre_config, sample_data_from_cov, flatten_pid_results,append_row_to_csv
-from utils import Tee
+from my_utils import Tee
 from mi_functions import calculate_mi_raw
 from PID_util import reorder_cov_blocks
 

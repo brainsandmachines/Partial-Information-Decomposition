@@ -16,7 +16,7 @@ sys.path.append(str(root))
 from Commonality_Analysis.CA import commonality_analysis
 from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
-from utils import (
+from my_utils import (
     create_test_histograms_with_kde,
     extract_all_components,
     run_configured_multiseed,

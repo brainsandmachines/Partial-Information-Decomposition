@@ -30,12 +30,6 @@ from pipeline.pipeline_utils import resolve_pipeline_function
 from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
 
 
-DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
-    "ViT-B_32_clip": "ViT-B/32_clip",
-    "ViT-L_14_clip": "ViT-L/14_clip",
-}
-
-
 #model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
 
 '''model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
@@ -56,23 +50,6 @@ model_1_names = ['nf_resnet50_classification','eca_nfnet_l0_classification','res
 
 model_2_names = model_1_names  # Compare all models against each other
 
-
-def to_deepdive_model_name(model_name: str) -> str:
-    """Convert a stored model alias to the canonical name expected by DeepDive.
-
-    Inputs:
-        model_name: str, model identifier used by the pairwise model list and
-            best-layer results CSV.
-
-    Output:
-        deepdive_model_name: str, canonical DeepDive model identifier. Names
-            that do not require conversion are returned unchanged.
-    """
-
-    deepdive_model_name = DEEPDIVE_MODEL_NAME_CONVERSIONS.get(model_name, model_name)
-    if deepdive_model_name != model_name:
-        print(f"Changed model name: {model_name} -> {deepdive_model_name}")
-    return deepdive_model_name
 
 
 def deterministic_pca(
@@ -141,7 +118,7 @@ def extract_model_projection(
         srp_components = target_context.get("n_projections")
     if use_srp and (srp_components is None or int(srp_components) < 1):
         raise ValueError("srp_n_components must be a positive integer when use_srp is true.")
-    model_context = prepare_model_context(to_deepdive_model_name(model_name))
+    model_context = prepare_model_context(model_name)
     layer_result = overall_best_layer(
         model_name=model_name,
         path_to_results=str(choose_layer_kwargs["path_to_results"]),

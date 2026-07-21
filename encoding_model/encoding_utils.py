@@ -366,7 +366,7 @@ def visualize_encdoing_accuaracy(args,lh_correlation,rh_correlation,correlation_
     rh_roi_correlation.append(rh_correlation)
     if plot:
         import matplotlib.pyplot as plt
-        from utils import check_file_exists
+        from my_utils import check_file_exists
 
         # Create the plot
         lh_mean_roi_correlation = [np.mean(lh_roi_correlation[r])
@@ -401,7 +401,7 @@ def save_corellation(roi_names,lh_correlation,rh_correlation,correlation_path,ex
         rh_correlation (np.array): Array of correlation values for right hemisphere vertices.
         correlation_path (str): Path to save the correlation files.
     """
-    from utils import check_file_exists
+    from my_utils import check_file_exists
 
     #Define file name: 
     lh_name = f'{experiment_name}_lh_correlation.npy' if experiment_name else 'lh_correlation.npy'
@@ -439,7 +439,7 @@ def save_model(folder_path, model_name,save_dict,reg_lh:Optional[ndarray]=None, 
             Saves the model and correlation values to specified folder with the specific rois.
     """
     import joblib
-    from utils import check_folder_exists
+    from my_utils import check_folder_exists
 
     model_name_joblib = f'{model_name}_encoding_model.joblib' if model_name else 'encoding_model.joblib'
     

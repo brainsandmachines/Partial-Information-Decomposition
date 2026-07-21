@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from encoding_model.suppression_core import create_predictions
-from utils import extract_all_components, run_configured_multiseed
+from my_utils import extract_all_components, run_configured_multiseed
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from Commonality_Analysis.CA import commonality_analysis

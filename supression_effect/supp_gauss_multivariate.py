@@ -14,7 +14,7 @@ from encoding_model.commonality import commonality_analysis
 from toy_examples.toy_example import run_experiment
 from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from Partial_Information_Decomposition.PID_util import compare_results
-from utils import (
+from my_utils import (
     Tee,
     extract_all_components,
     get_seed_runs_csv_path,
