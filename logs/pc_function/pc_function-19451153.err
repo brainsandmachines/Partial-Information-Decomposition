@@ -167,3 +167,29 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:16<00:00, 16.22s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:16<00:00, 16.22s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:15<00:00, 15.71s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:15<00:00, 15.71s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:05<00:00,  5.31s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:05<00:00,  5.31s/it]
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 308, in <module>
+    main()
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 293, in main
+    pc_function_analysis(
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 187, in pc_function_analysis
+    source_1_for_pid = _prepare_source_for_pid(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 56, in _prepare_source_for_pid
+    _, ridge_model = find_alpha_per_pc(source[~shared_mask], train_target)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/ridge_find_alpha/find_alpha.py", line 80, in find_alpha_per_pc
+    print("\nPredictor device:", predictor.device)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/base.py", line 1403, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/pipeline.py", line 639, in fit
+    with _print_elapsed_time("Pipeline", self._log_message(len(self.steps) - 1)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/.conda/envs/pid_env/lib/python3.12/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/ohadshee/.conda/envs/pid_env/lib/python3.12/site-packages/sklearn/utils/_user_interface.py", line 57, in _print_elapsed_time
+    print(_message_with_time(source, message, timeit.default_timer() - start))
+OSError: [Errno 116] Stale file handle
+/var/spool/slurmd/job19451153/slurm_script: line 38: 1920160 Bus error               (core dumped) python -u pipeline/analysis/pca_analysis/function_as_pc/pc_function.py

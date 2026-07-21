@@ -167,3 +167,12 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:16<00:00, 16.19s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:16<00:00, 16.20s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:16<00:00, 16.26s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:16<00:00, 16.26s/it]
 Feature Extraction (Batch):   0%|          | 0/1 [00:00<?, ?it/s]Feature Extraction (Batch): 100%|██████████| 1/1 [00:05<00:00,  5.41s/it]Feature Extraction (Batch): 100%|██████████| 1/1 [00:05<00:00,  5.41s/it]
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 308, in <module>
+    main()
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 293, in main
+    pc_function_analysis(
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/function_as_pc/pc_function.py", line 210, in pc_function_analysis
+    print(
+OSError: [Errno 116] Stale file handle
+/var/spool/slurmd/job19451154/slurm_script: line 38: 1738846 Bus error               (core dumped) python -u pipeline/analysis/pca_analysis/function_as_pc/pc_function.py

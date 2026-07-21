@@ -185,7 +185,7 @@ def pca_func(
 
     if mode == "eigenvector_CV":
         print("\nRunning Eigenvector PCA with cross-validation!!!")
-        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max=200/checkpoint.csv'
+        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max=150/checkpoint.csv'
         output = eigenvector_pca_cv(
             data_array,
             max_components=max_features,
@@ -354,7 +354,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max=200'
+    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max=150'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -362,6 +362,6 @@ if __name__ == "__main__":
         neural_data_path=subject_neural_data_path,
         variance_threshold=1.0,
         save_models_path=Path(save_path),
-        max_features=200,
+        max_features=150,
         pca_mode="eigenvector_CV",
     )

@@ -1,0 +1,1218 @@
+------------------------------------
+Tue 21 Jul 2026 13:36:29 IDT
+SLURM_JOBID:		19471237
+SLURM_JOB_NODELIST:	ise-cpu256-02
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19471237
+Allocated Resouces:	cpu - 8 / mem - 49152 MB / gpu - 1
+SLURM_GPU_INDEX:	0
+Running as ohadshee from golan.neuro account with golan-neuro QOS
+------------------------------------
+Running on host: ise-cpu256-02.auth.ad.bgu.ac.il
+Job ID: 19471237
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cuda
+Results will be saved to:
+ /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_30_pcs_correlations_by_model.csv
+Starting model: nf_resnet50_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for nf_resnet50_classification: {'model_name': 'nf_resnet50', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('nf_resnet50', pretrained = True)"}
+Image transforms for nf_resnet50_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: nf_resnet50_classification
+Ordered layers from model: ['ScaledStdConv2d-1', 'MaxPool2d-1', 'ReLU-1', 'Identity-1', 'ScaledStdConv2d-2', 'DownsampleAvg-1', 'ScaledStdConv2d-3', 'ReLU-2', 'ScaledStdConv2d-4', 'ReLU-3', 'ScaledStdConv2d-5', 'Identity-2', 'NormFreeBlock-1', 'ReLU-4', 'ScaledStdConv2d-6', 'ReLU-5', 'ScaledStdConv2d-7', 'ReLU-6', 'ScaledStdConv2d-8', 'Identity-3', 'NormFreeBlock-2', 'ReLU-7', 'ScaledStdConv2d-9', 'ReLU-8', 'ScaledStdConv2d-10', 'ReLU-9', 'ScaledStdConv2d-11', 'Identity-4', 'NormFreeBlock-3', 'ReLU-10', 'AvgPool2d-1', 'ScaledStdConv2d-12', 'DownsampleAvg-2', 'ScaledStdConv2d-13', 'ReLU-11', 'ScaledStdConv2d-14', 'ReLU-12', 'ScaledStdConv2d-15', 'Identity-5', 'NormFreeBlock-4', 'ReLU-13', 'ScaledStdConv2d-16', 'ReLU-14', 'ScaledStdConv2d-17', 'ReLU-15', 'ScaledStdConv2d-18', 'Identity-6', 'NormFreeBlock-5', 'ReLU-16', 'ScaledStdConv2d-19', 'ReLU-17', 'ScaledStdConv2d-20', 'ReLU-18', 'ScaledStdConv2d-21', 'Identity-7', 'NormFreeBlock-6', 'ReLU-19', 'ScaledStdConv2d-22', 'ReLU-20', 'ScaledStdConv2d-23', 'ReLU-21', 'ScaledStdConv2d-24', 'Identity-8', 'NormFreeBlock-7', 'ReLU-22', 'AvgPool2d-2', 'ScaledStdConv2d-25', 'DownsampleAvg-3', 'ScaledStdConv2d-26', 'ReLU-23', 'ScaledStdConv2d-27', 'ReLU-24', 'ScaledStdConv2d-28', 'Identity-9', 'NormFreeBlock-8', 'ReLU-25', 'ScaledStdConv2d-29', 'ReLU-26', 'ScaledStdConv2d-30', 'ReLU-27', 'ScaledStdConv2d-31', 'Identity-10', 'NormFreeBlock-9', 'ReLU-28', 'ScaledStdConv2d-32', 'ReLU-29', 'ScaledStdConv2d-33', 'ReLU-30', 'ScaledStdConv2d-34', 'Identity-11', 'NormFreeBlock-10', 'ReLU-31', 'ScaledStdConv2d-35', 'ReLU-32', 'ScaledStdConv2d-36', 'ReLU-33', 'ScaledStdConv2d-37', 'Identity-12', 'NormFreeBlock-11', 'ReLU-34', 'ScaledStdConv2d-38', 'ReLU-35', 'ScaledStdConv2d-39', 'ReLU-36', 'ScaledStdConv2d-40', 'Identity-13', 'NormFreeBlock-12', 'ReLU-37', 'ScaledStdConv2d-41', 'ReLU-38', 'ScaledStdConv2d-42', 'ReLU-39', 'ScaledStdConv2d-43', 'Identity-14', 'NormFreeBlock-13', 'ReLU-40', 'AvgPool2d-3', 'ScaledStdConv2d-44', 'DownsampleAvg-4', 'ScaledStdConv2d-45', 'ReLU-41', 'ScaledStdConv2d-46', 'ReLU-42', 'ScaledStdConv2d-47', 'Identity-15', 'NormFreeBlock-14', 'ReLU-43', 'ScaledStdConv2d-48', 'ReLU-44', 'ScaledStdConv2d-49', 'ReLU-45', 'ScaledStdConv2d-50', 'Identity-16', 'NormFreeBlock-15', 'ReLU-46', 'ScaledStdConv2d-51', 'ReLU-47', 'ScaledStdConv2d-52', 'ReLU-48', 'ScaledStdConv2d-53', 'Identity-17', 'NormFreeBlock-16', 'Identity-18', 'ReLU-49', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Dropout-1', 'Linear-1', 'Identity-19', 'ClassifierHead-1', 'NormFreeNet-1']
+Total number of layers: 152
+Starting to extract features for nf_resnet50_classification at layer 141
+
+==================================================
+Processing layer: NormFreeBlock-16 from model: nf_resnet50_classification
+
+For model nf_resnet50_classification Layer NormFreeBlock-16: Extracting features for 10000 images in batches of 128...
+Feature extraction for model nf_resnet50_classification layer NormFreeBlock-16 completed in 203.12 seconds.
+
+Features shape: (10000, 100352), Train target shape: (9000, 200), Shared target shape: (1000, 200)
+Running ridge regression for 30 PCs on model nf_resnet50_classification at layer 141
+Running analysis for 30 PCs
+Running analysis for PC index 0
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 0 correlation: 0.4507
+Running analysis for PC index 1
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 1 correlation: 0.8247
+Running analysis for PC index 2
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 2 correlation: 0.7351
+Running analysis for PC index 3
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 3 correlation: 0.7315
+Running analysis for PC index 4
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 4 correlation: 0.6938
+Running analysis for PC index 5
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 5 correlation: 0.5053
+Running analysis for PC index 6
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 6 correlation: 0.4639
+Running analysis for PC index 7
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 7 correlation: 0.2064
+Running analysis for PC index 8
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 8 correlation: 0.5040
+Running analysis for PC index 9
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 9 correlation: 0.5043
+Running analysis for PC index 10
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 10 correlation: 0.4310
+Running analysis for PC index 11
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 11 correlation: 0.7217
+Running analysis for PC index 12
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 12 correlation: 0.3332
+Running analysis for PC index 13
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 13 correlation: 0.4296
+Running analysis for PC index 14
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 14 correlation: 0.4831
+Running analysis for PC index 15
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 15 correlation: 0.3429
+Running analysis for PC index 16
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 16 correlation: 0.3634
+Running analysis for PC index 17
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 17 correlation: 0.1918
+Running analysis for PC index 18
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 18 correlation: 0.4100
+Running analysis for PC index 19
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 19 correlation: 0.3249
+Running analysis for PC index 20
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 20 correlation: 0.3789
+Running analysis for PC index 21
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 21 correlation: 0.3663
+Running analysis for PC index 22
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 22 correlation: 0.3474
+Running analysis for PC index 23
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 23 correlation: 0.2597
+Running analysis for PC index 24
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 24 correlation: 0.4052
+Running analysis for PC index 25
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 25 correlation: 0.2391
+Running analysis for PC index 26
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 26 correlation: 0.3681
+Running analysis for PC index 27
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 27 correlation: 0.2517
+Running analysis for PC index 28
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 28 correlation: 0.3067
+Running analysis for PC index 29
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 29 correlation: 0.3656
+Saved nf_resnet50_classification correlations to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_30_pcs_correlations_by_model.csv 😀
+Starting model: hardcorenas_f_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for hardcorenas_f_classification: {'model_name': 'hardcorenas_f', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('hardcorenas_f', pretrained = True)"}
+Image transforms for hardcorenas_f_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: hardcorenas_f_classification
+Ordered layers from model: ['Conv2d-1', 'Identity-1', 'Hardswish-1', 'BatchNormAct2d-1', 'Conv2d-2', 'Identity-2', 'ReLU-1', 'BatchNormAct2d-2', 'Identity-3', 'Identity-4', 'Conv2d-3', 'Identity-5', 'Identity-6', 'BatchNormAct2d-3', 'DepthwiseSeparableConv-1', 'Conv2d-4', 'Identity-7', 'ReLU-2', 'BatchNormAct2d-4', 'Conv2d-5', 'Identity-8', 'ReLU-3', 'BatchNormAct2d-5', 'Identity-9', 'Conv2d-6', 'ReLU-4', 'Conv2d-7', 'Hardsigmoid-1', 'SqueezeExcite-1', 'Conv2d-8', 'Identity-10', 'Identity-11', 'BatchNormAct2d-6', 'InvertedResidual-1', 'Conv2d-9', 'Identity-12', 'ReLU-5', 'BatchNormAct2d-7', 'Conv2d-10', 'Identity-13', 'ReLU-6', 'BatchNormAct2d-8', 'Identity-14', 'Conv2d-11', 'ReLU-7', 'Conv2d-12', 'Hardsigmoid-2', 'SqueezeExcite-2', 'Conv2d-13', 'Identity-15', 'Identity-16', 'BatchNormAct2d-9', 'Identity-17', 'InvertedResidual-2', 'Conv2d-14', 'Identity-18', 'ReLU-8', 'BatchNormAct2d-10', 'Conv2d-15', 'Identity-19', 'ReLU-9', 'BatchNormAct2d-11', 'Identity-20', 'Conv2d-16', 'ReLU-10', 'Conv2d-17', 'Hardsigmoid-3', 'SqueezeExcite-3', 'Conv2d-18', 'Identity-21', 'Identity-22', 'BatchNormAct2d-12', 'InvertedResidual-3', 'Conv2d-19', 'Identity-23', 'ReLU-11', 'BatchNormAct2d-13', 'Conv2d-20', 'Identity-24', 'ReLU-12', 'BatchNormAct2d-14', 'Identity-25', 'Conv2d-21', 'ReLU-13', 'Conv2d-22', 'Hardsigmoid-4', 'SqueezeExcite-4', 'Conv2d-23', 'Identity-26', 'Identity-27', 'BatchNormAct2d-15', 'Identity-28', 'InvertedResidual-4', 'Conv2d-24', 'Identity-29', 'Hardswish-2', 'BatchNormAct2d-16', 'Conv2d-25', 'Identity-30', 'Hardswish-3', 'BatchNormAct2d-17', 'Identity-31', 'Conv2d-26', 'ReLU-14', 'Conv2d-27', 'Hardsigmoid-5', 'SqueezeExcite-5', 'Conv2d-28', 'Identity-32', 'Identity-33', 'BatchNormAct2d-18', 'InvertedResidual-5', 'Conv2d-29', 'Identity-34', 'Hardswish-4', 'BatchNormAct2d-19', 'Conv2d-30', 'Identity-35', 'Hardswish-5', 'BatchNormAct2d-20', 'Identity-36', 'Conv2d-31', 'ReLU-15', 'Conv2d-32', 'Hardsigmoid-6', 'SqueezeExcite-6', 'Conv2d-33', 'Identity-37', 'Identity-38', 'BatchNormAct2d-21', 'Identity-39', 'InvertedResidual-6', 'Conv2d-34', 'Identity-40', 'Hardswish-6', 'BatchNormAct2d-22', 'Conv2d-35', 'Identity-41', 'Hardswish-7', 'BatchNormAct2d-23', 'Identity-42', 'Conv2d-36', 'ReLU-16', 'Conv2d-37', 'Hardsigmoid-7', 'SqueezeExcite-7', 'Conv2d-38', 'Identity-43', 'Identity-44', 'BatchNormAct2d-24', 'Identity-45', 'InvertedResidual-7', 'Conv2d-39', 'Identity-46', 'Hardswish-8', 'BatchNormAct2d-25', 'Conv2d-40', 'Identity-47', 'Hardswish-9', 'BatchNormAct2d-26', 'Identity-48', 'Conv2d-41', 'ReLU-17', 'Conv2d-42', 'Hardsigmoid-8', 'SqueezeExcite-8', 'Conv2d-43', 'Identity-49', 'Identity-50', 'BatchNormAct2d-27', 'Identity-51', 'InvertedResidual-8', 'Conv2d-44', 'Identity-52', 'Hardswish-10', 'BatchNormAct2d-28', 'Conv2d-45', 'Identity-53', 'Hardswish-11', 'BatchNormAct2d-29', 'Identity-54', 'Conv2d-46', 'ReLU-18', 'Conv2d-47', 'Hardsigmoid-9', 'SqueezeExcite-9', 'Conv2d-48', 'Identity-55', 'Identity-56', 'BatchNormAct2d-30', 'InvertedResidual-9', 'Conv2d-49', 'Identity-57', 'Hardswish-12', 'BatchNormAct2d-31', 'Conv2d-50', 'Identity-58', 'Hardswish-13', 'BatchNormAct2d-32', 'Identity-59', 'Conv2d-51', 'ReLU-19', 'Conv2d-52', 'Hardsigmoid-10', 'SqueezeExcite-10', 'Conv2d-53', 'Identity-60', 'Identity-61', 'BatchNormAct2d-33', 'Identity-62', 'InvertedResidual-10', 'Conv2d-54', 'Identity-63', 'Hardswish-14', 'BatchNormAct2d-34', 'Conv2d-55', 'Identity-64', 'Hardswish-15', 'BatchNormAct2d-35', 'Identity-65', 'Conv2d-56', 'ReLU-20', 'Conv2d-57', 'Hardsigmoid-11', 'SqueezeExcite-11', 'Conv2d-58', 'Identity-66', 'Identity-67', 'BatchNormAct2d-36', 'Identity-68', 'InvertedResidual-11', 'Conv2d-59', 'Identity-69', 'Hardswish-16', 'BatchNormAct2d-37', 'Conv2d-60', 'Identity-70', 'Hardswish-17', 'BatchNormAct2d-38', 'Identity-71', 'Conv2d-61', 'ReLU-21', 'Conv2d-62', 'Hardsigmoid-12', 'SqueezeExcite-12', 'Conv2d-63', 'Identity-72', 'Identity-73', 'BatchNormAct2d-39', 'Identity-74', 'InvertedResidual-12', 'Conv2d-64', 'Identity-75', 'Hardswish-18', 'BatchNormAct2d-40', 'Conv2d-65', 'Identity-76', 'Hardswish-19', 'BatchNormAct2d-41', 'Identity-77', 'Conv2d-66', 'ReLU-22', 'Conv2d-67', 'Hardsigmoid-13', 'SqueezeExcite-13', 'Conv2d-68', 'Identity-78', 'Identity-79', 'BatchNormAct2d-42', 'InvertedResidual-13', 'Conv2d-69', 'Identity-80', 'Hardswish-20', 'BatchNormAct2d-43', 'Conv2d-70', 'Identity-81', 'Hardswish-21', 'BatchNormAct2d-44', 'Identity-82', 'Conv2d-71', 'ReLU-23', 'Conv2d-72', 'Hardsigmoid-14', 'SqueezeExcite-14', 'Conv2d-73', 'Identity-83', 'Identity-84', 'BatchNormAct2d-45', 'Identity-85', 'InvertedResidual-14', 'Conv2d-74', 'Identity-86', 'Hardswish-22', 'BatchNormAct2d-46', 'Conv2d-75', 'Identity-87', 'Hardswish-23', 'BatchNormAct2d-47', 'Identity-88', 'Conv2d-76', 'ReLU-24', 'Conv2d-77', 'Hardsigmoid-15', 'SqueezeExcite-15', 'Conv2d-78', 'Identity-89', 'Identity-90', 'BatchNormAct2d-48', 'Identity-91', 'InvertedResidual-15', 'Conv2d-79', 'Identity-92', 'Hardswish-24', 'BatchNormAct2d-49', 'Conv2d-80', 'Identity-93', 'Hardswish-25', 'BatchNormAct2d-50', 'Identity-94', 'Conv2d-81', 'ReLU-25', 'Conv2d-82', 'Hardsigmoid-16', 'SqueezeExcite-16', 'Conv2d-83', 'Identity-95', 'Identity-96', 'BatchNormAct2d-51', 'Identity-97', 'InvertedResidual-16', 'Conv2d-84', 'Identity-98', 'Hardswish-26', 'BatchNormAct2d-52', 'Identity-99', 'ConvBnAct-1', 'AdaptiveAvgPool2d-1', 'Identity-100', 'SelectAdaptivePool2d-1', 'Conv2d-85', 'Identity-101', 'Hardswish-27', 'Flatten-1', 'Linear-1', 'MobileNetV3-1']
+Total number of layers: 345
+Starting to extract features for hardcorenas_f_classification at layer 294
+
+==================================================
+Processing layer: Conv2d-75 from model: hardcorenas_f_classification
+
+For model hardcorenas_f_classification Layer Conv2d-75: Extracting features for 10000 images in batches of 128...
+Feature extraction for model hardcorenas_f_classification layer Conv2d-75 completed in 72.98 seconds.
+
+Features shape: (10000, 56448), Train target shape: (9000, 200), Shared target shape: (1000, 200)
+Running ridge regression for 30 PCs on model hardcorenas_f_classification at layer 294
+Running analysis for 30 PCs
+Running analysis for PC index 0
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 0 correlation: 0.4597
+Running analysis for PC index 1
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 1 correlation: 0.8047
+Running analysis for PC index 2
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 2 correlation: 0.7389
+Running analysis for PC index 3
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 3 correlation: 0.7206
+Running analysis for PC index 4
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 4 correlation: 0.6898
+Running analysis for PC index 5
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 5 correlation: 0.4916
+Running analysis for PC index 6
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 6 correlation: 0.4771
+Running analysis for PC index 7
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 7 correlation: 0.2070
+Running analysis for PC index 8
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 8 correlation: 0.4943
+Running analysis for PC index 9
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 9 correlation: 0.5017
+Running analysis for PC index 10
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 10 correlation: 0.4418
+Running analysis for PC index 11
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 11 correlation: 0.7138
+Running analysis for PC index 12
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 12 correlation: 0.3178
+Running analysis for PC index 13
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 13 correlation: 0.4435
+Running analysis for PC index 14
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 14 correlation: 0.4850
+Running analysis for PC index 15
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 15 correlation: 0.3407
+Running analysis for PC index 16
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 16 correlation: 0.3870
+Running analysis for PC index 17
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 17 correlation: 0.1955
+Running analysis for PC index 18
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 18 correlation: 0.4064
+Running analysis for PC index 19
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 19 correlation: 0.2992
+Running analysis for PC index 20
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 20 correlation: 0.3745
+Running analysis for PC index 21
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 21 correlation: 0.3643
+Running analysis for PC index 22
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 22 correlation: 0.3405
+Running analysis for PC index 23
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 23 correlation: 0.2724
+Running analysis for PC index 24
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 24 correlation: 0.3760
+Running analysis for PC index 25
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 25 correlation: 0.2712
+Running analysis for PC index 26
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 26 correlation: 0.3436
+Running analysis for PC index 27
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 27 correlation: 0.2505
+Running analysis for PC index 28
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 28 correlation: 0.3181
+Running analysis for PC index 29
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 29 correlation: 0.3701
+Saved hardcorenas_f_classification correlations to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_30_pcs_correlations_by_model.csv 😀
+Starting model: eca_nfnet_l0_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for eca_nfnet_l0_classification: {'model_name': 'eca_nfnet_l0', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('eca_nfnet_l0', pretrained = True)"}
+Image transforms for eca_nfnet_l0_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: eca_nfnet_l0_classification
+Ordered layers from model: ['ScaledStdConv2d-1', 'SiLU-1', 'ScaledStdConv2d-2', 'SiLU-2', 'ScaledStdConv2d-3', 'SiLU-3', 'ScaledStdConv2d-4', 'SiLU-4', 'Identity-1', 'ScaledStdConv2d-5', 'DownsampleAvg-1', 'ScaledStdConv2d-6', 'SiLU-5', 'ScaledStdConv2d-7', 'SiLU-6', 'ScaledStdConv2d-8', 'SiLU-7', 'ScaledStdConv2d-9', 'Conv1d-1', 'Sigmoid-1', 'EcaModule-1', 'Identity-2', 'NormFreeBlock-1', 'SiLU-8', 'AvgPool2d-1', 'ScaledStdConv2d-10', 'DownsampleAvg-2', 'ScaledStdConv2d-11', 'SiLU-9', 'ScaledStdConv2d-12', 'SiLU-10', 'ScaledStdConv2d-13', 'SiLU-11', 'ScaledStdConv2d-14', 'Conv1d-2', 'Sigmoid-2', 'EcaModule-2', 'Identity-3', 'NormFreeBlock-2', 'SiLU-12', 'ScaledStdConv2d-15', 'SiLU-13', 'ScaledStdConv2d-16', 'SiLU-14', 'ScaledStdConv2d-17', 'SiLU-15', 'ScaledStdConv2d-18', 'Conv1d-3', 'Sigmoid-3', 'EcaModule-3', 'Identity-4', 'NormFreeBlock-3', 'SiLU-16', 'AvgPool2d-2', 'ScaledStdConv2d-19', 'DownsampleAvg-3', 'ScaledStdConv2d-20', 'SiLU-17', 'ScaledStdConv2d-21', 'SiLU-18', 'ScaledStdConv2d-22', 'SiLU-19', 'ScaledStdConv2d-23', 'Conv1d-4', 'Sigmoid-4', 'EcaModule-4', 'Identity-5', 'NormFreeBlock-4', 'SiLU-20', 'ScaledStdConv2d-24', 'SiLU-21', 'ScaledStdConv2d-25', 'SiLU-22', 'ScaledStdConv2d-26', 'SiLU-23', 'ScaledStdConv2d-27', 'Conv1d-5', 'Sigmoid-5', 'EcaModule-5', 'Identity-6', 'NormFreeBlock-5', 'SiLU-24', 'ScaledStdConv2d-28', 'SiLU-25', 'ScaledStdConv2d-29', 'SiLU-26', 'ScaledStdConv2d-30', 'SiLU-27', 'ScaledStdConv2d-31', 'Conv1d-6', 'Sigmoid-6', 'EcaModule-6', 'Identity-7', 'NormFreeBlock-6', 'SiLU-28', 'ScaledStdConv2d-32', 'SiLU-29', 'ScaledStdConv2d-33', 'SiLU-30', 'ScaledStdConv2d-34', 'SiLU-31', 'ScaledStdConv2d-35', 'Conv1d-7', 'Sigmoid-7', 'EcaModule-7', 'Identity-8', 'NormFreeBlock-7', 'SiLU-32', 'ScaledStdConv2d-36', 'SiLU-33', 'ScaledStdConv2d-37', 'SiLU-34', 'ScaledStdConv2d-38', 'SiLU-35', 'ScaledStdConv2d-39', 'Conv1d-8', 'Sigmoid-8', 'EcaModule-8', 'Identity-9', 'NormFreeBlock-8', 'SiLU-36', 'ScaledStdConv2d-40', 'SiLU-37', 'ScaledStdConv2d-41', 'SiLU-38', 'ScaledStdConv2d-42', 'SiLU-39', 'ScaledStdConv2d-43', 'Conv1d-9', 'Sigmoid-9', 'EcaModule-9', 'Identity-10', 'NormFreeBlock-9', 'SiLU-40', 'AvgPool2d-3', 'ScaledStdConv2d-44', 'DownsampleAvg-4', 'ScaledStdConv2d-45', 'SiLU-41', 'ScaledStdConv2d-46', 'SiLU-42', 'ScaledStdConv2d-47', 'SiLU-43', 'ScaledStdConv2d-48', 'Conv1d-10', 'Sigmoid-10', 'EcaModule-10', 'Identity-11', 'NormFreeBlock-10', 'SiLU-44', 'ScaledStdConv2d-49', 'SiLU-45', 'ScaledStdConv2d-50', 'SiLU-46', 'ScaledStdConv2d-51', 'SiLU-47', 'ScaledStdConv2d-52', 'Conv1d-11', 'Sigmoid-11', 'EcaModule-11', 'Identity-12', 'NormFreeBlock-11', 'SiLU-48', 'ScaledStdConv2d-53', 'SiLU-49', 'ScaledStdConv2d-54', 'SiLU-50', 'ScaledStdConv2d-55', 'SiLU-51', 'ScaledStdConv2d-56', 'Conv1d-12', 'Sigmoid-12', 'EcaModule-12', 'Identity-13', 'NormFreeBlock-12', 'ScaledStdConv2d-57', 'SiLU-52', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Dropout-1', 'Linear-1', 'Identity-14', 'ClassifierHead-1', 'NormFreeNet-1']
+Total number of layers: 185
+Starting to extract features for eca_nfnet_l0_classification at layer 134
+
+==================================================
+Processing layer: AvgPool2d-3 from model: eca_nfnet_l0_classification
+
+For model eca_nfnet_l0_classification Layer AvgPool2d-3: Extracting features for 10000 images in batches of 128...
+Feature extraction for model eca_nfnet_l0_classification layer AvgPool2d-3 completed in 80.38 seconds.
+
+Features shape: (10000, 75264), Train target shape: (9000, 200), Shared target shape: (1000, 200)
+Running ridge regression for 30 PCs on model eca_nfnet_l0_classification at layer 134
+Running analysis for 30 PCs
+Running analysis for PC index 0
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 0 correlation: 0.4470
+Running analysis for PC index 1
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 1 correlation: 0.8207
+Running analysis for PC index 2
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 2 correlation: 0.7581
+Running analysis for PC index 3
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 3 correlation: 0.7430
+Running analysis for PC index 4
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 4 correlation: 0.7097
+Running analysis for PC index 5
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 5 correlation: 0.5052
+Running analysis for PC index 6
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 6 correlation: 0.4812
+Running analysis for PC index 7
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 7 correlation: 0.2253
+Running analysis for PC index 8
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 8 correlation: 0.5211
+Running analysis for PC index 9
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 9 correlation: 0.5216
+Running analysis for PC index 10
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 10 correlation: 0.4542
+Running analysis for PC index 11
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 11 correlation: 0.7265
+Running analysis for PC index 12
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 12 correlation: 0.3506
+Running analysis for PC index 13
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 13 correlation: 0.4445
+Running analysis for PC index 14
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 14 correlation: 0.4957
+Running analysis for PC index 15
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 15 correlation: 0.3591
+Running analysis for PC index 16
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 16 correlation: 0.3854
+Running analysis for PC index 17
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 17 correlation: 0.2084
+Running analysis for PC index 18
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 18 correlation: 0.4452
+Running analysis for PC index 19
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 19 correlation: 0.3374
+Running analysis for PC index 20
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 20 correlation: 0.3727
+Running analysis for PC index 21
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 21 correlation: 0.3641
+Running analysis for PC index 22
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 22 correlation: 0.3623
+Running analysis for PC index 23
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 23 correlation: 0.2824
+Running analysis for PC index 24
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 24 correlation: 0.4167
+Running analysis for PC index 25
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 25 correlation: 0.2320
+Running analysis for PC index 26
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 26 correlation: 0.3454
+Running analysis for PC index 27
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 27 correlation: 0.2648
+Running analysis for PC index 28
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 28 correlation: 0.3310
+Running analysis for PC index 29
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 29 correlation: 0.3691
+Saved eca_nfnet_l0_classification correlations to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_30_pcs_correlations_by_model.csv 😀
+Starting model: resnet50_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for resnet50_classification: {'model_name': 'resnet50', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'torchvision', 'call': "get_torchvision_model('models.resnet50', True)"}
+Image transforms for resnet50_classification: Compose(
+    Resize(size=(224, 224), interpolation=bilinear, max_size=None, antialias=True)
+    ToTensor()
+    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+)
+Loaded model: resnet50_classification
+Ordered layers from model: ['Conv2d-1', 'BatchNorm2d-1', 'ReLU-1', 'MaxPool2d-1', 'Conv2d-2', 'BatchNorm2d-2', 'ReLU-2', 'Conv2d-3', 'BatchNorm2d-3', 'ReLU-3', 'Conv2d-4', 'BatchNorm2d-4', 'Conv2d-5', 'BatchNorm2d-5', 'ReLU-4', 'Bottleneck-1', 'Conv2d-6', 'BatchNorm2d-6', 'ReLU-5', 'Conv2d-7', 'BatchNorm2d-7', 'ReLU-6', 'Conv2d-8', 'BatchNorm2d-8', 'ReLU-7', 'Bottleneck-2', 'Conv2d-9', 'BatchNorm2d-9', 'ReLU-8', 'Conv2d-10', 'BatchNorm2d-10', 'ReLU-9', 'Conv2d-11', 'BatchNorm2d-11', 'ReLU-10', 'Bottleneck-3', 'Conv2d-12', 'BatchNorm2d-12', 'ReLU-11', 'Conv2d-13', 'BatchNorm2d-13', 'ReLU-12', 'Conv2d-14', 'BatchNorm2d-14', 'Conv2d-15', 'BatchNorm2d-15', 'ReLU-13', 'Bottleneck-4', 'Conv2d-16', 'BatchNorm2d-16', 'ReLU-14', 'Conv2d-17', 'BatchNorm2d-17', 'ReLU-15', 'Conv2d-18', 'BatchNorm2d-18', 'ReLU-16', 'Bottleneck-5', 'Conv2d-19', 'BatchNorm2d-19', 'ReLU-17', 'Conv2d-20', 'BatchNorm2d-20', 'ReLU-18', 'Conv2d-21', 'BatchNorm2d-21', 'ReLU-19', 'Bottleneck-6', 'Conv2d-22', 'BatchNorm2d-22', 'ReLU-20', 'Conv2d-23', 'BatchNorm2d-23', 'ReLU-21', 'Conv2d-24', 'BatchNorm2d-24', 'ReLU-22', 'Bottleneck-7', 'Conv2d-25', 'BatchNorm2d-25', 'ReLU-23', 'Conv2d-26', 'BatchNorm2d-26', 'ReLU-24', 'Conv2d-27', 'BatchNorm2d-27', 'Conv2d-28', 'BatchNorm2d-28', 'ReLU-25', 'Bottleneck-8', 'Conv2d-29', 'BatchNorm2d-29', 'ReLU-26', 'Conv2d-30', 'BatchNorm2d-30', 'ReLU-27', 'Conv2d-31', 'BatchNorm2d-31', 'ReLU-28', 'Bottleneck-9', 'Conv2d-32', 'BatchNorm2d-32', 'ReLU-29', 'Conv2d-33', 'BatchNorm2d-33', 'ReLU-30', 'Conv2d-34', 'BatchNorm2d-34', 'ReLU-31', 'Bottleneck-10', 'Conv2d-35', 'BatchNorm2d-35', 'ReLU-32', 'Conv2d-36', 'BatchNorm2d-36', 'ReLU-33', 'Conv2d-37', 'BatchNorm2d-37', 'ReLU-34', 'Bottleneck-11', 'Conv2d-38', 'BatchNorm2d-38', 'ReLU-35', 'Conv2d-39', 'BatchNorm2d-39', 'ReLU-36', 'Conv2d-40', 'BatchNorm2d-40', 'ReLU-37', 'Bottleneck-12', 'Conv2d-41', 'BatchNorm2d-41', 'ReLU-38', 'Conv2d-42', 'BatchNorm2d-42', 'ReLU-39', 'Conv2d-43', 'BatchNorm2d-43', 'ReLU-40', 'Bottleneck-13', 'Conv2d-44', 'BatchNorm2d-44', 'ReLU-41', 'Conv2d-45', 'BatchNorm2d-45', 'ReLU-42', 'Conv2d-46', 'BatchNorm2d-46', 'Conv2d-47', 'BatchNorm2d-47', 'ReLU-43', 'Bottleneck-14', 'Conv2d-48', 'BatchNorm2d-48', 'ReLU-44', 'Conv2d-49', 'BatchNorm2d-49', 'ReLU-45', 'Conv2d-50', 'BatchNorm2d-50', 'ReLU-46', 'Bottleneck-15', 'Conv2d-51', 'BatchNorm2d-51', 'ReLU-47', 'Conv2d-52', 'BatchNorm2d-52', 'ReLU-48', 'Conv2d-53', 'BatchNorm2d-53', 'ReLU-49', 'Bottleneck-16', 'AdaptiveAvgPool2d-1', 'Linear-1', 'ResNet-1']
+Total number of layers: 175
+Starting to extract features for resnet50_classification at layer 156
+
+==================================================
+Processing layer: BatchNorm2d-49 from model: resnet50_classification
+
+For model resnet50_classification Layer BatchNorm2d-49: Extracting features for 10000 images in batches of 128...
+Feature extraction for model resnet50_classification layer BatchNorm2d-49 completed in 61.41 seconds.
+
+Features shape: (10000, 25088), Train target shape: (9000, 200), Shared target shape: (1000, 200)
+Running ridge regression for 30 PCs on model resnet50_classification at layer 156
+Running analysis for 30 PCs
+Running analysis for PC index 0
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 0 correlation: 0.4329
+Running analysis for PC index 1
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 1 correlation: 0.8089
+Running analysis for PC index 2
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 2 correlation: 0.7135
+Running analysis for PC index 3
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 3 correlation: 0.7140
+Running analysis for PC index 4
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 4 correlation: 0.6734
+Running analysis for PC index 5
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 5 correlation: 0.5002
+Running analysis for PC index 6
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 6 correlation: 0.4332
+Running analysis for PC index 7
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 7 correlation: 0.2210
+Running analysis for PC index 8
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 8 correlation: 0.4955
+Running analysis for PC index 9
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 9 correlation: 0.4889
+Running analysis for PC index 10
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 10 correlation: 0.4309
+Running analysis for PC index 11
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 11 correlation: 0.6961
+Running analysis for PC index 12
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 12 correlation: 0.3187
+Running analysis for PC index 13
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 13 correlation: 0.4245
+Running analysis for PC index 14
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 14 correlation: 0.4639
+Running analysis for PC index 15
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 15 correlation: 0.3471
+Running analysis for PC index 16
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 16 correlation: 0.3734
+Running analysis for PC index 17
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 17 correlation: 0.1543
+Running analysis for PC index 18
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 18 correlation: 0.4135
+Running analysis for PC index 19
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 19 correlation: 0.2851
+Running analysis for PC index 20
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 20 correlation: 0.3650
+Running analysis for PC index 21
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 21 correlation: 0.3569
+Running analysis for PC index 22
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 22 correlation: 0.3427
+Running analysis for PC index 23
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 23 correlation: 0.2558
+Running analysis for PC index 24
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 24 correlation: 0.4091
+Running analysis for PC index 25
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 25 correlation: 0.2466
+Running analysis for PC index 26
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 26 correlation: 0.3364
+Running analysis for PC index 27
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 27 correlation: 0.2251
+Running analysis for PC index 28
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 28 correlation: 0.2798
+Running analysis for PC index 29
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 29 correlation: 0.3402
+Saved resnet50_classification correlations to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_30_pcs_correlations_by_model.csv 😀
+Starting model: semnasnet_100_classification
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Model options for semnasnet_100_classification: {'model_name': 'semnasnet_100', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('semnasnet_100', pretrained = True)"}
+Image transforms for semnasnet_100_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: semnasnet_100_classification
+Ordered layers from model: ['Conv2d-1', 'Identity-1', 'ReLU-1', 'BatchNormAct2d-1', 'Conv2d-2', 'Identity-2', 'ReLU-2', 'BatchNormAct2d-2', 'Identity-3', 'Identity-4', 'Conv2d-3', 'Identity-5', 'Identity-6', 'BatchNormAct2d-3', 'DepthwiseSeparableConv-1', 'Conv2d-4', 'Identity-7', 'ReLU-3', 'BatchNormAct2d-4', 'Conv2d-5', 'Identity-8', 'ReLU-4', 'BatchNormAct2d-5', 'Identity-9', 'Identity-10', 'Conv2d-6', 'Identity-11', 'Identity-12', 'BatchNormAct2d-6', 'InvertedResidual-1', 'Conv2d-7', 'Identity-13', 'ReLU-5', 'BatchNormAct2d-7', 'Conv2d-8', 'Identity-14', 'ReLU-6', 'BatchNormAct2d-8', 'Identity-15', 'Identity-16', 'Conv2d-9', 'Identity-17', 'Identity-18', 'BatchNormAct2d-9', 'Identity-19', 'InvertedResidual-2', 'Conv2d-10', 'Identity-20', 'ReLU-7', 'BatchNormAct2d-10', 'Conv2d-11', 'Identity-21', 'ReLU-8', 'BatchNormAct2d-11', 'Identity-22', 'Conv2d-12', 'ReLU-9', 'Conv2d-13', 'Sigmoid-1', 'SqueezeExcite-1', 'Conv2d-14', 'Identity-23', 'Identity-24', 'BatchNormAct2d-12', 'InvertedResidual-3', 'Conv2d-15', 'Identity-25', 'ReLU-10', 'BatchNormAct2d-13', 'Conv2d-16', 'Identity-26', 'ReLU-11', 'BatchNormAct2d-14', 'Identity-27', 'Conv2d-17', 'ReLU-12', 'Conv2d-18', 'Sigmoid-2', 'SqueezeExcite-2', 'Conv2d-19', 'Identity-28', 'Identity-29', 'BatchNormAct2d-15', 'Identity-30', 'InvertedResidual-4', 'Conv2d-20', 'Identity-31', 'ReLU-13', 'BatchNormAct2d-16', 'Conv2d-21', 'Identity-32', 'ReLU-14', 'BatchNormAct2d-17', 'Identity-33', 'Conv2d-22', 'ReLU-15', 'Conv2d-23', 'Sigmoid-3', 'SqueezeExcite-3', 'Conv2d-24', 'Identity-34', 'Identity-35', 'BatchNormAct2d-18', 'Identity-36', 'InvertedResidual-5', 'Conv2d-25', 'Identity-37', 'ReLU-16', 'BatchNormAct2d-19', 'Conv2d-26', 'Identity-38', 'ReLU-17', 'BatchNormAct2d-20', 'Identity-39', 'Identity-40', 'Conv2d-27', 'Identity-41', 'Identity-42', 'BatchNormAct2d-21', 'InvertedResidual-6', 'Conv2d-28', 'Identity-43', 'ReLU-18', 'BatchNormAct2d-22', 'Conv2d-29', 'Identity-44', 'ReLU-19', 'BatchNormAct2d-23', 'Identity-45', 'Identity-46', 'Conv2d-30', 'Identity-47', 'Identity-48', 'BatchNormAct2d-24', 'Identity-49', 'InvertedResidual-7', 'Conv2d-31', 'Identity-50', 'ReLU-20', 'BatchNormAct2d-25', 'Conv2d-32', 'Identity-51', 'ReLU-21', 'BatchNormAct2d-26', 'Identity-52', 'Identity-53', 'Conv2d-33', 'Identity-54', 'Identity-55', 'BatchNormAct2d-27', 'Identity-56', 'InvertedResidual-8', 'Conv2d-34', 'Identity-57', 'ReLU-22', 'BatchNormAct2d-28', 'Conv2d-35', 'Identity-58', 'ReLU-23', 'BatchNormAct2d-29', 'Identity-59', 'Identity-60', 'Conv2d-36', 'Identity-61', 'Identity-62', 'BatchNormAct2d-30', 'Identity-63', 'InvertedResidual-9', 'Conv2d-37', 'Identity-64', 'ReLU-24', 'BatchNormAct2d-31', 'Conv2d-38', 'Identity-65', 'ReLU-25', 'BatchNormAct2d-32', 'Identity-66', 'Conv2d-39', 'ReLU-26', 'Conv2d-40', 'Sigmoid-4', 'SqueezeExcite-4', 'Conv2d-41', 'Identity-67', 'Identity-68', 'BatchNormAct2d-33', 'InvertedResidual-10', 'Conv2d-42', 'Identity-69', 'ReLU-27', 'BatchNormAct2d-34', 'Conv2d-43', 'Identity-70', 'ReLU-28', 'BatchNormAct2d-35', 'Identity-71', 'Conv2d-44', 'ReLU-29', 'Conv2d-45', 'Sigmoid-5', 'SqueezeExcite-5', 'Conv2d-46', 'Identity-72', 'Identity-73', 'BatchNormAct2d-36', 'Identity-74', 'InvertedResidual-11', 'Conv2d-47', 'Identity-75', 'ReLU-30', 'BatchNormAct2d-37', 'Conv2d-48', 'Identity-76', 'ReLU-31', 'BatchNormAct2d-38', 'Identity-77', 'Conv2d-49', 'ReLU-32', 'Conv2d-50', 'Sigmoid-6', 'SqueezeExcite-6', 'Conv2d-51', 'Identity-78', 'Identity-79', 'BatchNormAct2d-39', 'InvertedResidual-12', 'Conv2d-52', 'Identity-80', 'ReLU-33', 'BatchNormAct2d-40', 'Conv2d-53', 'Identity-81', 'ReLU-34', 'BatchNormAct2d-41', 'Identity-82', 'Conv2d-54', 'ReLU-35', 'Conv2d-55', 'Sigmoid-7', 'SqueezeExcite-7', 'Conv2d-56', 'Identity-83', 'Identity-84', 'BatchNormAct2d-42', 'Identity-85', 'InvertedResidual-13', 'Conv2d-57', 'Identity-86', 'ReLU-36', 'BatchNormAct2d-43', 'Conv2d-58', 'Identity-87', 'ReLU-37', 'BatchNormAct2d-44', 'Identity-88', 'Conv2d-59', 'ReLU-38', 'Conv2d-60', 'Sigmoid-8', 'SqueezeExcite-8', 'Conv2d-61', 'Identity-89', 'Identity-90', 'BatchNormAct2d-45', 'Identity-91', 'InvertedResidual-14', 'Conv2d-62', 'Identity-92', 'ReLU-39', 'BatchNormAct2d-46', 'Conv2d-63', 'Identity-93', 'ReLU-40', 'BatchNormAct2d-47', 'Identity-94', 'Identity-95', 'Conv2d-64', 'Identity-96', 'Identity-97', 'BatchNormAct2d-48', 'InvertedResidual-15', 'Conv2d-65', 'Identity-98', 'ReLU-41', 'BatchNormAct2d-49', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Linear-1', 'EfficientNet-1']
+Total number of layers: 290
+Starting to extract features for semnasnet_100_classification at layer 270
+
+==================================================
+Processing layer: Conv2d-63 from model: semnasnet_100_classification
+
+For model semnasnet_100_classification Layer Conv2d-63: Extracting features for 10000 images in batches of 128...
+Feature extraction for model semnasnet_100_classification layer Conv2d-63 completed in 68.54 seconds.
+
+Features shape: (10000, 47040), Train target shape: (9000, 200), Shared target shape: (1000, 200)
+Running ridge regression for 30 PCs on model semnasnet_100_classification at layer 270
+Running analysis for 30 PCs
+Running analysis for PC index 0
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 0 correlation: 0.4599
+Running analysis for PC index 1
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 1 correlation: 0.8186
+Running analysis for PC index 2
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 2 correlation: 0.7097
+Running analysis for PC index 3
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 3 correlation: 0.7067
+Running analysis for PC index 4
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 4 correlation: 0.6866
+Running analysis for PC index 5
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 5 correlation: 0.4883
+Running analysis for PC index 6
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 6 correlation: 0.4617
+Running analysis for PC index 7
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 7 correlation: 0.1956
+Running analysis for PC index 8
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 8 correlation: 0.4902
+Running analysis for PC index 9
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 9 correlation: 0.4909
+Running analysis for PC index 10
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 10 correlation: 0.4377
+Running analysis for PC index 11
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 11 correlation: 0.7172
+Running analysis for PC index 12
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 12 correlation: 0.3274
+Running analysis for PC index 13
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 13 correlation: 0.4307
+Running analysis for PC index 14
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 14 correlation: 0.4754
+Running analysis for PC index 15
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 15 correlation: 0.3471
+Running analysis for PC index 16
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 16 correlation: 0.3752
+Running analysis for PC index 17
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 17 correlation: 0.1735
+Running analysis for PC index 18
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 18 correlation: 0.4188
+Running analysis for PC index 19
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 19 correlation: 0.2895
+Running analysis for PC index 20
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 20 correlation: 0.3686
+Running analysis for PC index 21
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 21 correlation: 0.3543
+Running analysis for PC index 22
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 22 correlation: 0.3244
+Running analysis for PC index 23
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 23 correlation: 0.2523
+Running analysis for PC index 24
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 24 correlation: 0.3736
+Running analysis for PC index 25
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 25 correlation: 0.2413
+Running analysis for PC index 26
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 26 correlation: 0.3514
+Running analysis for PC index 27
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 27 correlation: 0.2461
+Running analysis for PC index 28
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu
+PC index 28 correlation: 0.3049
+Running analysis for PC index 29
+NOTE: Using GPU for ridge regression.
+
+Predictor device: cuda:0
+Target device: cuda:0
+Alphas device: cpu

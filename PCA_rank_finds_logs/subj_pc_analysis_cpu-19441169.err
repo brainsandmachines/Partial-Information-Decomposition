@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 358, in <module>
+    main(
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 267, in main
+    pca_results = pca_func(
+                  ^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/subj_pc_analysis.py", line 189, in pca_func
+    output = eigenvector_pca_cv(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/Simulations/PCA_rank/eigenvector_pca.py", line 369, in eigenvector_pca_cv
+    sample_press = _eigenvector_pca_cv_sample_press(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/Simulations/PCA_rank/eigenvector_pca.py", line 266, in _eigenvector_pca_cv_sample_press
+    print(f"Processing component {f} of {max_components}...✅")
+OSError: [Errno 116] Stale file handle
+/var/spool/slurmd/job19441169/slurm_script: line 38: 1042620 Bus error               (core dumped) python -u pipeline/subj_PCs/subj_pc_analysis.py

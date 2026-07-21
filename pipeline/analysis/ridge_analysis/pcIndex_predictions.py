@@ -69,7 +69,7 @@ def each_pc_index_pred(
         raise ValueError(f"No best layer found for model {model_name!r}.")
     source_context = prepare_model_context(to_deepdive_model_name(model_name))
     print(f"Starting to extract features for {model_name} at layer {layer_index}")
-    features = nsd_feature_extraction(source_context, layer_index, target_context=target_context)
+    features = nsd_feature_extraction(source_context, layer_index, target_context=target_context,batch_size_process=128,batch_size_dataloader=128)
 
     print(f"\nFeatures shape: {features.shape}, Train target shape: {train_target.shape}, Shared target shape: {shared_target.shape}")
     print(f"Running ridge regression for {len(n_pcs)} PCs on model {model_name} at layer {layer_index}")
@@ -147,18 +147,18 @@ def main() -> None:
 
     model_names =  ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
-        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
-        ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
+        'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification'
+        ,'swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
         'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
         'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
         'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
         'convit_base_classification','RN50_clip','RN101_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
-        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-L_14_clip','ViT-B_32_clip'
-        ] #dino_resnet50_selfsupervised, dino_vitb16_selfsupervised - missing
-
-    n_pcs = list(range(200))  # zero-based PC indexes to predict
-    output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/alpha(1,50,100)_GPU_{max(n_pcs)+1}_pcs_correlations_by_model.csv')
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
+        ]
+    #oom kill: 'ViT-L_14_clip','ViT-B_32_clip','dino_resnet50_selfsupervised', 'dino_vitb16_selfsupervised''xcit_nano_12_p8_224_classification''xcit_nano_12_p16_224_classification',
+    n_pcs = list(range(30))  # zero-based PC indexes to predict
+    output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_{max(n_pcs)+1}_pcs_correlations_by_model.csv')
     print("Results will be saved to:\n", output_path)
     header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in n_pcs)]
     completed_models: set[str] = set()
@@ -168,18 +168,22 @@ def main() -> None:
             if reader.fieldnames != header:
                 raise ValueError(f"Existing checkpoint has an incompatible header: {output_path}")
             completed_models = {row["model_name"].strip() for row in reader if row["model_name"].strip()}
-
+    
     for model_name in model_names:
         if model_name in completed_models:
             print(f"Skipping completed model: {model_name}")
             continue
         print(f"Starting model: {model_name}")
-        correlations, layer_index = each_pc_index_pred(
-            model_name, n_pcs, pc_path, hdf_path, pkl_info_path, neural_data_path
-        )
-        save_correlations_to_csv(correlations, model_name, layer_index, n_pcs, output_path)
-        completed_models.add(model_name)
-
+        try:
+            correlations, layer_index = each_pc_index_pred(
+                model_name, n_pcs, pc_path, hdf_path, pkl_info_path, neural_data_path
+            )
+            save_correlations_to_csv(correlations, model_name, layer_index, n_pcs, output_path)
+            completed_models.add(model_name)
+            
+        except Exception as e:
+            print(f"Error processing model {model_name}: {e}")
+            continue
 
 if __name__ == "__main__":
     main()
