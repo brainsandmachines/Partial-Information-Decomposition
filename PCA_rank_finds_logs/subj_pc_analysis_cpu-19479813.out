@@ -1,0 +1,32 @@
+------------------------------------
+Tue 21 Jul 2026 17:45:48 IDT
+SLURM_JOBID:		19479813
+SLURM_JOB_NODELIST:	ise-cpu256-25
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19479813
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu256-25.auth.ad.bgu.ac.il
+Job ID: 19479813
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Loaded subject subj01 with 9000 unique images and 1000 shared held-out images.
+
+ Fitting PCA on unique images
+Running PCA by variance threshold
+PCA on unique data completed.
+PCA on shared held-out data completed.
+Held-out variance explained saved to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance_max=500/subj01_heldout_pca_variance_explained.csv.
