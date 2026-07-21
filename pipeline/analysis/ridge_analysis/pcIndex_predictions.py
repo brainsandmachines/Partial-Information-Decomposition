@@ -75,15 +75,27 @@ def each_pc_index_pred(
     print(f"Running ridge regression for {len(n_pcs)} PCs on model {model_name} at layer {layer_index}")
 
     correlations = np.full(len(n_pcs), np.nan, dtype=float)
+    selected_train_target = train_target[:, n_pcs]
+    # (n_train, n_all_pcs) -> (n_train, n_requested_pcs)
+    selected_shared_target = shared_target[:, n_pcs]
+    # (n_shared, n_all_pcs) -> (n_shared, n_requested_pcs)
+    source_predictions = np.asarray(
+        _prepare_source_for_pid(
+            features,
+            selected_train_target,
+            shared_mask,
+            ridge=True,
+        )
+    )
+    # (n_samples, n_features) -> (n_shared, n_requested_pcs)
+
     print(f"Running analysis for {len(n_pcs)} PCs")
     for result_index, pc_index in enumerate(n_pcs):
         print(f"Running analysis for PC index {pc_index}")
-        pc_train_target = train_target[:, [pc_index]]
-        pc_test_target = shared_target[:, pc_index]
-
-        source_pred = np.asarray(
-            _prepare_source_for_pid(features, pc_train_target, shared_mask, ridge=True)
-        ).reshape(-1)  # (n_shared, 1) -> (n_shared,)
+        pc_test_target = selected_shared_target[:, result_index]
+        # (n_shared, n_requested_pcs) -> (n_shared,)
+        source_pred = source_predictions[:, result_index]
+        # (n_shared, n_requested_pcs) -> (n_shared,)
         if np.std(pc_test_target) > 0 and np.std(source_pred) > 0:
             corr = pearsonr(pc_test_target, source_pred).statistic
             print(f"PC index {pc_index} correlation: {corr:.4f}")

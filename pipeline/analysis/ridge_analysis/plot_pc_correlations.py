@@ -278,17 +278,16 @@ def main() -> Path:
         / "alpha(1,50,100)_GPU_200_pcs_correlations_by_model.csv"
     ]
     model_names = [
-        "nf_resnet50_classification",
         "hardcorenas_f_classification",
         "eca_nfnet_l0_classification",
     ]
-    output_path = ridge_analysis_dir / "alpha_GPU_200_pcs_three_models.png"
+    output_path = ridge_analysis_dir / "alpha(1,50,100)_GPU_200_pcs_correlations_by_model.csv.png"
 
     figure_path = plot_pc_correlations(
         csv_paths=csv_paths,
         model_names=model_names,
         output_path=output_path,
-        title="Alpha (1, 50, 100): ridge correlation by PC index",
+        title="alpha(1,50,100)_GPU_200_pcs: ridge correlation by PC index",
     )
     print(f"Saved correlation plot to {figure_path}")
     return figure_path
