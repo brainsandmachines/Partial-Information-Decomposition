@@ -27,7 +27,7 @@ from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import nsd_feature_extraction
 
 
-pc_path = Path("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=1000/subj01_pca_model.pkl")
+pc_path = Path("/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=8000/subj01_pca_model.pkl")
 hdf_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5")
 pkl_info_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl")
 neural_data_path = Path("/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr")
@@ -170,7 +170,7 @@ def main() -> None:
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
         ]
     #oom kill: 'ViT-L_14_clip','ViT-B_32_clip','dino_resnet50_selfsupervised', 'dino_vitb16_selfsupervised''xcit_nano_12_p8_224_classification''xcit_nano_12_p16_224_classification',
-    n_pcs = list(range(1000))  # zero-based PC indexes to predict
+    n_pcs = list(range(8000))  # zero-based PC indexes to predict
     output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_{max(n_pcs)+1}_pcs_correlations_by_model.csv')
     print("Results will be saved to:\n", output_path)
     header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in n_pcs)]
