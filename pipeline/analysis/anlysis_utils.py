@@ -1,5 +1,6 @@
 
 import torch
+from sklearn import config_context
 
 import torch
 
@@ -57,30 +58,19 @@ def _prepare_source_for_pid(
 
     _, ridge_model = find_alpha_per_pc(source[~shared_mask], train_target)
 
-
     if isinstance(ridge_model.coef_, torch.Tensor):
-        ridge_model.coef_ = (
-            ridge_model.coef_
-            .detach()
-            .cpu()
-            .numpy()
+        held_out_source = torch.as_tensor(
+            source[shared_mask],
+            dtype=torch.float64,
+            device=ridge_model.coef_.device,
         )
+        # (n_shared, n_features) -> (n_shared, n_features)
+        with config_context(array_api_dispatch=True):
+            predictions = ridge_model.predict(held_out_source)
+        predictions = predictions.detach().cpu().numpy()
+        # (n_shared, n_targets) -> (n_shared, n_targets)
+        return predictions
 
-    if isinstance(ridge_model.intercept_, torch.Tensor):
-        ridge_model.intercept_ = (
-            ridge_model.intercept_
-            .detach()
-            .cpu()
-            .numpy()
-        )
-    if isinstance(ridge_model.alpha_, torch.Tensor):
-        ridge_model.alpha_ = (
-            ridge_model.alpha_
-            .detach()
-            .cpu()
-            .numpy()
-        )
     return ridge_model.predict(source[shared_mask])
-
 
 

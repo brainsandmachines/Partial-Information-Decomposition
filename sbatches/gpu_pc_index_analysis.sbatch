@@ -26,6 +26,7 @@ fi
 
 # Activate the environment
 conda activate pid_env
+export SCIPY_ARRAY_API=1
 
 # Useful debugging info in the .out file
 echo "Running on host: $(hostname)"

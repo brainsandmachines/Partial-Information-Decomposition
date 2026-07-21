@@ -7,6 +7,7 @@ from typing import Any
 import torch
 import joblib
 import numpy as np
+from sklearn import config_context
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import Pipeline, make_pipeline
 
@@ -21,9 +22,6 @@ from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.sources_target_features import prepare_target
 from pipeline.pipeline_utils import nsd_feature_extraction
 from pipeline.analysis.anlysis_utils import to_deepdive_model_name
-import os
-os.environ["SCIPY_ARRAY_API"] = "1"
-from sklearn import config_context
 
 
 
@@ -49,11 +47,8 @@ def find_alpha_per_pc(
             dtype=torch.float64,
             device="cuda",
         )
-        fit_intercept = False
-        print("Warning: RidgeCV with fit_intercept=False please center data before using this function. If you want to use fit_intercept=True, please set device=None or device='cpu'.")
     else:
         print("NOTE: Using CPU for ridge regression.")
-        fit_intercept = True
 
         predictor = np.asarray(predictor, dtype=np.float64)
         target = np.asarray(target, dtype=np.float64)
@@ -75,7 +70,7 @@ def find_alpha_per_pc(
             alphas=alphas,
             cv=None,
             scoring=None,
-            fit_intercept=fit_intercept,
+            fit_intercept=True,
             alpha_per_target=True,
             gcv_mode="auto",)
 

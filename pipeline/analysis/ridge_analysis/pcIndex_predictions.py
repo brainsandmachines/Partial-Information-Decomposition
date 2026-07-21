@@ -6,7 +6,6 @@ from pathlib import Path
 
 import numpy as np
 from scipy.stats import pearsonr
-import torch
 
 repo_root = Path(__file__).resolve().parents[3]
 external_root = repo_root / "external"
@@ -58,8 +57,6 @@ def each_pc_index_pred(
         the selected model-layer index.
     """
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    use_gpu = torch.cuda.is_available() and device == "cuda"
     target_context = prepare_target(Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
     train_target, shared_target, shared_mask = prepare_ridge_target(
         target_context["target"], target_context, pc_path
@@ -74,17 +71,6 @@ def each_pc_index_pred(
     print(f"Starting to extract features for {model_name} at layer {layer_index}")
     features = nsd_feature_extraction(source_context, layer_index, target_context=target_context)
 
-    if use_gpu:
-        features_shared = features[shared_mask]
-        features_train = features[~shared_mask]
-
-        features_train_mean = np.mean(features_train, axis=0, keepdims=True)
-        features_train -= features_train_mean
-        features_shared -= features_train_mean
-
-        features[~shared_mask] = features_train
-        features[shared_mask] = features_shared
-
     print(f"\nFeatures shape: {features.shape}, Train target shape: {train_target.shape}, Shared target shape: {shared_target.shape}")
     print(f"Running ridge regression for {len(n_pcs)} PCs on model {model_name} at layer {layer_index}")
 
@@ -94,19 +80,6 @@ def each_pc_index_pred(
         print(f"Running analysis for PC index {pc_index}")
         pc_train_target = train_target[:, [pc_index]]
         pc_test_target = shared_target[:, pc_index]
-
-        if use_gpu:
-            print("Centering data before using scikit-learn on GPU")
-
-            pc_train_target_mean = np.mean(
-                pc_train_target,
-                axis=0,
-                keepdims=True,
-            )
-
-            pc_train_target = (pc_train_target - pc_train_target_mean)
-
-            pc_test_target = (pc_test_target - pc_train_target_mean.item())
 
         source_pred = np.asarray(
             _prepare_source_for_pid(features, pc_train_target, shared_mask, ridge=True)

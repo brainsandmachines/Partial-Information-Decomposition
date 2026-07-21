@@ -203,6 +203,16 @@ File description: Search source-1 PCA component subsets for source-1 unique PID 
 | `save_correlations_to_csv (line 87)` | correlations: np.ndarray, model_name: str, layer_index: int, pc_indexes: list[int], output_path: str \| Path | Annotated: `Path` | Append exactly one completed model row to the validated task-specific per-PC checkpoint CSV. |
 | `main (line 126)` | No inputs | Annotated: `None` | Run every model listed by the best-layer CSV, skipping checkpointed models and saving each newly completed model immediately. Task-specific runner. |
 
+### `pipeline/analysis/ridge_analysis/plot_pc_correlations.py`
+
+File description: Load selected rows from one or more per-PC ridge-correlation CSV files and plot all requested models on shared axes with their selected layer indexes annotated above the curves.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `load_pc_correlation_series (line 28)` | csv_paths: Sequence[str \| Path], model_names: Sequence[str] | Annotated: `list[ModelCorrelationSeries]` | Validate CSV schemas and values, find every requested model exactly once across the inputs, numerically order PC columns, and preserve the requested model order. Task-specific. |
+| `plot_pc_correlations (line 162)` | csv_paths: Sequence[str \| Path], model_names: Sequence[str], output_path: str \| Path, *, title: str='Ridge prediction correlation by PC index', dpi: int=300 | Annotated: `Path` | Plot every requested model on one graph, distribute matching-color layer-index annotations above the curves, and save the figure. Plotting-specific. |
+| `main (line 265)` | No inputs | Annotated: `Path` | Run the built-in three-model example from the alpha `(1, 50, 100)` 200-PC correlation CSV, save the shared plot beside that CSV, print its path, and return it. Task-specific entry point. |
+
 ### `pipeline/plotting/pairwise_pid_heatmaps.py`
 
 File description: Create publication-friendly PID component matrices from the resumable pairwise OTC CSV.
