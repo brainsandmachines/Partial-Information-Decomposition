@@ -44,7 +44,7 @@ model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','ec
         'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
         'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
-        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised',
         'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
 
 
@@ -241,7 +241,7 @@ def extract_model_projection(
             source_context["features"] = intermediate
         print(f"Completed feature extraction for model {model_name} at layer {layer_index} ({layer_name}) with shape {intermediate.shape}")
         return (
-            pca_model(source_context, shared_mask=target_context["shared1000_subj"]),layer_index
+            pca_model(source_context, shared_mask=target_context["shared1000_subj"], n_components=n_components), layer_index
         )
     finally:
         del model_context, model
@@ -451,7 +451,7 @@ def run_pairwise_pid_pipeline(
     return output_path
 
 if __name__ == "__main__":
-    pcs_num = 3
+    pcs_num = 30
     analysis_dir = Path(
         "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise"
     )

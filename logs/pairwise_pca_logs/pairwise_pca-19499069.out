@@ -1,0 +1,27 @@
+------------------------------------
+Wed 22 Jul 2026 20:35:56 IDT
+SLURM_JOBID:		19499069
+SLURM_JOB_NODELIST:	ise-cpu256-06
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19499069
+Allocated Resouces:	cpu - 4 / mem - 131072 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu256-06.auth.ad.bgu.ac.il
+Job ID: 19499069
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+CUDA devices: not set
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu
+Running pairwise PID pipeline with 3 PCs and config: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
