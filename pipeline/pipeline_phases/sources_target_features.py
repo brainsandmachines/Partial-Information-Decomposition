@@ -69,6 +69,7 @@ def prepare_target(hdf_path:Path,pkl_info_path:Path,neural_data_path:Path,n_samp
         target_context["target"] = target_context["target"][:n_samples]
         target_context["image_ids_for_subj"] = target_context["image_ids_for_subj"][:n_samples]
         target_context["shared1000_subj"] = target_context["shared1000_subj"][:n_samples]
+        target_context["stim"] = target_context["stim"][:n_samples]
 
     print(f"\nLoaded target with shape {target_context['target'].shape}.")
 

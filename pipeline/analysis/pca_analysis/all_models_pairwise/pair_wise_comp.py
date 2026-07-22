@@ -28,7 +28,10 @@ from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.sources_target_features import batching
 from pipeline.pipeline_utils import resolve_pipeline_function
 from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
-
+from pipeline.analysis.anlysis_utils import (
+    _prepare_source_for_pid,
+    to_deepdive_model_name,
+)
 
 #model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
 
@@ -75,11 +78,53 @@ def deterministic_pca(
         raise ValueError("n_components must leave at least one PCA component.")
     pca = PCA(
         n_components=effective_components,
-        svd_solver="randomized",
-        random_state=int(random_state),
-        copy=False,
+        svd_solver="full",
     )
     return np.asarray(pca.fit_transform(array), dtype=np.float64)
+
+
+def target_pca(target_context: np.ndarray, n_components: int, random_state: int) -> np.ndarray:
+    """PCA target, train target on unique images and return projected target for shared images."""
+
+
+    shared_mask = target_context['shared1000_subj']
+    unique_mask = ~shared_mask
+    unique_target = target_context["target"][unique_mask]
+    shared_target = target_context["target"][shared_mask]
+
+    array = np.asarray(unique_target, dtype=np.float64)
+    if array.ndim != 2:
+        raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
+
+    pca = PCA(n_components=n_components,svd_solver="full",)
+
+    pca_model = pca.fit_transform(array)
+
+    pca_shared_target = pca.transform(shared_target)
+    print(f"Target PCA: unique target shape {unique_target.shape}, shared target shape {shared_target.shape}, projected shared target shape {pca_shared_target.shape}")
+
+    return pca_shared_target
+
+def pca_model(source_context,shared_mask):
+
+    """PCA source, train source on unique images and return projected source for shared images."""
+
+    unique_mask = ~shared_mask
+    unique_source = source_context["features"][unique_mask]
+    shared_source = source_context["features"][shared_mask]
+
+    array = np.asarray(unique_source, dtype=np.float64)
+    if array.ndim != 2:
+        raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
+
+    pca = PCA(n_components=source_context['n_projections'],svd_solver="full",)
+
+    pca_model = pca.fit_transform(array)
+
+    pca_shared_source = pca_model.transform(shared_source)
+    print(f"Source PCA: unique source shape {unique_source.shape}, shared source shape {shared_source.shape}, projected shared source shape {pca_shared_source.shape}")
+
+    return pca_shared_source
 
 
 def extract_model_projection(
@@ -111,6 +156,7 @@ def extract_model_projection(
     """
 
     use_srp = bool(feature_extraction_kwargs.get("use_srp", False))
+    print(f"Extracting model {model_name} with use_srp={use_srp} and n_components={n_components}")
     srp_components = feature_extraction_kwargs.get("srp_n_components")
     if use_srp and srp_components is None:
         srp_components = target_context.get("n_projections")
@@ -140,10 +186,12 @@ def extract_model_projection(
     batch_size_process = int(feature_extraction_kwargs["batch_size_process"])
     batch_size_dataloader = int(feature_extraction_kwargs["batch_size_dataloader"])
     sparse_projection = None
+    source_context = target_context.copy()
 
     try:
         if raw_dimension > intermediate_dimension:
             model_device = str(next(model.parameters()).device)
+            print(f"Using sparse projection for model {model_name} on device {model_device}")
             sparse_projection = get_sparse_projection_gpu(
                 raw_dimension,
                 intermediate_dimension,
@@ -177,10 +225,10 @@ def extract_model_projection(
                 )
             intermediate[batch_start:batch_end] = reduced_batch
             del reduced_batch
+            source_context["features"] = intermediate
 
         return (
-            deterministic_pca(intermediate, n_components, random_state),
-            layer_index,
+            pca_model(source_context, shared_mask=target_context["shared1000_subj"]),layer_index
         )
     finally:
         del model_context, model
@@ -282,9 +330,10 @@ def run_pairwise_pid_pipeline(
             "for source 1 and source 2."
         )
     target_context = target_extraction(**config.get("target_kwargs", {}))
+
     try:
-        target = deterministic_pca(
-            target_context["target"],
+        target_shared = target_pca(
+            target_context,
             feature_kwargs["n_components_target"],
             random_state,
         )
@@ -307,7 +356,7 @@ def run_pairwise_pid_pipeline(
                     
 
                 if model_1 not in feature_cache:
-                    feature_cache[model_1] = extract_model_projection(
+                    features_1 = extract_model_projection(
                         model_1,
                         target_context,
                         config["choose_layer_kwargs"],
@@ -315,9 +364,14 @@ def run_pairwise_pid_pipeline(
                         source_components,
                         random_state,
                     )
+                    assert features_1.shape == target_shared.shape, (
+                        f"Model {model_1} features shape {features_1.shape} does not match "
+                        f"target shape {target_shared.shape}."
+                    )
+                    feature_cache[model_1] = features_1
                     print(f"Extracted and cached features for model: {model_1}")
                 if model_2 not in feature_cache:
-                    feature_cache[model_2] = extract_model_projection(
+                    features_2 = extract_model_projection(
                         model_2,
                         target_context,
                         config["choose_layer_kwargs"],
@@ -325,11 +379,16 @@ def run_pairwise_pid_pipeline(
                         source_components,
                         random_state,
                     )
+                    assert features_2.shape == target_shared.shape, (
+                        f"Model {model_2} features shape {features_2.shape} does not match "
+                        f"target shape {target_shared.shape}."
+                    )
+                    feature_cache[model_2] = features_2
                     print(f"Extracted and cached features for model: {model_2}")
                 source_1, layer_1 = feature_cache[model_1]
                 source_2, layer_2 = feature_cache[model_2]
                 pid_results = pid_calculation(
-                    target,
+                    target_shared,
                     source_1,
                     source_2,
                     **pid_kwargs,
@@ -345,10 +404,10 @@ def run_pairwise_pid_pipeline(
                     "layer_1": layer_1,
                     "layer_2": layer_2,
                     "subj_id": config.get("target_kwargs", {}).get("subj_id"),
-                    "n_samples": len(target),
+                    "n_samples": len(target_shared),
                     "n_components_source_1": source_1.shape[1],
                     "n_components_source_2": source_2.shape[1],
-                    "n_components_target": target.shape[1],
+                    "n_components_target": target_shared.shape[1],
                     "pid_method": pid_results.get("method", pid_kwargs.get("method")),
                     "rng_seed": pid_kwargs.get("rng_seed"),
                     "bias_correction": pid_config.get("bias_correction"),
@@ -379,14 +438,20 @@ def run_pairwise_pid_pipeline(
     return output_path
 
 if __name__ == "__main__":
+    pcs_num = 3
     analysis_dir = Path(
-        "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise"
+        "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise"
     )
     config_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml')
-    csv_path = analysis_dir / "pairwise_pid_results.csv"
-    plot_path = csv_path.parent / "pairwise_pid_results"
+    csv_path = analysis_dir / f"{pcs_num}PCs_pairwise_pid_results.csv"
+    plot_path = csv_path.parent / f"{pcs_num}PCs_pairwise_pid_results"
     with open(config_path, "r") as config_file:
         otc_config = yaml.safe_load(config_file)
+        otc_config["feature_manipulation_kwargs"]["n_components_source_1"] = pcs_num
+        otc_config["feature_manipulation_kwargs"]["n_components_source_2"] = pcs_num
+        otc_config["feature_manipulation_kwargs"]["n_components_target"] = pcs_num
+        otc_config["preprocess_kwargs"]["n_components_target"] = pcs_num
+        print(f"Running pairwise PID pipeline with {pcs_num} PCs and config: {config_path}")
 
     run_pairwise_pid_pipeline(
         model_1_names=model_1_names,
@@ -394,8 +459,8 @@ if __name__ == "__main__":
         otc_config=otc_config,
         csv_path=csv_path,
     )
-    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results.csv')
+    csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/{pcs_num}PCs_pairwise_pid_results.csv')
     plot_pairwise_pid_matrices(
         csv_path=csv_path,
-        output_dir='/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise',
+        output_dir=f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/{pcs_num}PCs_pairwise_pid_results',
     )
