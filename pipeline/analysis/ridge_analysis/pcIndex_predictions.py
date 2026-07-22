@@ -170,7 +170,7 @@ def main() -> None:
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
         ]
     #oom kill: 'ViT-L_14_clip','ViT-B_32_clip','dino_resnet50_selfsupervised', 'dino_vitb16_selfsupervised''xcit_nano_12_p8_224_classification''xcit_nano_12_p16_224_classification',
-    n_pcs = list(range(8000))  # zero-based PC indexes to predict
+    n_pcs = list(range(1000))  # zero-based PC indexes to predict
     output_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/ridge_analysis/New_GPU_{max(n_pcs)+1}_pcs_correlations_by_model.csv')
     print("Results will be saved to:\n", output_path)
     header = ["model_name", "layer_index", *(f"pc_{index}_correlation" for index in n_pcs)]

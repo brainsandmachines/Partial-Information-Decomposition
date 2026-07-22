@@ -1,14 +1,14 @@
 ------------------------------------
-Tue 21 Jul 2026 12:53:27 IDT
-SLURM_JOBID:		19470585
-SLURM_JOB_NODELIST:	cs-cpu-06
+Tue 21 Jul 2026 19:29:50 IDT
+SLURM_JOBID:		19482650
+SLURM_JOB_NODELIST:	ise-cpu-intl-22
 SLURM_SCRATCH_DIR:	
 Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
 SLURM_GPU_INDEX:	
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
-Running on host: cs-cpu-06.auth.ad.bgu.ac.il
-Job ID: 19470585
+Running on host: ise-cpu-intl-22.auth.ad.bgu.ac.il
+Job ID: 19482650
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
@@ -24,8 +24,7 @@ Number of projections for SRP: 7894
 
 Loaded target with shape (10000, 8088).
 Loaded subject subj01 with 9000 unique images and 1000 shared held-out images.
-
- Fitting PCA on unique images
+Unique neural data shape after limiting to max_features=100: (9000, 8088)
 
 Running Eigenvector PCA with cross-validation!!!
 Using default PCA fitting function (SVD)!!!
@@ -390,29 +389,9 @@ Skipping sample 178 (already completed)✅
 Processing sample 180 of 9000...
 Skipping sample 179 (already completed)✅
 Processing sample 181 of 9000...
-Processing component 10 of 100...✅
-Processing component 20 of 100...✅
-Processing component 30 of 100...✅
-Processing component 40 of 100...✅
-Processing component 50 of 100...✅
-Processing component 60 of 100...✅
-Processing component 70 of 100...✅
-Processing component 80 of 100...✅
-Processing component 90 of 100...✅
-Processing component 100 of 100...✅
-Checkpoint saved. Elapsed time: 2128.17 seconds.
+Skipping sample 180 (already completed)✅
 Processing sample 182 of 9000...
-Processing component 10 of 100...✅
-Processing component 20 of 100...✅
-Processing component 30 of 100...✅
-Processing component 40 of 100...✅
-Processing component 50 of 100...✅
-Processing component 60 of 100...✅
-Processing component 70 of 100...✅
-Processing component 80 of 100...✅
-Processing component 90 of 100...✅
-Processing component 100 of 100...✅
-Checkpoint saved. Elapsed time: 4252.69 seconds.
+Skipping sample 181 (already completed)✅
 Processing sample 183 of 9000...
 Processing component 10 of 100...✅
 Processing component 20 of 100...✅
@@ -421,3 +400,196 @@ Processing component 40 of 100...✅
 Processing component 50 of 100...✅
 Processing component 60 of 100...✅
 Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 2770.27 seconds.
+Processing sample 184 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 5568.55 seconds.
+Processing sample 185 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 8189.23 seconds.
+Processing sample 186 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 10760.49 seconds.
+Processing sample 187 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 13398.70 seconds.
+Processing sample 188 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 16103.29 seconds.
+Processing sample 189 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 18909.24 seconds.
+Processing sample 190 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 21674.87 seconds.
+Processing sample 191 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 24417.54 seconds.
+Processing sample 192 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 27163.49 seconds.
+Processing sample 193 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 29998.73 seconds.
+Processing sample 194 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 32872.72 seconds.
+Processing sample 195 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 35734.73 seconds.
+Processing sample 196 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 38612.51 seconds.
+Processing sample 197 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 41524.38 seconds.
+Processing sample 198 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅
+Processing component 90 of 100...✅
+Processing component 100 of 100...✅
+Checkpoint saved. Elapsed time: 44510.78 seconds.
+Processing sample 199 of 9000...
+Processing component 10 of 100...✅
+Processing component 20 of 100...✅
+Processing component 30 of 100...✅
+Processing component 40 of 100...✅
+Processing component 50 of 100...✅
+Processing component 60 of 100...✅
+Processing component 70 of 100...✅
+Processing component 80 of 100...✅

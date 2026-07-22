@@ -22,7 +22,7 @@ from Simulations.PCA_rank.eigenvector_pca import eigenvector_pca_cv
 from library_wrappers.missmda_ncp import estimate_ncp_pca
 
 
-
+max_features = 100
 
 def split_unique_shared(
     subj_id: str,
@@ -185,7 +185,7 @@ def pca_func(
 
     if mode == "eigenvector_CV":
         print("\nRunning Eigenvector PCA with cross-validation!!!")
-        csv_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=8000/checkpoint.csv'
+        csv_path = f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max={max_features}/checkpoint.csv'
         output = eigenvector_pca_cv(
             data_array,
             max_components=max_features,
@@ -263,7 +263,7 @@ def main(
 
     print(f"Loaded subject {subj_id} with {data_split['unique_neural_data'].shape[0]} unique images and {data_split['shared_neural_data'].shape[0]} shared held-out images.")
 
-    print(f"\n Fitting PCA on unique images")
+    print(f"Unique neural data shape after limiting to max_features={max_features}: {data_split['unique_neural_data'].shape}")
     pca_results = pca_func(
         mode=pca_mode,
         data=data_split["unique_neural_data"],
@@ -354,7 +354,7 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = '/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=8000'
+    save_path = f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/eigenvector_max={max_features}'
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -362,6 +362,6 @@ if __name__ == "__main__":
         neural_data_path=subject_neural_data_path,
         variance_threshold=1.0,
         save_models_path=Path(save_path),
-        max_features=8000,
-        pca_mode="pca_by_variance",
-    )
+        max_features=max_features,
+        pca_mode="eigenvector_CV", #Options: "pca_by_variance", "eigenvector_CV", "missmda_CV"
+    ) 
