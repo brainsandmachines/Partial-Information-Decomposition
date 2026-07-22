@@ -1,14 +1,14 @@
 ------------------------------------
-Wed 22 Jul 2026 18:29:19 IDT
-SLURM_JOBID:		19498202
+Wed 22 Jul 2026 19:41:21 IDT
+SLURM_JOBID:		19498862
 SLURM_JOB_NODELIST:	ise-cpu256-25
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/19498202
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19498862
 Allocated Resouces:	cpu - 4 / mem - 131072 MB / gpu - 
 SLURM_GPU_INDEX:	
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
 Running on host: ise-cpu256-25.auth.ad.bgu.ac.il
-Job ID: 19498202
+Job ID: 19498862
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
@@ -39,3 +39,5 @@ Ordered layers from model: ['ScaledStdConv2d-1', 'MaxPool2d-1', 'ReLU-1', 'Ident
 Total number of layers: 152
 Empty layer shape for layer NormFreeBlock-16: torch.Size([1, 2048, 7, 7])
 Empty layer features flattened shape for layer NormFreeBlock-16: torch.Size([1, 100352])
+Completed feature extraction for model nf_resnet50_classification at layer 141 (NormFreeBlock-16) with shape (10000, 100352)
+Source PCA: unique source shape (9000, 100352), shared source shape (1000, 100352), projected shared source shape (1000, 7894)

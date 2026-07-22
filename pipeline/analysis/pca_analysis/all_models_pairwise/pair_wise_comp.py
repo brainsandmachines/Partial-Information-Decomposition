@@ -121,7 +121,7 @@ def pca_model(source_context,shared_mask):
 
     pca_model = pca.fit_transform(array)
 
-    pca_shared_source = pca_model.transform(shared_source)
+    pca_shared_source = pca.transform(shared_source)
     print(f"Source PCA: unique source shape {unique_source.shape}, shared source shape {shared_source.shape}, projected shared source shape {pca_shared_source.shape}")
 
     return pca_shared_source
@@ -226,7 +226,7 @@ def extract_model_projection(
             intermediate[batch_start:batch_end] = reduced_batch
             del reduced_batch
             source_context["features"] = intermediate
-
+        print(f"Completed feature extraction for model {model_name} at layer {layer_index} ({layer_name}) with shape {intermediate.shape}")
         return (
             pca_model(source_context, shared_mask=target_context["shared1000_subj"]),layer_index
         )
@@ -364,8 +364,8 @@ def run_pairwise_pid_pipeline(
                         source_components,
                         random_state,
                     )
-                    assert features_1.shape == target_shared.shape, (
-                        f"Model {model_1} features shape {features_1.shape} does not match "
+                    assert features_1[0].shape == target_shared.shape, (
+                        f"Model {model_1} features shape {features_1[0].shape} does not match "
                         f"target shape {target_shared.shape}."
                     )
                     feature_cache[model_1] = features_1
@@ -379,8 +379,8 @@ def run_pairwise_pid_pipeline(
                         source_components,
                         random_state,
                     )
-                    assert features_2.shape == target_shared.shape, (
-                        f"Model {model_2} features shape {features_2.shape} does not match "
+                    assert features_2[0].shape == target_shared.shape, (
+                        f"Model {model_2} features shape {features_2[0].shape} does not match "
                         f"target shape {target_shared.shape}."
                     )
                     feature_cache[model_2] = features_2
