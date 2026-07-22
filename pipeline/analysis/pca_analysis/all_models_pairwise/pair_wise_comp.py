@@ -53,34 +53,34 @@ model_2_names = model_1_names  # Compare all models against each other
 
 
 
-def deterministic_pca(
-    features: Any,
-    n_components: int,
-    random_state: int,
-) -> np.ndarray:
-    """Project one sample matrix with reproducible randomized PCA.
+# def deterministic_pca(
+#     features: Any,
+#     n_components: int,
+#     random_state: int,
+# ) -> np.ndarray:
+#     """Project one sample matrix with reproducible randomized PCA.
 
-    Inputs:
-        features: array-like, samples with shape (n_samples, n_features).
-        n_components: int, requested number of principal components.
-        random_state: int, seed used by randomized SVD.
+#     Inputs:
+#         features: array-like, samples with shape (n_samples, n_features).
+#         n_components: int, requested number of principal components.
+#         random_state: int, seed used by randomized SVD.
 
-    Output:
-        projected: np.ndarray, float64 samples with shape
-            (n_samples, min(n_components, n_samples, n_features)).
-    """
+#     Output:
+#         projected: np.ndarray, float64 samples with shape
+#             (n_samples, min(n_components, n_samples, n_features)).
+#     """
 
-    array = np.asarray(features, dtype=np.float64)
-    if array.ndim != 2:
-        raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
-    effective_components = min(int(n_components), *array.shape)
-    if effective_components < 1:
-        raise ValueError("n_components must leave at least one PCA component.")
-    pca = PCA(
-        n_components=effective_components,
-        svd_solver="full",
-    )
-    return np.asarray(pca.fit_transform(array), dtype=np.float64)
+#     array = np.asarray(features, dtype=np.float64)
+#     if array.ndim != 2:
+#         raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
+#     effective_components = min(int(n_components), *array.shape)
+#     if effective_components < 1:
+#         raise ValueError("n_components must leave at least one PCA component.")
+#     pca = PCA(
+#         n_components=effective_components,
+#         svd_solver="full",
+#     )
+#     return np.asarray(pca.fit_transform(array), dtype=np.float64)
 
 
 def target_pca(target_context: np.ndarray, n_components: int, random_state: int) -> np.ndarray:
@@ -105,26 +105,39 @@ def target_pca(target_context: np.ndarray, n_components: int, random_state: int)
 
     return pca_shared_target
 
-def pca_model(source_context,shared_mask):
+def pca_model(
+    source_context: dict[str, Any],
+    shared_mask: np.ndarray,
+    n_components: int,
+) -> np.ndarray:
+    """Fit source PCA on unique images and project shared images.
 
-    """PCA source, train source on unique images and return projected source for shared images."""
+    Inputs:
+        source_context: Mapping containing the full feature matrix.
+        shared_mask: Boolean array identifying shared images.
+        n_components: Number of PCA components to return.
 
-    unique_mask = ~shared_mask
-    unique_source = source_context["features"][unique_mask]
-    shared_source = source_context["features"][shared_mask]
+    Output:
+        Projected shared features with shape
+        (n_shared_images, n_components).
+    """
 
-    array = np.asarray(unique_source, dtype=np.float64)
-    if array.ndim != 2:
-        raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
+    features = np.asarray(source_context["features"], dtype=np.float64)
+    shared_mask = np.asarray(shared_mask, dtype=bool)
 
-    pca = PCA(n_components=source_context['n_projections'],svd_solver="full",)
+    unique_source = features[~shared_mask]
+    # (n_all_images, n_features) -> (n_unique_images, n_features)
 
-    pca_model = pca.fit_transform(array)
+    shared_source = features[shared_mask]
+    # (n_all_images, n_features) -> (n_shared_images, n_features)
+
+    pca = PCA(n_components=int(n_components), svd_solver="full")
+    pca.fit(unique_source)
 
     pca_shared_source = pca.transform(shared_source)
-    print(f"Source PCA: unique source shape {unique_source.shape}, shared source shape {shared_source.shape}, projected shared source shape {pca_shared_source.shape}")
+    # (n_shared_images, n_features) -> (n_shared_images, n_components)
 
-    return pca_shared_source
+    return np.asarray(pca_shared_source, dtype=np.float64)
 
 
 def extract_model_projection(
