@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py", line 239, in <module>
+    main()
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py", line 224, in main
+    written_csv_path = run_pairwise_pid_pipeline(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py", line 80, in run_pairwise_pid_pipeline
+    raise FileNotFoundError(
+FileNotFoundError: Configured target PCA artifact does not exist: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs/missmda_max=100_no_variance_standardization/subj01_pca_model.pkl

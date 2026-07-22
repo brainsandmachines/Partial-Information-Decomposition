@@ -32,7 +32,7 @@ from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
 
 #model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
 
-'''model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
+model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
         'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
@@ -42,11 +42,9 @@ from pipeline.plotting.plot_functions import plot_pairwise_pid_matrices
         'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
-        ]''' #dino_resnet50_selfsupervised, dino_vitb16_selfsupervised - missing
+        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
 
-model_1_names = ['nf_resnet50_classification','eca_nfnet_l0_classification','resnet50_classification','semnasnet_100_classification',
-                 'cspresnet50_classification','mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification',
-                 'xcit_nano_12_p16_224_classification']
+
 
 model_2_names = model_1_names  # Compare all models against each other
 
@@ -382,11 +380,11 @@ def run_pairwise_pid_pipeline(
 
 if __name__ == "__main__":
     analysis_dir = Path(
-        "//home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge"
+        "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise"
     )
-    config_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/ridge_otc_pair_wise_comp.yaml')
-    csv_path = analysis_dir / "pairwise_pid_results_ridge_pca.csv"
-    plot_path = csv_path.parent / "pairwise_figures_ridge_pca"
+    config_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml')
+    csv_path = analysis_dir / "pairwise_pid_results.csv"
+    plot_path = csv_path.parent / "pairwise_pid_results"
     with open(config_path, "r") as config_file:
         otc_config = yaml.safe_load(config_file)
 
@@ -396,8 +394,8 @@ if __name__ == "__main__":
         otc_config=otc_config,
         csv_path=csv_path,
     )
-    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results_ridge_pca.csv')
+    csv_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pairwise_pid_results.csv')
     plot_pairwise_pid_matrices(
         csv_path=csv_path,
-        output_dir='/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_ridge',
+        output_dir='/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise',
     )

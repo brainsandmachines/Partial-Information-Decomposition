@@ -1,0 +1,17 @@
+------------------------------------
+Wed 22 Jul 2026 12:45:31 IDT
+SLURM_JOBID:		19495659
+SLURM_JOB_NODELIST:	ise-cpu-intl-24
+SLURM_SCRATCH_DIR:	
+Allocated Resouces:	cpu - 4 / mem - 131072 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu-intl-24.auth.ad.bgu.ac.il
+Job ID: 19495659
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+CUDA devices: not set
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu

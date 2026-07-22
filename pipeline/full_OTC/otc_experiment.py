@@ -158,9 +158,9 @@ def nsd_otc_target(
     )
     target_context = dict(target_context)
     if n_images is not None:
-        target_context["neural_data"] = target_context["neural_data"][: int(n_images)]
+        target_context["target"] = target_context["target"][: int(n_images)]
         target_context["image_ids_for_subj"] = target_context["image_ids_for_subj"][: int(n_images)]
-    target_context["target"] = target_context["neural_data"]
+    target_context["target"] = target_context["target"]
 
 
     print(f"\nLoaded full OTC target with shape {target_context['target'].shape}.")

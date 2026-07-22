@@ -2,12 +2,9 @@
 #SBATCH --time=120:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=128G
-#SBATCH --gpus=1
-#SBATCH --partition=rtx_pro_6000
-#SBATCH --qos=golan-neuro
-#SBATCH --job-name=ridge_pairwise
-#SBATCH --output=/home/ohadshee/Desktop/Partial-Information-Decomposition/logs/ridge_pipeline_logs/%x-%j.out
-#SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/logs/ridge_pipeline_logs/%x-%j.err
+#SBATCH --job-name=pairwise_pca
+#SBATCH --output=/home/ohadshee/Desktop/Partial-Information-Decomposition/logs/pairwise_pca_logs/%x-%j.out
+#SBATCH --error=/home/ohadshee/Desktop/Partial-Information-Decomposition/logs/pairwise_pca_logs/%x-%j.err
 
 set -euo pipefail
 
@@ -35,4 +32,4 @@ echo "Python path: $(which python)"
 echo "Conda environment: $CONDA_DEFAULT_ENV"
 echo "CUDA devices: ${CUDA_VISIBLE_DEVICES:-not set}"
 
-python -u pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py
+python -u pipeline/analysis/pca_analysis/all_models_pairwise/pair_wise_comp.py
