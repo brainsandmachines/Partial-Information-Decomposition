@@ -17,12 +17,44 @@ from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
 from Flow_PID import load_flow_pid
 from Thin_PID import load_exact_gauss_thin_pid
-from Partial_Information_Decomposition.bias_functions import  mi_wishart_bias
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
 
 
 
 
+
+
+def mi_wishart_bias(dims:list,n_samples:int):
+    """Calculate Gaussian MI Wishart biases without loading simulation dependencies.
+
+    Inputs:
+        dims: list of three integers ordered as [source1, source2, target].
+        n_samples: int, number of samples used to estimate the covariance.
+    Outputs:
+        bias: dict containing pairwise, joint, and source-source MI biases in nats.
+    """
+    if len(dims) != 3:
+        raise ValueError(f"dims must have length 3. Got len(dims)={len(dims)}.")
+
+    dx, dy, dm = dims
+    df = n_samples - 1
+    dimensions = (dx, dy, dm, dx + dy, dx + dm, dy + dm, dx + dy + dm)
+    logdet_biases = []
+    for dimension in dimensions:
+        if df <= dimension - 1:
+            raise ValueError(f"Need df > d-1. Got df={df}, d={dimension}.")
+        indices = torch.arange(1, dimension + 1, dtype=torch.float64)  # scalar bounds -> (dimension,)
+        scale = torch.tensor(2.0 / df, dtype=torch.float64)  # scalar -> ()
+        bias = torch.sum(torch.special.digamma((df - indices + 1) / 2.0))
+        logdet_biases.append((bias + dimension * torch.log(scale)).item())
+
+    bias_x, bias_y, bias_m, bias_xy, bias_xm, bias_ym, bias_xym = logdet_biases
+    return {
+        'bias_mi_1_t': 0.5 * (bias_x + bias_m - bias_xm),
+        'bias_mi_2_t': 0.5 * (bias_y + bias_m - bias_ym),
+        'bias_tri_mi': 0.5 * (bias_xy + bias_m - bias_xym),
+        'bias_mi_12': 0.5 * (bias_x + bias_y - bias_xy),
+    }
 
 
 def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_seed(56),method=None,on_rvs:callable=None,covariance:torch.Tensor = None):
@@ -56,6 +88,10 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
         print("\nCalculating PID using Delta...")
         pid, mi = delta_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
     
+    elif method in ("thin", "thin_pid"):
+        print("\nCalculating PID using Thin-PID...")
+        pid, mi = thin_pid_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
+
     elif method in ("flow", "flow_pid"):
         print("\nCalculating PID using Flow...")
         pid, mi = flow_pid_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
@@ -195,6 +231,37 @@ def _to_numpy_samples(data):
     if data.ndim == 1:
         data = data.reshape(-1, 1)
     return data
+
+
+def thin_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None):
+    """Calculate Thin-PID from samples or covariance using the standard PID inputs.
+
+    Inputs:
+        config: dict containing PID dimensions and bias-correction settings.
+        sources: list of two source sample tensors.
+        target: list containing the target sample tensor.
+        covariance: optional covariance tensor ordered as [target, source1, source2].
+        rng: torch random generator (accepted for wrapper compatibility).
+        on_rvs: optional transformation callable (accepted for wrapper compatibility).
+    Outputs:
+        pid: dict containing redundant, unique, and synergistic information.
+        mi: dict containing joint and pairwise mutual information values.
+    """
+    dm, dx, dy = config['dt'], config['dx1'], config['dx2']
+    if covariance is None:
+        data = [target[0], sources[0], sources[1]]
+        cov = create_cov_matrix(data)["full_cov"]
+        sample_size = data[0].shape[0]
+        bias_correction = config['bias_correction']
+    else:
+        cov, sample_size, bias_correction = covariance, None, False
+
+    cov = cov.cpu().numpy() if isinstance(cov, torch.Tensor) else np.asarray(cov)  # (D, D) -> (D, D)
+    output = load_exact_gauss_thin_pid()(cov, dm, dx, dy, unbiased=bias_correction, sample_size=sample_size)
+    imx, imy, imxy, _, _, unq1, unq2, red, syn = output[:9]
+    pid = {'red': red, 'unq1': unq1, 'unq2': unq2, 'syn': syn}
+    mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
+    return pid, mi
 
 
 def flow_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None):
