@@ -36,7 +36,7 @@ from pipeline.analysis.anlysis_utils import (
 #model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
 
 model_1_names = ['levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
-        'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
+        'convit_base_classification','RN50_clip','RN101_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
@@ -44,7 +44,7 @@ model_1_names = ['levit_128_classification','coat_lite_tiny_classification','vis
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
         'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
         'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
-        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
+        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised','ViT-B_32_clip','ViT-L_14_clip']
 
 
 
@@ -95,7 +95,7 @@ def target_pca(target_context: np.ndarray, n_components: int, random_state: int)
     if array.ndim != 2:
         raise ValueError(f"features must be two-dimensional, got shape {array.shape}")
 
-    pca = PCA(n_components=n_components,svd_solver="full",)
+    pca = PCA(n_components=n_components,svd_solver="randomized", random_state=random_state)
 
     pca_model = pca.fit_transform(array)
 
@@ -105,23 +105,25 @@ def target_pca(target_context: np.ndarray, n_components: int, random_state: int)
     return pca_shared_target
 
 def pca_model(
-    source_context: dict[str, Any],
+    features: np.ndarray,
     shared_mask: np.ndarray,
     n_components: int,
+    random_state: int
 ) -> np.ndarray:
     """Fit source PCA on unique images and project shared images.
 
     Inputs:
-        source_context: Mapping containing the full feature matrix.
+        features: array-like, samples with shape (n_samples, n_features).
         shared_mask: Boolean array identifying shared images.
         n_components: Number of PCA components to return.
+        random_state: int, seed used by randomized SVD.
 
     Output:
         Projected shared features with shape
         (n_shared_images, n_components).
     """
 
-    features = np.asarray(source_context["features"], dtype=np.float64)
+    features = np.asarray(features, dtype=np.float64)
     shared_mask = np.asarray(shared_mask, dtype=bool)
 
     unique_source = features[~shared_mask]
@@ -130,7 +132,7 @@ def pca_model(
     shared_source = features[shared_mask]
     # (n_all_images, n_features) -> (n_shared_images, n_features)
 
-    pca = PCA(n_components=int(n_components), svd_solver="full")
+    pca = PCA(n_components=int(n_components), svd_solver="randomized", random_state=random_state,copy=False)
     pca.fit(unique_source)
 
     pca_shared_source = pca.transform(shared_source)
@@ -198,7 +200,6 @@ def extract_model_projection(
     batch_size_process = int(feature_extraction_kwargs["batch_size_process"])
     batch_size_dataloader = int(feature_extraction_kwargs["batch_size_dataloader"])
     sparse_projection = None
-    source_context = target_context.copy()
 
     try:
         if raw_dimension > intermediate_dimension:
@@ -237,10 +238,9 @@ def extract_model_projection(
                 )
             intermediate[batch_start:batch_end] = reduced_batch
             del reduced_batch
-            source_context["features"] = intermediate
         print(f"Completed feature extraction for model {model_name} at layer {layer_index} ({layer_name}) with shape {intermediate.shape}")
         return (
-            pca_model(source_context, shared_mask=target_context["shared1000_subj"], n_components=n_components), layer_index
+            pca_model(intermediate, shared_mask=target_context["shared1000_subj"], n_components=n_components, random_state=random_state), layer_index
         )
     finally:
         del model_context, model
