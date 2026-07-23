@@ -1,21 +1,21 @@
 ------------------------------------
-Wed 22 Jul 2026 20:37:05 IDT
-SLURM_JOBID:		19499075
-SLURM_JOB_NODELIST:	ise-cpu256-19
-SLURM_SCRATCH_DIR:	/scratch/ohadshee/19499075
+Wed 22 Jul 2026 20:39:27 IDT
+SLURM_JOBID:		19499088
+SLURM_JOB_NODELIST:	ise-cpu256-26
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19499088
 Allocated Resouces:	cpu - 4 / mem - 131072 MB / gpu - 
 SLURM_GPU_INDEX:	
 Running as ohadshee from golan.neuro account with normal QOS
 ------------------------------------
-Running on host: ise-cpu256-19.auth.ad.bgu.ac.il
-Job ID: 19499075
+Running on host: ise-cpu256-26.auth.ad.bgu.ac.il
+Job ID: 19499088
 CPUs per task: 4
 Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
 Conda environment: pid_env
 CUDA devices: not set
 Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
 Using device: cpu
-Running pairwise PID pipeline with 50 PCs and config: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml
+Running pairwise PID pipeline with 200 PCs and config: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml
 Number of images: 73000
 Image shape: (425, 425, 3), dtype: uint8
 nsdID shape: (73000,), Shared1000 shape: (73000,)
@@ -25,9 +25,9 @@ Number of voxels: 8088
 Number of projections for SRP: 7894
 
 Loaded target with shape (10000, 8088).
-Target PCA: unique target shape (9000, 8088), shared target shape (1000, 8088), projected shared target shape (1000, 50)
+Target PCA: unique target shape (9000, 8088), shared target shape (1000, 8088), projected shared target shape (1000, 200)
 Skipping pair: nf_resnet50_classification, nf_resnet50_classification (self-pair or already completed)
-Extracting model nf_resnet50_classification with use_srp=False and n_components=50
+Extracting model nf_resnet50_classification with use_srp=False and n_components=200
 Model options for nf_resnet50_classification: {'model_name': 'nf_resnet50', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('nf_resnet50', pretrained = True)"}
 Image transforms for nf_resnet50_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -41,7 +41,7 @@ Empty layer shape for layer NormFreeBlock-16: torch.Size([1, 2048, 7, 7])
 Empty layer features flattened shape for layer NormFreeBlock-16: torch.Size([1, 100352])
 Completed feature extraction for model nf_resnet50_classification at layer 141 (NormFreeBlock-16) with shape (10000, 100352)
 Extracted and cached features for model: nf_resnet50_classification
-Extracting model hardcorenas_f_classification with use_srp=False and n_components=50
+Extracting model hardcorenas_f_classification with use_srp=False and n_components=200
 Model options for hardcorenas_f_classification: {'model_name': 'hardcorenas_f', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('hardcorenas_f', pretrained = True)"}
 Image transforms for hardcorenas_f_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -60,16 +60,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.382232630055958
-  unq1: 0.23415466002346808
-  unq2: 0.5590706802434378
-  syn: 1.1204285822766114
+  red: 16.60189403489413
+  unq1: 0.46128045531508377
+  unq2: 0.0
+  syn: 3.2637557754594084
 Mutual Information Results:
-  tri_mi: 8.295886552599475
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 6.9413033102993955
-Completed PID for pair: nf_resnet50_classification, hardcorenas_f_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model eca_nfnet_l0_classification with use_srp=False and n_components=50
+  tri_mi: 20.326930265668622
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 16.60189403489413
+Completed PID for pair: nf_resnet50_classification, hardcorenas_f_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model eca_nfnet_l0_classification with use_srp=False and n_components=200
 Model options for eca_nfnet_l0_classification: {'model_name': 'eca_nfnet_l0', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('eca_nfnet_l0', pretrained = True)"}
 Image transforms for eca_nfnet_l0_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -88,16 +88,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.616387290079427
+  red: 17.063174490209214
   unq1: 0.0
-  unq2: 1.7812834632412633
-  syn: 0.6991291717150396
+  unq2: 1.6980955375634466
+  syn: 1.7699847117285756
 Mutual Information Results:
-  tri_mi: 9.096799925035729
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 8.39767075332069
-Completed PID for pair: nf_resnet50_classification, eca_nfnet_l0_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model resnet50_classification with use_srp=False and n_components=50
+  tri_mi: 20.531254739501236
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 18.76127002777266
+Completed PID for pair: nf_resnet50_classification, eca_nfnet_l0_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model resnet50_classification with use_srp=False and n_components=200
 Model options for resnet50_classification: {'model_name': 'resnet50', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'torchvision', 'call': "get_torchvision_model('models.resnet50', True)"}
 Image transforms for resnet50_classification: Compose(
     Resize(size=(224, 224), interpolation=bilinear, max_size=None, antialias=True)
@@ -117,16 +117,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.616387290079426
-  unq1: 0.0
-  unq2: 0.3407031821503992
-  syn: 1.0188056040219822
+  red: 15.75683559466544
+  unq1: 1.3063388955437745
+  unq2: 0.0
+  syn: 1.986716825409168
 Mutual Information Results:
-  tri_mi: 7.975896076251807
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 6.957090472229825
-Completed PID for pair: nf_resnet50_classification, resnet50_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model semnasnet_100_classification with use_srp=False and n_components=50
+  tri_mi: 19.049891315618382
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 15.75683559466544
+Completed PID for pair: nf_resnet50_classification, resnet50_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model semnasnet_100_classification with use_srp=False and n_components=200
 Model options for semnasnet_100_classification: {'model_name': 'semnasnet_100', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('semnasnet_100', pretrained = True)"}
 Image transforms for semnasnet_100_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -145,16 +145,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.510483822946368
-  unq1: 0.1059034671330581
-  unq2: 0.4321280331647701
-  syn: 1.1218847855804235
+  red: 15.801128723692841
+  unq1: 1.2620457665163727
+  unq2: 0.0
+  syn: 1.8801489876329711
 Mutual Information Results:
-  tri_mi: 8.17040010882462
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 6.942611856111138
-Completed PID for pair: nf_resnet50_classification, semnasnet_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model cspresnet50_classification with use_srp=False and n_components=50
+  tri_mi: 18.943323477842185
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 15.801128723692841
+Completed PID for pair: nf_resnet50_classification, semnasnet_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model cspresnet50_classification with use_srp=False and n_components=200
 Model options for cspresnet50_classification: {'model_name': 'cspresnet50', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('cspresnet50', pretrained = True)"}
 Image transforms for cspresnet50_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -173,16 +173,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.616387290079426
-  unq1: 0.0
-  unq2: 0.6766517746455865
-  syn: 0.8582811069785423
+  red: 16.617286141833958
+  unq1: 0.4458883483752558
+  unq2: 0.0
+  syn: 2.777368227229637
 Mutual Information Results:
-  tri_mi: 8.151320171703555
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 7.293039064725012
-Completed PID for pair: nf_resnet50_classification, cspresnet50_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model mobilenetv3_large_100_classification with use_srp=False and n_components=50
+  tri_mi: 19.84054271743885
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 16.617286141833958
+Completed PID for pair: nf_resnet50_classification, cspresnet50_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model mobilenetv3_large_100_classification with use_srp=False and n_components=200
 Model options for mobilenetv3_large_100_classification: {'model_name': 'mobilenetv3_large_100', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('mobilenetv3_large_100', pretrained = True)"}
 Image transforms for mobilenetv3_large_100_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -201,16 +201,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.616387290079426
-  unq1: 0.0
-  unq2: 0.6708453794206974
-  syn: 0.9587800782668454
+  red: 16.450027011737397
+  unq1: 0.6131474784718165
+  unq2: 0.0
+  syn: 2.591406599396798
 Mutual Information Results:
-  tri_mi: 8.246012747766969
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 7.287232669500123
-Completed PID for pair: nf_resnet50_classification, mobilenetv3_large_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model ghostnet_100_classification with use_srp=False and n_components=50
+  tri_mi: 19.654581089606012
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 16.450027011737397
+Completed PID for pair: nf_resnet50_classification, mobilenetv3_large_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model ghostnet_100_classification with use_srp=False and n_components=200
 Model options for ghostnet_100_classification: {'model_name': 'ghostnet_100', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('ghostnet_100', pretrained = True)"}
 Image transforms for ghostnet_100_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -229,16 +229,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.6118675606408965
-  unq1: 0.004519729438529296
-  unq2: 0.5911982210822089
-  syn: 1.0950778061904591
+  red: 15.748581458120704
+  unq1: 1.31459303208851
+  unq2: 0.0
+  syn: 2.1009015970508145
 Mutual Information Results:
-  tri_mi: 8.302663317352094
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 7.203065781723105
-Completed PID for pair: nf_resnet50_classification, ghostnet_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model convnext_base_classification with use_srp=False and n_components=50
+  tri_mi: 19.164076087260028
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 15.748581458120704
+Completed PID for pair: nf_resnet50_classification, ghostnet_100_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model convnext_base_classification with use_srp=False and n_components=200
 Model options for convnext_base_classification: {'model_name': 'convnext_base', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('convnext_base', pretrained = True)"}
 Image transforms for convnext_base_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
@@ -257,16 +257,16 @@ Bias correction is enabled for PID calculation:True.
 
 Calculating PID using Tilde...
 PID Results:
-  red: 6.616387290079427
+  red: 17.063174490209214
   unq1: 0.0
-  unq2: 1.7068779225609712
-  syn: 0.6652271606273601
+  unq2: 2.4976317619342154
+  syn: 1.6116205933672418
 Mutual Information Results:
-  tri_mi: 8.988492373267757
-  bi_mi_1: 6.616387290079426
-  bi_mi_2: 8.323265212640397
-Completed PID for pair: nf_resnet50_classification, convnext_base_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/50PCs_pairwise_pid_results.csv
-Extracting model xcit_nano_12_p8_224_classification with use_srp=False and n_components=50
+  tri_mi: 21.17242684551067
+  bi_mi_1: 17.063174490209214
+  bi_mi_2: 19.56080625214343
+Completed PID for pair: nf_resnet50_classification, convnext_base_classification. Results appended to /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise/200PCs_pairwise_pid_results.csv
+Extracting model xcit_nano_12_p8_224_classification with use_srp=False and n_components=200
 Model options for xcit_nano_12_p8_224_classification: {'model_name': 'xcit_nano_12_p8_224', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('xcit_nano_12_p8_224', pretrained = True)"}
 Image transforms for xcit_nano_12_p8_224_classification: Compose(
     Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)

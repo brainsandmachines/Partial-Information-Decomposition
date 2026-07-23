@@ -35,16 +35,15 @@ from pipeline.analysis.anlysis_utils import (
 
 #model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification']
 
-model_1_names = ['nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
+model_1_names = ['levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
+        'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
+        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','nf_resnet50_classification','hardcorenas_f_classification','eca_nfnet_l0_classification',
         'resnet50_classification','semnasnet_100_classification','cspresnet50_classification',
         'mobilenetv3_large_100_classification','ghostnet_100_classification','convnext_base_classification','xcit_nano_12_p8_224_classification'
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
         'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
         'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
-        'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
-        'convit_base_classification','ViT-B_32_clip','RN50_clip','RN101_clip','ViT-L_14_clip',
-        'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
-        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised',
         'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised']
 
 
@@ -382,7 +381,7 @@ def run_pairwise_pid_pipeline(
                         f"target shape {target_shared.shape}."
                     )
                     feature_cache[model_1] = features_1
-                    print(f"Extracted and cached features for model: {model_1}")
+                    print(f"Extracted and cached features for model: {model_1} with shape {features_1[0].shape}")
                 if model_2 not in feature_cache:
                     features_2 = extract_model_projection(
                         model_2,
@@ -397,7 +396,7 @@ def run_pairwise_pid_pipeline(
                         f"target shape {target_shared.shape}."
                     )
                     feature_cache[model_2] = features_2
-                    print(f"Extracted and cached features for model: {model_2}")
+                    print(f"Extracted and cached features for model: {model_2} with shape {features_2[0].shape}")
                 source_1, layer_1 = feature_cache[model_1]
                 source_2, layer_2 = feature_cache[model_2]
                 pid_results = pid_calculation(
@@ -451,7 +450,7 @@ def run_pairwise_pid_pipeline(
     return output_path
 
 if __name__ == "__main__":
-    pcs_num = 30
+    pcs_num = 40
     analysis_dir = Path(
         "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise"
     )
