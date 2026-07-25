@@ -459,12 +459,14 @@ File description: Main PID dispatcher and wrappers for Idep, Tilde, Delta, Thin 
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `pid_calc (line 28)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None | tuple of 2 values | No docstring; infer behavior from name/signature before reuse. |
-| `pid_idep_wrapper (line 53)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
-| `pid_tilde_wrapper (line 81)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
-| `delta_wrapper (line 119)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
-| `_to_numpy_samples (line 175)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
-| `flow_pid_wrapper (line 185)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
+| `mi_wishart_bias (line 27)` | dims: list, n_samples: int | dict | Calculate exact Gaussian pairwise, joint, and source-source MI Wishart biases in nats without simulation dependencies. |
+| `pid_calc (line 60)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None | tuple of 2 values | Dispatch standard PID inputs to Idep, Tilde, Delta, Thin, or Flow and return `(pid, mi)`. |
+| `pid_idep_wrapper (line 104)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
+| `pid_tilde_wrapper (line 132)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
+| `delta_wrapper (line 170)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
+| `_to_numpy_samples (line 226)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
+| `thin_pid_wrapper (line 236)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Run Thin-PID from samples or a target-first covariance and return standard `(pid, mi)` dictionaries. |
+| `flow_pid_wrapper (line 267)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
 
 ### `Partial_Information_Decomposition/PID_util.py`
 
@@ -1199,6 +1201,21 @@ File description: Create controlled low-rank sample matrices, add relative Gauss
 | `generate_rank_simulation_data (line 69)` | n_samples: int, n_features: int, rank: int, loading_corr: float, noise_std: float, random_state: int, component_strengths: list[float] \| np.ndarray \| None=None, center_columns: bool=True | Annotated: `dict` | Form unit-standard-deviation `X_signal = T @ P.T`, add relative Gaussian noise, optionally center columns, and return data plus condition metadata. |
 | `run_rank_simulation (line 95)` | grid: dict[str, list], output_dir: str \| Path=OUTPUT_DIR, nbsim: int=NBSIM | Annotated: `tuple[pd.DataFrame, pd.DataFrame]` | Run EM/K-fold rank selection across the grid, save raw/summary CSVs, and create per-rank success heatmaps over loading correlation and noise. Errors from the missMDA wrapper are allowed to propagate so batch jobs fail fast instead of recording a failed row and continuing. |
 
+## Simulations/PCA_Ridge
+
+Compact train/test PCA and Ridge-CV middleware used by controlled PID simulations.
+
+### `Simulations/PCA_Ridge/pid_feature_middleware.py`
+
+File description: Reusable held-out PCA/Ridge adapters, covariance CMI calculation, and the Sonic example.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `pca_target (line 25)` | source_1: Any, source_2: Any, target: Any, shared_mask: np.ndarray, n_components_target: int, random_state: int=0 | Annotated: `tuple[Any, Any, np.ndarray]` | Fit target PCA on training rows and transform every aligned target row. |
+| `pca_sources (line 40)` | source_1: Any, source_2: Any, target: Any, shared_mask: np.ndarray, n_components_source_1: int, n_components_source_2: int, random_state: int=0 | Annotated: `tuple[np.ndarray, np.ndarray, Any]` | Fit both source PCAs on training rows and return held-out source projections with the held-out target. |
+| `ridge_sources_on_target (line 59)` | source_1: Any, source_2: Any, target: Any, shared_mask: np.ndarray, **ridge_kwargs: Any | Annotated: `tuple[Any, Any, np.ndarray]` | Cross-validate both source-to-target ridge models on training rows and return held-out predictions and target. |
+| `calculate_covariance_cmi (line 74)` | covariance: Any, dims: list[int], n_samples: int \| None=None | Annotated: `dict[str, float]` | Calculate Gaussian `I(T;X2\|X1)` and `I(T;X1\|X2)` in bits from `[X1,X2,T]` covariance; supplying `n_samples` subtracts exact Wishart MI biases. |
+
 ## Simulations/Theoretical_Examples/Covariance
 
 Theoretical covariance examples, sampling, and result utilities.
@@ -1231,7 +1248,7 @@ File description: Python module for save results-related project logic.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `save_sample_simulation_results_table (line 15)` | results: dict, config: dict, save_path: str \| Path, decimals: int=4, title: str='PID Method Comparison', dpi: int=200 | Annotated: `Path` | Save sample-simulation PID/MI summaries as a styled table image. |
+| `save_sample_simulation_results_table (line 15)` | results: dict, config: dict, save_path: str \| Path, decimals: int=4, title: str='PID Method Comparison', dpi: int=200 | Annotated: `Path` | Save sample-simulation PID/MI summaries as a styled table image, adding optional Given-X1/Given-X2 CMI validation columns when their display keys are present. |
 
 ## Simulations/Theoretical_Examples/RVs_Story
 

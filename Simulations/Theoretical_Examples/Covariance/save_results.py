@@ -27,6 +27,7 @@ def save_sample_simulation_results_table(
             {method: {"theoretical": ..., "mean_sampled": ..., "bias": ...,
             "variance": ..., "mse": ...}}. The theoretical and mean_sampled
             entries are rendered as separate method-by-component tables.
+            Optional `cmi_*_test` strings add the two CMI validation columns.
         config: dict, simulation configuration with n/n_samples, dimensions,
             p_scale, q_scale, r_scale, seed, bias_correction, and n_trials.
         save_path: str | Path, target image file path.
@@ -43,7 +44,7 @@ def save_sample_simulation_results_table(
     save_path = Path(save_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
-    columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)"]
+    columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)", "Given X1\nCMI(T;X2|X1)", "Given X2\nCMI(T;X1|X2)"]
     component_keys = {
         "Red": ("red",),
         "Unq1": ("unq1", "unq0"),
@@ -52,6 +53,8 @@ def save_sample_simulation_results_table(
         "I(X1;T)": ("bi_mi_1", "I(M1;T)", "I(M0;T)"),
         "I(X2;T)": ("bi_mi_2", "I(M2;T)", "I(M1;T)"),
         "I(X1,X2;T)": ("tri_mi", "I(M1,M2;T)", "I(M0,M1;T)"),
+        "Given X1\nCMI(T;X2|X1)": ("cmi_x2_given_x1_test",),
+        "Given X2\nCMI(T;X1|X2)": ("cmi_x1_given_x2_test",),
     }
     method_names = {"flow": "Flow", "tilde": "Tilde", "delta": "Delta", "idep": "Idep"}
     metric_names = [
@@ -73,6 +76,7 @@ def save_sample_simulation_results_table(
                         methods.append(method)
 
     section_tables = []
+    has_cmi_validation = False
     for section_name, method_key, top_level_key in metric_names:
         rows = []
         for method in methods:
@@ -111,6 +115,8 @@ def save_sample_simulation_results_table(
                 if isinstance(cell_value, np.ndarray):
                     cell_value = cell_value.item() if cell_value.size == 1 else None
                 table_row[column] = cell_value
+                if column.startswith("Given ") and cell_value is not None:
+                    has_cmi_validation = True
             table_rows.append(table_row)
 
         if table_rows:
@@ -118,6 +124,8 @@ def save_sample_simulation_results_table(
 
     if not section_tables:
         raise ValueError("No table data found in results.")
+    if not has_cmi_validation:
+        columns = columns[:-2]
 
     legend_items = {
         "n": cfg.get("n", cfg.get("n_samples")),
@@ -130,11 +138,12 @@ def save_sample_simulation_results_table(
         "q_scale": cfg.get("q_scale"),
         "r_scale": cfg.get("r_scale"),
         "n_trials": cfg.get("n_trials"),
+        "cmi_tolerance": cfg.get("cmi_tolerance"),
     }
     legend = " | ".join(f"{key}={value}" for key, value in legend_items.items() if value is not None)
 
     fig_height = max(2.8, 1.35 + sum(0.42 * (len(rows) + 1) + 0.45 for _, rows in section_tables))
-    fig, axes = plt.subplots(len(section_tables), 1, figsize=(14, fig_height))
+    fig, axes = plt.subplots(len(section_tables), 1, figsize=(18 if has_cmi_validation else 14, fig_height))
     if len(section_tables) == 1:
         axes = [axes]
 

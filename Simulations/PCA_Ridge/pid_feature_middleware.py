@@ -10,11 +10,11 @@ import numpy as np
 import torch
 from sklearn.decomposition import PCA
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from Partial_Information_Decomposition.PID_calc import pid_calc
+from Partial_Information_Decomposition.PID_calc import mi_wishart_bias, pid_calc
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
 from pipeline.pipeline_phases.preprocessing_layer import ridge_train_to_test_prediction
 from pipeline.pipeline_phases.report_results import print_pid_mi
@@ -71,14 +71,32 @@ def ridge_sources_on_target(source_1: Any, source_2: Any, target: Any, shared_ma
     return prediction_1, prediction_2, target[shared_mask]  # (N, Dt) -> three (n_test, Dt) arrays
 
 
+def calculate_covariance_cmi(covariance: Any, dims: list[int], n_samples: int | None = None) -> dict[str, float]:
+    """Calculate Gaussian CMI in bits from covariance ordered as [X1, X2, T].
+
+    Inputs: covariance tensor/array, three integer dimensions, and optional
+    sample count; providing `n_samples` applies the exact Wishart MI biases.
+    Output: dict containing I(T;X2|X1) and I(T;X1|X2), both in bits.
+    """
+    covariance = torch.as_tensor(covariance, dtype=torch.float64)  # (D, D) -> (D, D)
+    if len(dims) != 3 or covariance.shape != (sum(dims), sum(dims)):
+        raise ValueError("dims and covariance must describe [X1, X2, T].")
+    mi = calculate_mi_raw(covariance.device, covariance, dims)
+    bias = mi_wishart_bias(dims, n_samples) if n_samples is not None else {}
+    tri = (mi["tri_mi"] - bias.get("bias_tri_mi", 0.0)) / np.log(2)
+    bi_1 = (mi["bi_mi_1_t"] - bias.get("bias_mi_1_t", 0.0)) / np.log(2)
+    bi_2 = (mi["bi_mi_2_t"] - bias.get("bias_mi_2_t", 0.0)) / np.log(2)
+    return {"cmi_x2_given_x1": float(tri - bi_1), "cmi_x1_given_x2": float(tri - bi_2)}
+
+
 if __name__ == "__main__":
-    n_samples, n_train, n_components, p = 10000, 9000, 30, 30
-    n_trials, base_seed = 50, 0
+    n_samples, n_train, n_components, p = 10000, 9000, 30, 70
+    n_trials, base_seed = 2, 0
     if n_trials < 1:
         raise ValueError("n_trials must be at least 1.")
-    pid_method = "thin"
-    bias_correction = False
+    pid_method, bias_correction, cmi_tolerance = "tilde", False, 1e-3
     component_keys = ("red", "unq1", "unq2", "syn", "bi_mi_1", "bi_mi_2", "tri_mi")
+    cmi_keys = ("cmi_x2_given_x1", "cmi_x1_given_x2")
     route_dimensions = {"RAW": p, "PCA": n_components, "RIDGE CV": n_components}
     sonic_covariance = torch.tensor(
         [[5.5, 3.0, 3.0], [3.0, 3.5, 1.0], [3.0, 1.0, 4.5]], dtype=torch.float64,
@@ -100,11 +118,13 @@ if __name__ == "__main__":
         method=pid_method,
     )
     ground_truth_per_dimension.update(ground_truth_pid)
+    ground_truth_cmi_per_dimension = calculate_covariance_cmi(sonic_covariance, [1, 1, 1])
 
     trial_values = {
         route: {key: [] for key in component_keys}
         for route in route_dimensions
     }
+    trial_cmi_values = {route: {key: [] for key in cmi_keys} for route in route_dimensions}
     for trial in range(n_trials):
         trial_seed = base_seed + trial
         print(f"\n{'#' * 18} TRIAL {trial + 1}/{n_trials} — seed={trial_seed} {'#' * 18}")
@@ -128,6 +148,13 @@ if __name__ == "__main__":
             source1 = torch.as_tensor(source1, dtype=torch.float64)  # (n_test, D1) -> (n_test, D1)
             source2 = torch.as_tensor(source2, dtype=torch.float64)  # (n_test, D2) -> (n_test, D2)
             target = torch.as_tensor(target, dtype=torch.float64)  # (n_test, Dt) -> (n_test, Dt)
+            joint_samples = torch.cat((source1, source2, target), dim=1)  # three (n_test, D*) arrays -> (n_test, D1 + D2 + Dt)
+            sample_covariance = torch.cov(joint_samples.T)  # (n_test, D1 + D2 + Dt) -> (D1 + D2 + Dt, D1 + D2 + Dt)
+            sample_cmi = calculate_covariance_cmi(
+                sample_covariance,
+                [source1.shape[1], source2.shape[1], target.shape[1]],
+                n_samples=target.shape[0],
+            )
             pid, mi = pid_calc(
                 config={"bias_correction": bias_correction, "n_samples": target.shape[0]},
                 sources=[source1, source2],
@@ -136,11 +163,19 @@ if __name__ == "__main__":
             )
             for key, value in {**pid, **mi}.items():
                 trial_values[route][key].append(float(value))
+            for key, value in sample_cmi.items():
+                trial_cmi_values[route][key].append(value)
 
     plot_results = {}
     for route, dimensions in route_dimensions.items():
         theoretical = {key: value * dimensions for key, value in ground_truth_per_dimension.items()}
+        theoretical_cmi = {key: value * dimensions for key, value in ground_truth_cmi_per_dimension.items()}
         mean_sampled = {key: float(np.mean(trial_values[route][key])) for key in component_keys}
+        mean_cmi = {key: float(np.mean(trial_cmi_values[route][key])) for key in cmi_keys}
+        theoretical["cmi_x2_given_x1_test"] = f"{'PASS' if np.isclose(theoretical['unq2'] + theoretical['syn'], theoretical_cmi['cmi_x2_given_x1'], atol=cmi_tolerance, rtol=0) else 'FAIL'} | CMI={theoretical_cmi['cmi_x2_given_x1']:.4f}"
+        theoretical["cmi_x1_given_x2_test"] = f"{'PASS' if np.isclose(theoretical['unq1'] + theoretical['syn'], theoretical_cmi['cmi_x1_given_x2'], atol=cmi_tolerance, rtol=0) else 'FAIL'} | CMI={theoretical_cmi['cmi_x1_given_x2']:.4f}"
+        mean_sampled["cmi_x2_given_x1_test"] = f"{'PASS' if np.allclose(np.asarray(trial_values[route]['unq2']) + np.asarray(trial_values[route]['syn']), trial_cmi_values[route]['cmi_x2_given_x1'], atol=cmi_tolerance, rtol=0) else 'FAIL'} | CMI={mean_cmi['cmi_x2_given_x1']:.4f}"
+        mean_sampled["cmi_x1_given_x2_test"] = f"{'PASS' if np.allclose(np.asarray(trial_values[route]['unq1']) + np.asarray(trial_values[route]['syn']), trial_cmi_values[route]['cmi_x1_given_x2'], atol=cmi_tolerance, rtol=0) else 'FAIL'} | CMI={mean_cmi['cmi_x1_given_x2']:.4f}"
         bias = {key: mean_sampled[key] - theoretical[key] for key in component_keys}
         variance = {key: float(np.var(trial_values[route][key])) for key in component_keys}
         mse = {key: bias[key] ** 2 + variance[key] for key in component_keys}
@@ -161,10 +196,10 @@ if __name__ == "__main__":
         for label, key in (("I(X1; T)", "bi_mi_1"), ("I(X2; T)", "bi_mi_2"), ("I(X1,X2; T)", "tri_mi")):
             print(f"  {label:<14} {theoretical[key]:>14.6f} {mean_sampled[key]:>14.6f} {abs(bias[key]):>16.6f}")
 
-    plot_path = PROJECT_ROOT / "Simulations" / "results" / f"sonic_pid_feature_comparison_{n_trials}_trials.png"
+    plot_path = PROJECT_ROOT / "Simulations" / "PCA_Ridge" / "results" / f"sonic_pid_feature_comparison_{n_trials}_trials.png"
     save_sample_simulation_results_table(
         plot_results,
-        {"n": n_samples - n_train, "seed": base_seed, "bias_correction": bias_correction, "n_trials": n_trials},
+        {"n": n_samples - n_train, "seed": base_seed, "bias_correction": bias_correction, "n_trials": n_trials, "cmi_tolerance": cmi_tolerance},
         plot_path,
         title="Sonic PID: RAW vs PCA vs Ridge CV",
     )
