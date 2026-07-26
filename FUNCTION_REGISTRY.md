@@ -459,14 +459,14 @@ File description: Main PID dispatcher and wrappers for Idep, Tilde, Delta, Thin 
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `mi_wishart_bias (line 27)` | dims: list, n_samples: int | dict | Calculate exact Gaussian pairwise, joint, and source-source MI Wishart biases in nats without simulation dependencies. |
-| `pid_calc (line 60)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None | tuple of 2 values | Dispatch standard PID inputs to Idep, Tilde, Delta, Thin, or Flow and return `(pid, mi)`. |
-| `pid_idep_wrapper (line 104)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
-| `pid_tilde_wrapper (line 132)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
-| `delta_wrapper (line 170)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
-| `_to_numpy_samples (line 226)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
-| `thin_pid_wrapper (line 236)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Run Thin-PID from samples or a target-first covariance and return standard `(pid, mi)` dictionaries. |
-| `flow_pid_wrapper (line 267)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
+| `mi_wishart_bias (line 29)` | dims: list, n_samples: int | dict | Calculate exact Gaussian pairwise, joint, and source-source MI Wishart biases in nats without simulation dependencies. |
+| `pid_calc (line 62)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None | tuple of 2 values | Dispatch standard PID inputs to Idep, Tilde, Delta, Thin, or Flow and return `(pid, mi)`. |
+| `pid_idep_wrapper (line 106)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
+| `pid_tilde_wrapper (line 134)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None, param_bias=False | tuple of 2 values | Wrap Venkatesh et al. Gaussian BROJA/Tilde PID, optionally disabling its union debias factor and using the configured permutation path. Covariance order is `[T, X1, X2]`. |
+| `delta_wrapper (line 198)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
+| `_to_numpy_samples (line 254)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
+| `thin_pid_wrapper (line 264)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Run Thin-PID from samples or a target-first covariance and return standard `(pid, mi)` dictionaries. |
+| `flow_pid_wrapper (line 295)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
 
 ### `Partial_Information_Decomposition/PID_util.py`
 
@@ -520,10 +520,11 @@ File description: Bias correction helpers for Gaussian MI/PID estimates and perm
 |---|---|---|---|
 | `logdet_wishart_bias (line 21)` | df: int, d: int | Annotated: `float` | Exact finite-sample bias for log\|S\| when S is the unbiased sample covariance from Gaussian data and (df) * S ~ Wishart_d(Sigma, df). |
 | `mi_wishart_bias (line 41)` | dims: list, n_samples: int | `bias_mi`; dict (bias_mi_1_t, bias_mi_2_t, bias_tri_mi, bias_mi_12) | Bias correction for Gaussian mutual information estimates from unbiased sample covariance. |
-| `permuteation_debiased (line 100)` | config, term='nume' | `value` | No docstring; infer behavior from name/signature before reuse. |
-| `permutation_null_debias (line 119)` | config, func | dict (bias, perm_mean, perm_std, perm_se, perm_values, n_perm); dict (debiased, perm_mean, perm_std, perm_se, perm_values, n_perm) | Debias an MI-like estimator by subtracting its permutation null floor. |
-| `unique_bias (line 187)` | config, functions_dict: dict=None | `bias_dict` | No docstring; infer behavior from name/signature before reuse. |
-| `bias_func (line 207)` | config, model | dict (i, h); dict (k, j) | No docstring; infer behavior from name/signature before reuse. |
+| `permuteation_debiased (line 100)` | config, term='nume' | `value` | Evaluate an M7 MI term from permuted `[X1, X2, T]` samples, reusing the already-whitened M7 covariance blocks directly. |
+| `broja_venkatesh_bias (line 123)` | config | `union_info` | Calculate permutation-sample Gaussian BROJA/Tilde union information in bits. Builds covariance in `[T, X1, X2]` order and converts the Torch `(D, D)` covariance to a CPU NumPy `(D, D)` array before calling GPID. |
+| `permutation_null_debias (line 160)` | config, func | dict (bias, perm_mean, perm_std, perm_se, perm_values, n_perm); dict (debiased, perm_mean, perm_std, perm_se, perm_values, n_perm) | Debias an MI-like estimator by subtracting its permutation null floor. |
+| `unique_bias (line 228)` | config, functions_dict: dict=None | `bias_dict` | No docstring; infer behavior from name/signature before reuse. |
+| `bias_func (line 248)` | config, model | dict (i, h); dict (k, j) | No docstring; infer behavior from name/signature before reuse. |
 
 ### `Partial_Information_Decomposition/heatmap_plot.py`
 

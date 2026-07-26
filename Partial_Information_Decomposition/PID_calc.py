@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import os
 import tempfile
+from functools import partial
+
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 root = Path(__file__).resolve().parents[1]
@@ -12,13 +14,13 @@ if str(root) not in sys.path:
 wrapper_root = root / "library_wrappers"
 if str(wrapper_root) not in sys.path:
     sys.path.insert(0, str(wrapper_root))
+from Partial_Information_Decomposition.bias_functions import broja_venkatesh_bias, permutation_null_debias
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
 from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
 from Flow_PID import load_flow_pid
 from Thin_PID import load_exact_gauss_thin_pid
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
-
 
 
 
@@ -57,16 +59,18 @@ def mi_wishart_bias(dims:list,n_samples:int):
     }
 
 
-def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_seed(56),method=None,on_rvs:callable=None,covariance:torch.Tensor = None):
+def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_seed(56),
+             method=None,on_rvs:callable=None,covariance:torch.Tensor = None,param_bias = False):
 
 
     assert method is not None, "Please specify a method for PID calculation (e.g., 'idep', 'idep_tilde'...etc)"
-    dx1 = sources[0].shape[1]
-    dx2 = sources[1].shape[1]
-    dt = target[0].shape[1]
-    config['dx1'] = dx1
-    config['dx2'] = dx2
-    config['dt'] = dt
+    if sources is not None and target is not None:
+        dx1 = sources[0].shape[1]
+        dx2 = sources[1].shape[1]
+        dt = target[0].shape[1]
+        config['dx1'] = dx1
+        config['dx2'] = dx2
+        config['dt'] = dt
     if on_rvs is not None:
         print("\nApplying on_rvs transformation to sources...")
         sources = on_rvs(sources)
@@ -82,7 +86,7 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
 
     elif method == "tilde":
         print("\nCalculating PID using Tilde...")
-        pid, mi = pid_tilde_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
+        pid, mi = pid_tilde_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs,param_bias=param_bias)
     
     elif method == "delta":
         print("\nCalculating PID using Delta...")
@@ -129,8 +133,8 @@ def pid_idep_wrapper(config,sources=None,target=None,covariance=None,rng=None,on
     return pid, mi
 
 
-def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None):
-    """This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023
+def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None,param_bias = False):
+    """This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. False
     Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation and then calls the PID calculation function.
     and calculates the PID using BROJA definition and calculation from Venkateh et al. 2023.
     
@@ -158,11 +162,44 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
     #print(f"\n Covariance matrix (shape {cov.shape}):")
 
     cov = cov.cpu().numpy() # Convert to numpy array for BROJA implementation
-    
-    output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N) 
-    imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
-    pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si}
-    mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
+
+    if not param_bias:
+        debias_factor_bool = config['debias_factor_bool']
+        if debias_factor_bool:
+            print("\nCalculating PID using BROJA Tilde with Venkateshes debias factor.❗❗❗")
+        else:
+            print("\nCalculating PID using BROJA Tilde without debias factor.❗❗❗")
+        output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N,debias_factor_bool=debias_factor_bool) 
+        imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
+        pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si, 'union_info':union_info,'obj':obj}
+        mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
+    else:
+        X_1, X_2 = sources[0], sources[1]
+        T = target[0]
+        print("\nCalculating PID using BROJA Tilde with parametric debias factor.❗❗❗")
+        output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N,debias_factor_bool=False)
+        imx, imy, imxy, union_info, obj, _, __, ___,____ = output[:9]
+        mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
+
+        #Calculate bias using permutation null distribution
+        print("\nCalculating bias using permutation null distribution...")
+        config['X1'] = X_1
+        config['X2'] = X_2
+        config['T'] = T
+        bias_func = partial(broja_venkatesh_bias,config=config)
+        bias = permutation_null_debias(config,func=bias_func)
+        print(f"\nBias calculated using permutation null distribution: {bias}")
+        #Debias the union info 
+        obj_bias = bias['bias']
+
+        obj_debiased = obj - obj_bias
+
+        uix = obj_debiased - imy
+        uiy = obj_debiased - imx
+        ri = imx + imy - obj_debiased
+        si = imxy - obj_debiased
+        pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si, 'union_info':obj_debiased,'obj':obj}
+
 
     return pid, mi
 

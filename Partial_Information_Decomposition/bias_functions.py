@@ -8,8 +8,8 @@ from functools import partial
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
-from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import make_random_true_cov,create_m7_cov
-from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import build_m7_terms
+from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import create_m7_cov
+from external.gpid.src.gpid import tilde_pid
 
 
 
@@ -109,11 +109,52 @@ def permuteation_debiased(config,term = 'nume'):
     if config['model'] == 'M7':
         M7_cov = create_m7_cov(config,Z['full_cov'],whitening_normalize=True) #Also Whiten Normalize
         M7_cov_dict = create_cov_matrix(Sigma=M7_cov,dims = [dx1, dx2, dt],device=device)
-        m7_dict = build_m7_terms(config,M7_cov_dict,whiten='True') # Because of one row above we can assume it's already whitened
+        m7_dict = {
+            'P': M7_cov_dict['cross_x1_x2'],
+            'Q': M7_cov_dict['cross_x1_t'],
+            'R': M7_cov_dict['cross_x2_t'],
+            'Sigma': M7_cov_dict['full_cov'],
+        }
         mi_terms = calcualte_mi(config,m7_dict)
         value = mi_terms[term]
     
     return value
+
+def broja_venkatesh_bias(config):
+    """ Function to calculate the BROJA using venkatesh et al. 2023 
+    implementation and return the bias using permuation
+    
+    config: dict
+        Dictionary containing the configuration parameters for the bias calculation.
+        X_1, X_2, T: torch.Tensor / Numpy array
+            Input tensors for the bias calculation.
+        dx1, dx2, dt (dx,dy,dm - Venkatesh notations): int
+            Dimensions of the input tensors.
+        
+        bias_corr_func: bool - whether to use the bias correction funtion wishart in vekateshes code
+
+        Sample size: int
+            Number of samples in the input tensors.
+        
+        Returns:
+            union_information: float
+                The union information calculated using the BROJA implementation.
+    """
+
+    dm , dx, dy = config['dt'] , config['dx1'] , config['dx2']
+    X_1, X_2, T = config['X1_perm'], config['X2_perm'], config['T_perm']
+    N = config['n_samples']
+    #bias_corr = config['bias_corr']
+    data = [T, X_1, X_2]  # [T, X1, X2]
+    dict_cov = create_cov_matrix(data)
+    cov = dict_cov["full_cov"].detach().cpu().numpy()  # torch (D, D) -> NumPy (D, D)
+    output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=config['bias_correction'],sample_size=N
+            ,debias_factor_bool=False) #We don't want debias factor
+    imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
+    pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si, 'union_info':union_info,'obj':obj}
+    mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
+    return obj
+
 
 
 def permutation_null_debias(config,func):
@@ -140,7 +181,12 @@ def permutation_null_debias(config,func):
     dt = config['dt']
     device = config['device']
     n_perm = config['n_perm']
-    rng = config['rng']
+
+    rng = config.get('rng', None)
+    if rng is None:
+        rng = torch.Generator(device=device)
+        rng.manual_seed(config['rng_seed'])
+
 
     if n_perm == 0:
         return {
@@ -234,4 +280,3 @@ def bias_func(config,model):
         return {'k': (nume_bias - deno_bias) - bi_variate_mix2t_bias,'j': (nume_bias - deno_bias) - bi_variate_mix1t_bias}
 
     
-

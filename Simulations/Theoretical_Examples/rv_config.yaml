@@ -6,7 +6,7 @@
 
 parameters: 
   description: "A theoretical example where the second source has zero unique information about the target. The first source has some unique information, and there is also some redundant and synergistic information."
-  n_samples: 10000000
+  n_samples: 10000
   p: 50 #The same feature dimension for all varaibles
   noise_std: 1.0
   seed: 42
@@ -17,16 +17,21 @@ parameters:
   n_flows: 4
   bits: True
   device: "cuda"
-  methods: ['tilde', 'delta']
+  methods: ['tilde']
 
 
 covariance:
   p_scale: 0.3
   q_scale: 0.5
   r_scale: 0.5
-  dx1: 50
-  dx2: 55
-  dt: 35
-  n_trials: 20
-  methods: ['tilde', 'delta']
-  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance"
+  dx1: 30
+  dx2: 32
+  dt: 20
+  n_trials: 10
+  methods: ['tilde']
+  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/param_bias"
+  debias_factor_bool: False
+  param_bias: False
+  n_perm: 20
+  rng_seed: 42
+  device: 'cpu'

@@ -103,8 +103,8 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
             cov = reordered_cov
         else:            
             cov = true_cov
-        theoretical_values[method] = pid_calc(config,rng=rng,covariance = cov, method=method)
-
+        theoretical_values[method] = pid_calc(config,rng=rng,covariance = cov, method=method,param_bias=False) #We don't permutation bias for the theoretical values, because we want to compare the sampled values with the true values, and the true values are not biased. The sampled values are biased because of the sampling, but we don't want to bias the true values, because we want to compare them with the sampled values.
+        
 
     values = ['red', 'unq1', 'unq2', 'syn', 'bi_mi_1', 'bi_mi_2', 'tri_mi']
     sampled_value = {method: {k: np.zeros((config['n_trials'],)) for k in values} for method in methods}
@@ -123,7 +123,7 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
                 cov = reordered_sampled_cov
             else:
                 cov = sampled_cov
-            pid_results,mi_results = pid_calc(config,sources=sources,target=target, method=method)
+            pid_results,mi_results = pid_calc(config,sources=sources,target=target, method=method,param_bias=config['param_bias'])
 
             results = {**pid_results, **mi_results}
 
@@ -169,9 +169,9 @@ if __name__ == "__main__":
     config_params = config['parameters']
     config_cov = config['covariance']
     config = {**config_params, **config_cov}
-    methods = config.get("methods", ["flow", "tilde", "delta", "idep"])
+    methods = config.get("methods", ["tilde"])
 
-    exp_name = f'Allcorr>0_Tilde&Delta-Debiased_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
+    exp_name = f'param_bias={config["param_bias"]}_Allcorr>0_Tilde&Delta-Debiased_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
     #exp_name = 'testt'
     results = simulation(config, methods, experiment_name=exp_name)
     
