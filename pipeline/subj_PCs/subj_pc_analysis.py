@@ -22,7 +22,7 @@ from Simulations.PCA_rank.eigenvector_pca import eigenvector_pca_cv
 from library_wrappers.missmda_ncp import estimate_ncp_pca
 
 
-max_features = 100
+max_features = 2000  # Maximum number of features to use for PCA
 
 def split_unique_shared(
     subj_id: str,

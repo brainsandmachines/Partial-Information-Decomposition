@@ -37,7 +37,7 @@ feature_manipulation_kwargs:
 
 
 pid_kwargs:
-  method: thin
+  method: tilde
   rng_seed: 56
   config:
     device: cuda

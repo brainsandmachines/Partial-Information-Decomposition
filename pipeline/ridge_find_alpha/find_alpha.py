@@ -360,15 +360,15 @@ def main(
         )
         print("\nSelected alpha and cross-validation score for each PC:")
 
-    ridge_cv = ridge_model.named_steps["ridgecv"]
+
     
     alphas_per_pc = np.asarray(
-    ridge_cv.alpha_,
+    ridge_model.alpha_,
     dtype=np.float64,
     )
 
     scores_per_pc = np.asarray(
-        ridge_cv.best_score_,
+        ridge_model.best_score_,
         dtype=np.float64,
     )
 
@@ -425,14 +425,14 @@ if __name__ == "__main__":
         'levit_128_classification','coat_lite_tiny_classification','visformer_small_classification',
         'convit_base_classification','RN50_clip','RN101_clip',
         'ResNet50-SimCLR_selfsupervised','ResNet50-DeepClusterV2-2x224_selfsupervised','ResNet50-SwAV-BS4096-2x224_selfsupervised',
-        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised','ViT-B_32_clip','ViT-L_14_clip'
+        'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
         ]
     
-    n_pcs = 20  # Number of principal components to use for ridge regression
+    n_pcs = 30  # Number of principal components to use for ridge regression
     #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
-    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl')
+    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=8000/subj01_pca_model.pkl')
     
     hdf_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5')
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')

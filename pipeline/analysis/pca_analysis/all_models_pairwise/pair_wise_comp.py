@@ -44,7 +44,7 @@ model_1_names = ['levit_128_classification','coat_lite_tiny_classification','vis
         ,'xcit_nano_12_p16_224_classification','swin_large_patch4_window7_224_classification','jx_nest_tiny_classification',''
         'pit_ti_224_classification','vit_base_patch32_224_classification','vit_base_patch16_224_classification',
         'tnt_s_patch16_224_classification','crossvit_base_240_classification','deit_base_patch16_224_classification',
-        'dino_resnet50_selfsupervised','dino_vitb16_selfsupervised','ViT-B_32_clip','ViT-L_14_clip']
+        'dino_vitb16_selfsupervised'] #'ViT-B_32_clip','ViT-L_14_clip',
 
 
 
@@ -450,11 +450,11 @@ def run_pairwise_pid_pipeline(
     return output_path
 
 if __name__ == "__main__":
-    pcs_num = 40
+    pcs_num = 50
     analysis_dir = Path(
-        "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/22_07_pair_wise"
+        "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid"
     )
-    config_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/otc_pair_wise_comp.yaml')
+    config_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/thin_pid_otc_pair_wise_comp.yaml')
     csv_path = analysis_dir / f"{pcs_num}PCs_pairwise_pid_results.csv"
     plot_path = csv_path.parent / f"{pcs_num}PCs_pairwise_pid_results"
     with open(config_path, "r") as config_file:
@@ -463,7 +463,7 @@ if __name__ == "__main__":
         otc_config["feature_manipulation_kwargs"]["n_components_source_2"] = pcs_num
         otc_config["feature_manipulation_kwargs"]["n_components_target"] = pcs_num
         otc_config["preprocess_kwargs"]["n_components_target"] = pcs_num
-        print(f"Running pairwise PID pipeline with {pcs_num} PCs and config: {config_path}")
+        print(f"Running pairwise PID pipeline with {pcs_num} PCs Using PID method {otc_config['pid_kwargs']['method']} and config: {config_path}")
 
     run_pairwise_pid_pipeline(
         model_1_names=model_1_names,
@@ -471,8 +471,8 @@ if __name__ == "__main__":
         otc_config=otc_config,
         csv_path=csv_path,
     )
-    csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/{pcs_num}PCs_pairwise_pid_results.csv')
+    csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/{pcs_num}PCs_pairwise_pid_results.csv')
     plot_pairwise_pid_matrices(
         csv_path=csv_path,
-        output_dir=f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/{pcs_num}PCs_pairwise_pid_results',
+        output_dir=f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/{pcs_num}PCs_pairwise_pid_results',
     )
