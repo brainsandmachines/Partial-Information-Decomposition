@@ -8,3 +8,5 @@
 3. When you are importing something put it in the top of the file and not inside a function.
 
 4. Each time you write a code that changes the shape or returns a tensor/array write a comment that say from what shape to what shape it changed. In that format: old_shape -> new_shape
+
+5. Each time you see a 

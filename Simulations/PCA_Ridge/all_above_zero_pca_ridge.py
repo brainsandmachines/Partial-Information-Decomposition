@@ -60,11 +60,11 @@ def build_all_above_zero_covariance(
 
 
 if __name__ == "__main__":
-    n_samples, n_train, n_components, p = 10000, 9000, 30, 70
+    n_samples, n_train, n_components, p = 10000, 9000, 5, 70
     n_trials, base_seed, noise_std = 2, 0, 1.0
     unique1_weight, unique2_weight = 6.0, 7.0
     redundant_weight, shared_noise_weight = 1.0, 1.0
-    pid_method, bias_correction = "tilde", False
+    pid_method, bias_correction = "tilde", True
 
     population_covariance = build_all_above_zero_covariance(
         p,

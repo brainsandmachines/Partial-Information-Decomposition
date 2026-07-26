@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 import torch
 from sklearn.decomposition import PCA
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -20,7 +20,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from Partial_Information_Decomposition.PID_calc import pid_calc
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
-from pipeline.pipeline_phases.preprocessing_layer import ridge_train_to_test_prediction
+from my_utils import standardize_np
 from pipeline.pipeline_phases.report_results import print_pid_mi
 from Simulations.evil_twin.covariance_example import evil_twin_example_torch
 from Simulations.Theoretical_Examples.Covariance.cov_functions import change_covariance_order
@@ -109,42 +109,48 @@ def _ridge_prediction_and_map(
     source_train: np.ndarray,
     target_train: np.ndarray,
     source_test: np.ndarray,
-    target_test: np.ndarray,
-    **ridge_kwargs: Any,
+    alphas: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Return existing Ridge-CV predictions and their effective RAW-input map.
+    """Return native per-target-alpha RidgeCV predictions and RAW-input map.
 
     Inputs:
         source_train: np.ndarray with shape (n_train, Ds).
         target_train: np.ndarray with shape (n_train, Dt).
         source_test: np.ndarray with shape (n_test, Ds).
-        target_test: np.ndarray with shape (n_test, Dt).
-        ridge_kwargs: keyword arguments passed to ridge_train_to_test_prediction.
+        alphas: np.ndarray candidate regularization strengths with shape (A,).
 
     Outputs:
         tuple[np.ndarray, np.ndarray]: held-out prediction with shape
-        (n_test, Dt) and effective linear map with shape (Dt, Ds).
+        (n_test, Dt) and effective linear map with shape (Dt, Ds). Every
+        target PC uses its own generalized-cross-validated alpha.
     """
-    prediction, info = ridge_train_to_test_prediction(
-        source_train,
-        target_train,
-        source_test,
-        target_test,
-        **ridge_kwargs,
-    )  # train/test arrays -> held-out prediction and scalar diagnostics
-    prediction = np.asarray(prediction).reshape(source_test.shape[0], target_train.shape[1])  # sklearn output -> (n_test, Dt)
+    alpha_grid = np.asarray(alphas, dtype=np.float64)  # candidate array-like (A,) -> float64 (A,)
     fitted_pipeline = make_pipeline(
         StandardScaler(),
-        Ridge(alpha=info["best_alpha"], fit_intercept=True, solver="svd"),
+        RidgeCV(
+            alphas=alpha_grid,
+            fit_intercept=True,
+            alpha_per_target=True,
+            cv=None,
+            scoring=None,
+            gcv_mode="auto",
+        ),
     )
     fitted_pipeline.fit(source_train, target_train)
-    reproduced_prediction = fitted_pipeline.predict(source_test).reshape(prediction.shape)  # sklearn output -> (n_test, Dt)
-    if not np.allclose(reproduced_prediction, prediction, rtol=1e-12, atol=1e-12):
-        raise RuntimeError("The fitted Ridge map does not reproduce the existing helper predictions.")
+    prediction = np.asarray(fitted_pipeline.predict(source_test), dtype=np.float64).reshape(
+        source_test.shape[0], target_train.shape[1],
+    )  # sklearn output -> (n_test, Dt)
     scaler = fitted_pipeline.named_steps["standardscaler"]
-    ridge = fitted_pipeline.named_steps["ridge"]
-    coefficients = np.asarray(ridge.coef_, dtype=np.float64).reshape(target_train.shape[1], source_train.shape[1])  # sklearn coefficients -> (Dt, Ds)
-    effective_map = coefficients / np.asarray(scaler.scale_)[None, :]  # standardized-input (Dt, Ds) -> RAW-input (Dt, Ds)
+    ridge = fitted_pipeline.named_steps["ridgecv"]
+    selected_alphas = np.atleast_1d(np.asarray(ridge.alpha_, dtype=np.float64))  # RidgeCV scalar/vector -> (Dt,)
+    if selected_alphas.shape != (target_train.shape[1],):
+        raise RuntimeError("RidgeCV must select exactly one alpha per target PC.")
+    coefficients = np.asarray(ridge.coef_, dtype=np.float64).reshape(
+        target_train.shape[1], source_train.shape[1],
+    )  # sklearn coefficients -> (Dt, Ds)
+    scales = np.asarray(scaler.scale_, dtype=np.float64)  # sklearn scale array (Ds,) -> float64 (Ds,)
+    effective_map = coefficients / scales[None, :]  # standardized-input (Dt, Ds) -> RAW-input (Dt, Ds)
+    print(f"Best alphas per target PC: {selected_alphas.tolist()}")
     return prediction, effective_map  # fitted pipeline -> (n_test, Dt), (Dt, Ds)
 
 
@@ -153,33 +159,34 @@ def ridge_sources_on_target(
     source_2: Any,
     target: Any,
     shared_mask: np.ndarray,
-    **ridge_kwargs: Any,
+    alphas: np.ndarray,
 ) -> tuple[
     tuple[np.ndarray, np.ndarray, np.ndarray],
     tuple[np.ndarray, np.ndarray],
 ]:
-    """Fit two Ridge-CV models and return held-out arrays and linear maps.
+    """Fit per-target-PC Ridge-CV models and return arrays and linear maps.
 
     Inputs:
         source_1: Any array-like source with shape (N, D1).
         source_2: Any array-like source with shape (N, D2).
         target: Any array-like target with shape (N, Dt).
         shared_mask: np.ndarray Boolean mask selecting held-out rows.
-        ridge_kwargs: keyword arguments for ridge_train_to_test_prediction.
+        alphas: np.ndarray candidate regularization strengths with shape (A,).
 
     Outputs:
         tuple containing the three held-out PID arrays and two effective
-        RAW-source-to-target maps with shapes (Dt, D1) and (Dt, D2).
+        RAW-source-to-target maps with shapes (Dt, D1) and (Dt, D2). Each map
+        row comes from the independently tuned model for that target PC.
     """
     source_1, source_2, target = map(np.asarray, (source_1, source_2, target))
     shared_mask = np.asarray(shared_mask, dtype=bool)
     if len({source_1.shape[0], source_2.shape[0], target.shape[0], shared_mask.shape[0]}) != 1:
         raise ValueError("Sources, target, and shared_mask must have matching rows.")
     prediction_1, source_1_map = _ridge_prediction_and_map(
-        source_1[~shared_mask], target[~shared_mask], source_1[shared_mask], target[shared_mask], **ridge_kwargs,
+        source_1[~shared_mask], target[~shared_mask], source_1[shared_mask], alphas,
     )  # (n_train, D1), (n_train, Dt), (n_test, D1) -> (n_test, Dt)
     prediction_2, source_2_map = _ridge_prediction_and_map(
-        source_2[~shared_mask], target[~shared_mask], source_2[shared_mask], target[shared_mask], **ridge_kwargs,
+        source_2[~shared_mask], target[~shared_mask], source_2[shared_mask], alphas,
     )  # (n_train, D2), (n_train, Dt), (n_test, D2) -> (n_test, Dt)
     arrays = prediction_1, prediction_2, target[shared_mask]  # (N, Dt) -> three (n_test, Dt) arrays
     return arrays, (source_1_map, source_2_map)  # fitted arrays/maps -> three PID arrays and two (Dt, D*) maps
@@ -236,6 +243,31 @@ def transform_population_covariance(
     return (transformed + transformed.T) / 2  # (sum(C*), sum(C*)) -> symmetric (sum(C*), sum(C*))
 
 
+def standardize_covariance(
+    covariance: torch.Tensor,
+) -> torch.Tensor:
+    """Convert a covariance to a correlation matrix without changing PID.
+
+    Inputs:
+        covariance: torch.Tensor positive-definite covariance with shape
+            (D, D).
+
+    Outputs:
+        torch.Tensor: float64 correlation matrix with shape (D, D). This is
+        an invertible coordinate-wise scaling of the original variables.
+    """
+    covariance = torch.as_tensor(covariance, dtype=torch.float64)  # covariance-like (D, D) -> float64 (D, D)
+    if covariance.ndim != 2 or covariance.shape[0] != covariance.shape[1]:
+        raise ValueError("covariance must be square.")
+    variances = torch.diagonal(covariance)  # covariance (D, D) -> variances (D,)
+    if torch.any(variances <= 0):
+        raise ValueError("covariance must have strictly positive diagonal entries.")
+    scales = torch.sqrt(variances)  # variances (D,) -> standard deviations (D,)
+    scale_matrix = torch.outer(scales, scales)  # two standard-deviation vectors (D,) -> (D, D)
+    correlation = covariance / scale_matrix  # covariance (D, D) -> correlation (D, D)
+    return (correlation + correlation.T) / 2  # correlation (D, D) -> symmetric correlation (D, D)
+
+
 def calculate_theoretical_pid(
     covariance: torch.Tensor,
     dims: list[int],
@@ -257,14 +289,15 @@ def calculate_theoretical_pid(
         raise ValueError("covariance and dims must describe [X1, X2, T].")
     if method not in COVARIANCE_PID_METHODS:
         raise ValueError(f"Theoretical covariance PID supports {COVARIANCE_PID_METHODS}; received {method!r}.")
-    mi_nats = calculate_mi_raw(covariance.device, covariance, dims)
+    correlation = standardize_covariance(covariance)  # covariance (D, D) -> correlation (D, D)
+    mi_nats = calculate_mi_raw(correlation.device, correlation, dims)
     ground_truth = {
         "bi_mi_1": float(mi_nats["bi_mi_1_t"] / np.log(2)),
         "bi_mi_2": float(mi_nats["bi_mi_2_t"] / np.log(2)),
         "tri_mi": float(mi_nats["tri_mi"] / np.log(2)),
     }
     pid_dtype = torch.float32 if method in ("thin", "thin_pid") else torch.float64
-    pid_covariance = change_covariance_order(covariance, [2, 0, 1], dims).to(pid_dtype)  # [X1, X2, T] -> [T, X1, X2]
+    pid_covariance = change_covariance_order(correlation, [2, 0, 1], dims).to(pid_dtype)  # [X1, X2, T] correlation -> [T, X1, X2] correlation
     source_1 = torch.zeros((2, dims[0]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_X1)
     source_2 = torch.zeros((2, dims[1]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_X2)
     target = torch.zeros((2, dims[2]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_T)
@@ -325,8 +358,6 @@ def prepare_pid_routes(
         target_pca,
         shared_mask,
         alphas=np.logspace(-2, 20, 100),
-        inner_cv=5,
-        random_state=seed,
     )  # three (N, D*) arrays -> three held-out arrays and two Ridge maps
     pca_covariance = transform_population_covariance(
         population_covariance, (*source_pca_maps, target_map),
@@ -379,6 +410,12 @@ def run_pid_feature_comparison(
     Outputs:
         dict containing mean route-specific theoretical and sampled values,
         paired bias, paired-error variance, and paired MSE for each route.
+
+    Notes:
+        Each held-out route array is column-standardized with zero numerical
+        offset before PID. This invertible affine scaling leaves Gaussian PID
+        unchanged and prevents tiny Ridge prediction variances from being
+        treated as singular.
     """
     if n_trials < 1:
         raise ValueError("n_trials must be at least 1.")
@@ -411,8 +448,14 @@ def run_pid_feature_comparison(
             )
             for key in RESULT_KEYS:
                 theoretical_values[route][key].append(float(route_theoretical[key]))
+            standardized_arrays = tuple(
+                standardize_np(np.asarray(array, dtype=np.float64), eps=0.0)
+                for array in arrays
+            )  # three (n_test, D*) arrays -> three standardized float64 (n_test, D*) arrays
+            if not all(np.isfinite(array).all() for array in standardized_arrays):
+                raise RuntimeError(f"{route} contains a constant or non-finite PID column.")
             pid_source_1, pid_source_2, pid_target = (
-                torch.as_tensor(array, dtype=torch.float64) for array in arrays
+                torch.as_tensor(array, dtype=torch.float64) for array in standardized_arrays
             )  # three (n_test, D*) arrays -> three float64 (n_test, D*) tensors
             pid, mi = pid_calc(
                 config={"bias_correction": bias_correction, "n_samples": pid_target.shape[0]},
@@ -481,7 +524,7 @@ def build_sonic_covariance(p: int) -> torch.Tensor:
 if __name__ == "__main__":
     n_samples, n_train, n_components, p = 10000, 9000, 10, 70
     n_trials, base_seed = 2, 0
-    pid_method, bias_correction = "tilde", False
+    pid_method, bias_correction = "tilde", True
     population_covariance = build_sonic_covariance(p)  # (3, 3) construction -> (3*p, 3*p)
     run_pid_feature_comparison(
         lambda seed: evil_twin_example_torch(

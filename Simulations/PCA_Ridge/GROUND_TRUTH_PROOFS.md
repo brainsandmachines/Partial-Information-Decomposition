@@ -352,12 +352,18 @@ the covariance of the fitted PCA route.
 ## 5. Ridge-CV-route ground truth
 
 The Ridge route predicts the target PCA representation separately from each
-RAW source. For source \(i\) in trial \(s\), the selected sklearn pipeline
-contains:
+RAW source. It selects a separate cross-validated penalty
+\(\alpha_{i,s,j}\) for every target PC \(j\). Source 1 and source 2 each use
+one multi-output `StandardScaler -> RidgeCV` pipeline whose `alpha_` output is
+a length-\(k\) vector. With `cv=None`, `RidgeCV` uses efficient generalized
+leave-one-out cross-validation, matching the project's existing
+`find_alpha_per_pc` mechanism. For source \(i\) and trial \(s\), the fitted
+pipeline contains:
 
 - a `StandardScaler` mean \(m_{i,s}\) and scale vector \(q_{i,s}\);
-- a fitted Ridge coefficient matrix \(C_{i,s}\);
-- a fitted Ridge intercept \(c_{i,s}\).
+- a fitted Ridge coefficient matrix \(C_{i,s}\), whose row \(j\) is
+  \(c_{i,s,j}^{\mathsf T}\);
+- a fitted Ridge intercept vector \(b_{i,s}\).
 
 Let
 
@@ -365,14 +371,15 @@ Let
 D_{i,s}=\operatorname{diag}(q_{i,s}).
 \]
 
-The prediction is
+The prediction for target PC \(j\) is
 
 \[
-\widehat T_{i,s}
-=C_{i,s}D_{i,s}^{-1}(X_i-m_{i,s})+c_{i,s}.
+\widehat T_{i,s,j}
+=c_{i,s,j}^{\mathsf T}D_{i,s}^{-1}(X_i-m_{i,s})+b_{i,s,j}.
 \]
 
-Therefore its effective RAW-input linear map is
+Stacking the \(k\) coefficient rows into \(C_{i,s}\), the effective RAW-input
+linear map is
 
 \[
 \boxed{B_{i,s}=C_{i,s}D_{i,s}^{-1}.}
@@ -384,7 +391,7 @@ In the NumPy/sklearn orientation used by the code,
 effective_map = ridge.coef_ / scaler.scale_[None, :]
 ```
 
-after converting `ridge.coef_` to shape `(k, source_dimension)`.
+where each coefficient row was fitted with that target PC's selected alpha.
 
 Define
 
@@ -431,22 +438,53 @@ The exact trial-specific Ridge-CV ground truth is
 }
 \]
 
-The existing shared Ridge helper returns predictions and the selected alpha,
-but not its fitted pipeline. The simulation preserves those returned
-predictions. It then refits the same deterministic
-`StandardScaler -> Ridge` pipeline, using the selected alpha and exactly the
-same complete training rows, only to recover \(B_{i,s}\).
+The fitted `RidgeCV` pipeline directly supplies both the held-out predictions
+and the coefficient matrix. Therefore the simulation recovers \(B_{i,s}\)
+from the exact fitted estimator that generated the PID arrays; no second
+Ridge fit is needed.
 
-This refit is the same operation performed by `GridSearchCV(refit=True)` after
-alpha selection. The code additionally asserts that the recovered pipeline
-reproduces the original held-out predictions to numerical precision before
-using its matrix for ground truth.
+### Numerical conditioning without changing ground truth
+
+In suppression cases, a correctly regularized Ridge source can have variance
+many orders of magnitude below the target variance. Before passing any
+theoretical route covariance to the PID implementation, the code therefore
+applies
+
+\[
+R=D^{-1}\Sigma D^{-1},
+\qquad
+D=\operatorname{diag}\left(\sqrt{\Sigma_{11}},\ldots,
+\sqrt{\Sigma_{dd}}\right).
+\]
+
+This changes the covariance to its correlation matrix. Every diagonal entry
+of \(D\) is strictly positive, so the transformation is invertible. Mutual
+information and Gaussian PID are invariant under invertible transformations
+applied separately to the variables; coordinate-wise rescaling is such a
+transformation. Consequently,
+
+\[
+\boxed{\mathcal P_m(R;d_1,d_2,d_T)
+=\mathcal P_m(\Sigma;d_1,d_2,d_T).}
+\]
+
+The normalization therefore leaves the theoretical ground truth unchanged
+while preventing Tilde's internal whitening from treating a tiny but
+non-zero Ridge prediction variance as exactly singular.
+
+The sampled PID inputs receive the corresponding operation directly:
+each held-out column is centered and divided by its non-zero sample standard
+deviation. The sample covariance is therefore transformed by the same
+invertible diagonal congruence. This does not change the sampled Gaussian PID
+or its dimension-and-sample-size bias correction; it only removes destructive
+scale differences before numerical whitening.
 
 ## 6. Why PCA and Ridge ground truth is calculated per trial
 
 Let \(\mathcal D_s^{\mathrm{train}}\) be trial \(s\)'s training data. The PCA
 matrices, scaler parameters, selected Ridge alpha, and Ridge coefficients are
-functions of this training set.
+functions of this training set. Here “selected Ridge alpha” means the complete
+per-source, per-target-PC alpha vector.
 
 The held-out rows are independent of the training rows. Conditional on
 \(\mathcal D_s^{\mathrm{train}}\), all fitted maps are fixed and
