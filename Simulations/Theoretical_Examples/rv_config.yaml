@@ -5,12 +5,12 @@
 
 
 parameters: 
-  description: "A theoretical example where the second source has zero unique information about the target. The first source has some unique information, and there is also some redundant and synergistic information."
-  n_samples: 10000
+  description: "A direct Gaussian covariance with known equivalent source-target channels; both population unique-information terms are zero."
+  n_samples: 1000
   p: 50 #The same feature dimension for all varaibles
   noise_std: 1.0
   seed: 42
-  bias_correction: True
+  bias_correction: False
   results_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/RVs_Story/results_rvs" #For RVs simulations
   n_epochs: 30
   batch_size: 128
@@ -21,17 +21,26 @@ parameters:
 
 
 covariance:
-  p_scale: 0.3
-  q_scale: 0.5
-  r_scale: 0.5
-  dx1: 30
-  dx2: 32
-  dt: 20
-  n_trials: 10
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+  dx1: 70
+  dx2: 70
+  dt: 70
+  n_trials: 5
   methods: ['tilde']
-  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/param_bias"
+  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/loernz_bias/No_Mi/100_100"
   debias_factor_bool: False
-  param_bias: False
+  param_bias: True
+  param_bias_method: "lorenz_gaussian_merged"
+  known_equal_direct_covariance: True
+  n_obj_bootstrap: 50
+  obj_bootstrap_seed: 50000000
   n_perm: 20
+  n_lorenz_resamples: 100
+  n_lorenz_shuffles: 100
+  lorenz_merge_weight: 0.5
+  lorenz_resampling_seed: 50000000
+  lorenz_shuffle_seed: 50000001
   rng_seed: 42
   device: 'cpu'

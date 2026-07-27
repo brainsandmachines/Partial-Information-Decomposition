@@ -1,3 +1,4 @@
+import csv
 import torch
 import numpy as np
 import yaml
@@ -14,6 +15,19 @@ if str(STORY_ROOT) not in sys.path:
 from cov_functions import make_direct_true_cov_from_config, make_random_true_cov, change_covariance_order,sample_from_cov
 from Partial_Information_Decomposition.PID_calc import pid_calc
 from save_results import save_sample_simulation_results_table
+
+RESULT_KEYS = (
+    'red',
+    'unq1',
+    'unq2',
+    'syn',
+    'bi_mi_1',
+    'bi_mi_2',
+    'tri_mi',
+    'union_info',
+    'obj',
+    'obj_bias',
+)
 
 """This file generates a covriance matrix, and sample from it and then calculate PID values. 
 But it is also calculate the PID values for the true covariance, so it is not only a sampling script but also a script for calculating the true PID values for the covariance.
@@ -41,9 +55,8 @@ def csv_save(config: dict, experiment_name: str, method: str, theoretical_values
     Outputs:
         Path, path to the saved CSV file.
     """
-    import csv
 
-    values = ['red', 'unq1', 'unq2', 'syn', 'bi_mi_1', 'bi_mi_2', 'tri_mi']
+    values = list(RESULT_KEYS)
     pid_values, mi_values = theoretical_values
     theoretical_row = {key: {**pid_values, **mi_values}.get(key, np.nan) for key in values}
 
@@ -87,7 +100,10 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
         raise FileExistsError(f"Experiment folder already exists: {experiment_dir}")
 
 
+    simulation_seed = int(config.get('seed', 42))
+    torch.manual_seed(simulation_seed)
     rng = torch.Generator(device=config['device'])
+    rng.manual_seed(simulation_seed)
     experiment_name = experiment_name or config.get("exp_name", "sample_simulation")
 
     true_cov = make_direct_true_cov_from_config(config)
@@ -103,13 +119,37 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
             cov = reordered_cov
         else:            
             cov = true_cov
-        theoretical_values[method] = pid_calc(config,rng=rng,covariance = cov, method=method,param_bias=False) #We don't permutation bias for the theoretical values, because we want to compare the sampled values with the true values, and the true values are not biased. The sampled values are biased because of the sampling, but we don't want to bias the true values, because we want to compare them with the sampled values.
+        theoretical_pid, theoretical_mi = pid_calc(
+            config,
+            rng=rng,
+            covariance=cov,
+            method=method,
+            param_bias=False,
+        )
+        theoretical_pid = theoretical_pid.copy()
+        theoretical_pid['obj_bias'] = (
+            theoretical_pid.get('obj', np.nan)
+            - theoretical_pid.get('union_info', np.nan)
+        )
+        theoretical_values[method] = (theoretical_pid, theoretical_mi)
         
 
-    values = ['red', 'unq1', 'unq2', 'syn', 'bi_mi_1', 'bi_mi_2', 'tri_mi']
-    sampled_value = {method: {k: np.zeros((config['n_trials'],)) for k in values} for method in methods}
+    values = list(RESULT_KEYS)
+    sampled_value = {
+        method: {
+            key: np.zeros((config['n_trials'],))
+            for key in values
+        }
+        for method in methods
+    }  # scalar trial count -> method/component NumPy arrays with shape (n_trials,)
 
     n_trials = config['n_trials']
+    bootstrap_seed_base = int(
+        config.get(
+            'obj_bootstrap_seed',
+            config.get('rng_seed', simulation_seed),
+        )
+    )
     for trial in range(n_trials):
         if trial % max(1, n_trials // 10) == 0:
             print(f"Trial {trial}/{n_trials} ({(trial / n_trials) * 100:.1f}%)")
@@ -123,9 +163,32 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
                 cov = reordered_sampled_cov
             else:
                 cov = sampled_cov
-            pid_results,mi_results = pid_calc(config,sources=sources,target=target, method=method,param_bias=config['param_bias'])
+            trial_config = config.copy()
+            trial_config['obj_bootstrap_seed'] = bootstrap_seed_base + trial
+            use_constrained_obj_correction = (
+                str(method).lower() == 'tilde'
+                and bool(config.get('param_bias', False))
+                and config.get('param_bias_method')
+                == 'equal_direct_wishart_control'
+            )
+            covariance_input = cov if use_constrained_obj_correction else None
+            if covariance_input is not None:
+                trial_config['covariance_is_sample'] = True
+            pid_results, mi_results = pid_calc(
+                trial_config,
+                sources=sources,
+                target=target,
+                covariance=covariance_input,
+                rng=rng,
+                method=method,
+                param_bias=config['param_bias'],
+            )
 
             results = {**pid_results, **mi_results}
+            results['obj_bias'] = (
+                results.get('obj', np.nan)
+                - results.get('union_info', np.nan)
+            )
 
             for k in values:
                 sampled_value[method][k][trial] = results[k]
@@ -163,20 +226,30 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
 
 
 if __name__ == "__main__":
-
-    #Config and experiment setup
-    config = load_config()
-    config_params = config['parameters']
-    config_cov = config['covariance']
-    config = {**config_params, **config_cov}
-    methods = config.get("methods", ["tilde"])
-
-    exp_name = f'param_bias={config["param_bias"]}_Allcorr>0_Tilde&Delta-Debiased_{config["n_samples"]}_samples_{config["n_trials"]}_trials'
-    #exp_name = 'testt'
-    results = simulation(config, methods, experiment_name=exp_name)
-    
-    save_sample_simulation_results_table(
-        results,
-        config,
-        Path(config['output_dir']) / exp_name / f"{exp_name}_sample_simulation_results.png",
-    )
+    lorenz_wieghted_sum = [0.3,0.4,0.5]
+    for d in [50]:
+        for weight in lorenz_wieghted_sum:
+            #Config and experiment setup
+            config = load_config()
+            config_params = config['parameters']
+            config_cov = config['covariance']
+            config = {**config_params, **config_cov}
+            methods = config.get("methods", ["tilde"])
+            config['lorenz_merge_weight'] = weight
+            config['dx1'] = d
+            config['dx2'] = d
+            config['dt'] = d
+            obj_bias_method = config.get('param_bias_method', 'none')
+            exp_name = (f'lw:{config['lorenz_merge_weight']}_'
+                f'{obj_bias_method}_'
+                f'd:{d}_'
+                f'seed{config.get("seed", 42)}'
+            )
+            #exp_name = 'testt'
+            results = simulation(config, methods, experiment_name=exp_name)
+            
+            save_sample_simulation_results_table(
+                results,
+                config,
+            Path(config['output_dir']) / exp_name / f"{exp_name}_sample_simulation_results.png",
+        )

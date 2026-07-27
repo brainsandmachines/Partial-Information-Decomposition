@@ -14,7 +14,12 @@ if str(root) not in sys.path:
 wrapper_root = root / "library_wrappers"
 if str(wrapper_root) not in sys.path:
     sys.path.insert(0, str(wrapper_root))
-from Partial_Information_Decomposition.bias_functions import broja_venkatesh_bias, permutation_null_debias
+from Partial_Information_Decomposition.bias_functions import (
+    broja_venkatesh_bias,
+    equal_direct_wishart_control_obj_debias,
+    lorenz_gaussian_obj_debias,
+    permutation_null_debias,
+)
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
 from external.gpid.src.gpid import estimate
 from external.gpid.src.gpid import tilde_pid
@@ -77,7 +82,19 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
 
 
     if not config['bias_correction']:
-        print(f"\nWARNING: Bias correction is disabled:{config['bias_correction']} for PID calculation.")
+        if method == "tilde" and param_bias:
+            if config.get('param_bias_method') == 'lorenz_gaussian_merged':
+                print(
+                    "\nVenkatesh's built-in correction is disabled; the "
+                    "Lorenz Gaussian merged correction is enabled."
+                )
+            else:
+                print(
+                    "\nMarginal-MI bias correction is disabled; "
+                    "the configured Venkatesh-objective correction is enabled."
+                )
+        else:
+            print(f"\nWARNING: Bias correction is disabled:{config['bias_correction']} for PID calculation.")
     else: 
         print(f"\nBias correction is enabled for PID calculation:{config['bias_correction']}.")
     if method == "idep":
@@ -134,21 +151,39 @@ def pid_idep_wrapper(config,sources=None,target=None,covariance=None,rng=None,on
 
 
 def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tensor,rng:torch.random.Generator,on_rvs:callable=None,param_bias = False):
-    """This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. False
-    Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation and then calls the PID calculation function.
-    and calculates the PID using BROJA definition and calculation from Venkateh et al. 2023.
-    
-    Inputs: 
-        config: dict, configuration dictionary containing parameters for PID calculation
-        sources: list of torch tensors, the source variables
-        target: list of torch tensors, the target variable
-        covariance: torch tensor, the covariance matrix
-        rng: torch random generator, for reproducibility
-        on_rvs: callable, a function to apply on the random variables (sources and targets) before PID calculation, if not None. This can be used to apply transformations to the random"""
+    """Calculate Gaussian BROJA/Tilde PID with an optional objective correction.
+
+    Inputs:
+        config: dict containing dimensions, sample size, bias settings, and
+            optional ``param_bias_method`` selection.
+        sources: list containing source X1 and X2 sample tensors, or None when
+            a covariance is supplied for an uncorrected population calculation.
+        target: list containing the target sample tensor, or None when a
+            covariance is supplied for an uncorrected population calculation.
+        covariance: optional torch.Tensor covariance ordered [T, X1, X2].
+        rng: torch.Generator used by the legacy permutation correction.
+        on_rvs: optional transformation callable accepted for wrapper
+            compatibility.
+        param_bias: bool, whether to use the selected objective-bias method.
+
+    Outputs:
+        tuple[dict, dict], where the first dict contains PID atoms, raw ``obj``,
+        and the union information, and the second dict contains the three
+        Gaussian mutual informations in bits.
+
+    Notes:
+        ``param_bias_method='lorenz_gaussian_merged'`` applies the Gaussian
+        correction of Lorenz et al.: exact Goodman/Wishart MI correction plus
+        merged resampling and target-shuffle synergy correction. The raw
+        Venkatesh objective is retained as ``obj`` and corrected additively as
+        ``union_info``. All corrected PID atoms are reconstructed without
+        clipping. The older objective-only methods remain available.
+    """
 
     dm , dx, dy = config['dt'] , config['dx1'] , config['dx2']
     
     
+    covariance_was_supplied = covariance is not None
     if covariance is None:
         data = [target[0], sources[0], sources[1]]  # [T, X1, X2]
         dict_cov = create_cov_matrix(data)
@@ -161,7 +196,12 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
         bias_corr = False
     #print(f"\n Covariance matrix (shape {cov.shape}):")
 
-    cov = cov.cpu().numpy() # Convert to numpy array for BROJA implementation
+    covariance_for_bias = cov
+    cov = (
+        cov.detach().cpu().numpy()
+        if torch.is_tensor(cov)
+        else np.asarray(cov)
+    )  # torch/array-like (D, D) -> NumPy (D, D)
 
     if not param_bias:
         debias_factor_bool = config['debias_factor_bool']
@@ -174,23 +214,96 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
         pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si, 'union_info':union_info,'obj':obj}
         mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
     else:
-        X_1, X_2 = sources[0], sources[1]
-        T = target[0]
-        print("\nCalculating PID using BROJA Tilde with parametric debias factor.❗❗❗")
-        output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N,debias_factor_bool=False)
-        imx, imy, imxy, union_info, obj, _, __, ___,____ = output[:9]
+        param_bias_method = config.get('param_bias_method', 'permutation')
+        print(
+            "\nCalculating PID using BROJA Tilde with objective-bias method "
+            f"'{param_bias_method}'."
+        )
+        output = tilde_pid.exact_gauss_tilde_pid(
+            cov,
+            dm,
+            dx,
+            dy,
+            unbiased=False,
+            sample_size=N,
+            debias_factor_bool=False,
+        )
+        imx, imy, imxy, _, obj, _, __, ___, ____ = output[:9]
         mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
 
-        #Calculate bias using permutation null distribution
-        print("\nCalculating bias using permutation null distribution...")
-        config['X1'] = X_1
-        config['X2'] = X_2
-        config['T'] = T
-        bias_func = partial(broja_venkatesh_bias,config=config)
-        bias = permutation_null_debias(config,func=bias_func)
-        print(f"\nBias calculated using permutation null distribution: {bias}")
-        #Debias the union info 
-        obj_bias = bias['bias']
+        if param_bias_method == 'equal_direct_wishart_control':
+            correction_config = config.copy()
+            correction_config['n_samples'] = N
+            if not covariance_was_supplied:
+                correction_config['covariance_is_sample'] = True
+            correction = equal_direct_wishart_control_obj_debias(
+                correction_config,
+                covariance_for_bias,
+                raw_obj=obj,
+            )
+            obj_bias = correction['bias']
+            print(
+                "\nEstimated additive bias of raw Venkatesh obj: "
+                f"{obj_bias:.8f} bits "
+                f"(bootstrap SE={correction['bootstrap_residual_se']:.8f})."
+            )
+        elif param_bias_method == 'lorenz_gaussian_merged':
+            if sources is None or target is None:
+                raise ValueError(
+                    "The Lorenz Gaussian correction requires source and target "
+                    "samples for target shuffling."
+                )
+            correction_config = config.copy()
+            correction_config.update(
+                {
+                    'X1': sources[0],
+                    'X2': sources[1],
+                    'T': target[0],
+                    'n_samples': N,
+                }
+            )
+            correction = lorenz_gaussian_obj_debias(
+                correction_config,
+                covariance=covariance_for_bias,
+                raw_obj=None,
+            )
+            obj = correction['raw_obj']
+            obj_bias = correction['bias']
+            corrected = correction['corrected']
+            imx = corrected['mi_target_source_1']
+            imy = corrected['mi_target_source_2']
+            imxy = corrected['mi_target_joint_sources']
+            mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
+            print(
+                "\nLorenz Gaussian merged correction: "
+                f"obj bias={obj_bias:.8f} bits, "
+                f"resampling synergy bias="
+                f"{correction['bias_components']['syn_resampling']:.8f}, "
+                f"shuffle synergy bias="
+                f"{correction['bias_components']['syn_shuffle']:.8f}."
+            )
+        elif param_bias_method == 'permutation':
+            if sources is None or target is None:
+                raise ValueError(
+                    "The permutation objective correction requires source and "
+                    "target samples."
+                )
+            X_1, X_2 = sources[0], sources[1]
+            T = target[0]
+            print("\nCalculating bias using permutation null distribution...")
+            config['X1'] = X_1
+            config['X2'] = X_2
+            config['T'] = T
+            bias_func = partial(broja_venkatesh_bias,config=config)
+            bias = permutation_null_debias(config,func=bias_func)
+            print(f"\nBias calculated using permutation null distribution: {bias}")
+            obj_bias = bias['bias']
+        else:
+            raise ValueError(
+                "param_bias_method must be 'permutation', "
+                "'equal_direct_wishart_control', or "
+                f"'lorenz_gaussian_merged'; got {param_bias_method!r}."
+            )
 
         obj_debiased = obj - obj_bias
 
@@ -198,7 +311,18 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
         uiy = obj_debiased - imx
         ri = imx + imy - obj_debiased
         si = imxy - obj_debiased
-        pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si, 'union_info':obj_debiased,'obj':obj}
+        pid = {
+            'red': ri,
+            'unq1': uix,
+            'unq2': uiy,
+            'syn': si,
+            'union_info': obj_debiased,
+            'obj': obj,
+            'obj_bias': obj_bias,
+        }
+        if param_bias_method == 'lorenz_gaussian_merged':
+            pid['bias_components'] = correction['bias_components']
+            pid['bias_diagnostics'] = correction['diagnostics']
 
 
     return pid, mi
