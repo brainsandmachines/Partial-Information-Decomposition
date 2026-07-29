@@ -1,0 +1,23 @@
+parameters:
+  n_samples: 1000
+  seed: 42
+  device: "cpu"
+  methods: ["tilde"]
+  bias_correction: false
+
+covariance:
+  use_both_unique_covariance: false
+  both_unique_connection_probability: 0.0
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+  dx1: 70
+  dx2: 70
+  dt: 70
+  n_trials: 5
+  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/loernz_bias/No_Mi"
+  param_bias: true
+  param_bias_method: "lorenz_gaussian_merged"
+  n_lorenz_resamples: 20
+  n_lorenz_shuffles: 20
+  lorenz_merge_weight: 0.5

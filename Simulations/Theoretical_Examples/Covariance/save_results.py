@@ -26,7 +26,9 @@ def save_sample_simulation_results_table(
         results: dict, output from simulation. Expected shape is
             {method: {"theoretical": ..., "mean_sampled": ..., "bias": ...,
             "variance": ..., "mse": ...}}. The theoretical and mean_sampled
-            entries are rendered as separate method-by-component tables.
+            entries are rendered as separate method-by-component tables. When
+            the ``own_im*_wishart_bits`` fields are present, each section adds
+            one ``Own MI (Wishart)`` row for imx, imy, and imxy.
             Optional `cmi_*_test` strings add the two CMI validation columns.
         config: dict, simulation configuration with n/n_samples, dimensions,
             p_scale, q_scale, r_scale, seed, bias_correction, and n_trials.
@@ -55,6 +57,11 @@ def save_sample_simulation_results_table(
         "I(X1,X2;T)": ("tri_mi", "I(M1,M2;T)", "I(M0,M1;T)"),
         "Given X1\nCMI(T;X2|X1)": ("cmi_x2_given_x1_test",),
         "Given X2\nCMI(T;X1|X2)": ("cmi_x1_given_x2_test",),
+    }
+    own_mi_component_keys = {
+        "I(X1;T)": "own_imx_wishart_bits",
+        "I(X2;T)": "own_imy_wishart_bits",
+        "I(X1,X2;T)": "own_imxy_wishart_bits",
     }
     method_names = {"flow": "Flow", "tilde": "Tilde", "delta": "Delta", "idep": "Idep"}
     metric_names = [
@@ -93,6 +100,7 @@ def save_sample_simulation_results_table(
             rows.append((method_names.get(str(method).lower(), str(method)), value))
 
         table_rows = []
+        own_value_dict = None
         for method_label, value in rows:
             value_dict = {}
             if isinstance(value, (tuple, list)) and len(value) >= 2:
@@ -107,6 +115,12 @@ def save_sample_simulation_results_table(
                     value_dict.update(value["mi"])
                 value_dict.update({key: val for key, val in value.items() if key not in ("pid", "mi")})
 
+            if (
+                own_value_dict is None
+                and all(key in value_dict for key in own_mi_component_keys.values())
+            ):
+                own_value_dict = value_dict
+
             table_row = {"method": method_label}
             for column in columns[1:]:
                 cell_value = next((value_dict[key] for key in component_keys[column] if key in value_dict), None)
@@ -118,6 +132,24 @@ def save_sample_simulation_results_table(
                 if column.startswith("Given ") and cell_value is not None:
                     has_cmi_validation = True
             table_rows.append(table_row)
+
+        if own_value_dict is not None:
+            own_table_row = {column: None for column in columns}
+            own_table_row["method"] = "Own MI (Wishart)"
+            for column, result_key in own_mi_component_keys.items():
+                cell_value = own_value_dict[result_key]
+                if isinstance(cell_value, torch.Tensor):
+                    cell_value = (
+                        cell_value.detach().cpu().item()
+                        if cell_value.numel() == 1
+                        else None
+                    )
+                if isinstance(cell_value, np.ndarray):
+                    cell_value = cell_value.item() if cell_value.size == 1 else None
+                own_table_row[column] = cell_value
+            table_rows.append(
+                own_table_row
+            )  # (n_methods,) table rows -> (n_methods + 1,) table rows
 
         if table_rows:
             section_tables.append((section_name, table_rows))
@@ -171,6 +203,9 @@ def save_sample_simulation_results_table(
             if table_row == 0:
                 cell.set_facecolor("#111827")
                 cell.set_text_props(color="white", weight="bold")
+            elif cell_text[table_row - 1][0] == "Own MI (Wishart)":
+                cell.set_facecolor("#dbeafe")
+                cell.set_text_props(color="#1e3a8a", weight="bold")
             else:
                 cell.set_facecolor("#f9fafb" if table_row % 2 else "white")
 

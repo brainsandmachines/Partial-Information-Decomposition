@@ -180,6 +180,46 @@ def make_direct_true_cov_from_config(
 
     return Sigma
 
+def make_both_unique_true_cov_from_config(
+    config: dict,
+    rng: torch.Generator | None = None,
+) -> torch.Tensor:
+    """Create the paper's Gaussian both-unique covariance in [X1, X2, T].
+
+    Inputs:
+        config: dict containing dx1, dx2, dt, device, and optionally
+        both_unique_connection_probability (default 0.1).
+        rng: torch.Generator or None controlling the two channel matrices.
+
+    Outputs:
+        torch.Tensor: float64 population covariance with shape
+        (dx1 + dx2 + dt, dx1 + dx2 + dt), ordered [X1, X2, T].
+    """
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
+    device = config['device']
+    connection_probability = config.get('both_unique_connection_probability', 0.1)
+
+    H1 = torch.bernoulli(
+        torch.full((dx1, dt), connection_probability, dtype=torch.float64, device=device),
+        generator=rng,
+    )  # Bernoulli probabilities (dx1, dt) -> channel matrix (dx1, dt)
+    H2 = torch.bernoulli(
+        torch.full((dx2, dt), connection_probability, dtype=torch.float64, device=device),
+        generator=rng,
+    )  # Bernoulli probabilities (dx2, dt) -> channel matrix (dx2, dt)
+
+    cov_x1 = H1 @ H1.T + torch.eye(dx1, dtype=torch.float64, device=device)  # (dx1, dt) @ (dt, dx1) -> (dx1, dx1)
+    cov_x2 = H2 @ H2.T + torch.eye(dx2, dtype=torch.float64, device=device)  # (dx2, dt) @ (dt, dx2) -> (dx2, dx2)
+    cov_x1_x2 = H1 @ H2.T  # (dx1, dt) @ (dt, dx2) -> (dx1, dx2)
+    cov_t = torch.eye(dt, dtype=torch.float64, device=device)  # scalar dimension dt -> (dt, dt)
+
+    top = torch.cat([cov_x1, cov_x1_x2, H1], dim=1)  # three covariance blocks -> (dx1, dx1 + dx2 + dt)
+    middle = torch.cat([cov_x1_x2.T, cov_x2, H2], dim=1)  # three covariance blocks -> (dx2, dx1 + dx2 + dt)
+    bottom = torch.cat([H1.T, H2.T, cov_t], dim=1)  # three covariance blocks -> (dt, dx1 + dx2 + dt)
+    return torch.cat([top, middle, bottom], dim=0)  # three block rows -> (dx1 + dx2 + dt, dx1 + dx2 + dt)
+
 def sample_from_cov(config,true_cov: torch.Tensor, n_samples: int, rng: torch.Generator) -> torch.Tensor:
     """
     Sample from a Gaussian distribution with the given covariance.

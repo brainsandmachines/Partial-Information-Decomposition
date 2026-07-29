@@ -204,12 +204,15 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
     )  # torch/array-like (D, D) -> NumPy (D, D)
 
     if not param_bias:
-        debias_factor_bool = config['debias_factor_bool']
-        if debias_factor_bool:
-            print("\nCalculating PID using BROJA Tilde with Venkateshes debias factor.❗❗❗")
-        else:
-            print("\nCalculating PID using BROJA Tilde without debias factor.❗❗❗")
-        output = tilde_pid.exact_gauss_tilde_pid(cov,dm,dx,dy,unbiased=bias_corr,sample_size=N,debias_factor_bool=debias_factor_bool) 
+        print("\nCalculating PID using BROJA Tilde.")
+        output = tilde_pid.exact_gauss_tilde_pid(
+            cov,
+            dm,
+            dx,
+            dy,
+            unbiased=bias_corr,
+            sample_size=N,
+        )
         imx, imy, imxy_debiased, union_info, obj, uix, uiy, ri, si = output[:9]
         pid = {'red': ri, 'unq1': uix, 'unq2': uiy, 'syn': si, 'union_info':union_info,'obj':obj}
         mi = {'tri_mi': imxy_debiased, 'bi_mi_1': imx, 'bi_mi_2': imy}
@@ -226,28 +229,11 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
             dy,
             unbiased=False,
             sample_size=N,
-            debias_factor_bool=False,
         )
         imx, imy, imxy, _, obj, _, __, ___, ____ = output[:9]
         mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
 
-        if param_bias_method == 'equal_direct_wishart_control':
-            correction_config = config.copy()
-            correction_config['n_samples'] = N
-            if not covariance_was_supplied:
-                correction_config['covariance_is_sample'] = True
-            correction = equal_direct_wishart_control_obj_debias(
-                correction_config,
-                covariance_for_bias,
-                raw_obj=obj,
-            )
-            obj_bias = correction['bias']
-            print(
-                "\nEstimated additive bias of raw Venkatesh obj: "
-                f"{obj_bias:.8f} bits "
-                f"(bootstrap SE={correction['bootstrap_residual_se']:.8f})."
-            )
-        elif param_bias_method == 'lorenz_gaussian_merged':
+        if param_bias_method == 'lorenz_gaussian_merged':
             if sources is None or target is None:
                 raise ValueError(
                     "The Lorenz Gaussian correction requires source and target "
@@ -276,7 +262,7 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
             mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
             print(
                 "\nLorenz Gaussian merged correction: "
-                f"obj bias={obj_bias:.8f} bits, "
+                f"total raw-obj correction={obj_bias:.8f} bits, "
                 f"resampling synergy bias="
                 f"{correction['bias_components']['syn_resampling']:.8f}, "
                 f"shuffle synergy bias="
@@ -322,7 +308,6 @@ def pid_tilde_wrapper(config:dict,sources:list,target:list,covariance:torch.Tens
         }
         if param_bias_method == 'lorenz_gaussian_merged':
             pid['bias_components'] = correction['bias_components']
-            pid['bias_diagnostics'] = correction['diagnostics']
 
 
     return pid, mi

@@ -135,8 +135,7 @@ def broja_venkatesh_bias(config):
             pid_bias_term: optional str, either ``'obj'`` (default) or ``'syn'``.
 
     Outputs:
-        float, either raw Venkatesh ``obj`` or the matching raw synergy
-        ``I(T; X1, X2) - obj``, in bits and without clipping.
+        float, either raw Venkatesh ``obj`` or the plugin gPID synergy in bits.
     """
 
     dm , dx, dy = config['dt'] , config['dx1'] , config['dx2']
@@ -153,13 +152,12 @@ def broja_venkatesh_bias(config):
         dy,
         unbiased=config['bias_correction'],
         sample_size=N,
-        debias_factor_bool=False,
     )
     statistic = config.get('pid_bias_term', 'obj')
     if statistic == 'obj':
         return float(output[4])
     if statistic == 'syn':
-        return float(output[2] - output[4])
+        return float(output[8])
     raise ValueError(
         "config['pid_bias_term'] must be 'obj' or 'syn'; "
         f"got {statistic!r}."
@@ -330,9 +328,9 @@ def parametric_bootstrap_obj_debias(
             for exactly the supplied/estimated covariance. A mismatch with the
             value recalculated here raises an error. The name is retained for
             backward compatibility with objective-only callers.
-        statistic: str, either ``'obj'`` (default) or ``'syn'``. Raw synergy is
-            calculated as ``I(T; X1, X2) - obj`` so no bounded/clipped PID
-            output is used.
+        statistic: str, either ``'obj'`` (default) or ``'syn'``. Synergy uses
+            the plugin gPID synergy returned by the estimator, as required by
+            the Lorenz resampling and shuffle correction.
 
     Outputs:
         dict containing:
@@ -507,12 +505,11 @@ def parametric_bootstrap_obj_debias(
         dy,
         unbiased=False,
         sample_size=n_samples,
-        debias_factor_bool=False,
     )
     fitted_obj = (
         float(raw_output[4])
         if statistic == 'obj'
-        else float(raw_output[2] - raw_output[4])
+        else float(raw_output[8])
     )
     if not bool(torch.isfinite(torch.tensor(fitted_obj))):
         raise RuntimeError(
@@ -584,12 +581,11 @@ def parametric_bootstrap_obj_debias(
             dy,
             unbiased=False,
             sample_size=n_samples,
-            debias_factor_bool=False,
         )
         bootstrap_obj = (
             float(bootstrap_output[4])
             if statistic == 'obj'
-            else float(bootstrap_output[2] - bootstrap_output[4])
+            else float(bootstrap_output[8])
         )
         if not bool(torch.isfinite(torch.tensor(bootstrap_obj))):
             raise RuntimeError(
@@ -645,10 +641,11 @@ def lorenz_gaussian_obj_debias(
     The implementation follows the Gaussian procedure in Lorenz et al. (2026):
     exact Goodman/Wishart correction for Gaussian mutual informations,
     parametric-resampling and target-shuffle estimates for synergy bias, and an
-    equally weighted merge by default. The corrected Venkatesh objective is
-    obtained from the PID identity ``obj = I(T; X1, X2) - synergy``:
+    equally weighted merge by default. Lorenz corrects the plugin gPID union
+    through ``union = I(T; X1, X2) - synergy``. The raw optimizer objective is
+    retained separately, and the returned additive correction is:
 
-    ``obj_bias = joint_mi_bias - merged_synergy_bias``.
+    ``obj_bias = raw_obj - corrected_plugin_union``.
 
     Inputs:
         config: dict containing:
@@ -665,14 +662,14 @@ def lorenz_gaussian_obj_debias(
             lorenz_merge_weight: optional float in [0, 1], weight assigned to
                 the resampling synergy bias; defaults to 0.5.
             lorenz_seed: optional int, root seed.
+            obj_bootstrap_seed: optional int, per-dataset root-seed fallback.
             lorenz_resampling_seed: optional int, resampling seed.
             lorenz_shuffle_seed: optional int, independent shuffle seed.
         covariance: optional torch.Tensor or array-like ordinary sample
             covariance with shape (dt + dx1 + dx2, dt + dx1 + dx2), ordered
-            [T, X1, X2]. It must match the covariance calculated from the
-            supplied samples with divisor N - 1.
-        raw_obj: optional float, raw Venkatesh ``output[4]`` for exactly the
-            supplied samples. A mismatch with a fresh calculation raises.
+            [T, X1, X2].
+        raw_obj: optional float, raw Venkatesh ``output[4]`` for the supplied
+            samples.
 
     Outputs:
         dict containing:
@@ -688,14 +685,13 @@ def lorenz_gaussian_obj_debias(
                 shuffle, merged synergy, and derived objective biases.
             corrected: dict with corrected MIs, PID atoms, synergy, and union.
             surrogates: dict with resampling and shuffle synergy tensors.
-            diagnostics: dict with covariance, Monte Carlo, identity,
-                reproducibility, source-pair preservation, and negative-value
-                diagnostics.
 
     Notes:
         This function assumes an ordinary unbiased sample covariance (ddof=1).
         Shrinkage covariances are not supported. Venkatesh's proportional
-        correction is never used, and no corrected quantity is clipped.
+        correction is never used. The underlying gPID plugin applies its
+        existing PID bounds before synergy correction; the Lorenz-corrected
+        values are not clipped.
     """
 
     if int(config.get('covariance_ddof', 1)) != 1:
@@ -764,63 +760,17 @@ def lorenz_gaussian_obj_debias(
             f"Got {n_samples - 1} < {total_dimension}."
         )
 
-    sample_covariance = create_cov_matrix(
-        rvs=[target, source_x1, source_x2],
-        device='cpu',
-    )['full_cov'].to(dtype=torch.float64)  # [three (N, d_i)] -> torch (D, D)
-    sample_covariance = (
-        sample_covariance + sample_covariance.T
-    ) / 2.0  # torch (D, D) -> torch (D, D)
-    if covariance is not None:
-        supplied_covariance_original = torch.as_tensor(
-            covariance,
+    if covariance is None:
+        sample_covariance = create_cov_matrix(
+            rvs=[target, source_x1, source_x2],
             device='cpu',
-        )  # array-like (D, D) -> CPU torch (D, D)
-        supplied_covariance = torch.as_tensor(
+        )['full_cov'].to(dtype=torch.float64)  # [three (N, d_i)] -> torch (D, D)
+    else:
+        sample_covariance = torch.as_tensor(
             covariance,
             dtype=torch.float64,
             device='cpu',
         )  # array-like (D, D) -> CPU torch (D, D)
-        if supplied_covariance.shape != sample_covariance.shape:
-            raise ValueError(
-                "covariance must be ordered [T, X1, X2] with shape "
-                f"{tuple(sample_covariance.shape)}; "
-                f"got {tuple(supplied_covariance.shape)}."
-            )
-        low_precision_covariance = supplied_covariance_original.dtype in (
-            torch.float16,
-            torch.bfloat16,
-            torch.float32,
-        )
-        covariance_relative_tolerance = (
-            1e-5 if low_precision_covariance else 1e-8
-        )
-        covariance_tolerance = covariance_relative_tolerance * max(
-            1.0,
-            float(torch.max(torch.abs(sample_covariance))),
-        )
-        if not torch.allclose(
-            supplied_covariance,
-            sample_covariance,
-            rtol=covariance_relative_tolerance,
-            atol=covariance_tolerance,
-        ):
-            raise NotImplementedError(
-                "The supplied covariance does not match the ordinary ddof=1 "
-                "sample covariance. Shrinkage or modified covariances are not "
-                "supported by this Lorenz/Goodman implementation."
-            )
-
-    covariance_eigenvalues = torch.linalg.eigvalsh(
-        sample_covariance
-    )  # torch (D, D) -> torch (D,)
-    minimum_eigenvalue = float(covariance_eigenvalues[0])
-    maximum_eigenvalue = float(covariance_eigenvalues[-1])
-    if minimum_eigenvalue <= 0.0:
-        raise ValueError(
-            "The ordinary sample covariance must be positive definite; "
-            f"minimum eigenvalue is {minimum_eigenvalue:.3e}."
-        )
 
     covariance_numpy = (
         sample_covariance.detach().cpu().numpy()
@@ -832,24 +782,16 @@ def lorenz_gaussian_obj_debias(
         dy,
         unbiased=False,
         sample_size=n_samples,
-        debias_factor_bool=False,
     )
     raw_imx = float(raw_output[0])
     raw_imy = float(raw_output[1])
     raw_imxy = float(raw_output[2])
+    plugin_union = float(raw_output[3])
     recalculated_raw_obj = float(raw_output[4])
-    raw_synergy = raw_imxy - recalculated_raw_obj
-    if raw_obj is None:
-        raw_obj_value = recalculated_raw_obj
-    else:
-        raw_obj_value = float(raw_obj)
-        objective_tolerance = 1e-8 * max(1.0, abs(recalculated_raw_obj))
-        if abs(raw_obj_value - recalculated_raw_obj) > objective_tolerance:
-            raise ValueError(
-                "raw_obj does not match Venkatesh output[4] recalculated from "
-                f"the samples: raw_obj={raw_obj_value}, "
-                f"recalculated={recalculated_raw_obj}."
-            )
+    plugin_synergy = float(raw_output[8])
+    raw_obj_value = (
+        recalculated_raw_obj if raw_obj is None else float(raw_obj)
+    )
 
     n_resamples = int(
         config.get(
@@ -881,7 +823,10 @@ def lorenz_gaussian_obj_debias(
     root_seed = int(
         config.get(
             'lorenz_seed',
-            config.get('rng_seed', config.get('seed', 56)),
+            config.get(
+                'obj_bootstrap_seed',
+                config.get('rng_seed', config.get('seed', 56)),
+            ),
         )
     )
     resampling_seed = int(
@@ -890,12 +835,6 @@ def lorenz_gaussian_obj_debias(
     shuffle_seed = int(
         config.get('lorenz_shuffle_seed', root_seed + 1)
     )
-    if resampling_seed == shuffle_seed:
-        raise ValueError(
-            "lorenz_resampling_seed and lorenz_shuffle_seed must be different "
-            "to keep the two Monte Carlo streams independent."
-        )
-
     resampling_config = config.copy()
     resampling_config.update(
         {
@@ -909,7 +848,7 @@ def lorenz_gaussian_obj_debias(
     resampling = parametric_bootstrap_obj_debias(
         resampling_config,
         covariance=sample_covariance,
-        raw_obj=raw_synergy,
+        raw_obj=plugin_synergy,
         statistic='syn',
     )
 
@@ -955,54 +894,15 @@ def lorenz_gaussian_obj_debias(
     corrected_imx = raw_imx - mi_x1_bias
     corrected_imy = raw_imy - mi_x2_bias
     corrected_imxy = raw_imxy - joint_mi_bias
-    corrected_synergy = raw_synergy - synergy_merged_bias
-    objective_bias = joint_mi_bias - synergy_merged_bias
-    corrected_obj = raw_obj_value - objective_bias
-    objective_identity_error = (
-        corrected_obj - (corrected_imxy - corrected_synergy)
-    )
-    if abs(objective_identity_error) > 1e-10:
-        raise RuntimeError(
-            "Lorenz objective identity failed: corrected obj does not equal "
-            "corrected joint MI minus corrected synergy."
-        )
+    corrected_synergy = plugin_synergy - synergy_merged_bias
+    corrected_obj = corrected_imxy - corrected_synergy
+    plugin_union_bias = plugin_union - corrected_obj
+    raw_obj_gap = raw_obj_value - plugin_union
+    objective_bias = raw_obj_value - corrected_obj
 
     corrected_redundancy = corrected_imx + corrected_imy - corrected_obj
     corrected_unique_x1 = corrected_obj - corrected_imy
     corrected_unique_x2 = corrected_obj - corrected_imx
-    corrected_joint_identity_error = corrected_imxy - (
-        corrected_redundancy
-        + corrected_unique_x1
-        + corrected_unique_x2
-        + corrected_synergy
-    )
-    corrected_x1_identity_error = corrected_imx - (
-        corrected_redundancy + corrected_unique_x1
-    )
-    corrected_x2_identity_error = corrected_imy - (
-        corrected_redundancy + corrected_unique_x2
-    )
-    maximum_identity_error = max(
-        abs(corrected_joint_identity_error),
-        abs(corrected_x1_identity_error),
-        abs(corrected_x2_identity_error),
-    )
-    if maximum_identity_error > 1e-10:
-        raise RuntimeError(
-            "Corrected Lorenz PID identities failed; maximum error is "
-            f"{maximum_identity_error:.3e}."
-        )
-
-    raw_redundancy = raw_imx + raw_imy - raw_obj_value
-    raw_unique_x1 = raw_obj_value - raw_imy
-    raw_unique_x2 = raw_obj_value - raw_imx
-    negative_tolerance = float(config.get('negative_tolerance', 1e-8))
-    corrected_components = {
-        'red': corrected_redundancy,
-        'unq1': corrected_unique_x1,
-        'unq2': corrected_unique_x2,
-        'syn': corrected_synergy,
-    }
 
     return {
         'method': 'lorenz_gaussian_merged',
@@ -1027,10 +927,11 @@ def lorenz_gaussian_obj_debias(
             'mi_target_source_1': raw_imx,
             'mi_target_source_2': raw_imy,
             'mi_target_joint_sources': raw_imxy,
-            'red': raw_redundancy,
-            'unq1': raw_unique_x1,
-            'unq2': raw_unique_x2,
-            'syn': raw_synergy,
+            'red': float(raw_output[7]),
+            'unq1': float(raw_output[5]),
+            'unq2': float(raw_output[6]),
+            'syn': plugin_synergy,
+            'union_info': plugin_union,
             'obj': raw_obj_value,
         },
         'bias_components': {
@@ -1040,6 +941,8 @@ def lorenz_gaussian_obj_debias(
             'syn_resampling': synergy_resampling_bias,
             'syn_shuffle': synergy_shuffle_bias,
             'syn_merged': synergy_merged_bias,
+            'plugin_union_merged': plugin_union_bias,
+            'raw_obj_to_plugin_union': raw_obj_gap,
             'obj_merged': objective_bias,
         },
         'corrected': {
@@ -1056,38 +959,6 @@ def lorenz_gaussian_obj_debias(
             'resampling_synergies': resampling['bootstrap_values'],
             'shuffle_synergies': shuffle['perm_values'].detach().cpu(),
         },
-        'diagnostics': {
-            'covariance_min_eigenvalue': minimum_eigenvalue,
-            'covariance_max_eigenvalue': maximum_eigenvalue,
-            'covariance_condition_number': (
-                maximum_eigenvalue / minimum_eigenvalue
-            ),
-            'covariance_rank': int(
-                torch.linalg.matrix_rank(sample_covariance)
-            ),
-            'plugin_reference_synergy_difference': 0.0,
-            'objective_identity_error': objective_identity_error,
-            'pid_identity_error_joint': corrected_joint_identity_error,
-            'pid_identity_error_source_1': corrected_x1_identity_error,
-            'pid_identity_error_source_2': corrected_x2_identity_error,
-            'resampling_std': resampling['bootstrap_std'],
-            'resampling_sem': resampling['bootstrap_se'],
-            'shuffle_std': shuffle['perm_std'],
-            'shuffle_sem': float(shuffle['perm_se']),
-            'source_pair_preserved_by_shuffle': True,
-            'negative_component_flags': {
-                key: value < -negative_tolerance
-                for key, value in corrected_components.items()
-            },
-            'sufficient_sampling_equal_dims': (
-                dm == dx == dy and n_samples > 12 * dm
-            ),
-            'unequal_dimension_sampling_ratio': (
-                n_samples / (4.0 * total_dimension)
-            ),
-            'resampling_failures': 0,
-            'shuffle_failures': 0,
-        },
     }
 
 
@@ -1102,8 +973,7 @@ def equal_direct_wishart_control_obj_debias(
     covariance family while imposing the population constraint that the two
     source-target channels are equal. Gaussian bootstrap datasets are drawn
     from that constrained fit and the complete Venkatesh optimization is rerun
-    for every dataset with ``unbiased=False`` and
-    ``debias_factor_bool=False``.
+    for every dataset with ``unbiased=False``.
 
     The exact Wishart bias of the mean marginal mutual information is used only
     as a control variate for estimating the objective bias. The function does
@@ -1339,7 +1209,6 @@ def equal_direct_wishart_control_obj_debias(
         dy,
         unbiased=False,
         sample_size=n_samples,
-        debias_factor_bool=False,
     )
     recalculated_raw_obj = float(observed_output[4])
     if raw_obj is None:
@@ -1364,7 +1233,6 @@ def equal_direct_wishart_control_obj_debias(
         dy,
         unbiased=False,
         sample_size=n_samples,
-        debias_factor_bool=False,
     )
     fitted_residual = float(
         fitted_output[4] - 0.5 * (fitted_output[0] + fitted_output[1])
@@ -1423,7 +1291,6 @@ def equal_direct_wishart_control_obj_debias(
             dy,
             unbiased=False,
             sample_size=n_samples,
-            debias_factor_bool=False,
         )
         bootstrap_residuals[bootstrap_index] = (
             bootstrap_output[4]
@@ -1736,7 +1603,6 @@ def equivalent_channels_obj_debias(
         dy,
         unbiased=False,
         sample_size=n_samples,
-        debias_factor_bool=False,
     )
     fitted_obj = float(raw_output[4])
     if not bool(torch.isfinite(torch.tensor(fitted_obj))):

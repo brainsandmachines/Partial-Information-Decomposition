@@ -1,0 +1,19 @@
+parameters:
+  n_samples: 1000
+  seed: 42
+  device: "cpu"
+  methods: ["tilde"]
+  bias_correction: true
+
+covariance:
+  use_both_unique_covariance: true
+  both_unique_connection_probability: 0.0
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+  dx1: 70
+  dx2: 70
+  dt: 70
+  n_trials: 100
+  output_dir: "//home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/WishartVenk"
+  param_bias: false

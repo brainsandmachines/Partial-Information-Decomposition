@@ -13,3 +13,6 @@
 [submodule "external/DeepDive"]
 	path = external/DeepDive
 	url = https://github.com/ColinConwell/DeepDive.git
+[submodule "external/Sampling_bias_corrections_Syn_Red"]
+	path = external/Sampling_bias_corrections_Syn_Red
+	url = https://github.com/panzerilab/Sampling_bias_corrections_Syn_Red.git
