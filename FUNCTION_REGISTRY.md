@@ -455,18 +455,19 @@ PID calculation, mutual information helpers, bias correction, plotting, and PID-
 
 ### `Partial_Information_Decomposition/PID_calc.py`
 
-File description: Main PID dispatcher and wrappers for Idep, Tilde, Delta, Thin fallback, and Flow-PID.
+File description: Main PID dispatcher and wrappers for Idep, Tilde, Delta, Thin fallback, Gaussian Eigen-PID, and Flow-PID.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `mi_wishart_bias (line 33)` | dims: list, n_samples: int | dict | Calculate exact Gaussian pairwise, joint, and source-source MI Wishart biases in nats without simulation dependencies. |
-| `pid_calc (line 66)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None, param_bias=False | tuple of 2 values | Dispatch standard PID inputs to Idep, Tilde, Delta, Thin, or Flow and return `(pid, mi)`. |
-| `pid_idep_wrapper (line 112)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
-| `pid_tilde_wrapper (line 153)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None, param_bias=False | tuple of 2 values | Calculate Gaussian BROJA/Tilde PID from `[T, X1, X2]` covariance or samples. The `lorenz_gaussian_merged` route applies exact Goodman/Wishart MI correction and merged Gaussian-resampling/target-shuffle synergy correction, retains raw Venkatesh `output[4]` as `obj`, corrects it additively as `union_info`, and reconstructs all atoms without clipping. Older permutation and equal-direct objective routes remain available. |
-| `delta_wrapper (line 198)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
-| `_to_numpy_samples (line 254)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
-| `thin_pid_wrapper (line 264)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Run Thin-PID from samples or a target-first covariance and return standard `(pid, mi)` dictionaries. |
-| `flow_pid_wrapper (line 295)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
+| `mi_wishart_bias (line 38)` | dims: list, n_samples: int | dict | Calculate exact Gaussian pairwise, joint, and source-source MI Wishart biases in nats without simulation dependencies. |
+| `pid_calc (line 71)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None, param_bias=False | tuple of 2 values | Dispatch standard PID inputs to Idep, Tilde, Delta, Thin, Flow, or Gaussian Eigen-PID and return `(pid, mi)`. Eigen-PID is selected with `method="eigen"` or `method="eigen_pid"`. |
+| `pid_idep_wrapper (line 140)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | tuple of 2 values | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for bot... |
+| `pid_tilde_wrapper (line 168)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None, param_bias=False | tuple of 2 values | Calculate Gaussian BROJA/Tilde PID from `[T, X1, X2]` covariance or samples. The `lorenz_gaussian_merged` route applies exact Goodman/Wishart MI correction and merged Gaussian-resampling/target-shuffle synergy correction, retains raw Venkatesh `output[4]` as `obj`, corrects it additively as `union_info`, and reconstructs all atoms without clipping. Older permutation and equal-direct objective routes remain available. |
+| `delta_wrapper (line 331)` | config, sources, target, covariance, rng, on_rvs | tuple of 2 values | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation... |
+| `_to_numpy_samples (line 387)` | data | `data` | Convert torch/numpy samples to the numpy format expected by flow-pid. |
+| `thin_pid_wrapper (line 397)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Run Thin-PID from samples or a target-first covariance and return standard `(pid, mi)` dictionaries. |
+| `eigen_pid_wrapper (line 428)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.Generator, on_rvs: callable=None | tuple of 2 values | Run deterministic Gaussian Eigen-PID on sample-derived or supplied population covariance ordered `[T, X1, X2]`; return PID atoms and MI in bits, with method-specific eigenvalues, conditioning, numerical residuals, warnings, and optional timings under `pid["extra"]`. Sample bias correction uses `gpid_compat`; supplied covariance is uncorrected. |
+| `flow_pid_wrapper (line 539)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | tuple of 2 values | Wrapper for flow-pid. |
 
 ### `Partial_Information_Decomposition/PID_util.py`
 
@@ -1450,23 +1451,45 @@ File description: Seed-loop and CSV helpers for evil-twin PID_calc sweeps.
 
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
-| `summary_csv_path (line 39)` | output_dir: Path, prefix: str='evil_twin_pid' | Annotated: `Path` | Build the output CSV path for the mean summary table. |
-| `method_csv_path (line 53)` | output_dir: Path, method: str, prefix: str='evil_twin_pid' | Annotated: `Path` | Build the output CSV path for one PID method. |
-| `append_rows_to_csv (line 68)` | path: Path, rows: list[dict] | Annotated: `Path` | Append rows to a CSV file, creating the header when needed. |
-| `write_rows_to_csv (line 87)` | path: Path, rows: list[dict], fieldnames: list[str] | Annotated: `Path` | Write a complete CSV table, replacing any existing file. |
-| `make_pid_config (line 106)` | n: int, p: int, device: str, flow_epochs: int, flow_verbose: bool | Annotated: `dict` | Create the config dictionary expected by PID_calc wrappers. |
-| `result_row (line 131)` | seed: int, twin: str, method: str, n: int, p: int, pid: dict, mi: dict | Annotated: `dict` | Create a successful result row for one twin and PID method. |
-| `error_row (line 164)` | seed: int, twin: str, method: str, n: int, p: int, error: Exception | Annotated: `dict` | Create an error row for one failed twin and PID method. |
-| `run_seed (line 193)` | seed: int, config: dict, methods: tuple[str, ...], output_dir: Path, csv_prefix: str | Annotated: `dict` | Run all requested PID methods for one evil-twin seed and save CSV rows. |
-| `summary_fieldnames (line 238)` | twins: tuple[str, ...]=SUMMARY_TWINS | Annotated: `list[str]` | Build ordered column names for the mean summary table. |
-| `mean_summary_rows (line 254)` | seed_results: dict, methods: tuple[str, ...], twins: tuple[str, ...]=SUMMARY_TWINS | Annotated: `list[dict]` | Calculate mean PID and MI values across seeds for each method. |
-| `save_summary_csv (line 288)` | output_dir: Path, prefix: str, rows: list[dict] | Annotated: `Path` | Save the mean summary table to a CSV file. |
-| `summary_image_path (line 302)` | output_dir: Path, prefix: str, twin: str | Annotated: `Path` | Build the output image path for one twin's mean summary table. |
-| `summary_rows_to_pid_results (line 317)` | rows: list[dict], twin: str | Annotated: `dict` | Convert mean summary rows to the PID result shape used by RVs_Story tables. |
-| `save_summary_table_images (line 346)` | rows: list[dict], output_dir: Path, prefix: str, config: dict, twins: tuple[str, ...]=SUMMARY_TWINS | Annotated: `list[Path]` | Save RVs_Story-style PID comparison images for the mean summary. |
-| `format_summary_value (line 391)` | value, decimals: int | Annotated: `str` | Format one summary table cell for terminal output. |
-| `format_summary_table (line 408)` | rows: list[dict], decimals: int=6 | Annotated: `str` | Format summary rows as an aligned plain-text table. |
-| `run_evil_twin_pid_sweep (line 439)` | seeds: list[int], n: int=1000, p: int=1, methods: tuple[str, ...]=DEFAULT_METHODS, output_dir: Path \| str=Path('simulation_results/evil_twin_pid'), device: str='cpu', flow_epochs: int=250, flow_verbose: bool=False, csv_prefix: str='evil_twin_pid' | Annotated: `dict` | Run PID_calc methods on Sonic and Shadow across multiple seeds. |
+| `summary_csv_path (line 40)` | output_dir: Path, prefix: str='evil_twin_pid' | Annotated: `Path` | Build the output CSV path for the mean summary table. |
+| `method_csv_path (line 54)` | output_dir: Path, method: str, prefix: str='evil_twin_pid' | Annotated: `Path` | Build the output CSV path for one PID method. |
+| `append_rows_to_csv (line 69)` | path: Path, rows: list[dict] | Annotated: `Path` | Append rows to a CSV file, creating the header when needed. |
+| `write_rows_to_csv (line 88)` | path: Path, rows: list[dict], fieldnames: list[str] | Annotated: `Path` | Write a complete CSV table, replacing any existing file. |
+| `make_pid_config (line 107)` | n: int, p: int, device: str, flow_epochs: int, flow_verbose: bool | Annotated: `dict` | Create the config dictionary expected by PID_calc wrappers. |
+| `result_row (line 132)` | seed: int, twin: str, method: str, n: int, p: int, pid: dict, mi: dict | Annotated: `dict` | Create a successful result row for one twin and PID method. |
+| `error_row (line 165)` | seed: int, twin: str, method: str, n: int, p: int, error: Exception | Annotated: `dict` | Create an error row for one failed twin and PID method. |
+| `run_seed (line 194)` | seed: int, config: dict, methods: tuple[str, ...], output_dir: Path, csv_prefix: str | Annotated: `dict` | Run all requested PID methods for one evil-twin seed and save CSV rows. |
+| `summary_fieldnames (line 239)` | twins: tuple[str, ...]=SUMMARY_TWINS | Annotated: `list[str]` | Build ordered summary columns beginning with method, n_samples, dimension, and bias_correction, followed by each twin's PID/MI means and success/error counts. |
+| `mean_summary_rows (line 255)` | seed_results: dict, methods: tuple[str, ...], n_samples: int, dimension: int, bias_correction: bool, twins: tuple[str, ...]=SUMMARY_TWINS | Annotated: `list[dict]` | Calculate one row per PID method, repeating the run metadata and averaging each twin's PID/MI values across successful seeds. Task-specific evil-twin summary builder. |
+| `save_summary_csv (line 312)` | output_dir: Path, prefix: str, rows: list[dict] | Annotated: `Path` | Save the mean summary table, including run metadata columns, to a CSV file. |
+| `summary_image_path (line 326)` | output_dir: Path, prefix: str, twin: str | Annotated: `Path` | Build the output image path for one twin's mean summary table. |
+| `summary_rows_to_pid_results (line 341)` | rows: list[dict], twin: str | Annotated: `dict` | Convert mean summary rows to the PID result shape used by RVs_Story tables. |
+| `save_summary_table_images (line 370)` | rows: list[dict], output_dir: Path, prefix: str, config: dict, twins: tuple[str, ...]=SUMMARY_TWINS | Annotated: `list[Path]` | Save RVs_Story-style PID comparison images for the mean summary. |
+| `format_summary_value (line 415)` | value, decimals: int | Annotated: `str` | Format one summary table cell for terminal output. |
+| `format_summary_table (line 432)` | rows: list[dict], decimals: int=6 | Annotated: `str` | Format summary rows as an aligned plain-text table. |
+| `run_evil_twin_pid_sweep (line 463)` | seeds: list[int], n: int=1000, p: int=1, methods: tuple[str, ...]=DEFAULT_METHODS, output_dir: Path \| str=Path('simulation_results/evil_twin_pid'), device: str='cpu', flow_epochs: int=250, flow_verbose: bool=False, csv_prefix: str='evil_twin_pid' | Annotated: `dict` | Run PID_calc methods on Sonic and Shadow across multiple seeds and write metadata-complete summary output. |
+
+### `Simulations/evil_twin/plot_summary_csv.py`
+
+File description: Load an existing evil-twin mean-summary CSV and render Sonic and Shadow PNG tables with the shared RVs_Story simulation style.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `load_summary_rows (line 37)` | summary_csv: Path \| str | Annotated: `list[dict]` | Validate the metadata-complete evil-twin summary schema and parse n_samples/dimension/counts as integers, bias_correction as bool, and PID/MI means as floats. |
+| `plot_summary_csv (line 103)` | summary_csv: Path \| str, output_dir: Path \| str \| None=None, prefix: str \| None=None, n_samples: int \| None=None, dimension: int \| None=None, bias_correction: bool \| None=None | Annotated: `list[Path]` | Render Sonic and Shadow PNGs using metadata read automatically from the summary CSV; explicit metadata arguments remain optional overrides. Reuses the shared RVs_Story table style. |
+| `main (line 174)` | config: dict \| None=None | Annotated: `list[Path]` | Render from the provided config or editable module-level `CONFIG`; its metadata values default to None so they are loaded from the CSV. No command-line parser is used. |
+
+### `Simulations/evil_twin/run_from_config.py`
+
+File description: Run a configurable evil-twin PID experiment, write method CSVs, and write a metadata-complete summary CSV.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `validate_config (line 48)` | config: dict | Annotated: `None` | Validate the editable experiment settings, including seeds, dimensions, methods, bias mode, device, and output behavior. |
+| `uncorrected_delta_pid (line 111)` | config: dict, sources: list[torch.Tensor], target: list[torch.Tensor] | Annotated: `tuple[dict, dict]` | Calculate raw Delta PID from target-first sample covariance without Wishart bias correction. Task-specific compatibility path. |
+| `calculate_pid (line 159)` | config: dict, sources: list[torch.Tensor], target: list[torch.Tensor], generator: torch.Generator, method: str | Annotated: `tuple[dict, dict]` | Dispatch one configured evil-twin sample set, using the local uncorrected Delta path when requested and PID_calc otherwise. |
+| `run_from_config (line 189)` | config: dict | Annotated: `dict` | Run all configured seeds, methods, and twins; write method CSVs and a summary CSV containing n_samples, dimension, and bias_correction on every method row. |
+| `main (line 291)` | No inputs | Annotated: `dict` | Run the editable module-level evil-twin experiment configuration. |
 
 ### `Simulations/evil_twin/run_pid_calc_methods.py`
 

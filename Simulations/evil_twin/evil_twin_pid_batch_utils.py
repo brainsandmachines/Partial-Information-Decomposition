@@ -34,6 +34,7 @@ CSV_FIELDS = (
 )
 SUMMARY_VALUE_FIELDS = ("red", "unq1", "unq2", "syn", "tri_mi", "bi_mi_1", "bi_mi_2")
 SUMMARY_TWINS = ("sonic", "shadow")
+SUMMARY_METADATA_FIELDS = ("n_samples", "dimension", "bias_correction")
 
 
 def summary_csv_path(output_dir: Path, prefix: str = "evil_twin_pid") -> Path:
@@ -244,27 +245,50 @@ def summary_fieldnames(twins: tuple[str, ...] = SUMMARY_TWINS) -> list[str]:
     Outputs:
         list[str], ordered summary table field names.
     """
-    fields = ["method"]
+    fields = ["method", *SUMMARY_METADATA_FIELDS]
     for twin in twins:
         fields.extend(f"{twin}_{name}_mean" for name in SUMMARY_VALUE_FIELDS)
         fields.extend((f"{twin}_n_ok", f"{twin}_n_error"))
     return fields
 
 
-def mean_summary_rows(seed_results: dict, methods: tuple[str, ...], twins: tuple[str, ...] = SUMMARY_TWINS) -> list[dict]:
+def mean_summary_rows(
+    seed_results: dict,
+    methods: tuple[str, ...],
+    n_samples: int,
+    dimension: int,
+    bias_correction: bool,
+    twins: tuple[str, ...] = SUMMARY_TWINS,
+) -> list[dict]:
     """Calculate mean PID and MI values across seeds for each method.
 
     Inputs:
         seed_results: dict, nested results keyed by seed, method, and twin.
         methods: tuple[str, ...], PID method names to summarize.
+        n_samples: int, number of samples used by every summarized run.
+        dimension: int, shared source and target dimension.
+        bias_correction: bool, whether PID bias correction was enabled.
         twins: tuple[str, ...], twin labels to summarize separately.
 
     Outputs:
-        list[dict], one summary row per PID method with mean PID and MI columns.
+        list[dict], one summary row per PID method with experiment metadata and
+            mean PID/MI columns.
     """
+    if not isinstance(n_samples, int) or isinstance(n_samples, bool) or n_samples <= 0:
+        raise ValueError("n_samples must be a positive integer.")
+    if not isinstance(dimension, int) or isinstance(dimension, bool) or dimension <= 0:
+        raise ValueError("dimension must be a positive integer.")
+    if not isinstance(bias_correction, bool):
+        raise TypeError("bias_correction must be a bool.")
+
     rows = []
     for method in methods:
-        row = {"method": method}
+        row = {
+            "method": method,
+            "n_samples": n_samples,
+            "dimension": dimension,
+            "bias_correction": bias_correction,
+        }
         for twin in twins:
             twin_results = [
                 result[method][twin]
@@ -468,7 +492,13 @@ def run_evil_twin_pid_sweep(
     all_results = {}
     for seed in seeds:
         all_results[seed] = run_seed(seed, config, methods, output_path, csv_prefix)
-    summary_rows = mean_summary_rows(all_results, methods)
+    summary_rows = mean_summary_rows(
+        all_results,
+        methods,
+        n_samples=n,
+        dimension=p,
+        bias_correction=config["bias_correction"],
+    )
     summary_path = save_summary_csv(output_path, csv_prefix, summary_rows)
     image_paths = save_summary_table_images(summary_rows, output_path, csv_prefix, config)
     print("\nMean PID/MI summary across seeds")

@@ -32,9 +32,9 @@ from Simulations.evil_twin.evil_twin_pid_batch_utils import (
 # Edit only this dictionary to configure the experiment.
 CONFIG = {
     "seeds": [0],
-    "n_samples": 1000,
+    "n_samples": 10000,
     "dimension": 100,
-    "methods": ("idep", "tilde"),
+    "methods": ("eigen",'tilde','idep'),
     "bias_correction": False,
     "device": "cpu",
     "output_dir": "simulation_results/evil_twin_config",
@@ -42,7 +42,7 @@ CONFIG = {
     "overwrite_outputs": True,
 }
 
-SUPPORTED_METHODS = ("idep", "tilde", "delta")
+SUPPORTED_METHODS = ("idep", "tilde", "delta",'eigen')
 
 
 def validate_config(config: dict) -> None:
@@ -262,7 +262,13 @@ def run_from_config(config: dict) -> dict:
     for method, rows in rows_by_method.items():
         write_rows_to_csv(method_paths[method], rows, list(CSV_FIELDS))
 
-    summary_rows = mean_summary_rows(all_results, methods)
+    summary_rows = mean_summary_rows(
+        all_results,
+        methods,
+        n_samples=n_samples,
+        dimension=dimension,
+        bias_correction=config["bias_correction"],
+    )
     summary_path = save_summary_csv(output_dir, csv_prefix, summary_rows)
     print("\nEvil-twin configuration")
     print(

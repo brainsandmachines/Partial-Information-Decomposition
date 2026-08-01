@@ -14,6 +14,9 @@ if str(root) not in sys.path:
 wrapper_root = root / "library_wrappers"
 if str(wrapper_root) not in sys.path:
     sys.path.insert(0, str(wrapper_root))
+eigen_pid_root = root / "external" / "Gaussian_eig_PID" / "src"
+if str(eigen_pid_root) not in sys.path:
+    sys.path.insert(0, str(eigen_pid_root))
 from Partial_Information_Decomposition.bias_functions import (
     broja_venkatesh_bias,
     equal_direct_wishart_control_obj_debias,
@@ -26,6 +29,7 @@ from external.gpid.src.gpid import tilde_pid
 from Flow_PID import load_flow_pid
 from Thin_PID import load_exact_gauss_thin_pid
 from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
+from gaussian_eigen_pid import GaussianEigenPID
 
 
 
@@ -116,6 +120,17 @@ def pid_calc(config=None,sources=None,target=None,rng=torch.Generator().manual_s
     elif method in ("flow", "flow_pid"):
         print("\nCalculating PID using Flow...")
         pid, mi = flow_pid_wrapper(config=config,sources=sources,target=target,covariance=covariance,rng=rng,on_rvs=on_rvs)
+
+    elif method in ("eigen", "eigen_pid"):
+        print("\nCalculating PID using Gaussian Eigen-PID...")
+        pid, mi = eigen_pid_wrapper(
+            config=config,
+            sources=sources,
+            target=target,
+            covariance=covariance,
+            rng=rng,
+            on_rvs=on_rvs,
+        )
     else:
         raise ValueError("Unsupported method specified")
 
@@ -407,6 +422,117 @@ def thin_pid_wrapper(config:dict,sources:list,target:list,covariance:torch.Tenso
     imx, imy, imxy, _, _, unq1, unq2, red, syn = output[:9]
     pid = {'red': red, 'unq1': unq1, 'unq2': unq2, 'syn': syn}
     mi = {'tri_mi': imxy, 'bi_mi_1': imx, 'bi_mi_2': imy}
+    return pid, mi
+
+
+def eigen_pid_wrapper(
+    config: dict,
+    sources: list,
+    target: list,
+    covariance: torch.Tensor,
+    rng: torch.Generator,
+    on_rvs: callable = None,
+):
+    """Calculate Gaussian Eigen-PID using the standard PID_calc inputs.
+
+    Inputs:
+        config: dict containing ``dt``, ``dx1``, ``dx2``, and
+            ``bias_correction``. Optional ``eigen_pid_mode`` selects
+            ``"mathematical"`` or ``"gpid_compat"``, and
+            ``eigen_collect_timings`` enables timing diagnostics.
+        sources: list containing source X1 and X2 sample tensors, or None when
+            ``covariance`` is supplied.
+        target: list containing the target sample tensor, or None when
+            ``covariance`` is supplied.
+        covariance: optional covariance tensor/array ordered [T, X1, X2].
+        rng: torch.Generator accepted for compatibility with other PID
+            wrappers; Eigen-PID is deterministic and does not consume it.
+        on_rvs: optional transformation callable accepted for wrapper
+            compatibility; transformations are applied by ``pid_calc``.
+
+    Outputs:
+        tuple[dict, dict]: the PID dictionary contains ``red``, ``unq1``,
+            ``unq2``, ``syn``, the method name, and Eigen-PID diagnostics under
+            ``extra``. The MI dictionary contains pairwise and joint mutual
+            information values in bits.
+
+    Notes:
+        Bias correction is used only for sample-derived covariance and selects
+        the estimator's ``gpid_compat`` mode. A supplied covariance is treated
+        as a population covariance, matching the other Gaussian wrappers.
+    """
+    del rng, on_rvs
+
+    dm, dx, dy = config['dt'], config['dx1'], config['dx2']
+    if covariance is None:
+        if sources is None or target is None:
+            raise ValueError(
+                "Eigen-PID requires source and target samples when covariance "
+                "is not supplied."
+            )
+        data = [target[0], sources[0], sources[1]]  # Covariance order: [T, X1, X2].
+        cov = create_cov_matrix(data)["full_cov"]
+        sample_size = data[0].shape[0]
+        bias_correction = bool(config['bias_correction'])
+    else:
+        cov = covariance
+        sample_size = None
+        bias_correction = False
+
+    cov = (
+        cov.detach().cpu().numpy()
+        if isinstance(cov, torch.Tensor)
+        else np.asarray(cov)
+    )  # torch/array-like (D, D) -> NumPy (D, D)
+
+    mode = "gpid_compat" if bias_correction else config.get(
+        "eigen_pid_mode",
+        "mathematical",
+    )
+    estimator = GaussianEigenPID(
+        mode=mode,
+        collect_timings=bool(config.get("eigen_collect_timings", False)),
+    )
+    result = estimator.decompose(
+        cov,
+        dm,
+        dx,
+        dy,
+        unbiased=bias_correction,
+        sample_size=sample_size if bias_correction else None,
+    )
+
+    pid = {
+        'red': result.redundancy_bits,
+        'unq1': result.uix_bits,
+        'unq2': result.uiy_bits,
+        'syn': result.synergy_bits,
+        'method': 'eigen_pid',
+        'extra': {
+            'mode': result.postprocessing_mode,
+            'union_info_bits': result.union_info_bits,
+            'raw_objective_bits': result.raw_objective_bits,
+            'generalized_eigenvalues': result.generalized_eigenvalues.tolist(),
+            'log2_generalized_eigenvalues': result.log2_generalized_eigenvalues.tolist(),
+            'condition_numbers': dict(result.condition_numbers),
+            'jitter_used': dict(result.jitter_used),
+            'timings_seconds': dict(result.timings_seconds),
+            'warnings': list(result.warnings),
+            'identity_residuals_bits': {
+                'unique_difference': result.residual_unique_difference_bits,
+                'union_direction': result.residual_union_direction_bits,
+                'redundancy_direction': result.residual_redundancy_direction_bits,
+                'mi_x1_reconstruction': result.residual_imx_reconstruction_bits,
+                'mi_x2_reconstruction': result.residual_imy_reconstruction_bits,
+                'mi_joint_reconstruction': result.residual_imxy_reconstruction_bits,
+            },
+        },
+    }
+    mi = {
+        'tri_mi': result.imxy_bits,
+        'bi_mi_1': result.imx_bits,
+        'bi_mi_2': result.imy_bits,
+    }
     return pid, mi
 
 

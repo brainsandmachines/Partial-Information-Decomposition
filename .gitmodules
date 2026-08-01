@@ -16,3 +16,6 @@
 [submodule "external/Sampling_bias_corrections_Syn_Red"]
 	path = external/Sampling_bias_corrections_Syn_Red
 	url = https://github.com/panzerilab/Sampling_bias_corrections_Syn_Red.git
+[submodule "external/Gaussian_eig_PID"]
+	path = external/Gaussian_eig_PID
+	url = git@github.com:brainsandmachines/Gaussian_eig_PID.git
