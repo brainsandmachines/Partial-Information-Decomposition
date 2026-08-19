@@ -1239,6 +1239,21 @@ File description: Python module for cov functions-related project logic.
 | `sample_from_cov (line 221)` | config, true_cov: torch.Tensor, n_samples: int, rng: torch.Generator | Annotated: `torch.Tensor` | Sample from a Gaussian distribution with the given covariance. |
 | `change_covariance_order (line 250)` | cov: torch.Tensor, new_order: list[int], dims: list[int] | Annotated: `torch.Tensor` | Permute the covariance matrix to change the order of variables. |
 
+### `Simulations/Theoretical_Examples/Covariance/compare_multidim_gaussian_pid.py`
+
+File description: Snapshot all run constants to YAML, compare GPID Tilde, Thin-PID, and Gaussian Eigen-PID across a theoretical-covariance dimension sweep, checkpoint each completed dimension to CSV, and plot PID, MI, runtime, and direct Eigen-PID speedup curves at completion.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `save_run_constants (line 93)` | yaml_path: str \| Path | Annotated: `Path` | Save every uppercase script constant to YAML before calculation, normalizing paths to strings, NumPy sweep integers to Python integers, and tuple schemas to lists. Task-specific run provenance helper. |
+| `validate_parameters (line 140)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | Annotated: `None` | Validate positive dimensions, finite gains, and strictly positive source-noise variances. |
+| `build_channel_matrix (line 192)` | source_dim: int, target_dim: int, special_gain: float, special_coordinate: int | Annotated: `torch.Tensor` | Build a rectangular diagonal target-to-source channel by applying the configured gain at position zero or one of every repeated two-coordinate block; unmatched source coordinates remain noise-only. |
+| `build_population_covariance (line 226)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | Annotated: `torch.Tensor` | Construct and validate the flexible positive-definite Gaussian population covariance in `[T,X1,X2]` order using repeated two-coordinate channel-gain blocks. |
+| `run_pid_methods (line 292)` | covariance: torch.Tensor, target_dim: int, source1_dim: int, source2_dim: int | Annotated: `dict[str, dict[str, float]]` | Run population GPID Tilde, Thin-PID, and mathematical Eigen-PID through `PID_calc` and collect atoms, MI, and single-run timings. |
+| `run_dimension_sweep (line 348)` | dimension_to_sweep: str, dimension_values: list[int], target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float, csv_path: str \| Path | Annotated: `list[dict[str, float \| int \| str]]` | Sweep one variable dimension while holding the other two fixed; reset the CSV at run start and rewrite all accumulated method rows after each completed dimension so partial progress survives later failures. |
+| `plot_dimension_sweep_csv (line 441)` | csv_path: str \| Path, plot_path: str \| Path, speedup_plot_path: str \| Path | Annotated: `tuple[Path, Path]` | Read a completed sweep CSV, save the eight-panel PID/MI/runtime PNG, and save an annotation-free linear-scale plot of GPID Tilde and Thin-PID runtime divided by Eigen-PID runtime. The speedup plot is written to the requested format plus sibling SVG and PDF vector files for papers. |
+| `main (line 616)` | No inputs | Annotated: `tuple[Path, Path, Path, Path]` | Save the YAML constants snapshot, run and checkpoint the configured sweep, create the result plot and annotation-free Eigen-PID speedup plot with SVG/PDF counterparts, and return the CSV, both primary plot, and YAML paths. |
+
 ### `Simulations/Theoretical_Examples/Covariance/sample_simulation.py`
 
 File description: Python module for sample simulation-related project logic.
@@ -1718,3 +1733,45 @@ File description: Python module for toy example new-related project logic.
 | Function / Method | Inputs | Outputs | What it does |
 |---|---|---|---|
 | `main (line 16)` | No inputs | No explicit return; likely `None` / side effects. | Run the 2x3 factorial experiment design. |
+
+## Eigen_PID_Simulations
+
+Task-specific simulations comparing Gaussian Eigen-PID with iterative GPID
+and Thin-PID optimizers.
+
+### `Eigen_PID_Simulations/gammaSTAR_as_inpunt.py`
+
+File description: Run balanced Gaussian covariance experiments using native or
+Eigen-PID Gamma-star optimizer initializations. Covariances use
+`[target, source1, source2]` order, all three variables have the same dimension,
+and PID quantities are population-Gaussian values in bits.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `load_optimizer_modules (line 71)` | No inputs | `dict[str, tuple[str, Any]]` | Load the task-specific GPID/Tilde-PID and Thin-PID modules and associate each with the replay method key. Related to `library_wrappers/Thin_PID.py::load_exact_gauss_thin_pid`. |
+| `generate_gaussian_system (line 86)` | `random_generator: np.random.Generator`, `dimension: int` | `tuple[np.ndarray, np.ndarray, np.ndarray]` | Generate a balanced linear-Gaussian system and return `(covariance, channel_x, channel_y)`. The covariance has shape `(3d, 3d)` in `[target, source1, source2]` order; channels have shape `(d, d)` and conditional source noises are independent identities. Task-specific. |
+| `construct_native_couplings (line 128)` | `channel_x: np.ndarray`, `channel_y: np.ndarray`, `thin_pid_module: Any` | `dict[str, np.ndarray]` | Reproduce each released optimizer's native projected `Hx @ pinv(Hy)` starting coupling. Inputs are whitened channels and outputs have shape `(dx, dy)`. Task-specific; not the observed source cross-covariance. |
+| `run_experiment (line 156)` | No inputs | `list[dict[str, Any]]` | Run every configured dimension, repeat, method, and initialization; print start/progress messages and elapsed times for every repeat, dimension sweep, and full sweep; compare the best unregularized optimizer union with mathematical Eigen-PID; and return detailed paired rows. Reuses `construct_eigen_coupling`, `replay_from_coupling`, and reporting helpers. Task-specific. |
+| `main (line 265)` | No inputs | `Path` | Run the experiment; save its detailed CSV, iteration plot, PID plot, and reproducibility YAML in one experiment directory; print summaries; display the figures; and return the CSV path. Task-specific entry point. |
+
+### `Eigen_PID_Simulations/gamma_star_reporting.py`
+
+File description: Hold all CSV schema, paired-result, console-summary, and
+Matplotlib logic for the Gamma-star initialization experiment. Optimizer PID
+atoms are reconstructed from the best unregularized union objective and the
+shared Eigen-PID marginal/joint mutual informations; nonconverged runs are
+retained as lower bounds but excluded from converged summaries.
+
+| Function / Method | Inputs | Outputs | What it does |
+|---|---|---|---|
+| `create_result_row (line 21)` | `experiment_metadata: Mapping[str, Any]`, `run_metadata: Mapping[str, Any]`, `eigen_result: Any`, `eigen_coupling: Any`, `convergence: Mapping[str, Any]` | `dict[str, Any]` | Flatten one optimizer replay into the detailed CSV schema, convert the replay loop counter to applied optimizer updates, reconstruct PID atoms, and calculate method-minus-Eigen differences. Task-specific; raw unregularized population-Gaussian convention. |
+| `add_paired_comparisons (line 116)` | `result_rows: Sequence[Mapping[str, Any]]` | `list[dict[str, Any]]` | Copy rows and add native-minus-Gamma update differences only when both paired runs converged. Pairing keys are dimension, repeat, and method. |
+| `save_results_csv (line 156)` | `result_rows: Sequence[Mapping[str, Any]]`, `path: str \| Path` | `Path` | Validate a nonempty row sequence, create the experiment directory, and overwrite one detailed CSV using the first row's ordered schema. Task-specific CSV writer. |
+| `save_hyperparameters_yaml (line 179)` | `hyperparameters: Mapping[str, Any]`, `path: str \| Path` | `Path` | Save YAML-serializable experiment settings and artifact paths in a reproducibility YAML file, creating its parent directory when necessary. Reporting-specific. |
+| `print_experiment_summary (line 199)` | `result_rows: Sequence[Mapping[str, Any]]`, `csv_path: str \| Path` | `None` | Print optimizer-update counts with convergence labels and maximum converged optimizer-versus-Eigen union gaps. Reporting-specific. |
+| `_result_matrix (line 270)` | `result_rows: Sequence[Mapping[str, Any]]`, `dimensions: Sequence[int]`, `repeats: int`, `method: str`, `initialization: str`, `field: str` | `np.ndarray` | Arrange one selected scalar field into a float array shaped `(dimensions, repeats)` for plotting. Task-specific internal helper. |
+| `_masked_summary (line 303)` | `values: np.ndarray`, `valid_mask: np.ndarray` | `tuple[np.ndarray, np.ndarray, np.ndarray]` | Reduce `(dimensions, repeats)` arrays to median/minimum/maximum vectors while returning `NaN` for dimensions without valid runs. Plotting-specific internal helper. |
+| `plot_iteration_comparison (line 325)` | `result_rows: Sequence[Mapping[str, Any]]`, `dimensions: Sequence[int]`, `repeats: int`, `methods: Sequence[str]`, `initializations: Sequence[str]` | `matplotlib.figure.Figure` | Plot only the raw converged optimizer-update summaries and mark nonconverged lower bounds for the native and Gamma-star initializations. Plotting-specific. |
+| `plot_pid_comparison (line 405)` | `result_rows: Sequence[Mapping[str, Any]]`, `dimensions: Sequence[int]`, `repeats: int`, `methods: Sequence[str]`, `initializations: Sequence[str]` | `matplotlib.figure.Figure` | For GPID and Thin-PID, plot raw unique-X, unique-Y, redundancy, and synergy results against Eigen-PID, followed by paired native-result-minus-Gamma-star-result component differences. Only paired converged runs enter the difference summaries. Plotting-specific. |
+| `save_figure (line 591)` | `figure: matplotlib.figure.Figure`, `path: str \| Path`, `dpi: int = 300` | `Path` | Validate the resolution, create the destination directory, and save a tightly bounded Matplotlib image. Reporting-specific. |
+| `show_figures (line 615)` | No inputs | `None` | Display every currently open Matplotlib figure. Plotting-specific. |
