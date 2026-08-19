@@ -1,0 +1,6 @@
+pid:
+  n_samples: 1000
+  n_trials: 1000
+  dx1: 1
+  dx2: 1
+  dt: 1

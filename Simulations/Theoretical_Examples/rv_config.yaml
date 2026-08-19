@@ -1,0 +1,49 @@
+
+
+
+
+
+
+parameters: 
+  description: "A direct Gaussian covariance with known equivalent source-target channels; both population unique-information terms are zero."
+  n_samples: 1000000
+  p: 50 #The same feature dimension for all varaibles
+  noise_std: 1.0
+  seed: 42
+  bias_correction: false
+  results_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/RVs_Story/results_rvs" #For RVs simulations
+  n_epochs: 30
+  batch_size: 128
+  n_flows: 4
+  bits: True
+  device: "cuda"
+  methods: ['eigen']
+  commonality_analysis: true
+  commonality_method: "ridge_cv"
+  commonality_alphas: [0.01, 0.1, 1.0, 10.0]
+  commonality_scale_by_target_variance: false
+
+
+covariance:
+  p_scale: 0.0
+  q_scale: 0.0
+  r_scale: 0.0
+  dx1: 70
+  dx2: 70
+  dt: 70
+  n_trials: 5
+  methods: ['tilde']
+  output_dir: "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/loernz_bias/No_Mi"
+  param_bias: true
+  param_bias_method: "lorenz_gaussian_merged"
+  known_equal_direct_covariance: True
+  n_obj_bootstrap: 50
+  obj_bootstrap_seed: 50000000
+  n_perm: 20
+  n_lorenz_resamples: 20
+  n_lorenz_shuffles: 20
+  lorenz_merge_weight: 0.5
+  lorenz_resampling_seed: 50000000
+  lorenz_shuffle_seed: 50000001
+  rng_seed: 42
+  device: 'cpu'

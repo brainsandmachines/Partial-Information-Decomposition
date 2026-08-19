@@ -1,28 +1,29 @@
-from nilearn import plotting
 import os
 import numpy as np
 from numpy import ndarray
-from nilearn import datasets
-import matplotlib.pyplot as plt
-from PIL import Image
 from typing import Optional, List
-import joblib
-#Import utils
 from pathlib import Path
 import sys
+
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from utils import check_file_exists,check_folder_exists
-from torch.utils.data import DataLoader, Dataset
-from torchvision import transforms
-import torch
-from sklearn.linear_model import RidgeCV, LinearRegression
-from sklearn.decomposition import IncrementalPCA
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import LassoCV
-from sklearn.multioutput import MultiOutputRegressor
-class ImageDataset(Dataset):
+
+from encoding_model.regression_metrics import (
+    compute_lasso_cv_r2,
+    compute_ols_cv_r2,
+    compute_r2,
+    compute_ridge_cv_r2,
+)
+from Partial_Information_Decomposition.PID_util import (
+    correlation_matrix,
+    diagnostic_plots,
+    singularity_report,
+)
+
+class ImageDataset:
     def __init__(self, imgs_paths, idxs, transform):
+        import torch
+
         self.imgs_paths = np.array(imgs_paths)[idxs]
         self.transform = transform
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -31,6 +32,8 @@ class ImageDataset(Dataset):
         return len(self.imgs_paths)
 
     def __getitem__(self, idx):
+        from PIL import Image
+
         # Load the image
         img_path = self.imgs_paths[idx]
         img = Image.open(img_path).convert('RGB')
@@ -47,6 +50,7 @@ def plot_fmri(path,args, hemi, title=''):
         title (str, optional): Title of the plot. Defaults to ''.
         vmax (float, optional): Maximum value for color scaling. Defaults to None.
         arguments (argObj): Argument object containing data directories."""
+    from nilearn import datasets, plotting
     
     hemisphere = hemi
 
@@ -77,6 +81,10 @@ def fmri_response_image(path,args,hemisphere,img_idx,train_img_dir,train_img_lis
         hemi (str): 'left' or 'right' hemisphere.
         img_idx (int): Index of the image shown.
         arguments (argObj): Argument object containing data directories."""
+    import matplotlib.pyplot as plt
+    from nilearn import datasets, plotting
+    from PIL import Image
+
     img = 0 #@param
     hemisphere = 'left' #@param ['left', 'right'] {allow-input: true}
 
@@ -143,7 +151,8 @@ def split_dataset(train_img_list,test_img_list,rand_seed=5,train_p=90):
     return idxs_train, idxs_val
 
 def fmri_data_loader(lh_fmri,rh_fmri,train_img_list,test_img_list,train_img_dir,test_img_dir,batch_size=500,train_p=90):
-    
+    from torch.utils.data import DataLoader
+    from torchvision import transforms
     
 
     dataset = split_dataset(train_img_list=train_img_list,test_img_list=test_img_list,train_p=train_p)
@@ -201,6 +210,8 @@ def map_correlation_to_rois(args,lh_correlation,rh_correlation,hemisphere):
     Returns:
         dict: Dictionary mapping ROI labels to mean correlation values.
     """
+    from nilearn import datasets, plotting
+
         # Load the brain surface map of all vertices
     roi_dir = os.path.join(args.data_dir, 'roi_masks',
         hemisphere[0]+'h.all-vertices_fsaverage_space.npy')
@@ -354,6 +365,9 @@ def visualize_encdoing_accuaracy(args,lh_correlation,rh_correlation,correlation_
     lh_roi_correlation.append(lh_correlation)
     rh_roi_correlation.append(rh_correlation)
     if plot:
+        import matplotlib.pyplot as plt
+        from my_utils import check_file_exists
+
         # Create the plot
         lh_mean_roi_correlation = [np.mean(lh_roi_correlation[r])
             for r in range(len(lh_roi_correlation))]
@@ -387,6 +401,8 @@ def save_corellation(roi_names,lh_correlation,rh_correlation,correlation_path,ex
         rh_correlation (np.array): Array of correlation values for right hemisphere vertices.
         correlation_path (str): Path to save the correlation files.
     """
+    from my_utils import check_file_exists
+
     #Define file name: 
     lh_name = f'{experiment_name}_lh_correlation.npy' if experiment_name else 'lh_correlation.npy'
     rh_name = f'{experiment_name}_rh_correlation.npy' if experiment_name else 'rh_correlation.npy'
@@ -422,6 +438,9 @@ def save_model(folder_path, model_name,save_dict,reg_lh:Optional[ndarray]=None, 
         Returns:
             Saves the model and correlation values to specified folder with the specific rois.
     """
+    import joblib
+    from my_utils import check_folder_exists
+
     model_name_joblib = f'{model_name}_encoding_model.joblib' if model_name else 'encoding_model.joblib'
     
     models_folder = check_folder_exists(f'{folder_path}/{model_name}')
@@ -436,152 +455,3 @@ def save_model(folder_path, model_name,save_dict,reg_lh:Optional[ndarray]=None, 
     print(f"Encoding model saved to: {model_save_path}")
     
     return models_folder
-
-
-def compute_ols_cv_r2(X, y):
-    """
-    Compute cross-validated R² using leave-one-out cross-validation.
-    
-    Uses RidgeCV with near-zero regularization (alpha=1e-16) which is
-    effectively OLS but leverages the efficient GCV formula.
-    
-    Args:
-        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
-        y (np.ndarray): Target variable (shape: [n,]).
-        
-    Returns:
-        float: Cross-validated R² (can be negative if model overfits badly)
-    """
-    ridge_cv = RidgeCV(alphas=[1e-16], fit_intercept=True, scoring='r2', cv=None)
-    ridge_cv.fit(X, y)
-    return ridge_cv.best_score_
-
-
-def compute_ridge_cv_r2(X, y, alphas=None):
-    """
-    Compute cross-validated R² using RidgeCV with efficient LOO cross-validation.
-    
-    RidgeCV uses generalized cross-validation (GCV) which is an efficient 
-    approximation to leave-one-out CV for ridge regression.
-    
-    Args:
-        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
-        y (np.ndarray): Target variable (shape: [n,]).
-        alphas (array-like, optional): Array of alpha values to try.
-            Defaults to DEFAULT_RIDGE_ALPHAS.
-        
-    Returns:
-        float: Best cross-validated R² across all alpha values.
-    """
-    if alphas is None:
-        alphas = np.logspace(-3, 3, 50)
-    
-    # RidgeCV with leave-one-out CV (efficient GCV approximation)
-    # cv=None means use efficient LOO via GCV
-    ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
-    ridge_cv.fit(X, y)
-    
-    return ridge_cv.best_score_
-
-
-def compute_r2(X, y):
-    """
-    Compute in-sample R² for OLS regression.
-    
-    Args:
-        X (np.ndarray): Design matrix WITHOUT intercept (shape: [n, p]).
-        y (np.ndarray): Target variable (shape: [n,]).
-        
-    Returns:
-        float: In-sample R².
-    """
-    model = LinearRegression()
-    model.fit(X, y)
-    return model.score(X, y)
-
-def compute_lasso_cv_r2(X, y):
-
-    base_lasso = LassoCV(
-        n_alphas=100,
-        fit_intercept=True,
-        cv=5,
-        max_iter=5000
-    )
-
-    mo_lasso = MultiOutputRegressor(base_lasso)
-
-    mo_lasso.fit(X, y)
-
-    r2 = mo_lasso.score(X, y)
-
-    return mo_lasso, r2
-
-
-
-def correlation_matrix(X):
-    """Compute the correlation matrix of the columns of X."""
-    X_centered = X - np.mean(X, axis=0)
-    cov_matrix = np.cov(X_centered, rowvar=False)
-    stddev = np.sqrt(np.diag(cov_matrix))
-    corr_matrix = cov_matrix / np.outer(stddev, stddev)
-    return corr_matrix
-
-def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
-    """Return min eigenvalue and singularity flag for blocks and combinations."""
-    blocks = {
-        "M1": X_M1,
-        "M2": X_M2,
-        "Y": y_real,
-        "M1+M2": np.hstack([X_M1, X_M2]),
-        "M1+Y": np.hstack([X_M1, y_real]),
-        "M2+Y": np.hstack([X_M2, y_real]),
-        "M1+M2+Y": np.hstack([X_M1, X_M2, y_real]),
-    }
-    report = {}
-    printing_required = False
-    for name, block in blocks.items():
-        eigvals = np.linalg.eigvalsh(correlation_matrix(block))
-        min_eig = float(eigvals.min())
-        report[name] = {"min_eigval": min_eig, "is_singular": min_eig <= tol}
-        if min_eig <= tol:
-            printing_required = True
-    # print report if any block is singular or ill-conditioned
-    if printing_required:
-        for name, info in report.items():
-            status = "SINGULAR" if info["is_singular"] else "OK"
-            print(f"Block {name}: min eigenvalue = {info['min_eigval']:.2e} -> {status}")
-    return report
-
-def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
-    def cross_correlation(X, Y):
-        Xc, Yc = X - X.mean(0), Y - Y.mean(0)
-        n = Xc.shape[0] - 1
-        cov = (Xc.T @ Yc) / n
-        sx = np.sqrt(np.diag((Xc.T @ Xc) / n))
-        sy = np.sqrt(np.diag((Yc.T @ Yc) / n))
-        with np.errstate(divide='ignore', invalid='ignore'):
-            return cov / np.outer(sx, sy)
-
-    blocks, labels = [X_M1, X_M2, y_real], ["M1", "M2", "Y"]
-    counts = [b.shape[1] for b in blocks]
-    fig = plt.figure(figsize=(9, 9))
-    gs = plt.GridSpec(3, 3, width_ratios=counts, height_ratios=counts, wspace=0.05, hspace=0.05)
-    axes, im = [], None
-    for i in range(3):
-        for j in range(3):
-            ax = fig.add_subplot(gs[i, j])
-            corr = cross_correlation(blocks[i], blocks[j])
-            im = ax.imshow(corr, cmap='bwr', vmin=-1, vmax=1, aspect='auto')
-            max_text = "max: n/a" if np.all(np.isnan(corr)) else f"max: {np.nanmax(corr):.2f}"
-            ax.text(0.02, 0.98, max_text, transform=ax.transAxes, ha='left', va='top', fontsize=8,
-                    color='black', bbox={'boxstyle': 'round,pad=0.2', 'facecolor': 'white', 'alpha': 0.7, 'edgecolor': 'none'})
-            if i == 0:
-                ax.set_title(labels[j])
-            if j == 0:
-                ax.set_ylabel(labels[i])
-            ax.set_xticks([]); ax.set_yticks([])
-            axes.append(ax)
-    fig.colorbar(im, ax=axes, fraction=0.03, pad=0.02).set_label('Correlation Coefficient')
-    fig.suptitle(f'Correlation Matrix - Method: {method}, Mixing Dim: {mixing_dimension}')
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    plt.show()

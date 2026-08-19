@@ -1,0 +1,2 @@
+dimension,ntrials,n_repetitions,bias_iterations,resampling_seconds,shuffle_seconds,merged_seconds,venkatesh_seconds,eigenvalue_pid_seconds
+84,512,100,20,151645.836987980,170391.738506215,322037.575512178,9798.366271176,2790.953727362

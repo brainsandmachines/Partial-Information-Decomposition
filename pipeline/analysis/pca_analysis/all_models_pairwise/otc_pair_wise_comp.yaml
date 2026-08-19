@@ -1,0 +1,47 @@
+functions:
+  target_extraction: prepare_target
+  sources_extraction: nsd_sources
+  choose_layer: overall_best_layer
+  feature_extraction: nsd_feature_extraction
+  preprocess: null
+  feature_manipulation: pca_each_source
+  pid_calculation: pid_calc
+  pid_report: print_pid_mi
+
+target_kwargs:
+  hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
+  pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
+  neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
+  n_samples: null
+
+sources_kwargs:
+  model_name_1: crossvit_base_240_classification
+  model_name_2: ResNet50-SimCLR_selfsupervised
+
+choose_layer_kwargs:
+  path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
+
+feature_extraction_kwargs:
+  batch_size_process: 128
+  batch_size_dataloader: 16
+  use_srp: false
+  srp_n_components: null
+
+preprocess_kwargs:
+  n_components_target : 50
+
+feature_manipulation_kwargs:
+  n_components_source_1: 50
+  n_components_source_2: 50
+  n_components_target: 50
+
+
+pid_kwargs:
+  method: thin
+  rng_seed: 56
+  config:
+    device: cuda
+    bias_correction: True
+
+report_kwargs: {}
+only_shared: true

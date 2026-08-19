@@ -1,17 +1,32 @@
 # Ignore Python cache files
 __pycache__/
 *.pyc
-gpid/
 source_conwell_code/
-external/mayas_project/*
-!/external/mayas_project/.git
 figures_/
 trained_models/
 **/fmri_dicts/
 **/fmri_figs/
 **/data_frames/
 **/between_models_cor/
-**/data_frames/
 **/test_runs/
 **/simulation_results/
-Partial_Information_Decomposition/Idep_Simulations/figures/
+Partial_Information_Decomposition/Idep/Idep_Simulations/figures/
+file_ignore/
+library_wrappers/evil_twin_check_outputs/
+Codex_opreations/
+flow_pid/
+Simulations/Theoretical_Examples/Covariance/results_covariance/
+pipeline/trash/
+subj01_results/
+pipeline/subj_PCs/saved_pcs/
+pipeline/ridge_find_alpha/results/
+pca_by_variance=8000/
+MultivariateStatistics/
+
+# Local test/tool caches and scheduler output
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+*.out
+*.err

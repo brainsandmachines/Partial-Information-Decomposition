@@ -1,0 +1,17 @@
+pipeline_config: ../../full_OTC/otc_config.yaml
+max_source_components: 50
+search_source: X1
+all_csv_path: unique_search_outputs/minsubset=2_otc_unique_search_all.csv
+best_csv_path: unique_search_outputs/minsubset=2_otc_unique_search_best.csv
+
+search_kwargs:
+  cmi_threshold: 0.2
+  unique_threshold: 0.1
+  beam_width: 5
+  max_subset_size: 8
+  initial_subset_size: 5
+  initial_subset_count: 300
+  rng_seed: 42
+  floating_tolerance: 1.0e-9
+  max_runtime_seconds: 7200
+  use_floating_backward: true

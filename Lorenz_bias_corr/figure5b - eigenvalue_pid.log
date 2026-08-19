@@ -1,0 +1,73 @@
+Running Figure 5B dimension 4 (1/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=4
+/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/external/gpid/src/gpid/tilde_pid.py:381: RuntimeWarning: invalid value encountered in scalar divide
+  debias_factor = imxy_debiased / imxy
+  shuffle
+Running: ntrials=256, alpha=1.2, M=4
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=4
+Running: ntrials=256, alpha=1.2, M=4
+Running: ntrials=256, alpha=1.2, M=4
+Running Figure 5B dimension 12 (2/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=12
+  shuffle
+Running: ntrials=256, alpha=1.2, M=12
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=12
+Running: ntrials=256, alpha=1.2, M=12
+Running: ntrials=256, alpha=1.2, M=12
+Running Figure 5B dimension 20 (3/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=20
+  shuffle
+Running: ntrials=256, alpha=1.2, M=20
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=20
+Running: ntrials=256, alpha=1.2, M=20
+Running: ntrials=256, alpha=1.2, M=20
+Running Figure 5B dimension 28 (4/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=28
+  shuffle
+Running: ntrials=256, alpha=1.2, M=28
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=28
+Running: ntrials=256, alpha=1.2, M=28
+Running: ntrials=256, alpha=1.2, M=28
+Running Figure 5B dimension 36 (5/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=36
+  shuffle
+Running: ntrials=256, alpha=1.2, M=36
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=36
+Running: ntrials=256, alpha=1.2, M=36
+Running: ntrials=256, alpha=1.2, M=36
+Running Figure 5B dimension 44 (6/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=44
+  shuffle
+Running: ntrials=256, alpha=1.2, M=44
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=44
+Running: ntrials=256, alpha=1.2, M=44
+Running: ntrials=256, alpha=1.2, M=44
+Running Figure 5B dimension 50 (7/7)
+  resampling
+Running: ntrials=256, alpha=1.2, M=50
+  shuffle
+Running: ntrials=256, alpha=1.2, M=50
+  Venkatesh
+Running: ntrials=256, alpha=1.2, M=50
+Running: ntrials=256, alpha=1.2, M=50
+Running: ntrials=256, alpha=1.2, M=50
+Lorenz commit: 728e55024227dfa2b1915bc7df56f54b34117f41
+gPID commit: 179fd78ef426c34837e23d95c31db0293e74585d
+Gaussian Eigen-PID commit: 72294d7b26f8b77a9663866a017f3167b4906a53
+Figure 5B parameters: scenario=bit_of_all, N=256, repetitions=100, T=20, alpha=1.2, dimensions=[4, 12, 20, 28, 36, 44, 50]
+Merged timing is the resampling runtime plus shuffle runtime plus the averaging overhead.
+MAT result: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Lorenz_bias_corr/Results/Gauss/figure5b - eigenvalue_pid.mat
+Timing CSV: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Lorenz_bias_corr/figure5b - eigenvalue_pid.csv
+Figure: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Lorenz_bias_corr/figure5b - eigenvalue_pid.svg

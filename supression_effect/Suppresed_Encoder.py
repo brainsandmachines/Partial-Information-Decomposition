@@ -15,16 +15,16 @@ _append_project_root_to_path()
 from encoding_model.algoanut_data import argObj
 from encoding_model.suppresion_model import train_save_or_load   
 from encoding_model.suppression_core import *
-from Partial_Information_Decomposition.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
 from encoding_model.encoding_utils import get_specific_roi_fmri
 from Partial_Information_Decomposition.PID_util import *
-from utils import (
+from my_utils import (
     run_multi_seed_experiment,
     append_seed_run_checkpoint,
     get_seed_runs_csv_path,
     save_seed_summary_csv,
     extract_all_components,
-    print_seed_summary,
+    run_configured_multiseed,
     create_test_histograms_with_kde,
     load_hist_kde_and_change_colors,
     seed_summary_to_table,
@@ -198,12 +198,16 @@ def print_results(outputs: dict, mi: dict, pid: dict) -> None:
 
 def main() -> None:
     config = get_run_config()
-    summary, seed_rows = run_encoding_multi_seed_experiment(config)
-    print_seed_summary(summary, config["n_seeds"], config["seed_start"])
-    all_runs_path = get_seed_runs_csv_path(config)
-    saved_path = save_seed_summary(summary, config)
-    print(f"\nSaved all seed run results to: {all_runs_path}")
-    print(f"\nSaved summary to: {saved_path}")
+    real_features, fmri_dict = load_model_and_fmri(config)
+    run_configured_multiseed(
+        config,
+        per_seed_runner=lambda seed, run_config: run_single_seed(
+            seed,
+            run_config,
+            real_features=real_features,
+            fmri_dict=fmri_dict,
+        ),
+    )
 
 
 if __name__ == "__main__":

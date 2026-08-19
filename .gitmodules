@@ -1,0 +1,21 @@
+[submodule "external/flow-pid"]
+	path = external/flow-pid
+	url = https://github.com/warrenzha/flow-pid.git
+[submodule "external/gpid"]
+	path = external/gpid
+	url = https://github.com/praveenv253/gpid.git
+[submodule "external/PID"]
+	path = external/PID
+	url = https://github.com/JWKay/PID.git
+[submodule "external/mayas_project"]
+	path = external/mayas_project
+	url = https://github.com/brainsandmachines/Mayas-Project.git
+[submodule "external/DeepDive"]
+	path = external/DeepDive
+	url = https://github.com/ColinConwell/DeepDive.git
+[submodule "external/Sampling_bias_corrections_Syn_Red"]
+	path = external/Sampling_bias_corrections_Syn_Red
+	url = https://github.com/panzerilab/Sampling_bias_corrections_Syn_Red.git
+[submodule "external/Gaussian_eig_PID"]
+	path = external/Gaussian_eig_PID
+	url = git@github.com:brainsandmachines/Gaussian_eig_PID.git

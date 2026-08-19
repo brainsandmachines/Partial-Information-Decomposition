@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import yaml
 import sys
 from pathlib import Path
-
+from Partial_Information_Decomposition.PID_util import *
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from PID_util import *
+
 
 
 
@@ -103,25 +103,83 @@ def np_safe_logdet(A, eps=1e-8):
 def calcualte_mi(config,sigma_dict,term='full'):
     """This function calculates the tri-variate mutual information using the covariance 
     matrices and the formula MI = 0.5 * (log|deno_matrix| - log|nume_matrix|)"""
-    n0 = config['n0']
-    n1 = config['n1']
-    n2 = config['n2']
+    dx1 = config['dx1']
+    dx2 = config['dx2']
+    dt = config['dt']
     device = config['device']
 
     Q = sigma_dict['Q']
     R = sigma_dict['R']
     P = sigma_dict['P']
     sigma = sigma_dict['Sigma']
-    nume_raw = 0.5*safe_logdet((torch.eye(n1, device=device) - (P.T @ P)))
-    deno_q = torch.eye(n2, device=device)-(Q.T @ Q)
-    deno_r = torch.eye(n2, device=device)-(R.T @ R)
+    nume_raw = 0.5*safe_logdet((torch.eye(dx2, device=device) - (P.T @ P)))
+    deno_q = torch.eye(dt, device=device)-(Q.T @ Q)
+    deno_r = torch.eye(dt, device=device)-(R.T @ R)
     deno_raw = 0.5*safe_logdet(sigma)
 
     mi_tri = (nume_raw - deno_raw).item()
-    mi_bi_1 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (Q.T @ Q)))
-    mi_bi_2 = -0.5 * (safe_logdet(torch.eye(n2, device=device) - (R.T @ R)))
-    return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
+    mi_bi_1 = -0.5 * (safe_logdet(torch.eye(dt, device=device) - (Q.T @ Q)))
+    mi_bi_2 = -0.5 * (safe_logdet(torch.eye(dt, device=device) - (R.T @ R)))
+    all_terms_dict = {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2,'nume': nume_raw,'deno': deno_raw}
+    if term == 'full':
+        return {"mi_tri": mi_tri,'mi_bi_1': mi_bi_1,'mi_bi_2': mi_bi_2.item(),'nume': nume_raw.item(),'deno': deno_raw.item()}
+    else:
+        return {term: all_terms_dict[term]}
+    
+def calculate_mi_raw(device:torch.device,sigma:torch.Tensor,dims:list):
+    """This function calculates the tri-variate or bi-variate
+    mutual information using the covariance matrices without any whitening - in raw mode (:
+    
+    Input: 
+        device: torch.device - the device on which to perform the calculations
+        sigma: torch.Tensor - the covariance matrix of the joint distribution of the sources and target, in the order [X1,X2,T]
+        dims = list - the dimensions of the random variables\
+        tri_variate: bool - whether to calculate tri-variate mutual information (True) or bi-variate mutual information (False)
 
+
+    Output: Mutual Iformation value (float)"""
+
+
+    sigma_dict = create_cov_matrix(Sigma=sigma, dims=dims, device=device)
+
+    cov_x12 = sigma_dict['joint_x1_x2']
+    cov_t = sigma_dict['cov_t']
+
+    #log∣ΣX1​X2​​∣
+    logdet_x12 = 0.5 * safe_logdet(cov_x12)
+    #log∣ΣT∣
+    logdet_t = 0.5 * safe_logdet(cov_t)
+    #log∣ΣT​X1​X2​​∣
+    logdet_joint = 0.5 * safe_logdet(sigma)
+    mi_tri = logdet_x12 + logdet_t - logdet_joint
+
+    #bi-X1T:
+    cov_x1 = sigma_dict['cov_x1']
+    cov_x1_t = sigma_dict['joint_x1_t']
+    logdet_x1 = 0.5 * safe_logdet(cov_x1)
+    logdet_x1_t = 0.5 * safe_logdet(cov_x1_t)
+    mi_bi_1 = logdet_x1 + logdet_t - logdet_x1_t
+
+    #bi-X2T:
+    cov_x2 = sigma_dict['cov_x2']
+    cov_x2_t = sigma_dict['joint_x2_t']
+    logdet_x2 = 0.5 * safe_logdet(cov_x2)
+    logdet_x2_t = 0.5 * safe_logdet(cov_x2_t)
+
+    mi_bi_2 = logdet_x2 + logdet_t - logdet_x2_t
+
+    return {'tri_mi':mi_tri.item(),'bi_mi_1_t': mi_bi_1.item(),'bi_mi_2_t': mi_bi_2.item()}
+
+
+
+
+    
+
+    
+    
+
+    
+    
 
 def para_calcualte_mi(config,sigma_dict,term='full',assumed_whitened = True):
     """This function calculates the tri-variate mutual information using the for 
@@ -167,7 +225,7 @@ def calculate_mi_lr(config,sigma_dict):
             using: create_con_matrix function in PID_util.py
 
             
-    output: dict - contains the mutual information and the numerator and denominator of the calculation"""
+    output: dict - contains the mutual information"""
 
     n0 = config['n0']
     n1 = config['n1']
@@ -175,17 +233,18 @@ def calculate_mi_lr(config,sigma_dict):
     device = config['device']
 
     joint_cov_x1_x2 = sigma_dict['joint_x1_x2']
-    # Solve the linear system instead of explicitly inverting cov_xt
-    solve_x1 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x1_xt'].T)
-    solve_x2 = torch.linalg.solve(sigma_dict['cov_xt'], sigma_dict['cross_x2_xt'].T)
+    # Solve the linear system instead of explicitly inverting cov_t
+    solve_x1 = torch.linalg.solve(sigma_dict['cov_t'], sigma_dict['cross_x1_t'].T)
+    solve_x2 = torch.linalg.solve(sigma_dict['cov_t'], sigma_dict['cross_x2_t'].T)
 
     # Calculate conditional covariances
-    cov_x1_given_t = (sigma_dict['cov_x1'] - sigma_dict['cross_x1_xt'] @ solve_x1).to(device)
-    cov_x2_given_t = (sigma_dict['cov_x2'] - sigma_dict['cross_x2_xt'] @ solve_x2).to(device)
+    cov_x1_given_t = (sigma_dict['cov_x1'] - sigma_dict['cross_x1_t'] @ solve_x1).to(device)
+    cov_x2_given_t = (sigma_dict['cov_x2'] - sigma_dict['cross_x2_t'] @ solve_x2).to(device)
 
     mi_tri = 0.5 * (safe_logdet(joint_cov_x1_x2) - safe_logdet(cov_x1_given_t) - safe_logdet(cov_x2_given_t))
     mi_bi_1 = 0.5 * (safe_logdet(sigma_dict['cov_x1']) - safe_logdet(cov_x1_given_t))
     mi_bi_2 = 0.5 * (safe_logdet(sigma_dict['cov_x2']) - safe_logdet(cov_x2_given_t))
+
     return {'mi_tri':mi_tri.item(),'mi_bi_1': mi_bi_1.item(),'mi_bi_2': mi_bi_2.item(),'nume': safe_logdet(joint_cov_x1_x2).item(),'deno_1': safe_logdet(cov_x1_given_t).item(),'deno_2': safe_logdet(cov_x2_given_t).item()}
 
 
@@ -204,10 +263,64 @@ def mi_wrapper(config,sigma_dict,whiten_terms_dict,tri_variate=True):
 
     mi_type = config['mi_type'] if tri_variate else config['bi_mi_type']
     if mi_type == 'whiten':
-        return calcualte_mi(config,whiten_terms_dict)
+        mi = calcualte_mi(config,whiten_terms_dict)
     elif mi_type == 'lr':
-        return calculate_mi_lr(config,sigma_dict)
+        mi = calculate_mi_lr(config,sigma_dict)
     else:
         raise ValueError(f"Invalid mi_type: {mi_type}. Must be either 'not_whiten' or 'lr'.")
     
+    return mi
 
+
+
+
+def pid_components(pid_config,print_results=False):
+    """Calculate PID components with the known components. 
+    Input: 
+        pid_config: dict - contains all need mutual information (I(T,X1), I(T,X2), I(T,X1,X2)) and 
+        at least one of the PID components (redundancy, synergy, unique1, unique2)
+        
+    Output:
+        pid_dict: dict - contains all PID components calculated from the known components and the mutual information values"""
+    
+    mi_tri = pid_config['mi_tri']
+    mi_bi_1 = pid_config['mi_bi_1']
+    mi_bi_2 = pid_config['mi_bi_2']
+    redundancy = pid_config.get('red', None)
+    synergy = pid_config.get('sy', None)
+    unique1 = pid_config.get('unq1', None)
+    unique2 = pid_config.get('unq2', None)
+
+    if redundancy is not None:
+        unique1 = mi_bi_1 - redundancy
+        unique2 = mi_bi_2 - redundancy
+        synergy = mi_tri - unique1 - unique2 - redundancy
+    elif synergy is not None:
+        unique1 = mi_bi_1 - (mi_tri - synergy - mi_bi_2)
+        unique2 = mi_bi_2 - (mi_tri - synergy - mi_bi_1)
+        redundancy = mi_bi_1 - unique1
+    elif unique1 is not None:
+        redundancy = mi_bi_1 - unique1
+        unique2 = mi_bi_2 - redundancy
+        synergy = mi_tri - unique1 - unique2 - redundancy
+    elif unique2 is not None:
+        redundancy = mi_bi_2 - unique2
+        unique1 = mi_bi_1 - redundancy
+        synergy = mi_tri - unique1 - unique2 - redundancy
+    else:
+        raise ValueError("At least one of redundancy, synergy, unique1, or unique2 must be provided in pid_config.")
+    
+    pid_dict = {
+        'mi_tri': mi_tri,
+        'mi_bi_1': mi_bi_1,
+        'mi_bi_2': mi_bi_2,
+        'redundancy': redundancy,
+        'unique1': unique1,
+        'unique2': unique2,
+        'synergy': synergy
+    }
+    if print_results:
+        print("PID Components:")
+        for key, value in pid_dict.items():
+            print(f"  {key}: {value:.6f}")
+    return pid_dict

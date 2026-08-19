@@ -1,0 +1,3482 @@
+------------------------------------
+Sun 19 Jul 2026 15:48:27 IDT
+SLURM_JOBID:		19451192
+SLURM_JOB_NODELIST:	ise-cpu128-13
+SLURM_SCRATCH_DIR:	/scratch/ohadshee/19451192
+Allocated Resouces:	cpu - 4 / mem - 49152 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu128-13.auth.ad.bgu.ac.il
+Job ID: 19451192
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu
+
+ Starting Experiment: Ridge_Bias_True_False
+
+Bias correction is set to: True
+Ridge is set to: True
+Results will be saved to: pipeline/analysis/pca_analysis/function_as_pc/results/Ridge_Bias_True_False/R_B_tilde_['convnext_base_classification']_['eca_nfnet_l0_classification']
+Plots will be saved to: pipeline/analysis/pca_analysis/function_as_pc/plots/Ridge_Bias_True_False/R_B_tilde_['convnext_base_classification']_['eca_nfnet_l0_classification']
+Target PCA model will be loaded from: /home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl
+
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+
+Running target-PC analysis with Source 1: convnext_base_classification 😀
+Model options for convnext_base_classification: {'model_name': 'convnext_base', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('convnext_base', pretrained = True)"}
+Image transforms for convnext_base_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: convnext_base_classification
+Ordered layers from model: ['Conv2d-1', 'LayerNorm2d-1', 'Identity-1', 'Conv2d-2', 'LayerNorm-2', 'Linear-1', 'GELU-1', 'Dropout-1', 'Identity-2', 'Linear-2', 'Dropout-2', 'Mlp-1', 'Identity-3', 'Identity-4', 'ConvNeXtBlock-1', 'Conv2d-3', 'LayerNorm-3', 'Linear-3', 'GELU-2', 'Dropout-3', 'Identity-5', 'Linear-4', 'Dropout-4', 'Mlp-2', 'Identity-6', 'Identity-7', 'ConvNeXtBlock-2', 'Conv2d-4', 'LayerNorm-4', 'Linear-5', 'GELU-3', 'Dropout-5', 'Identity-8', 'Linear-6', 'Dropout-6', 'Mlp-3', 'Identity-9', 'Identity-10', 'ConvNeXtBlock-3', 'ConvNeXtStage-1', 'LayerNorm2d-2', 'Conv2d-5', 'Conv2d-6', 'LayerNorm-6', 'Linear-7', 'GELU-4', 'Dropout-7', 'Identity-11', 'Linear-8', 'Dropout-8', 'Mlp-4', 'Identity-12', 'Identity-13', 'ConvNeXtBlock-4', 'Conv2d-7', 'LayerNorm-7', 'Linear-9', 'GELU-5', 'Dropout-9', 'Identity-14', 'Linear-10', 'Dropout-10', 'Mlp-5', 'Identity-15', 'Identity-16', 'ConvNeXtBlock-5', 'Conv2d-8', 'LayerNorm-8', 'Linear-11', 'GELU-6', 'Dropout-11', 'Identity-17', 'Linear-12', 'Dropout-12', 'Mlp-6', 'Identity-18', 'Identity-19', 'ConvNeXtBlock-6', 'ConvNeXtStage-2', 'LayerNorm2d-3', 'Conv2d-9', 'Conv2d-10', 'LayerNorm-10', 'Linear-13', 'GELU-7', 'Dropout-13', 'Identity-20', 'Linear-14', 'Dropout-14', 'Mlp-7', 'Identity-21', 'Identity-22', 'ConvNeXtBlock-7', 'Conv2d-11', 'LayerNorm-11', 'Linear-15', 'GELU-8', 'Dropout-15', 'Identity-23', 'Linear-16', 'Dropout-16', 'Mlp-8', 'Identity-24', 'Identity-25', 'ConvNeXtBlock-8', 'Conv2d-12', 'LayerNorm-12', 'Linear-17', 'GELU-9', 'Dropout-17', 'Identity-26', 'Linear-18', 'Dropout-18', 'Mlp-9', 'Identity-27', 'Identity-28', 'ConvNeXtBlock-9', 'Conv2d-13', 'LayerNorm-13', 'Linear-19', 'GELU-10', 'Dropout-19', 'Identity-29', 'Linear-20', 'Dropout-20', 'Mlp-10', 'Identity-30', 'Identity-31', 'ConvNeXtBlock-10', 'Conv2d-14', 'LayerNorm-14', 'Linear-21', 'GELU-11', 'Dropout-21', 'Identity-32', 'Linear-22', 'Dropout-22', 'Mlp-11', 'Identity-33', 'Identity-34', 'ConvNeXtBlock-11', 'Conv2d-15', 'LayerNorm-15', 'Linear-23', 'GELU-12', 'Dropout-23', 'Identity-35', 'Linear-24', 'Dropout-24', 'Mlp-12', 'Identity-36', 'Identity-37', 'ConvNeXtBlock-12', 'Conv2d-16', 'LayerNorm-16', 'Linear-25', 'GELU-13', 'Dropout-25', 'Identity-38', 'Linear-26', 'Dropout-26', 'Mlp-13', 'Identity-39', 'Identity-40', 'ConvNeXtBlock-13', 'Conv2d-17', 'LayerNorm-17', 'Linear-27', 'GELU-14', 'Dropout-27', 'Identity-41', 'Linear-28', 'Dropout-28', 'Mlp-14', 'Identity-42', 'Identity-43', 'ConvNeXtBlock-14', 'Conv2d-18', 'LayerNorm-18', 'Linear-29', 'GELU-15', 'Dropout-29', 'Identity-44', 'Linear-30', 'Dropout-30', 'Mlp-15', 'Identity-45', 'Identity-46', 'ConvNeXtBlock-15', 'Conv2d-19', 'LayerNorm-19', 'Linear-31', 'GELU-16', 'Dropout-31', 'Identity-47', 'Linear-32', 'Dropout-32', 'Mlp-16', 'Identity-48', 'Identity-49', 'ConvNeXtBlock-16', 'Conv2d-20', 'LayerNorm-20', 'Linear-33', 'GELU-17', 'Dropout-33', 'Identity-50', 'Linear-34', 'Dropout-34', 'Mlp-17', 'Identity-51', 'Identity-52', 'ConvNeXtBlock-17', 'Conv2d-21', 'LayerNorm-21', 'Linear-35', 'GELU-18', 'Dropout-35', 'Identity-53', 'Linear-36', 'Dropout-36', 'Mlp-18', 'Identity-54', 'Identity-55', 'ConvNeXtBlock-18', 'Conv2d-22', 'LayerNorm-22', 'Linear-37', 'GELU-19', 'Dropout-37', 'Identity-56', 'Linear-38', 'Dropout-38', 'Mlp-19', 'Identity-57', 'Identity-58', 'ConvNeXtBlock-19', 'Conv2d-23', 'LayerNorm-23', 'Linear-39', 'GELU-20', 'Dropout-39', 'Identity-59', 'Linear-40', 'Dropout-40', 'Mlp-20', 'Identity-60', 'Identity-61', 'ConvNeXtBlock-20', 'Conv2d-24', 'LayerNorm-24', 'Linear-41', 'GELU-21', 'Dropout-41', 'Identity-62', 'Linear-42', 'Dropout-42', 'Mlp-21', 'Identity-63', 'Identity-64', 'ConvNeXtBlock-21', 'Conv2d-25', 'LayerNorm-25', 'Linear-43', 'GELU-22', 'Dropout-43', 'Identity-65', 'Linear-44', 'Dropout-44', 'Mlp-22', 'Identity-66', 'Identity-67', 'ConvNeXtBlock-22', 'Conv2d-26', 'LayerNorm-26', 'Linear-45', 'GELU-23', 'Dropout-45', 'Identity-68', 'Linear-46', 'Dropout-46', 'Mlp-23', 'Identity-69', 'Identity-70', 'ConvNeXtBlock-23', 'Conv2d-27', 'LayerNorm-27', 'Linear-47', 'GELU-24', 'Dropout-47', 'Identity-71', 'Linear-48', 'Dropout-48', 'Mlp-24', 'Identity-72', 'Identity-73', 'ConvNeXtBlock-24', 'Conv2d-28', 'LayerNorm-28', 'Linear-49', 'GELU-25', 'Dropout-49', 'Identity-74', 'Linear-50', 'Dropout-50', 'Mlp-25', 'Identity-75', 'Identity-76', 'ConvNeXtBlock-25', 'Conv2d-29', 'LayerNorm-29', 'Linear-51', 'GELU-26', 'Dropout-51', 'Identity-77', 'Linear-52', 'Dropout-52', 'Mlp-26', 'Identity-78', 'Identity-79', 'ConvNeXtBlock-26', 'Conv2d-30', 'LayerNorm-30', 'Linear-53', 'GELU-27', 'Dropout-53', 'Identity-80', 'Linear-54', 'Dropout-54', 'Mlp-27', 'Identity-81', 'Identity-82', 'ConvNeXtBlock-27', 'Conv2d-31', 'LayerNorm-31', 'Linear-55', 'GELU-28', 'Dropout-55', 'Identity-83', 'Linear-56', 'Dropout-56', 'Mlp-28', 'Identity-84', 'Identity-85', 'ConvNeXtBlock-28', 'Conv2d-32', 'LayerNorm-32', 'Linear-57', 'GELU-29', 'Dropout-57', 'Identity-86', 'Linear-58', 'Dropout-58', 'Mlp-29', 'Identity-87', 'Identity-88', 'ConvNeXtBlock-29', 'Conv2d-33', 'LayerNorm-33', 'Linear-59', 'GELU-30', 'Dropout-59', 'Identity-89', 'Linear-60', 'Dropout-60', 'Mlp-30', 'Identity-90', 'Identity-91', 'ConvNeXtBlock-30', 'Conv2d-34', 'LayerNorm-34', 'Linear-61', 'GELU-31', 'Dropout-61', 'Identity-92', 'Linear-62', 'Dropout-62', 'Mlp-31', 'Identity-93', 'Identity-94', 'ConvNeXtBlock-31', 'Conv2d-35', 'LayerNorm-35', 'Linear-63', 'GELU-32', 'Dropout-63', 'Identity-95', 'Linear-64', 'Dropout-64', 'Mlp-32', 'Identity-96', 'Identity-97', 'ConvNeXtBlock-32', 'Conv2d-36', 'LayerNorm-36', 'Linear-65', 'GELU-33', 'Dropout-65', 'Identity-98', 'Linear-66', 'Dropout-66', 'Mlp-33', 'Identity-99', 'Identity-100', 'ConvNeXtBlock-33', 'ConvNeXtStage-3', 'LayerNorm2d-4', 'Conv2d-37', 'Conv2d-38', 'LayerNorm-38', 'Linear-67', 'GELU-34', 'Dropout-67', 'Identity-101', 'Linear-68', 'Dropout-68', 'Mlp-34', 'Identity-102', 'Identity-103', 'ConvNeXtBlock-34', 'Conv2d-39', 'LayerNorm-39', 'Linear-69', 'GELU-35', 'Dropout-69', 'Identity-104', 'Linear-70', 'Dropout-70', 'Mlp-35', 'Identity-105', 'Identity-106', 'ConvNeXtBlock-35', 'Conv2d-40', 'LayerNorm-40', 'Linear-71', 'GELU-36', 'Dropout-71', 'Identity-107', 'Linear-72', 'Dropout-72', 'Mlp-36', 'Identity-108', 'Identity-109', 'ConvNeXtBlock-36', 'ConvNeXtStage-4', 'Identity-110', 'AdaptiveAvgPool2d-1', 'Identity-111', 'SelectAdaptivePool2d-1', 'LayerNorm2d-5', 'Flatten-1', 'Identity-112', 'Dropout-73', 'Linear-73', 'NormMlpClassifierHead-1', 'ConvNeXt-41']
+Total number of layers: 456
+Model options for eca_nfnet_l0_classification: {'model_name': 'eca_nfnet_l0', 'train_type': 'classification', 'train_data': 'imagenet', 'model_source': 'timm', 'call': "get_timm_model('eca_nfnet_l0', pretrained = True)"}
+Image transforms for eca_nfnet_l0_classification: Compose(
+    Resize(size=(224, 224), interpolation=bicubic, max_size=None, antialias=True)
+    MaybeToTensor()
+    Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+)
+Loaded model: eca_nfnet_l0_classification
+Ordered layers from model: ['ScaledStdConv2d-1', 'SiLU-1', 'ScaledStdConv2d-2', 'SiLU-2', 'ScaledStdConv2d-3', 'SiLU-3', 'ScaledStdConv2d-4', 'SiLU-4', 'Identity-1', 'ScaledStdConv2d-5', 'DownsampleAvg-1', 'ScaledStdConv2d-6', 'SiLU-5', 'ScaledStdConv2d-7', 'SiLU-6', 'ScaledStdConv2d-8', 'SiLU-7', 'ScaledStdConv2d-9', 'Conv1d-1', 'Sigmoid-1', 'EcaModule-1', 'Identity-2', 'NormFreeBlock-1', 'SiLU-8', 'AvgPool2d-1', 'ScaledStdConv2d-10', 'DownsampleAvg-2', 'ScaledStdConv2d-11', 'SiLU-9', 'ScaledStdConv2d-12', 'SiLU-10', 'ScaledStdConv2d-13', 'SiLU-11', 'ScaledStdConv2d-14', 'Conv1d-2', 'Sigmoid-2', 'EcaModule-2', 'Identity-3', 'NormFreeBlock-2', 'SiLU-12', 'ScaledStdConv2d-15', 'SiLU-13', 'ScaledStdConv2d-16', 'SiLU-14', 'ScaledStdConv2d-17', 'SiLU-15', 'ScaledStdConv2d-18', 'Conv1d-3', 'Sigmoid-3', 'EcaModule-3', 'Identity-4', 'NormFreeBlock-3', 'SiLU-16', 'AvgPool2d-2', 'ScaledStdConv2d-19', 'DownsampleAvg-3', 'ScaledStdConv2d-20', 'SiLU-17', 'ScaledStdConv2d-21', 'SiLU-18', 'ScaledStdConv2d-22', 'SiLU-19', 'ScaledStdConv2d-23', 'Conv1d-4', 'Sigmoid-4', 'EcaModule-4', 'Identity-5', 'NormFreeBlock-4', 'SiLU-20', 'ScaledStdConv2d-24', 'SiLU-21', 'ScaledStdConv2d-25', 'SiLU-22', 'ScaledStdConv2d-26', 'SiLU-23', 'ScaledStdConv2d-27', 'Conv1d-5', 'Sigmoid-5', 'EcaModule-5', 'Identity-6', 'NormFreeBlock-5', 'SiLU-24', 'ScaledStdConv2d-28', 'SiLU-25', 'ScaledStdConv2d-29', 'SiLU-26', 'ScaledStdConv2d-30', 'SiLU-27', 'ScaledStdConv2d-31', 'Conv1d-6', 'Sigmoid-6', 'EcaModule-6', 'Identity-7', 'NormFreeBlock-6', 'SiLU-28', 'ScaledStdConv2d-32', 'SiLU-29', 'ScaledStdConv2d-33', 'SiLU-30', 'ScaledStdConv2d-34', 'SiLU-31', 'ScaledStdConv2d-35', 'Conv1d-7', 'Sigmoid-7', 'EcaModule-7', 'Identity-8', 'NormFreeBlock-7', 'SiLU-32', 'ScaledStdConv2d-36', 'SiLU-33', 'ScaledStdConv2d-37', 'SiLU-34', 'ScaledStdConv2d-38', 'SiLU-35', 'ScaledStdConv2d-39', 'Conv1d-8', 'Sigmoid-8', 'EcaModule-8', 'Identity-9', 'NormFreeBlock-8', 'SiLU-36', 'ScaledStdConv2d-40', 'SiLU-37', 'ScaledStdConv2d-41', 'SiLU-38', 'ScaledStdConv2d-42', 'SiLU-39', 'ScaledStdConv2d-43', 'Conv1d-9', 'Sigmoid-9', 'EcaModule-9', 'Identity-10', 'NormFreeBlock-9', 'SiLU-40', 'AvgPool2d-3', 'ScaledStdConv2d-44', 'DownsampleAvg-4', 'ScaledStdConv2d-45', 'SiLU-41', 'ScaledStdConv2d-46', 'SiLU-42', 'ScaledStdConv2d-47', 'SiLU-43', 'ScaledStdConv2d-48', 'Conv1d-10', 'Sigmoid-10', 'EcaModule-10', 'Identity-11', 'NormFreeBlock-10', 'SiLU-44', 'ScaledStdConv2d-49', 'SiLU-45', 'ScaledStdConv2d-50', 'SiLU-46', 'ScaledStdConv2d-51', 'SiLU-47', 'ScaledStdConv2d-52', 'Conv1d-11', 'Sigmoid-11', 'EcaModule-11', 'Identity-12', 'NormFreeBlock-11', 'SiLU-48', 'ScaledStdConv2d-53', 'SiLU-49', 'ScaledStdConv2d-54', 'SiLU-50', 'ScaledStdConv2d-55', 'SiLU-51', 'ScaledStdConv2d-56', 'Conv1d-12', 'Sigmoid-12', 'EcaModule-12', 'Identity-13', 'NormFreeBlock-12', 'ScaledStdConv2d-57', 'SiLU-52', 'AdaptiveAvgPool2d-1', 'Flatten-1', 'SelectAdaptivePool2d-1', 'Dropout-1', 'Linear-1', 'Identity-14', 'ClassifierHead-1', 'NormFreeNet-1']
+Total number of layers: 185
+
+==================================================
+Processing layer: Conv2d-26 from model: convnext_base_classification
+
+For model convnext_base_classification Layer Conv2d-26: Extracting features for 10000 images in batches of 120...
+Feature extraction for model convnext_base_classification layer Conv2d-26 completed in 2826.71 seconds.
+
+==================================================
+Processing layer: AvgPool2d-3 from model: eca_nfnet_l0_classification
+
+For model eca_nfnet_l0_classification Layer AvgPool2d-3: Extracting features for 10000 images in batches of 120...
+Feature extraction for model eca_nfnet_l0_classification layer AvgPool2d-3 completed in 692.31 seconds.
+
+Running target-PC analysis with Source 1: convnext_base_classification and Source 2: eca_nfnet_l0_classification 😀
+Selecting the first 1 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 1 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.0min
+Finding best ridge alphas for 1 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 2.6min
+Source 1 shape: (1000,), Source 2 shape: (1000,)
+Shared target shape: (1000, 1)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 1 target PCs:
+PID Results:
+  red: 0.16010748554777895
+  unq1: 0.018272678713957963
+  unq2: 0.0
+  syn: 0.0
+Mutual Information Results:
+  tri_mi: 0.1783801642617369
+  bi_mi_1: 0.1783801642617369
+  bi_mi_2: 0.16010748554777893
+Selecting the first 2 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 2 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.6min
+Finding best ridge alphas for 2 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.1min
+Source 1 shape: (1000, 2), Source 2 shape: (1000, 2)
+Shared target shape: (1000, 2)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 2 target PCs:
+PID Results:
+  red: 1.2083736740841935
+  unq1: 0.029279740527234477
+  unq2: 0.0
+  syn: 0.02820786260517849
+Mutual Information Results:
+  tri_mi: 1.2658612772166065
+  bi_mi_1: 1.237653414611428
+  bi_mi_2: 1.2083736740841935
+Selecting the first 3 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 3 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Finding best ridge alphas for 3 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.2min
+Source 1 shape: (1000, 3), Source 2 shape: (1000, 3)
+Shared target shape: (1000, 3)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 3 target PCs:
+PID Results:
+  red: 1.8197919893732373
+  unq1: 0.04531260686208993
+  unq2: 0.0
+  syn: 0.05585827160995027
+Mutual Information Results:
+  tri_mi: 1.9209628678452775
+  bi_mi_1: 1.8651045962353272
+  bi_mi_2: 1.8197919893732373
+Selecting the first 4 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 4 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.6min
+Finding best ridge alphas for 4 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.1min
+Source 1 shape: (1000, 4), Source 2 shape: (1000, 4)
+Shared target shape: (1000, 4)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 4 target PCs:
+PID Results:
+  red: 2.4891830758239135
+  unq1: 0.04837036187552757
+  unq2: 0.01322587811022391
+  syn: 0.07296404818677882
+Mutual Information Results:
+  tri_mi: 2.6237433639964434
+  bi_mi_1: 2.5375534376994406
+  bi_mi_2: 2.502408953934137
+Selecting the first 5 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 5 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+Finding best ridge alphas for 5 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.1min
+Source 1 shape: (1000, 5), Source 2 shape: (1000, 5)
+Shared target shape: (1000, 5)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 5 target PCs:
+PID Results:
+  red: 3.0248153756480174
+  unq1: 0.06359483996378357
+  unq2: 0.016949424715137607
+  syn: 0.08414432175226816
+Mutual Information Results:
+  tri_mi: 3.1895039620792067
+  bi_mi_1: 3.088410215611801
+  bi_mi_2: 3.041764800363155
+Selecting the first 6 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 6 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+Finding best ridge alphas for 6 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.2min
+Source 1 shape: (1000, 6), Source 2 shape: (1000, 6)
+Shared target shape: (1000, 6)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 6 target PCs:
+PID Results:
+  red: 3.3081271487711446
+  unq1: 0.06623393769651509
+  unq2: 0.0296349497071553
+  syn: 0.09432552963837004
+Mutual Information Results:
+  tri_mi: 3.4983215658131845
+  bi_mi_1: 3.374361086467659
+  bi_mi_2: 3.3377620984782994
+Selecting the first 7 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 7 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Finding best ridge alphas for 7 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.2min
+Source 1 shape: (1000, 7), Source 2 shape: (1000, 7)
+Shared target shape: (1000, 7)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 7 target PCs:
+PID Results:
+  red: 3.5531685957415196
+  unq1: 0.06757606109645575
+  unq2: 0.028011012345697583
+  syn: 0.10319246141005767
+Mutual Information Results:
+  tri_mi: 3.751948130593731
+  bi_mi_1: 3.6207446568379758
+  bi_mi_2: 3.5811796080872176
+Selecting the first 8 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 8 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+Finding best ridge alphas for 8 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.1min
+Source 1 shape: (1000, 8), Source 2 shape: (1000, 8)
+Shared target shape: (1000, 8)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 8 target PCs:
+PID Results:
+  red: 3.6189786922484957
+  unq1: 0.06471098783682239
+  unq2: 0.021632668099322405
+  syn: 0.10519562732292043
+Mutual Information Results:
+  tri_mi: 3.810517975507561
+  bi_mi_1: 3.683689680085318
+  bi_mi_2: 3.640611360347818
+Selecting the first 9 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 9 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Finding best ridge alphas for 9 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.3min
+Source 1 shape: (1000, 9), Source 2 shape: (1000, 9)
+Shared target shape: (1000, 9)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 9 target PCs:
+PID Results:
+  red: 3.95383522804702
+  unq1: 0.07274883347768224
+  unq2: 0.02946850840968107
+  syn: 0.11005696745335403
+Mutual Information Results:
+  tri_mi: 4.166109537387737
+  bi_mi_1: 4.0265840615247015
+  bi_mi_2: 3.9833037364567003
+Selecting the first 10 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 10 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Finding best ridge alphas for 10 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.3min
+Source 1 shape: (1000, 10), Source 2 shape: (1000, 10)
+Shared target shape: (1000, 10)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 10 target PCs:
+PID Results:
+  red: 4.16427887157388
+  unq1: 0.08284896833222888
+  unq2: 0.06172648368420841
+  syn: 0.11496232991230748
+Mutual Information Results:
+  tri_mi: 4.423816653502626
+  bi_mi_1: 4.24712783990611
+  bi_mi_2: 4.226005355258089
+Selecting the first 11 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 11 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Finding best ridge alphas for 11 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 11), Source 2 shape: (1000, 11)
+Shared target shape: (1000, 11)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 11 target PCs:
+PID Results:
+  red: 4.468578271055245
+  unq1: 0.10037991420876136
+  unq2: 0.06543645795547182
+  syn: 0.11576319433842652
+Mutual Information Results:
+  tri_mi: 4.7501578375579045
+  bi_mi_1: 4.568958185264006
+  bi_mi_2: 4.534014729010717
+Selecting the first 12 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 12 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Finding best ridge alphas for 12 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.2min
+Source 1 shape: (1000, 12), Source 2 shape: (1000, 12)
+Shared target shape: (1000, 12)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 12 target PCs:
+PID Results:
+  red: 5.056183256859006
+  unq1: 0.12295844638867859
+  unq2: 0.05692854209168363
+  syn: 0.13799546095636117
+Mutual Information Results:
+  tri_mi: 5.374065706295729
+  bi_mi_1: 5.1791417032476845
+  bi_mi_2: 5.11311179895069
+Selecting the first 13 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 13 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Finding best ridge alphas for 13 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Source 1 shape: (1000, 13), Source 2 shape: (1000, 13)
+Shared target shape: (1000, 13)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 13 target PCs:
+PID Results:
+  red: 5.199678651058685
+  unq1: 0.13865641596052836
+  unq2: 0.06455060738371543
+  syn: 0.13932596167786215
+Mutual Information Results:
+  tri_mi: 5.542211636080792
+  bi_mi_1: 5.338335067019214
+  bi_mi_2: 5.264229258442401
+Selecting the first 14 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 14 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Finding best ridge alphas for 14 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 14), Source 2 shape: (1000, 14)
+Shared target shape: (1000, 14)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 14 target PCs:
+PID Results:
+  red: 5.389431911397418
+  unq1: 0.14529875807848125
+  unq2: 0.05805716890343593
+  syn: 0.1456071205752174
+Mutual Information Results:
+  tri_mi: 5.738394958954553
+  bi_mi_1: 5.534730669475899
+  bi_mi_2: 5.447489080300854
+Selecting the first 15 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 15 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Finding best ridge alphas for 15 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 15), Source 2 shape: (1000, 15)
+Shared target shape: (1000, 15)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 15 target PCs:
+PID Results:
+  red: 5.696986100110771
+  unq1: 0.1334728919440602
+  unq2: 0.04222219268023597
+  syn: 0.17963823727255157
+Mutual Information Results:
+  tri_mi: 6.052319422007619
+  bi_mi_1: 5.830458992054831
+  bi_mi_2: 5.739208292791007
+Selecting the first 16 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 16 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+Finding best ridge alphas for 16 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.4min
+Source 1 shape: (1000, 16), Source 2 shape: (1000, 16)
+Shared target shape: (1000, 16)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 16 target PCs:
+PID Results:
+  red: 5.857001194484435
+  unq1: 0.13140442855289614
+  unq2: 0.04064216487330974
+  syn: 0.1864658485051871
+Mutual Information Results:
+  tri_mi: 6.215513636415828
+  bi_mi_1: 5.988405623037331
+  bi_mi_2: 5.897643359357745
+Selecting the first 17 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 17 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Finding best ridge alphas for 17 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 17), Source 2 shape: (1000, 17)
+Shared target shape: (1000, 17)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 17 target PCs:
+PID Results:
+  red: 6.058253975452685
+  unq1: 0.1485196559606381
+  unq2: 0.02411468422362706
+  syn: 0.19587818925839695
+Mutual Information Results:
+  tri_mi: 6.4267665048953475
+  bi_mi_1: 6.2067736314133235
+  bi_mi_2: 6.0823686596763125
+Selecting the first 18 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 18 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Finding best ridge alphas for 18 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 18), Source 2 shape: (1000, 18)
+Shared target shape: (1000, 18)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 18 target PCs:
+PID Results:
+  red: 6.134013787379072
+  unq1: 0.1596530079609968
+  unq2: 0.034979223477178856
+  syn: 0.20057828893595708
+Mutual Information Results:
+  tri_mi: 6.529224307753204
+  bi_mi_1: 6.2936667953400685
+  bi_mi_2: 6.1689930108562505
+Selecting the first 19 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 19 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Finding best ridge alphas for 19 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.6min
+Source 1 shape: (1000, 19), Source 2 shape: (1000, 19)
+Shared target shape: (1000, 19)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 19 target PCs:
+PID Results:
+  red: 6.362167561512424
+  unq1: 0.1527095377098986
+  unq2: 0.034261488144764485
+  syn: 0.2239694083683883
+Mutual Information Results:
+  tri_mi: 6.773107995735476
+  bi_mi_1: 6.514877099222323
+  bi_mi_2: 6.396429049657189
+Selecting the first 20 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 20 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Finding best ridge alphas for 20 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 20), Source 2 shape: (1000, 20)
+Shared target shape: (1000, 20)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 20 target PCs:
+PID Results:
+  red: 6.480179137872531
+  unq1: 0.147171143235024
+  unq2: 0.027556695417622734
+  syn: 0.23608823730618145
+Mutual Information Results:
+  tri_mi: 6.890995213831359
+  bi_mi_1: 6.627350281107555
+  bi_mi_2: 6.507735833290154
+Selecting the first 21 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 21 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Finding best ridge alphas for 21 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 21), Source 2 shape: (1000, 21)
+Shared target shape: (1000, 21)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 21 target PCs:
+PID Results:
+  red: 6.646349790753276
+  unq1: 0.15568650657509764
+  unq2: 0.03144480094855595
+  syn: 0.25296782753043434
+Mutual Information Results:
+  tri_mi: 7.086448925807364
+  bi_mi_1: 6.802036297328374
+  bi_mi_2: 6.677794591701832
+Selecting the first 22 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 22 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Finding best ridge alphas for 22 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.6min
+Source 1 shape: (1000, 22), Source 2 shape: (1000, 22)
+Shared target shape: (1000, 22)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 22 target PCs:
+PID Results:
+  red: 6.839603682764461
+  unq1: 0.17553117921119732
+  unq2: 0.021244939463455736
+  syn: 0.2734170152353137
+Mutual Information Results:
+  tri_mi: 7.309796816674429
+  bi_mi_1: 7.0151348619756595
+  bi_mi_2: 6.860848622227918
+Selecting the first 23 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 23 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Finding best ridge alphas for 23 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+Source 1 shape: (1000, 23), Source 2 shape: (1000, 23)
+Shared target shape: (1000, 23)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 23 target PCs:
+PID Results:
+  red: 7.023687340652799
+  unq1: 0.1725248701835831
+  unq2: 0.02119247235112187
+  syn: 0.2913797253917494
+Mutual Information Results:
+  tri_mi: 7.508784408579253
+  bi_mi_1: 7.196212210836381
+  bi_mi_2: 7.04487981300392
+Selecting the first 24 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 24 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Finding best ridge alphas for 24 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.5min
+Source 1 shape: (1000, 24), Source 2 shape: (1000, 24)
+Shared target shape: (1000, 24)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 24 target PCs:
+PID Results:
+  red: 7.126802664637039
+  unq1: 0.16158185932813574
+  unq2: 0.014063769592795872
+  syn: 0.30154364851905413
+Mutual Information Results:
+  tri_mi: 7.603991942077024
+  bi_mi_1: 7.288384523965174
+  bi_mi_2: 7.140866434229834
+Selecting the first 25 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 25 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Finding best ridge alphas for 25 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.6min
+Source 1 shape: (1000, 25), Source 2 shape: (1000, 25)
+Shared target shape: (1000, 25)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 25 target PCs:
+PID Results:
+  red: 7.298836611323216
+  unq1: 0.15295711022463454
+  unq2: 0.019596531421623098
+  syn: 0.3179120268459048
+Mutual Information Results:
+  tri_mi: 7.789302279815377
+  bi_mi_1: 7.451793721547849
+  bi_mi_2: 7.318433142744838
+Selecting the first 26 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 26 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+Finding best ridge alphas for 26 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+Source 1 shape: (1000, 26), Source 2 shape: (1000, 26)
+Shared target shape: (1000, 26)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 26 target PCs:
+PID Results:
+  red: 7.383981809772791
+  unq1: 0.1559417840697428
+  unq2: 0.012213127034819138
+  syn: 0.3281228402383878
+Mutual Information Results:
+  tri_mi: 7.880259561115741
+  bi_mi_1: 7.539923593842534
+  bi_mi_2: 7.3961949368076105
+Selecting the first 27 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 27 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Finding best ridge alphas for 27 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Source 1 shape: (1000, 27), Source 2 shape: (1000, 27)
+Shared target shape: (1000, 27)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 27 target PCs:
+PID Results:
+  red: 7.5581944998253485
+  unq1: 0.158542214925685
+  unq2: 0.0
+  syn: 0.3471224291902475
+Mutual Information Results:
+  tri_mi: 8.063859143941281
+  bi_mi_1: 7.7167367147510335
+  bi_mi_2: 7.5581944998253485
+Selecting the first 28 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 28 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+Finding best ridge alphas for 28 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.6min
+Source 1 shape: (1000, 28), Source 2 shape: (1000, 28)
+Shared target shape: (1000, 28)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 28 target PCs:
+PID Results:
+  red: 7.6610184586317045
+  unq1: 0.1557215116459325
+  unq2: 0.0
+  syn: 0.34965425069346967
+Mutual Information Results:
+  tri_mi: 8.166394220971107
+  bi_mi_1: 7.816739970277637
+  bi_mi_2: 7.6610184586317045
+Selecting the first 29 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 29 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Finding best ridge alphas for 29 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Source 1 shape: (1000, 29), Source 2 shape: (1000, 29)
+Shared target shape: (1000, 29)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 29 target PCs:
+PID Results:
+  red: 7.794816706911172
+  unq1: 0.16995252781040904
+  unq2: 0.0
+  syn: 0.35112069998344886
+Mutual Information Results:
+  tri_mi: 8.31588993470503
+  bi_mi_1: 7.964769234721581
+  bi_mi_2: 7.794816706911172
+Selecting the first 30 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 30 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Finding best ridge alphas for 30 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Source 1 shape: (1000, 30), Source 2 shape: (1000, 30)
+Shared target shape: (1000, 30)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 30 target PCs:
+PID Results:
+  red: 7.953625730755588
+  unq1: 0.17273715405558576
+  unq2: 0.0
+  syn: 0.3576052287309892
+Mutual Information Results:
+  tri_mi: 8.483968113542163
+  bi_mi_1: 8.126362884811174
+  bi_mi_2: 7.953625730755588
+Selecting the first 31 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 31 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Finding best ridge alphas for 31 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Source 1 shape: (1000, 31), Source 2 shape: (1000, 31)
+Shared target shape: (1000, 31)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 31 target PCs:
+PID Results:
+  red: 8.131986402919491
+  unq1: 0.1634283843125104
+  unq2: 0.0
+  syn: 0.3625463422074713
+Mutual Information Results:
+  tri_mi: 8.657961129439473
+  bi_mi_1: 8.295414787232001
+  bi_mi_2: 8.131986402919491
+Selecting the first 32 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 32 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Finding best ridge alphas for 32 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.7min
+Source 1 shape: (1000, 32), Source 2 shape: (1000, 32)
+Shared target shape: (1000, 32)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 32 target PCs:
+PID Results:
+  red: 8.25649223738742
+  unq1: 0.19006174868986747
+  unq2: 0.0
+  syn: 0.3675235009256994
+Mutual Information Results:
+  tri_mi: 8.814077487002987
+  bi_mi_1: 8.446553986077287
+  bi_mi_2: 8.25649223738742
+Selecting the first 33 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 33 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+Finding best ridge alphas for 33 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Source 1 shape: (1000, 33), Source 2 shape: (1000, 33)
+Shared target shape: (1000, 33)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 33 target PCs:
+PID Results:
+  red: 8.351855338660084
+  unq1: 0.20163448355045865
+  unq2: 0.0
+  syn: 0.3619614385205576
+Mutual Information Results:
+  tri_mi: 8.915451260731098
+  bi_mi_1: 8.55348982221054
+  bi_mi_2: 8.351855338660082
+Selecting the first 34 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 34 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+Finding best ridge alphas for 34 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Source 1 shape: (1000, 34), Source 2 shape: (1000, 34)
+Shared target shape: (1000, 34)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 34 target PCs:
+PID Results:
+  red: 8.40086080960313
+  unq1: 0.21937421290834358
+  unq2: 0.0
+  syn: 0.36069695807403157
+Mutual Information Results:
+  tri_mi: 8.980931980585506
+  bi_mi_1: 8.620235022511475
+  bi_mi_2: 8.400860809603131
+Selecting the first 35 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 35 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Finding best ridge alphas for 35 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+Source 1 shape: (1000, 35), Source 2 shape: (1000, 35)
+Shared target shape: (1000, 35)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 35 target PCs:
+PID Results:
+  red: 8.587917292631017
+  unq1: 0.22030638714235806
+  unq2: 0.0
+  syn: 0.3808310861635089
+Mutual Information Results:
+  tri_mi: 9.189054765936884
+  bi_mi_1: 8.808223679773375
+  bi_mi_2: 8.587917292631017
+Selecting the first 36 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 36 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+Finding best ridge alphas for 36 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.8min
+Source 1 shape: (1000, 36), Source 2 shape: (1000, 36)
+Shared target shape: (1000, 36)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 36 target PCs:
+PID Results:
+  red: 8.674782024330302
+  unq1: 0.23531528948623048
+  unq2: 0.0
+  syn: 0.3785751083239042
+Mutual Information Results:
+  tri_mi: 9.288672422140436
+  bi_mi_1: 8.910097313816532
+  bi_mi_2: 8.674782024330302
+Selecting the first 37 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 37 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Finding best ridge alphas for 37 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Source 1 shape: (1000, 37), Source 2 shape: (1000, 37)
+Shared target shape: (1000, 37)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 37 target PCs:
+PID Results:
+  red: 8.748068932334464
+  unq1: 0.22652725377503202
+  unq2: 0.0
+  syn: 0.3922427196284133
+Mutual Information Results:
+  tri_mi: 9.36683890573791
+  bi_mi_1: 8.974596186109496
+  bi_mi_2: 8.748068932334464
+Selecting the first 38 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 38 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Finding best ridge alphas for 38 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Source 1 shape: (1000, 38), Source 2 shape: (1000, 38)
+Shared target shape: (1000, 38)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 38 target PCs:
+PID Results:
+  red: 8.887493068772766
+  unq1: 0.2480320256792794
+  unq2: 0.0
+  syn: 0.39734917842426754
+Mutual Information Results:
+  tri_mi: 9.532874272876313
+  bi_mi_1: 9.135525094452046
+  bi_mi_2: 8.887493068772766
+Selecting the first 39 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 39 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Finding best ridge alphas for 39 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+Source 1 shape: (1000, 39), Source 2 shape: (1000, 39)
+Shared target shape: (1000, 39)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 39 target PCs:
+PID Results:
+  red: 8.95344498287942
+  unq1: 0.27620876017107676
+  unq2: 0.0
+  syn: 0.38177015915950996
+Mutual Information Results:
+  tri_mi: 9.611423902210007
+  bi_mi_1: 9.229653743050497
+  bi_mi_2: 8.95344498287942
+Selecting the first 40 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 40 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Finding best ridge alphas for 40 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 3.9min
+Source 1 shape: (1000, 40), Source 2 shape: (1000, 40)
+Shared target shape: (1000, 40)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 40 target PCs:
+PID Results:
+  red: 9.092367815935042
+  unq1: 0.2654062440525067
+  unq2: 0.0
+  syn: 0.3998264613644462
+Mutual Information Results:
+  tri_mi: 9.757600521351995
+  bi_mi_1: 9.357774059987548
+  bi_mi_2: 9.092367815935042
+Selecting the first 41 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 41 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Finding best ridge alphas for 41 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+Source 1 shape: (1000, 41), Source 2 shape: (1000, 41)
+Shared target shape: (1000, 41)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 41 target PCs:
+PID Results:
+  red: 9.172880178920451
+  unq1: 0.27169609255041216
+  unq2: 0.0
+  syn: 0.4080199413053336
+Mutual Information Results:
+  tri_mi: 9.852596212776199
+  bi_mi_1: 9.444576271470865
+  bi_mi_2: 9.172880178920453
+Selecting the first 42 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 42 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Finding best ridge alphas for 42 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+Source 1 shape: (1000, 42), Source 2 shape: (1000, 42)
+Shared target shape: (1000, 42)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 42 target PCs:
+PID Results:
+  red: 9.313829069590115
+  unq1: 0.2895825615092438
+  unq2: 0.0
+  syn: 0.4137721362662514
+Mutual Information Results:
+  tri_mi: 10.017183767365612
+  bi_mi_1: 9.60341163109936
+  bi_mi_2: 9.313829069590117
+Selecting the first 43 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 43 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Finding best ridge alphas for 43 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Source 1 shape: (1000, 43), Source 2 shape: (1000, 43)
+Shared target shape: (1000, 43)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 43 target PCs:
+PID Results:
+  red: 9.463112507424423
+  unq1: 0.2790629771868769
+  unq2: 0.0
+  syn: 0.45457003098424664
+Mutual Information Results:
+  tri_mi: 10.196745515595545
+  bi_mi_1: 9.742175484611298
+  bi_mi_2: 9.463112507424421
+Selecting the first 44 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 44 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Finding best ridge alphas for 44 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.0min
+Source 1 shape: (1000, 44), Source 2 shape: (1000, 44)
+Shared target shape: (1000, 44)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 44 target PCs:
+PID Results:
+  red: 9.525313959440373
+  unq1: 0.29334482293688247
+  unq2: 0.0
+  syn: 0.4559316047890807
+Mutual Information Results:
+  tri_mi: 10.274590387166338
+  bi_mi_1: 9.818658782377257
+  bi_mi_2: 9.525313959440375
+Selecting the first 45 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 45 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Finding best ridge alphas for 45 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Source 1 shape: (1000, 45), Source 2 shape: (1000, 45)
+Shared target shape: (1000, 45)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 45 target PCs:
+PID Results:
+  red: 9.670384902503125
+  unq1: 0.2903077366689626
+  unq2: 0.0
+  syn: 0.4524343645650788
+Mutual Information Results:
+  tri_mi: 10.413127003737165
+  bi_mi_1: 9.960692639172086
+  bi_mi_2: 9.670384902503123
+Selecting the first 46 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 46 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Finding best ridge alphas for 46 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Source 1 shape: (1000, 46), Source 2 shape: (1000, 46)
+Shared target shape: (1000, 46)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 46 target PCs:
+PID Results:
+  red: 9.758916469125479
+  unq1: 0.30065121096064296
+  unq2: 0.0
+  syn: 0.4537614768830611
+Mutual Information Results:
+  tri_mi: 10.513329156969181
+  bi_mi_1: 10.05956768008612
+  bi_mi_2: 9.758916469125477
+Selecting the first 47 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 47 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Finding best ridge alphas for 47 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Source 1 shape: (1000, 47), Source 2 shape: (1000, 47)
+Shared target shape: (1000, 47)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 47 target PCs:
+PID Results:
+  red: 9.868589682853713
+  unq1: 0.31063060967893463
+  unq2: 0.0
+  syn: 0.45580236347997527
+Mutual Information Results:
+  tri_mi: 10.635022656012623
+  bi_mi_1: 10.179220292532648
+  bi_mi_2: 9.868589682853713
+Selecting the first 48 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 48 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Finding best ridge alphas for 48 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.1min
+Source 1 shape: (1000, 48), Source 2 shape: (1000, 48)
+Shared target shape: (1000, 48)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 48 target PCs:
+PID Results:
+  red: 10.054340615004987
+  unq1: 0.2992650053995476
+  unq2: 0.0
+  syn: 0.48909815962785075
+Mutual Information Results:
+  tri_mi: 10.842703780032386
+  bi_mi_1: 10.353605620404535
+  bi_mi_2: 10.054340615004987
+Selecting the first 49 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 49 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Finding best ridge alphas for 49 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Source 1 shape: (1000, 49), Source 2 shape: (1000, 49)
+Shared target shape: (1000, 49)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 49 target PCs:
+PID Results:
+  red: 10.224325551243055
+  unq1: 0.29367290420158376
+  unq2: 0.0
+  syn: 0.47505258679397677
+Mutual Information Results:
+  tri_mi: 10.993051042238617
+  bi_mi_1: 10.51799845544464
+  bi_mi_2: 10.224325551243057
+Selecting the first 50 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 50 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Finding best ridge alphas for 50 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Source 1 shape: (1000, 50), Source 2 shape: (1000, 50)
+Shared target shape: (1000, 50)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 50 target PCs:
+PID Results:
+  red: 10.321357303012297
+  unq1: 0.31627998422977477
+  unq2: 0.0
+  syn: 0.46932554500540746
+Mutual Information Results:
+  tri_mi: 11.106962832247481
+  bi_mi_1: 10.637637287242073
+  bi_mi_2: 10.321357303012299
+Selecting the first 51 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 51 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Finding best ridge alphas for 51 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Source 1 shape: (1000, 51), Source 2 shape: (1000, 51)
+Shared target shape: (1000, 51)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 51 target PCs:
+PID Results:
+  red: 10.496131312657953
+  unq1: 0.32930222175341584
+  unq2: 0.0
+  syn: 0.47787595154304086
+Mutual Information Results:
+  tri_mi: 11.30330948595441
+  bi_mi_1: 10.825433534411369
+  bi_mi_2: 10.496131312657953
+Selecting the first 52 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 52 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Finding best ridge alphas for 52 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.2min
+Source 1 shape: (1000, 52), Source 2 shape: (1000, 52)
+Shared target shape: (1000, 52)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 52 target PCs:
+PID Results:
+  red: 10.530755374740354
+  unq1: 0.31742458891928926
+  unq2: 0.0
+  syn: 0.4818777615975751
+Mutual Information Results:
+  tri_mi: 11.33005772525722
+  bi_mi_1: 10.848179963659645
+  bi_mi_2: 10.530755374740355
+Selecting the first 53 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 53 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Finding best ridge alphas for 53 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Source 1 shape: (1000, 53), Source 2 shape: (1000, 53)
+Shared target shape: (1000, 53)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 53 target PCs:
+PID Results:
+  red: 10.616320583477442
+  unq1: 0.32883610348914516
+  unq2: 0.0
+  syn: 0.48589168641893465
+Mutual Information Results:
+  tri_mi: 11.431048373385522
+  bi_mi_1: 10.945156686966588
+  bi_mi_2: 10.616320583477442
+Selecting the first 54 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 54 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Finding best ridge alphas for 54 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Source 1 shape: (1000, 54), Source 2 shape: (1000, 54)
+Shared target shape: (1000, 54)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 54 target PCs:
+PID Results:
+  red: 10.706129888505533
+  unq1: 0.3442546414936718
+  unq2: 0.0
+  syn: 0.49832623313650615
+Mutual Information Results:
+  tri_mi: 11.548710763135709
+  bi_mi_1: 11.050384529999203
+  bi_mi_2: 10.706129888505531
+Selecting the first 55 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 55 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Finding best ridge alphas for 55 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+Source 1 shape: (1000, 55), Source 2 shape: (1000, 55)
+Shared target shape: (1000, 55)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 55 target PCs:
+PID Results:
+  red: 10.83030253614916
+  unq1: 0.36092925182379965
+  unq2: 0.0
+  syn: 0.4886086320456151
+Mutual Information Results:
+  tri_mi: 11.679840420018577
+  bi_mi_1: 11.191231787972962
+  bi_mi_2: 10.830302536149162
+Selecting the first 56 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 56 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Finding best ridge alphas for 56 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.3min
+Source 1 shape: (1000, 56), Source 2 shape: (1000, 56)
+Shared target shape: (1000, 56)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 56 target PCs:
+PID Results:
+  red: 10.988082122848287
+  unq1: 0.3686971257943714
+  unq2: 0.0
+  syn: 0.5016896248137428
+Mutual Information Results:
+  tri_mi: 11.858468873456399
+  bi_mi_1: 11.356779248642656
+  bi_mi_2: 10.988082122848285
+Selecting the first 57 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 57 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Finding best ridge alphas for 57 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+Source 1 shape: (1000, 57), Source 2 shape: (1000, 57)
+Shared target shape: (1000, 57)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 57 target PCs:
+PID Results:
+  red: 11.117590447141094
+  unq1: 0.38090170146721647
+  unq2: 0.0
+  syn: 0.5057763004950289
+Mutual Information Results:
+  tri_mi: 12.00426844910334
+  bi_mi_1: 11.49849214860831
+  bi_mi_2: 11.117590447141094
+Selecting the first 58 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 58 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Finding best ridge alphas for 58 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+Source 1 shape: (1000, 58), Source 2 shape: (1000, 58)
+Shared target shape: (1000, 58)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 58 target PCs:
+PID Results:
+  red: 11.267234528370194
+  unq1: 0.3796299924760529
+  unq2: 0.0
+  syn: 0.5290931256443248
+Mutual Information Results:
+  tri_mi: 12.17595764649057
+  bi_mi_1: 11.646864520846245
+  bi_mi_2: 11.267234528370192
+Selecting the first 59 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 59 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Finding best ridge alphas for 59 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Source 1 shape: (1000, 59), Source 2 shape: (1000, 59)
+Shared target shape: (1000, 59)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 59 target PCs:
+PID Results:
+  red: 11.336045193935512
+  unq1: 0.3791599010450639
+  unq2: 0.0
+  syn: 0.5451587089637382
+Mutual Information Results:
+  tri_mi: 12.260363803944314
+  bi_mi_1: 11.715205094980575
+  bi_mi_2: 11.336045193935512
+Selecting the first 60 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 60 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Finding best ridge alphas for 60 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.4min
+Source 1 shape: (1000, 60), Source 2 shape: (1000, 60)
+Shared target shape: (1000, 60)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 60 target PCs:
+PID Results:
+  red: 11.414939974015724
+  unq1: 0.3769173137137347
+  unq2: 0.0
+  syn: 0.5510802013767169
+Mutual Information Results:
+  tri_mi: 12.342937489106173
+  bi_mi_1: 11.791857287729457
+  bi_mi_2: 11.414939974015722
+Selecting the first 61 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 61 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Finding best ridge alphas for 61 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Source 1 shape: (1000, 61), Source 2 shape: (1000, 61)
+Shared target shape: (1000, 61)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 61 target PCs:
+PID Results:
+  red: 11.490484108147129
+  unq1: 0.3962051972369771
+  unq2: 0.0
+  syn: 0.5556815618996751
+Mutual Information Results:
+  tri_mi: 12.442370867283781
+  bi_mi_1: 11.886689305384106
+  bi_mi_2: 11.490484108147129
+Selecting the first 62 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 62 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Finding best ridge alphas for 62 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Source 1 shape: (1000, 62), Source 2 shape: (1000, 62)
+Shared target shape: (1000, 62)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 62 target PCs:
+PID Results:
+  red: 11.601588338598916
+  unq1: 0.41314228262249486
+  unq2: 0.0
+  syn: 0.5444080816247077
+Mutual Information Results:
+  tri_mi: 12.559138702846118
+  bi_mi_1: 12.01473062122141
+  bi_mi_2: 11.601588338598916
+Selecting the first 63 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 63 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Finding best ridge alphas for 63 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+Source 1 shape: (1000, 63), Source 2 shape: (1000, 63)
+Shared target shape: (1000, 63)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 63 target PCs:
+PID Results:
+  red: 11.692240796806981
+  unq1: 0.4223753873586613
+  unq2: 0.0
+  syn: 0.5372026171116779
+Mutual Information Results:
+  tri_mi: 12.651818801277322
+  bi_mi_1: 12.114616184165644
+  bi_mi_2: 11.692240796806983
+Selecting the first 64 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 64 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Finding best ridge alphas for 64 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.5min
+Source 1 shape: (1000, 64), Source 2 shape: (1000, 64)
+Shared target shape: (1000, 64)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 64 target PCs:
+PID Results:
+  red: 11.819979260842768
+  unq1: 0.41435357164733233
+  unq2: 0.0
+  syn: 0.548411447602895
+Mutual Information Results:
+  tri_mi: 12.782744280092995
+  bi_mi_1: 12.2343328324901
+  bi_mi_2: 11.819979260842768
+Selecting the first 65 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 65 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Finding best ridge alphas for 65 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+Source 1 shape: (1000, 65), Source 2 shape: (1000, 65)
+Shared target shape: (1000, 65)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 65 target PCs:
+PID Results:
+  red: 12.121420038468806
+  unq1: 0.38327101990791235
+  unq2: 0.0
+  syn: 0.5951094342530432
+Mutual Information Results:
+  tri_mi: 13.099800492629761
+  bi_mi_1: 12.504691058376718
+  bi_mi_2: 12.121420038468806
+Selecting the first 66 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 66 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Finding best ridge alphas for 66 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Source 1 shape: (1000, 66), Source 2 shape: (1000, 66)
+Shared target shape: (1000, 66)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 66 target PCs:
+PID Results:
+  red: 12.200192636388545
+  unq1: 0.37829853586443285
+  unq2: 0.0
+  syn: 0.5830180541381154
+Mutual Information Results:
+  tri_mi: 13.161509226391095
+  bi_mi_1: 12.57849117225298
+  bi_mi_2: 12.200192636388547
+Selecting the first 67 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 67 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.7min
+Finding best ridge alphas for 67 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Source 1 shape: (1000, 67), Source 2 shape: (1000, 67)
+Shared target shape: (1000, 67)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 67 target PCs:
+PID Results:
+  red: 12.267233127979104
+  unq1: 0.3502612413626025
+  unq2: 0.0
+  syn: 0.6068752022810315
+Mutual Information Results:
+  tri_mi: 13.224369571622738
+  bi_mi_1: 12.617494369341706
+  bi_mi_2: 12.267233127979104
+Selecting the first 68 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 68 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Finding best ridge alphas for 68 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.6min
+Source 1 shape: (1000, 68), Source 2 shape: (1000, 68)
+Shared target shape: (1000, 68)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 68 target PCs:
+PID Results:
+  red: 12.31073209060319
+  unq1: 0.33221875357919295
+  unq2: 0.0
+  syn: 0.6235285696844244
+Mutual Information Results:
+  tri_mi: 13.26647941386681
+  bi_mi_1: 12.642950844182385
+  bi_mi_2: 12.310732090603192
+Selecting the first 69 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 69 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Finding best ridge alphas for 69 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Source 1 shape: (1000, 69), Source 2 shape: (1000, 69)
+Shared target shape: (1000, 69)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 69 target PCs:
+PID Results:
+  red: 12.365939534289415
+  unq1: 0.3268334185896862
+  unq2: 0.0
+  syn: 0.6344377377948547
+Mutual Information Results:
+  tri_mi: 13.327210690673956
+  bi_mi_1: 12.692772952879102
+  bi_mi_2: 12.365939534289415
+Selecting the first 70 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 70 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Finding best ridge alphas for 70 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Source 1 shape: (1000, 70), Source 2 shape: (1000, 70)
+Shared target shape: (1000, 70)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 70 target PCs:
+PID Results:
+  red: 12.510134262981609
+  unq1: 0.25771364328227264
+  unq2: 0.0
+  syn: 0.6867788259508458
+Mutual Information Results:
+  tri_mi: 13.454626732214727
+  bi_mi_1: 12.767847906263881
+  bi_mi_2: 12.510134262981609
+Selecting the first 71 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 71 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Finding best ridge alphas for 71 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Source 1 shape: (1000, 71), Source 2 shape: (1000, 71)
+Shared target shape: (1000, 71)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 71 target PCs:
+PID Results:
+  red: 12.653763132485153
+  unq1: 0.2666233254263055
+  unq2: 0.0
+  syn: 0.6920408191903196
+Mutual Information Results:
+  tri_mi: 13.612427277101778
+  bi_mi_1: 12.920386457911459
+  bi_mi_2: 12.653763132485153
+Selecting the first 72 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 72 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Finding best ridge alphas for 72 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.7min
+Source 1 shape: (1000, 72), Source 2 shape: (1000, 72)
+Shared target shape: (1000, 72)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 72 target PCs:
+PID Results:
+  red: 12.770064022880776
+  unq1: 0.25492530012678927
+  unq2: 0.0
+  syn: 0.7151751864017193
+Mutual Information Results:
+  tri_mi: 13.740164509409285
+  bi_mi_1: 13.024989323007565
+  bi_mi_2: 12.770064022880776
+Selecting the first 73 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 73 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Finding best ridge alphas for 73 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Source 1 shape: (1000, 73), Source 2 shape: (1000, 73)
+Shared target shape: (1000, 73)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 73 target PCs:
+PID Results:
+  red: 12.899833618040471
+  unq1: 0.2444965740197098
+  unq2: 0.0
+  syn: 0.720852583907515
+Mutual Information Results:
+  tri_mi: 13.865182775967696
+  bi_mi_1: 13.144330192060181
+  bi_mi_2: 12.899833618040471
+Selecting the first 74 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 74 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Finding best ridge alphas for 74 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Source 1 shape: (1000, 74), Source 2 shape: (1000, 74)
+Shared target shape: (1000, 74)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 74 target PCs:
+PID Results:
+  red: 12.986052978685269
+  unq1: 0.22167998280941958
+  unq2: 0.0
+  syn: 0.7256443956982928
+Mutual Information Results:
+  tri_mi: 13.933377357192981
+  bi_mi_1: 13.207732961494688
+  bi_mi_2: 12.986052978685269
+Selecting the first 75 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 75 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 75 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Source 1 shape: (1000, 75), Source 2 shape: (1000, 75)
+Shared target shape: (1000, 75)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 75 target PCs:
+PID Results:
+  red: 13.002252935311375
+  unq1: 0.2274067996321243
+  unq2: 0.0
+  syn: 0.7227256333962675
+Mutual Information Results:
+  tri_mi: 13.952385368339767
+  bi_mi_1: 13.2296597349435
+  bi_mi_2: 13.002252935311375
+Selecting the first 76 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 76 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Finding best ridge alphas for 76 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.8min
+Source 1 shape: (1000, 76), Source 2 shape: (1000, 76)
+Shared target shape: (1000, 76)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 76 target PCs:
+PID Results:
+  red: 13.141969285238101
+  unq1: 0.23733220017557954
+  unq2: 0.0
+  syn: 0.7303894290949824
+Mutual Information Results:
+  tri_mi: 14.109690914508663
+  bi_mi_1: 13.37930148541368
+  bi_mi_2: 13.141969285238101
+Selecting the first 77 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 77 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 77 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Source 1 shape: (1000, 77), Source 2 shape: (1000, 77)
+Shared target shape: (1000, 77)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 77 target PCs:
+PID Results:
+  red: 13.208474638422917
+  unq1: 0.24100597058533424
+  unq2: 0.0
+  syn: 0.7562056667389392
+Mutual Information Results:
+  tri_mi: 14.20568627574719
+  bi_mi_1: 13.449480609008251
+  bi_mi_2: 13.208474638422917
+Selecting the first 78 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 78 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 78 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Source 1 shape: (1000, 78), Source 2 shape: (1000, 78)
+Shared target shape: (1000, 78)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 78 target PCs:
+PID Results:
+  red: 13.282055920742838
+  unq1: 0.2386045533974155
+  unq2: 0.0
+  syn: 0.7596891863872486
+Mutual Information Results:
+  tri_mi: 14.280349660527502
+  bi_mi_1: 13.520660474140254
+  bi_mi_2: 13.282055920742838
+Selecting the first 79 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 79 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 79 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Source 1 shape: (1000, 79), Source 2 shape: (1000, 79)
+Shared target shape: (1000, 79)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 79 target PCs:
+PID Results:
+  red: 13.373417106509006
+  unq1: 0.22652064521082593
+  unq2: 0.0
+  syn: 0.792230432877286
+Mutual Information Results:
+  tri_mi: 14.392168184597118
+  bi_mi_1: 13.599937751719832
+  bi_mi_2: 13.373417106509006
+Selecting the first 80 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 80 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Finding best ridge alphas for 80 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 4.9min
+Source 1 shape: (1000, 80), Source 2 shape: (1000, 80)
+Shared target shape: (1000, 80)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 80 target PCs:
+PID Results:
+  red: 13.458622272478294
+  unq1: 0.2195279346263419
+  unq2: 0.0
+  syn: 0.8521708550100442
+Mutual Information Results:
+  tri_mi: 14.53032106211468
+  bi_mi_1: 13.678150207104636
+  bi_mi_2: 13.458622272478294
+Selecting the first 81 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 81 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 81 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Source 1 shape: (1000, 81), Source 2 shape: (1000, 81)
+Shared target shape: (1000, 81)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 81 target PCs:
+PID Results:
+  red: 13.541001291305342
+  unq1: 0.23524535531616664
+  unq2: 0.0
+  syn: 0.8538468382371782
+Mutual Information Results:
+  tri_mi: 14.630093484858687
+  bi_mi_1: 13.776246646621509
+  bi_mi_2: 13.541001291305342
+Selecting the first 82 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 82 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Finding best ridge alphas for 82 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Source 1 shape: (1000, 82), Source 2 shape: (1000, 82)
+Shared target shape: (1000, 82)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 82 target PCs:
+PID Results:
+  red: 13.61010536515326
+  unq1: 0.2379938172120326
+  unq2: 0.0
+  syn: 0.8534034920528981
+Mutual Information Results:
+  tri_mi: 14.70150267441819
+  bi_mi_1: 13.848099182365292
+  bi_mi_2: 13.61010536515326
+Selecting the first 83 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 83 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 83 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Source 1 shape: (1000, 83), Source 2 shape: (1000, 83)
+Shared target shape: (1000, 83)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 83 target PCs:
+PID Results:
+  red: 13.720330944630941
+  unq1: 0.20092757757899804
+  unq2: 0.0
+  syn: 0.9089460975960773
+Mutual Information Results:
+  tri_mi: 14.830204619806016
+  bi_mi_1: 13.92125852220994
+  bi_mi_2: 13.720330944630941
+Selecting the first 84 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 84 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Finding best ridge alphas for 84 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.0min
+Source 1 shape: (1000, 84), Source 2 shape: (1000, 84)
+Shared target shape: (1000, 84)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 84 target PCs:
+PID Results:
+  red: 13.800971337874419
+  unq1: 0.22442805103382213
+  unq2: 0.0
+  syn: 0.9088526990189187
+Mutual Information Results:
+  tri_mi: 14.93425208792716
+  bi_mi_1: 14.025399388908241
+  bi_mi_2: 13.800971337874419
+Selecting the first 85 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 85 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 85 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Source 1 shape: (1000, 85), Source 2 shape: (1000, 85)
+Shared target shape: (1000, 85)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 85 target PCs:
+PID Results:
+  red: 13.898678347865626
+  unq1: 0.2333307793848931
+  unq2: 0.0
+  syn: 0.9039615674868386
+Mutual Information Results:
+  tri_mi: 15.035970694737358
+  bi_mi_1: 14.13200912725052
+  bi_mi_2: 13.898678347865626
+Selecting the first 86 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 86 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 86 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Source 1 shape: (1000, 86), Source 2 shape: (1000, 86)
+Shared target shape: (1000, 86)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 86 target PCs:
+PID Results:
+  red: 13.942302962839605
+  unq1: 0.2512437058539163
+  unq2: 0.0
+  syn: 0.8806839271099474
+Mutual Information Results:
+  tri_mi: 15.074230595803469
+  bi_mi_1: 14.193546668693521
+  bi_mi_2: 13.942302962839605
+Selecting the first 87 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 87 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Finding best ridge alphas for 87 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Source 1 shape: (1000, 87), Source 2 shape: (1000, 87)
+Shared target shape: (1000, 87)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 87 target PCs:
+PID Results:
+  red: 14.03459991264593
+  unq1: 0.22240973832131772
+  unq2: 0.0
+  syn: 0.8751206007195496
+Mutual Information Results:
+  tri_mi: 15.132130251686798
+  bi_mi_1: 14.257009650967248
+  bi_mi_2: 14.03459991264593
+Selecting the first 88 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 88 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Finding best ridge alphas for 88 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.1min
+Source 1 shape: (1000, 88), Source 2 shape: (1000, 88)
+Shared target shape: (1000, 88)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 88 target PCs:
+PID Results:
+  red: 14.150090099236884
+  unq1: 0.2092050693255345
+  unq2: 0.0
+  syn: 0.8698432254127368
+Mutual Information Results:
+  tri_mi: 15.229138393975155
+  bi_mi_1: 14.359295168562419
+  bi_mi_2: 14.150090099236884
+Selecting the first 89 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 89 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Finding best ridge alphas for 89 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Source 1 shape: (1000, 89), Source 2 shape: (1000, 89)
+Shared target shape: (1000, 89)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 89 target PCs:
+PID Results:
+  red: 14.207048184068501
+  unq1: 0.22382090450177472
+  unq2: 0.0
+  syn: 0.8766554595339162
+Mutual Information Results:
+  tri_mi: 15.307524548104192
+  bi_mi_1: 14.430869088570276
+  bi_mi_2: 14.207048184068501
+Selecting the first 90 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 90 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Finding best ridge alphas for 90 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.2min
+Source 1 shape: (1000, 90), Source 2 shape: (1000, 90)
+Shared target shape: (1000, 90)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 90 target PCs:
+PID Results:
+  red: 14.32675508940852
+  unq1: 0.21155280935423448
+  unq2: 0.0
+  syn: 0.9034056972391742
+Mutual Information Results:
+  tri_mi: 15.441713596001929
+  bi_mi_1: 14.538307898762755
+  bi_mi_2: 14.32675508940852
+Selecting the first 91 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 91 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 91 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Source 1 shape: (1000, 91), Source 2 shape: (1000, 91)
+Shared target shape: (1000, 91)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 91 target PCs:
+PID Results:
+  red: 14.363843598574327
+  unq1: 0.19273697174621418
+  unq2: 0.0
+  syn: 0.911600172993273
+Mutual Information Results:
+  tri_mi: 15.468180743313814
+  bi_mi_1: 14.556580570320541
+  bi_mi_2: 14.363843598574327
+Selecting the first 92 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 92 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Finding best ridge alphas for 92 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Source 1 shape: (1000, 92), Source 2 shape: (1000, 92)
+Shared target shape: (1000, 92)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 92 target PCs:
+PID Results:
+  red: 14.467395706517419
+  unq1: 0.2202637536633283
+  unq2: 0.0
+  syn: 0.9298108822260502
+Mutual Information Results:
+  tri_mi: 15.617470342406797
+  bi_mi_1: 14.687659460180747
+  bi_mi_2: 14.467395706517419
+Selecting the first 93 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 93 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 93 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Source 1 shape: (1000, 93), Source 2 shape: (1000, 93)
+Shared target shape: (1000, 93)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 93 target PCs:
+PID Results:
+  red: 14.512846684987089
+  unq1: 0.22452560620191875
+  unq2: 0.0
+  syn: 0.9595529886773662
+Mutual Information Results:
+  tri_mi: 15.696925279866374
+  bi_mi_1: 14.737372291189008
+  bi_mi_2: 14.512846684987089
+Selecting the first 94 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 94 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Finding best ridge alphas for 94 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Source 1 shape: (1000, 94), Source 2 shape: (1000, 94)
+Shared target shape: (1000, 94)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 94 target PCs:
+PID Results:
+  red: 14.549840422997264
+  unq1: 0.23340922042578782
+  unq2: 0.0
+  syn: 0.9474890578276138
+Mutual Information Results:
+  tri_mi: 15.730738701250665
+  bi_mi_1: 14.783249643423051
+  bi_mi_2: 14.549840422997264
+Selecting the first 95 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 95 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.7min
+Finding best ridge alphas for 95 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Source 1 shape: (1000, 95), Source 2 shape: (1000, 95)
+Shared target shape: (1000, 95)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 95 target PCs:
+PID Results:
+  red: 14.646383407562187
+  unq1: 0.21730006361127963
+  unq2: 0.0
+  syn: 0.9642319094924474
+Mutual Information Results:
+  tri_mi: 15.827915380665914
+  bi_mi_1: 14.863683471173466
+  bi_mi_2: 14.646383407562187
+Selecting the first 96 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 96 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.6min
+Finding best ridge alphas for 96 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.3min
+Source 1 shape: (1000, 96), Source 2 shape: (1000, 96)
+Shared target shape: (1000, 96)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 96 target PCs:
+PID Results:
+  red: 14.69980833077851
+  unq1: 0.21458889770257983
+  unq2: 0.0
+  syn: 0.9484769214529294
+Mutual Information Results:
+  tri_mi: 15.862874149934019
+  bi_mi_1: 14.91439722848109
+  bi_mi_2: 14.69980833077851
+Selecting the first 97 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 97 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.7min
+Finding best ridge alphas for 97 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Source 1 shape: (1000, 97), Source 2 shape: (1000, 97)
+Shared target shape: (1000, 97)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 97 target PCs:
+PID Results:
+  red: 14.806145994471342
+  unq1: 0.26562255003541324
+  unq2: 0.0
+  syn: 0.955045418764696
+Mutual Information Results:
+  tri_mi: 16.02681396327145
+  bi_mi_1: 15.071768544506755
+  bi_mi_2: 14.806145994471342
+Selecting the first 98 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 98 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 98 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Source 1 shape: (1000, 98), Source 2 shape: (1000, 98)
+Shared target shape: (1000, 98)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 98 target PCs:
+PID Results:
+  red: 14.849229664705966
+  unq1: 0.2553072677180559
+  unq2: 0.0
+  syn: 0.965134782523581
+Mutual Information Results:
+  tri_mi: 16.069671714947603
+  bi_mi_1: 15.104536932424022
+  bi_mi_2: 14.849229664705966
+Selecting the first 99 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 99 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.8min
+Finding best ridge alphas for 99 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Source 1 shape: (1000, 99), Source 2 shape: (1000, 99)
+Shared target shape: (1000, 99)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 99 target PCs:
+PID Results:
+  red: 14.862697573495442
+  unq1: 0.24114482688839445
+  unq2: 0.0
+  syn: 0.9675128400230406
+Mutual Information Results:
+  tri_mi: 16.071355240406877
+  bi_mi_1: 15.103842400383837
+  bi_mi_2: 14.862697573495442
+Selecting the first 100 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 100 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.7min
+Finding best ridge alphas for 100 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.4min
+Source 1 shape: (1000, 100), Source 2 shape: (1000, 100)
+Shared target shape: (1000, 100)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 100 target PCs:
+PID Results:
+  red: 14.894260610285848
+  unq1: 0.24377752433008126
+  unq2: 0.0
+  syn: 0.9505593660110812
+Mutual Information Results:
+  tri_mi: 16.08859750062701
+  bi_mi_1: 15.138038134615929
+  bi_mi_2: 14.894260610285848
+Selecting the first 101 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 101 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.8min
+Finding best ridge alphas for 101 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Source 1 shape: (1000, 101), Source 2 shape: (1000, 101)
+Shared target shape: (1000, 101)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 101 target PCs:
+PID Results:
+  red: 14.99802644242379
+  unq1: 0.18506739903093816
+  unq2: 0.0
+  syn: 0.9693946316011761
+Mutual Information Results:
+  tri_mi: 16.152488473055904
+  bi_mi_1: 15.183093841454728
+  bi_mi_2: 14.99802644242379
+Selecting the first 102 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 102 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 102 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Source 1 shape: (1000, 102), Source 2 shape: (1000, 102)
+Shared target shape: (1000, 102)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 102 target PCs:
+PID Results:
+  red: 15.111977574309599
+  unq1: 0.19222239121930684
+  unq2: 0.0
+  syn: 0.9981703973621556
+Mutual Information Results:
+  tri_mi: 16.30237036289106
+  bi_mi_1: 15.304199965528905
+  bi_mi_2: 15.111977574309599
+Selecting the first 103 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 103 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 103 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Source 1 shape: (1000, 103), Source 2 shape: (1000, 103)
+Shared target shape: (1000, 103)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 103 target PCs:
+PID Results:
+  red: 15.224935745399078
+  unq1: 0.20016131681802207
+  unq2: 0.0
+  syn: 1.0096270540993846
+Mutual Information Results:
+  tri_mi: 16.434724116316485
+  bi_mi_1: 15.4250970622171
+  bi_mi_2: 15.224935745399078
+Selecting the first 104 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 104 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.8min
+Finding best ridge alphas for 104 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.5min
+Source 1 shape: (1000, 104), Source 2 shape: (1000, 104)
+Shared target shape: (1000, 104)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 104 target PCs:
+PID Results:
+  red: 15.353949764496768
+  unq1: 0.18638784153051802
+  unq2: 0.0
+  syn: 1.0212284189607175
+Mutual Information Results:
+  tri_mi: 16.561566024988004
+  bi_mi_1: 15.540337606027286
+  bi_mi_2: 15.353949764496768
+Selecting the first 105 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 105 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.9min
+Finding best ridge alphas for 105 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Source 1 shape: (1000, 105), Source 2 shape: (1000, 105)
+Shared target shape: (1000, 105)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 105 target PCs:
+PID Results:
+  red: 15.398346110145145
+  unq1: 0.20851580166413086
+  unq2: 0.0
+  syn: 1.0135774990514825
+Mutual Information Results:
+  tri_mi: 16.620439410860758
+  bi_mi_1: 15.606861911809276
+  bi_mi_2: 15.398346110145145
+Selecting the first 106 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 106 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.2min
+Finding best ridge alphas for 106 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Source 1 shape: (1000, 106), Source 2 shape: (1000, 106)
+Shared target shape: (1000, 106)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 106 target PCs:
+PID Results:
+  red: 15.476686281957146
+  unq1: 0.22198069088291206
+  unq2: 0.0
+  syn: 1.0149478212825933
+Mutual Information Results:
+  tri_mi: 16.713614794122652
+  bi_mi_1: 15.698666972840059
+  bi_mi_2: 15.476686281957146
+Selecting the first 107 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 107 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 107 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Source 1 shape: (1000, 107), Source 2 shape: (1000, 107)
+Shared target shape: (1000, 107)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 107 target PCs:
+PID Results:
+  red: 15.510663594258215
+  unq1: 0.24676246595361562
+  unq2: 0.0
+  syn: 0.9911928632352982
+Mutual Information Results:
+  tri_mi: 16.74861892344713
+  bi_mi_1: 15.75742606021183
+  bi_mi_2: 15.510663594258215
+Selecting the first 108 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 108 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.9min
+Finding best ridge alphas for 108 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.6min
+Source 1 shape: (1000, 108), Source 2 shape: (1000, 108)
+Shared target shape: (1000, 108)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 108 target PCs:
+PID Results:
+  red: 15.59879007107507
+  unq1: 0.23919106443206672
+  unq2: 0.0
+  syn: 1.0084736181095213
+Mutual Information Results:
+  tri_mi: 16.84645475361666
+  bi_mi_1: 15.837981135507137
+  bi_mi_2: 15.59879007107507
+Selecting the first 109 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 109 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 109 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Source 1 shape: (1000, 109), Source 2 shape: (1000, 109)
+Shared target shape: (1000, 109)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 109 target PCs:
+PID Results:
+  red: 15.64909299715355
+  unq1: 0.25199988528665074
+  unq2: 0.0
+  syn: 1.0282953843508071
+Mutual Information Results:
+  tri_mi: 16.92938826679101
+  bi_mi_1: 15.901092882440201
+  bi_mi_2: 15.64909299715355
+Selecting the first 110 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 110 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.1min
+Finding best ridge alphas for 110 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Source 1 shape: (1000, 110), Source 2 shape: (1000, 110)
+Shared target shape: (1000, 110)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 110 target PCs:
+PID Results:
+  red: 15.668002740530879
+  unq1: 0.2626573037220048
+  unq2: 0.0
+  syn: 1.0544749483158338
+Mutual Information Results:
+  tri_mi: 16.985134992568717
+  bi_mi_1: 15.930660044252884
+  bi_mi_2: 15.668002740530879
+Selecting the first 111 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 111 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.2min
+Finding best ridge alphas for 111 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Source 1 shape: (1000, 111), Source 2 shape: (1000, 111)
+Shared target shape: (1000, 111)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 111 target PCs:
+PID Results:
+  red: 15.670728776028218
+  unq1: 0.25201959195665324
+  unq2: 0.0
+  syn: 1.0689934407006252
+Mutual Information Results:
+  tri_mi: 16.991741808685497
+  bi_mi_1: 15.922748367984871
+  bi_mi_2: 15.670728776028218
+Selecting the first 112 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 112 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.0min
+Finding best ridge alphas for 112 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.7min
+Source 1 shape: (1000, 112), Source 2 shape: (1000, 112)
+Shared target shape: (1000, 112)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 112 target PCs:
+PID Results:
+  red: 15.746512268117534
+  unq1: 0.2685962457454085
+  unq2: 0.0
+  syn: 1.097541586290621
+Mutual Information Results:
+  tri_mi: 17.112650100153562
+  bi_mi_1: 16.01510851386294
+  bi_mi_2: 15.746512268117533
+Selecting the first 113 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 113 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.2min
+Finding best ridge alphas for 113 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Source 1 shape: (1000, 113), Source 2 shape: (1000, 113)
+Shared target shape: (1000, 113)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 113 target PCs:
+PID Results:
+  red: 15.795599331465112
+  unq1: 0.29433567019445306
+  unq2: 0.0
+  syn: 1.1060264029643854
+Mutual Information Results:
+  tri_mi: 17.19596140462395
+  bi_mi_1: 16.089935001659565
+  bi_mi_2: 15.795599331465112
+Selecting the first 114 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 114 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.2min
+Finding best ridge alphas for 114 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Source 1 shape: (1000, 114), Source 2 shape: (1000, 114)
+Shared target shape: (1000, 114)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 114 target PCs:
+PID Results:
+  red: 15.876019016379374
+  unq1: 0.28622904769409274
+  unq2: 0.0
+  syn: 1.1258216723005887
+Mutual Information Results:
+  tri_mi: 17.288069736374055
+  bi_mi_1: 16.162248064073466
+  bi_mi_2: 15.876019016379374
+Selecting the first 115 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 115 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.3min
+Finding best ridge alphas for 115 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Source 1 shape: (1000, 115), Source 2 shape: (1000, 115)
+Shared target shape: (1000, 115)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 115 target PCs:
+PID Results:
+  red: 16.012787916722548
+  unq1: 0.3055178293389069
+  unq2: 0.0
+  syn: 1.141879890774792
+Mutual Information Results:
+  tri_mi: 17.460185636836243
+  bi_mi_1: 16.31830574606145
+  bi_mi_2: 16.012787916722544
+Selecting the first 116 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 116 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.2min
+Finding best ridge alphas for 116 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.8min
+Source 1 shape: (1000, 116), Source 2 shape: (1000, 116)
+Shared target shape: (1000, 116)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 116 target PCs:
+PID Results:
+  red: 16.092455757190663
+  unq1: 0.3017360742956541
+  unq2: 0.0
+  syn: 1.1262222077066824
+Mutual Information Results:
+  tri_mi: 17.520414039193
+  bi_mi_1: 16.394191831486317
+  bi_mi_2: 16.092455757190663
+Selecting the first 117 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 117 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.3min
+Finding best ridge alphas for 117 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Source 1 shape: (1000, 117), Source 2 shape: (1000, 117)
+Shared target shape: (1000, 117)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 117 target PCs:
+PID Results:
+  red: 16.160843311847643
+  unq1: 0.30480721971085956
+  unq2: 0.0
+  syn: 1.092739160303207
+Mutual Information Results:
+  tri_mi: 17.55838969186171
+  bi_mi_1: 16.465650531558502
+  bi_mi_2: 16.160843311847643
+Selecting the first 118 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 118 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.3min
+Finding best ridge alphas for 118 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Source 1 shape: (1000, 118), Source 2 shape: (1000, 118)
+Shared target shape: (1000, 118)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 118 target PCs:
+PID Results:
+  red: 16.25221847597176
+  unq1: 0.28393156823958066
+  unq2: 0.0
+  syn: 1.1083296562030682
+Mutual Information Results:
+  tri_mi: 17.644479700414408
+  bi_mi_1: 16.53615004421134
+  bi_mi_2: 16.25221847597176
+Selecting the first 119 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 119 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.5min
+Finding best ridge alphas for 119 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Source 1 shape: (1000, 119), Source 2 shape: (1000, 119)
+Shared target shape: (1000, 119)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 119 target PCs:
+PID Results:
+  red: 16.310266497973416
+  unq1: 0.29819309113297976
+  unq2: 0.0
+  syn: 1.113333882106712
+Mutual Information Results:
+  tri_mi: 17.721793471213108
+  bi_mi_1: 16.608459589106396
+  bi_mi_2: 16.310266497973416
+Selecting the first 120 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 120 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.3min
+Finding best ridge alphas for 120 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 5.9min
+Source 1 shape: (1000, 120), Source 2 shape: (1000, 120)
+Shared target shape: (1000, 120)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 120 target PCs:
+PID Results:
+  red: 16.382457475426058
+  unq1: 0.3250583222436134
+  unq2: 0.0
+  syn: 1.106182037411898
+Mutual Information Results:
+  tri_mi: 17.81369783508157
+  bi_mi_1: 16.70751579766967
+  bi_mi_2: 16.382457475426058
+Selecting the first 121 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 121 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.5min
+Finding best ridge alphas for 121 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Source 1 shape: (1000, 121), Source 2 shape: (1000, 121)
+Shared target shape: (1000, 121)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 121 target PCs:
+PID Results:
+  red: 16.40216241020879
+  unq1: 0.36661594819747734
+  unq2: 0.0
+  syn: 1.0885255222604684
+Mutual Information Results:
+  tri_mi: 17.857303880666734
+  bi_mi_1: 16.768778358406266
+  bi_mi_2: 16.40216241020879
+Selecting the first 122 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 122 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.4min
+Finding best ridge alphas for 122 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Source 1 shape: (1000, 122), Source 2 shape: (1000, 122)
+Shared target shape: (1000, 122)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 122 target PCs:
+PID Results:
+  red: 16.502362692945923
+  unq1: 0.367839011759699
+  unq2: 0.0
+  syn: 1.0871989696407915
+Mutual Information Results:
+  tri_mi: 17.957400674346413
+  bi_mi_1: 16.87020170470562
+  bi_mi_2: 16.502362692945923
+Selecting the first 123 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 123 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.6min
+Finding best ridge alphas for 123 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.7min
+Source 1 shape: (1000, 123), Source 2 shape: (1000, 123)
+Shared target shape: (1000, 123)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 123 target PCs:
+PID Results:
+  red: 16.602446868677198
+  unq1: 0.3480610641437636
+  unq2: 0.0
+  syn: 1.1093889593249457
+Mutual Information Results:
+  tri_mi: 18.059896892145908
+  bi_mi_1: 16.950507932820962
+  bi_mi_2: 16.602446868677198
+Selecting the first 124 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 124 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.8min
+Finding best ridge alphas for 124 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.0min
+Source 1 shape: (1000, 124), Source 2 shape: (1000, 124)
+Shared target shape: (1000, 124)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 124 target PCs:
+PID Results:
+  red: 16.6596201262723
+  unq1: 0.331309644259683
+  unq2: 0.0
+  syn: 1.065339895262504
+Mutual Information Results:
+  tri_mi: 18.05626966579449
+  bi_mi_1: 16.990929770531984
+  bi_mi_2: 16.6596201262723
+Selecting the first 125 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 125 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.6min
+Finding best ridge alphas for 125 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Source 1 shape: (1000, 125), Source 2 shape: (1000, 125)
+Shared target shape: (1000, 125)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 125 target PCs:
+PID Results:
+  red: 16.738593819504047
+  unq1: 0.296346896163314
+  unq2: 0.0
+  syn: 1.0536345605140447
+Mutual Information Results:
+  tri_mi: 18.088575276181405
+  bi_mi_1: 17.03494071566736
+  bi_mi_2: 16.738593819504047
+Selecting the first 126 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 126 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.6min
+Finding best ridge alphas for 126 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Source 1 shape: (1000, 126), Source 2 shape: (1000, 126)
+Shared target shape: (1000, 126)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 126 target PCs:
+PID Results:
+  red: 16.809133901838038
+  unq1: 0.3228661368169625
+  unq2: 0.0
+  syn: 1.0867643116405716
+Mutual Information Results:
+  tri_mi: 18.218764350295572
+  bi_mi_1: 17.132000038655
+  bi_mi_2: 16.809133901838038
+Selecting the first 127 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 127 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.7min
+Finding best ridge alphas for 127 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Source 1 shape: (1000, 127), Source 2 shape: (1000, 127)
+Shared target shape: (1000, 127)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 127 target PCs:
+PID Results:
+  red: 16.86169211251007
+  unq1: 0.3169362135710685
+  unq2: 0.0
+  syn: 1.0881009335421687
+Mutual Information Results:
+  tri_mi: 18.266729259623308
+  bi_mi_1: 17.17862832608114
+  bi_mi_2: 16.86169211251007
+Selecting the first 128 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 128 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.6min
+Finding best ridge alphas for 128 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.1min
+Source 1 shape: (1000, 128), Source 2 shape: (1000, 128)
+Shared target shape: (1000, 128)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 128 target PCs:
+PID Results:
+  red: 16.952481797118182
+  unq1: 0.29876800831277706
+  unq2: 0.0
+  syn: 1.1309819463562363
+Mutual Information Results:
+  tri_mi: 18.382231751787195
+  bi_mi_1: 17.25124980543096
+  bi_mi_2: 16.952481797118182
+Selecting the first 129 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 129 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.7min
+Finding best ridge alphas for 129 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Source 1 shape: (1000, 129), Source 2 shape: (1000, 129)
+Shared target shape: (1000, 129)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 129 target PCs:
+PID Results:
+  red: 17.005420736618827
+  unq1: 0.3345869615574806
+  unq2: 0.0
+  syn: 1.1382369493714002
+Mutual Information Results:
+  tri_mi: 18.47824464754771
+  bi_mi_1: 17.34000769817631
+  bi_mi_2: 17.00542073661883
+Selecting the first 130 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 130 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.7min
+Finding best ridge alphas for 130 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Source 1 shape: (1000, 130), Source 2 shape: (1000, 130)
+Shared target shape: (1000, 130)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 130 target PCs:
+PID Results:
+  red: 17.11313473706867
+  unq1: 0.3588765643560592
+  unq2: 0.0
+  syn: 1.184716936251725
+Mutual Information Results:
+  tri_mi: 18.656728237676454
+  bi_mi_1: 17.47201130142473
+  bi_mi_2: 17.11313473706867
+Selecting the first 131 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 131 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.9min
+Finding best ridge alphas for 131 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Source 1 shape: (1000, 131), Source 2 shape: (1000, 131)
+Shared target shape: (1000, 131)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 131 target PCs:
+PID Results:
+  red: 17.210790843972724
+  unq1: 0.3463864056447612
+  unq2: 0.0
+  syn: 1.19020890182194
+Mutual Information Results:
+  tri_mi: 18.74738615143943
+  bi_mi_1: 17.55717724961749
+  bi_mi_2: 17.210790843972728
+Selecting the first 132 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 132 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.0min
+Finding best ridge alphas for 132 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Source 1 shape: (1000, 132), Source 2 shape: (1000, 132)
+Shared target shape: (1000, 132)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 132 target PCs:
+PID Results:
+  red: 17.222243887801035
+  unq1: 0.3218928146987565
+  unq2: 0.0
+  syn: 1.1949705017752592
+Mutual Information Results:
+  tri_mi: 18.73910720427505
+  bi_mi_1: 17.54413670249979
+  bi_mi_2: 17.222243887801035
+Selecting the first 133 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 133 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.8min
+Finding best ridge alphas for 133 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.2min
+Source 1 shape: (1000, 133), Source 2 shape: (1000, 133)
+Shared target shape: (1000, 133)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 133 target PCs:
+PID Results:
+  red: 17.303214169205894
+  unq1: 0.3242834476785603
+  unq2: 0.0
+  syn: 1.2270316113748905
+Mutual Information Results:
+  tri_mi: 18.854529228259345
+  bi_mi_1: 17.627497616884455
+  bi_mi_2: 17.303214169205894
+Selecting the first 134 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 134 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.8min
+Finding best ridge alphas for 134 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Source 1 shape: (1000, 134), Source 2 shape: (1000, 134)
+Shared target shape: (1000, 134)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 134 target PCs:
+PID Results:
+  red: 17.337020518657916
+  unq1: 0.32600620703011884
+  unq2: 0.0
+  syn: 1.2675631300327552
+Mutual Information Results:
+  tri_mi: 18.93058985572079
+  bi_mi_1: 17.663026725688034
+  bi_mi_2: 17.337020518657916
+Selecting the first 135 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 135 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.1min
+Finding best ridge alphas for 135 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Source 1 shape: (1000, 135), Source 2 shape: (1000, 135)
+Shared target shape: (1000, 135)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 135 target PCs:
+PID Results:
+  red: 17.416106553258366
+  unq1: 0.3171425278940987
+  unq2: 0.0
+  syn: 1.2769967593358942
+Mutual Information Results:
+  tri_mi: 19.01024584048836
+  bi_mi_1: 17.733249081152465
+  bi_mi_2: 17.416106553258366
+Selecting the first 136 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 136 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.8min
+Finding best ridge alphas for 136 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Source 1 shape: (1000, 136), Source 2 shape: (1000, 136)
+Shared target shape: (1000, 136)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 136 target PCs:
+PID Results:
+  red: 17.505016288038203
+  unq1: 0.29364475496532805
+  unq2: 0.0
+  syn: 1.269800669692021
+Mutual Information Results:
+  tri_mi: 19.06846171269555
+  bi_mi_1: 17.79866104300353
+  bi_mi_2: 17.505016288038203
+Selecting the first 137 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 137 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.9min
+Finding best ridge alphas for 137 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Source 1 shape: (1000, 137), Source 2 shape: (1000, 137)
+Shared target shape: (1000, 137)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 137 target PCs:
+PID Results:
+  red: 17.55448729882979
+  unq1: 0.2756367828463695
+  unq2: 0.0
+  syn: 1.2610493470183712
+Mutual Information Results:
+  tri_mi: 19.091173428694532
+  bi_mi_1: 17.83012408167616
+  bi_mi_2: 17.55448729882979
+Selecting the first 138 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 138 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 7.9min
+Finding best ridge alphas for 138 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.3min
+Source 1 shape: (1000, 138), Source 2 shape: (1000, 138)
+Shared target shape: (1000, 138)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 138 target PCs:
+PID Results:
+  red: 17.613449971413992
+  unq1: 0.2734722297194878
+  unq2: 0.0
+  syn: 1.2664134479231492
+Mutual Information Results:
+  tri_mi: 19.15333564905663
+  bi_mi_1: 17.88692220113348
+  bi_mi_2: 17.613449971413992
+Selecting the first 139 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 139 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.3min
+Finding best ridge alphas for 139 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Source 1 shape: (1000, 139), Source 2 shape: (1000, 139)
+Shared target shape: (1000, 139)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 139 target PCs:
+PID Results:
+  red: 17.64932397771846
+  unq1: 0.324729251823463
+  unq2: 0.0
+  syn: 1.2429640598451073
+Mutual Information Results:
+  tri_mi: 19.21701728938703
+  bi_mi_1: 17.974053229541923
+  bi_mi_2: 17.64932397771846
+Selecting the first 140 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 140 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.1min
+Finding best ridge alphas for 140 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.4min
+Source 1 shape: (1000, 140), Source 2 shape: (1000, 140)
+Shared target shape: (1000, 140)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 140 target PCs:
+PID Results:
+  red: 17.736329957705124
+  unq1: 0.2916195074209753
+  unq2: 0.0
+  syn: 1.2387574626474986
+Mutual Information Results:
+  tri_mi: 19.266706927773598
+  bi_mi_1: 18.0279494651261
+  bi_mi_2: 17.736329957705124
+Selecting the first 141 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 141 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.1min
+Finding best ridge alphas for 141 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Source 1 shape: (1000, 141), Source 2 shape: (1000, 141)
+Shared target shape: (1000, 141)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 141 target PCs:
+PID Results:
+  red: 17.7660275115552
+  unq1: 0.31119961130163887
+  unq2: 0.0
+  syn: 1.2243100971290914
+Mutual Information Results:
+  tri_mi: 19.30153721998593
+  bi_mi_1: 18.07722712285684
+  bi_mi_2: 17.7660275115552
+Selecting the first 142 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 142 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.1min
+Finding best ridge alphas for 142 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 6.5min
+Source 1 shape: (1000, 142), Source 2 shape: (1000, 142)
+Shared target shape: (1000, 142)
+
+Bias correction is enabled for PID calculation:True.
+
+Calculating PID using Tilde...
+
+Results after selecting the first 142 target PCs:
+PID Results:
+  red: 17.78918923580977
+  unq1: 0.31676453313902186
+  unq2: 0.0
+  syn: 1.272951815386488
+Mutual Information Results:
+  tri_mi: 19.37890558433528
+  bi_mi_1: 18.10595376894879
+  bi_mi_2: 17.78918923580977
+Selecting the first 143 target PCs and running PID for convnext_base_classification and eca_nfnet_l0_classification 😀
+Finding best ridge alphas for 143 target PCs using 100352 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.
+[Pipeline] ........... (step 1 of 1) Processing ridgecv, total= 8.4min
+Finding best ridge alphas for 143 target PCs using 75264 features and 9000 samples.
+Using alphas: 10^1 to 10^20, 100 values spaced logarithmically.

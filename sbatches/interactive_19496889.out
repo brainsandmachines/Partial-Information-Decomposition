@@ -1,0 +1,12 @@
+------------------------------------
+Wed 22 Jul 2026 16:27:09 IDT
+SLURM_JOBID:		19496889
+SLURM_JOB_NODELIST:	cs-cpu-08
+SLURM_SCRATCH_DIR:	
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Wed 22 Jul 2026 16:27:08 IDT
+ STARTING JOB WITH THE COMMAND:  sleep 600 
+[2026-07-22T18:27:33.094] error: *** JOB 19496889 ON cs-cpu-08 CANCELLED AT 2026-07-22T18:27:33 DUE TO TIME LIMIT ***

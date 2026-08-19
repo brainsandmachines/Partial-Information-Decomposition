@@ -72,11 +72,11 @@ def test_commonality_analysis_keys_and_identity():
     B = X[:, 5:]
 
     out = se.commonality_analysis(A, B, y, method="standard")
-    assert set(out.keys()) == {"R²_A", "R²_B", "R²_AB", "unique_A", "unique_B", "common", "unexplained"}
+    assert set(out.keys()) == {"R²_X1", "R²_X2", "R²_X12", "unique_X1", "unique_X2", "common", "unexplained"}
 
-    # identity: unique_A + unique_B + common == R²_AB
-    lhs = out["unique_A"] + out["unique_B"] + out["common"]
-    assert np.isclose(lhs, out["R²_AB"])
+    # identity: unique_X1 + unique_X2 + common == R²_X12
+    lhs = out["unique_X1"] + out["unique_X2"] + out["common"]
+    assert np.isclose(lhs, out["R²_X12"])
 
 
 def test_commonality_analysis_invalid_method_raises():

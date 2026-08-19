@@ -95,11 +95,11 @@ def example_with_synthetic_data():
             print(f"\n  {method.upper()} method:")
             result = results['commonality_results'][hemi][method]
             
-            print(f"    R² Model A (M1):     {result['R²_A']:.4f}")
-            print(f"    R² Model B (M2):     {result['R²_B']:.4f}")
-            print(f"    R² Combined (AB):    {result['R²_AB']:.4f}")
-            print(f"    Unique A:            {result['unique_A']:.4f}")
-            print(f"    Unique B:            {result['unique_B']:.4f}")
+            print(f"    R² Model X1 (M1):    {result['R²_X1']:.4f}")
+            print(f"    R² Model X2 (M2):    {result['R²_X2']:.4f}")
+            print(f"    R² Combined X12:     {result['R²_X12']:.4f}")
+            print(f"    Unique X1:           {result['unique_X1']:.4f}")
+            print(f"    Unique X2:           {result['unique_X2']:.4f}")
             print(f"    Common:              {result['common']:.4f}")
             print(f"    Unexplained:         {result['unexplained']:.4f}")
     

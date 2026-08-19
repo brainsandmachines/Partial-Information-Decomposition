@@ -1,0 +1,76 @@
+------------------------------------
+Sat 25 Jul 2026 17:58:14 IDT
+SLURM_JOBID:		19544202
+SLURM_JOB_NODELIST:	ise-cpu128-03
+SLURM_SCRATCH_DIR:	
+Allocated Resouces:	cpu - 4 / mem - 24576 MB / gpu - 
+SLURM_GPU_INDEX:	
+Running as ohadshee from golan.neuro account with normal QOS
+------------------------------------
+Running on host: ise-cpu128-03.auth.ad.bgu.ac.il
+Job ID: 19544202
+CPUs per task: 4
+Python path: /home/ohadshee/.conda/envs/pid_env/bin/python
+Conda environment: pid_env
+Project root directory: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project
+Using device: cpu
+Number of images: 73000
+Image shape: (425, 425, 3), dtype: uint8
+nsdID shape: (73000,), Shared1000 shape: (73000,)
+Neural data shape: (10000, 8088)
+Image IDs shape: (10000,)
+Number of voxels: 8088
+Number of projections for SRP: 7894
+
+Loaded target with shape (10000, 8088).
+Loaded subject subj01 with 9000 unique images and 1000 shared held-out images.
+Unique neural data shape after limiting to max_features=2000: (9000, 8088)
+
+Running Eigenvector PCA with cross-validation!!!
+Using default PCA fitting function (SVD)!!!
+Processing sample 1 of 9000...
+Processing component 10 of 2000...✅
+Processing component 20 of 2000...✅
+Processing component 30 of 2000...✅
+Processing component 40 of 2000...✅
+Processing component 50 of 2000...✅
+Processing component 60 of 2000...✅
+Processing component 70 of 2000...✅
+Processing component 80 of 2000...✅
+Processing component 90 of 2000...✅
+Processing component 100 of 2000...✅
+Processing component 110 of 2000...✅
+Processing component 120 of 2000...✅
+Processing component 130 of 2000...✅
+Processing component 140 of 2000...✅
+Processing component 150 of 2000...✅
+Processing component 160 of 2000...✅
+Processing component 170 of 2000...✅
+Processing component 180 of 2000...✅
+Processing component 190 of 2000...✅
+Processing component 200 of 2000...✅
+Processing component 210 of 2000...✅
+Processing component 220 of 2000...✅
+Processing component 230 of 2000...✅
+Processing component 240 of 2000...✅
+Processing component 250 of 2000...✅
+Processing component 260 of 2000...✅
+Processing component 270 of 2000...✅
+Processing component 280 of 2000...✅
+Processing component 290 of 2000...✅
+Processing component 300 of 2000...✅
+Processing component 310 of 2000...✅
+Processing component 320 of 2000...✅
+Processing component 330 of 2000...✅
+Processing component 340 of 2000...✅
+Processing component 350 of 2000...✅
+Processing component 360 of 2000...✅
+Processing component 370 of 2000...✅
+Processing component 380 of 2000...✅
+Processing component 390 of 2000...✅
+Processing component 400 of 2000...✅
+Processing component 410 of 2000...✅
+Processing component 420 of 2000...✅
+Processing component 430 of 2000...✅
+Processing component 440 of 2000...✅
+Processing component 450 of 2000...✅

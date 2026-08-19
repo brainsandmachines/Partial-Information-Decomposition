@@ -1,0 +1,45 @@
+experiment_name: exp3
+random_seed: 56
+target_dimensions:
+- 2
+- 4
+- 8
+- 16
+- 32
+- 64
+source1_dimensions:
+- 2
+- 4
+- 8
+- 16
+- 32
+- 64
+source2_dimensions:
+- 2
+- 4
+- 8
+- 16
+- 32
+- 64
+repeats_per_dimension: 5
+channel_gain_scale: 0.75
+optimizer_regularization: 1.0e-07
+eigen_neutral_log2_tolerance: 0.0
+time_limit_seconds: null
+plot_dpi: 300
+methods:
+- GPID/Tilde-PID
+- Thin-PID
+initializations:
+- Original covariance (native start)
+- Eigen-PID Gamma* start
+covariance_variable_order:
+- target
+- source1
+- source2
+balanced_dimensions: true
+output_paths:
+  results_csv: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/exp3/iteration_results.csv
+  iteration_plot: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/exp3/iteration_comparison.png
+  pid_plot: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/exp3/pid_comparison.png
+  hyperparameters_yaml: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/exp3/hyperparameters.yaml

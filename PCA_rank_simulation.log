@@ -1,0 +1,125 @@
+Total simulations to run: 24
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=5, loading_corr=0.4, noise_std=0.1
+
+TRUE RANK: 5
+
+Eigenvector PCA selected components: 5 
+ It took 15.08554893899418 seconds to run
+
+EM-wold estimated components: 5 
+ It took 166.51448791500297 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 5.0 
+ It took 0.05252166400896385 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 5
+Completed 1/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=5, loading_corr=0.4, noise_std=0.3
+
+TRUE RANK: 5
+
+Eigenvector PCA selected components: 5 
+ It took 45.281162807994406 seconds to run
+
+EM-wold estimated components: 5 
+ It took 214.7457182960061 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 10.0125 
+ It took 0.052863902994431555 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 10
+Completed 2/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=5, loading_corr=0.9, noise_std=0.1
+
+TRUE RANK: 5
+
+Eigenvector PCA selected components: 5 
+ It took 24.769270930992207 seconds to run
+
+EM-wold estimated components: 5 
+ It took 498.55147280900565 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 4.0 
+ It took 0.06159840199688915 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 4
+Completed 3/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=5, loading_corr=0.9, noise_std=0.3
+
+TRUE RANK: 5
+
+Eigenvector PCA selected components: 5 
+ It took 39.7591773239983 seconds to run
+
+EM-wold estimated components: 5 
+ It took 209.7766106469935 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 10.0375 
+ It took 0.07812105299672112 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 10
+Completed 4/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=20, loading_corr=0.4, noise_std=0.1
+
+TRUE RANK: 20
+
+Eigenvector PCA selected components: 20 
+ It took 81.43595786399965 seconds to run
+
+EM-wold estimated components: 20 
+ It took 181.10734285699436 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 17.0 
+ It took 0.09859698699438013 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 17
+Completed 5/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=20, loading_corr=0.4, noise_std=0.3
+
+TRUE RANK: 20
+
+Eigenvector PCA selected components: 20 
+ It took 25.462558077997528 seconds to run
+
+EM-wold estimated components: 20 
+ It took 118.38035034800123 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 19.0 
+ It took 0.05581857300421689 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 19
+Completed 6/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=20, loading_corr=0.9, noise_std=0.1
+
+TRUE RANK: 20
+
+Eigenvector PCA selected components: 20 
+ It took 21.208213157005957 seconds to run
+
+EM-wold estimated components: 20 
+ It took 232.01787598300143 seconds to run
+
+Row-wise LOOCV PCA selected components mean over fold: 7.1125 
+ It took 0.06604836099722888 seconds to run
+
+ Row-wise LOOCV PCA selected components minimum fold: 7
+Completed 7/24 simulations.
+======================================================================
+
+Running simulation with n_samples=80, n_features=50, rank=20, loading_corr=0.9, noise_std=0.3
+
+TRUE RANK: 20

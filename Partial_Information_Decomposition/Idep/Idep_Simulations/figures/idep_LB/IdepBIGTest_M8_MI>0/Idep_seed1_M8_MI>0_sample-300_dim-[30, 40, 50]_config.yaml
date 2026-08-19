@@ -1,0 +1,35 @@
+device: cpu
+seed: 1
+n_trials: 2
+bias_correction: true
+lr_type: ridge
+lasso_alpha: 0.1
+on_covariance: 'False'
+alpha: 2
+bias_method:
+- bootstrap
+n_bootstraps: 20
+mi_type: whiten
+bi_mi_type: whiten
+n_perm: 20
+normalization: 'True'
+ver: raw
+p_scale: 0.05
+q_scale: 0.65
+r_scale: 0.75
+mode: m8_side
+delta: 0.2
+N_values:
+- 300
+- 500
+- 1000
+p_values:
+- - 30
+  - 40
+  - 50
+- - 50
+  - 50
+  - 50
+- - 40
+  - 50
+  - 100

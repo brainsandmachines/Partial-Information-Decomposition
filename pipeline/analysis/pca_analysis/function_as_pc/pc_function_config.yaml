@@ -1,0 +1,51 @@
+# Functions are resolved from pipeline.full_OTC.otc_experiment.PIPELINE_STEP_FUNCTIONS.
+# target_extraction is included because PIDPipelineFunctions requires it, even
+# though pc_function_analysis prepares the target directly from the paths below.
+functions:
+  target_extraction: prepare_target
+  sources_extraction: nsd_sources
+  choose_layer: overall_best_layer
+  feature_extraction: nsd_feature_extraction
+  preprocess: null
+  feature_manipulation: null
+  pid_calculation: pid_calc
+  pid_report: null
+
+# Every model in model1_name is paired with every model in model2_name.
+model1_name:
+  - convnext_base_classification
+
+model2_name:
+  - eca_nfnet_l0_classification
+
+# Target data and the saved PCA used to order/select the target PCs.
+pc_path: pipeline/subj_PCs/saved_pcs_nostandardization/pca_by_variance=200/subj01_pca_model.pkl
+hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
+pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
+neural_data_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr
+
+choose_layer_kwargs:
+  path_to_results: external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
+
+feature_extraction_kwargs:
+  batch_size_process: 120
+  batch_size_dataloader: 128
+
+# For each cumulative target-PC count, ridge is fitted only after those target
+# PCs have been selected.
+feature_manipulation_kwargs:
+  ridge: true
+
+pid_kwargs:
+  method: tilde
+  rng_seed: 39
+  config:
+    device: cuda
+    bias_correction: true
+
+# pc_function_analysis writes one pickle per pair to results_dir when it is
+# passed config["results_dir"]. plot_pid_mi_as_function_of_pcs writes both the
+# absolute and normalized PNGs to plot_dir.
+results_dir: pipeline/analysis/pca_analysis/function_as_pc/results/Ridge_Bias_True_False
+plot_dir: pipeline/analysis/pca_analysis/function_as_pc/plots/Ridge_Bias_True_False
+experiment_name: Ridge_Bias_True_False

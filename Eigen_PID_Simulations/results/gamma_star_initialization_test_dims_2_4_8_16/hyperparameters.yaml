@@ -1,0 +1,39 @@
+experiment_name: gamma_star_initialization_test_dims_2_4_8_16
+random_seed: 56
+target_dimensions:
+- 2
+- 4
+- 8
+- 16
+source1_dimensions:
+- 2
+- 4
+- 8
+- 16
+source2_dimensions:
+- 2
+- 4
+- 8
+- 16
+repeats_per_dimension: 5
+channel_gain_scale: 0.75
+optimizer_regularization: 1.0e-07
+eigen_neutral_log2_tolerance: 0.0
+time_limit_seconds: null
+plot_dpi: 300
+methods:
+- GPID/Tilde-PID
+- Thin-PID
+initializations:
+- Original covariance (native start)
+- Eigen-PID Gamma* start
+covariance_variable_order:
+- target
+- source1
+- source2
+balanced_dimensions: true
+output_paths:
+  results_csv: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/gamma_star_initialization_test_dims_2_4_8_16/iteration_results.csv
+  iteration_plot: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/gamma_star_initialization_test_dims_2_4_8_16/iteration_comparison.png
+  pid_plot: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/gamma_star_initialization_test_dims_2_4_8_16/pid_comparison.png
+  hyperparameters_yaml: /home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Eigen_PID_Simulations/results/gamma_star_initialization_test_dims_2_4_8_16/hyperparameters.yaml

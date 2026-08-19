@@ -1,0 +1,4 @@
+interface:
+  display_name: "Function Registry Reuse"
+  short_description: "Prevent duplicate project functions"
+  default_prompt: "Use $function-registry-reuse before creating or modifying functions in this project."

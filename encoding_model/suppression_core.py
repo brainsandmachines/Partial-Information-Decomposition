@@ -1,19 +1,12 @@
 import numpy as np
 import torch
-import pandas as pd
 import sys
 import joblib
 from pathlib import Path
-from encoding_model.encoding_utils import diagnostic_plots, singularity_report
+from encoding_model.commonality import commonality_analysis
 
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
-from sklearn.linear_model import RidgeCV, LinearRegression
-from sklearn.linear_model import LinearRegression
-from encoding_model.encoding_utils import compute_r2,compute_ols_cv_r2,compute_ridge_cv_r2
-
-
-
 
 
 def create_predictions(reg_lh, reg_rh, features):
@@ -45,6 +38,8 @@ def create_encoder(rng,features,target,n_features):
     Returns:
         Tuple[LinearRegression, np.ndarray]: Trained regression model and used features.
     """
+    from sklearn.linear_model import LinearRegression
+
     assert n_features <= features.shape[1], "n_features must be less than or equal to the number of available features."
 
 
@@ -148,42 +143,9 @@ def create_supression_model(rng,signal,suppresion_method, features, suppression_
 
     return X_M1, X_M2,target
 
-
-def commonality_analysis(features_A, features_B, target, method='standard', alphas=None):
-    # Select R² computation function based on method
-    if method == 'standard':
-        compute_r2_fn = compute_r2
-    elif method == 'ols_cv':
-        compute_r2_fn = compute_ols_cv_r2
-    elif method == 'ridge_cv':
-        compute_r2_fn = lambda X, y: compute_ridge_cv_r2(X, y, alphas)
-    else:
-        raise ValueError(f"Unknown method: {method}. Use 'standard', 'ols_cv', or 'ridge_cv'.")
-    
-    #Define joint model features
-    features_AB = np.hstack([features_A, features_B])
-    # Compute R² for each model
-    r2_A = compute_r2_fn(features_A, target)
-    r2_B = compute_r2_fn(features_B, target)
-    r2_AB = compute_r2_fn(features_AB, target)
-    
-    # Commonality analysis decomposition
-    unique_A = (r2_AB - r2_B)
-    unique_B = (r2_AB - r2_A)
-    common_AB = (r2_A + r2_B - r2_AB)
-    unexplained = (1 - r2_AB)
-    
-    return {
-        'R²_X1': r2_A,
-        'R²_X2': r2_B,
-        'R²_X12': r2_AB,
-        'unique_X1': unique_A,
-        'unique_X2': unique_B,
-        'common': common_AB,
-        'unexplained': unexplained
-    }
-
 def run_all_methods(rng_seed,suppresion_method ,mixing_dimension, snr,suppression_strength,models_and_features_dict=None):
+    import pandas as pd
+
     methods_outputs = {}
     """Run all three analysis methods with the same random seed."""
     X_M1,X_M2,target,signal,real_feature = models_and_features_dict['X_M1'],models_and_features_dict['X_M2'],models_and_features_dict['target'],models_and_features_dict['signal'],models_and_features_dict['real_feature']
@@ -235,6 +197,8 @@ def suppression_analysis_pipeline(
             - suppression_models: Dictionary with X_M1, X_M2, target for each hemisphere
             - commonality_results: Dictionary with analysis results for each hemisphere and method
     """
+    import pandas as pd
+
     # Initialize RNG
     rng = np.random.default_rng(rng_seed) if rng_seed is not None else np.random.default_rng()
     
@@ -376,6 +340,8 @@ def grid_search_suppression_analysis(
             - results_by_seed: Dictionary with results grouped by rng_seed
             - file_paths: List of saved file paths
     """
+    import pandas as pd
+
     # Set defaults
     suppression_strength_list = suppression_strength_list or [0.3, 0.5, 0.7]
     snr_list = snr_list or [1.0, 5.0, 10.0]
@@ -522,4 +488,3 @@ def grid_search_suppression_analysis(
             'file_paths': file_paths,
             'output_dir': str(output_dir)
         }
-

@@ -1,24 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.discriminant_analysis import StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.utils.validation import check_array, check_is_fitted
-from sklearn.metrics import r2_score
 from itertools import chain, combinations
 from typing import List, Tuple, Union
 import torch
 from torch.linalg import inv, slogdet
-from sklearn.covariance import MinCovDet
-import statsmodels
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-from sklearn.covariance import LedoitWolf
 import os
 from matplotlib.colors import LogNorm
-from sklearn.linear_model import RidgeCV, LinearRegression
 
 
 def LinearRegression_fit(X,y):
+    from sklearn.linear_model import LinearRegression
+
     model = LinearRegression()
     if X.device != 'cpu':
         X = X.cpu().numpy()
@@ -51,6 +43,8 @@ def compute_ridge_cv_r2(X, y, alphas=None):
     
     # RidgeCV with leave-one-out CV (efficient GCV approximation)
     # cv=None means use efficient LOO via GCV
+    from sklearn.linear_model import RidgeCV
+
     ridge_cv = RidgeCV(alphas=alphas, fit_intercept=True, scoring='r2', cv=None)
     
     if X.device != 'cpu':
@@ -82,6 +76,8 @@ def ledoit_wolf_cov_torch(X: torch.Tensor, assume_centered: bool = False) -> tor
     """
     Fit Ledoit-Wolf on X (N,פ) and return covariance as torch.Tensor on same device/dtype.
     """
+    from sklearn.covariance import LedoitWolf
+
     X_np = X.detach().cpu().numpy()
     lw = LedoitWolf(assume_centered=assume_centered).fit(X_np)
     Sigma = torch.from_numpy(lw.covariance_).to(device=X.device, dtype=X.dtype)
@@ -136,21 +132,63 @@ def create_cov_matrix(rvs:list=[],verbose=False,Sigma=None,dims:list=None,device
 
     if (rvs and len(rvs) == 3) or (dims and len(dims) == 3):
         #Cross-Covariances:
-        cov_dict['cross_x2_xt'] = Sigma[x1_dim:dx1_dx2, dx1_dx2:d_all]#ΣX2,XT
+        cov_dict['cross_x2_t'] = Sigma[x1_dim:dx1_dx2, dx1_dx2:d_all]#ΣX2,XT
         cov_dict['cross_x2t_x1'] = Sigma[x1_dim:d_all, 0:x1_dim] #ΣX2XT,X1
-        cov_dict['cross_x1_xt'] = Sigma[0:x1_dim, dx1_dx2:d_all] #ΣX1,XT
+        cov_dict['cross_x1_t'] = Sigma[0:x1_dim, dx1_dx2:d_all] #ΣX1,XT
 
         #Auto-Covariances:
-        cov_dict['joint_x2_xt'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
-        cov_dict['cov_xt'] = Sigma[dx1_dx2:d_all, dx1_dx2:d_all] #ΣXT
+        cov_dict['joint_x2_t'] = Sigma[x1_dim:d_all, x1_dim:d_all]  #ΣX2XT
+        cov_dict['cov_t'] = Sigma[dx1_dx2:d_all, dx1_dx2:d_all] #ΣXT
 
         ##ΣX1,XT:
-        a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_xt']),dim=1,)
-        b = torch.cat((cov_dict['cross_x1_xt'].T, cov_dict['cov_xt']),dim=1)
-        cov_dict['joint_x1_xt'] = torch.cat((a,b),dim=0)
+        a = torch.cat((cov_dict['cov_x1'], cov_dict['cross_x1_t']),dim=1,)
+        b = torch.cat((cov_dict['cross_x1_t'].T, cov_dict['cov_t']),dim=1)
+        cov_dict['joint_x1_t'] = torch.cat((a,b),dim=0)
 
 
     return cov_dict
+
+
+def reorder_cov_blocks(
+    Sigma: torch.Tensor,
+    dims: dict[str, int],
+    old_order: list[str],
+    new_order: list[str],
+) -> torch.Tensor:
+    """
+    Reorder covariance matrix blocks according to variable names.
+
+    Example:
+        Sigma is ordered as [X1, X2, T]
+        reorder to [T, X1, X2]
+
+        Sigma_new = reorder_cov_blocks(
+            Sigma,
+            dims={'X1': d1, 'X2': d2, 'T': dt},
+            old_order=['X1', 'X2', 'T'],
+            new_order=['T', 'X1', 'X2']
+        )
+    """
+
+    assert set(old_order) == set(new_order), "old_order and new_order must contain the same variables"
+
+    start = {}
+    current = 0
+    for var in old_order:
+        start[var] = current
+        current += dims[var]
+
+    indices = []
+    for var in new_order:
+        s = start[var]
+        e = s + dims[var]
+        indices.append(torch.arange(s, e, device=Sigma.device))
+
+    new_idx = torch.cat(indices)
+
+    return Sigma[new_idx][:, new_idx]
+
+
 
 def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
     """This function will create the covariance matrix for the three variables M1,M2,T
@@ -370,10 +408,17 @@ def assert_full_rank(X: torch.Tensor,jitter=0) -> None:
 
 def correlation_matrix(X):
     """Compute the correlation matrix of the columns of X."""
+    X = np.asarray(X)
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+    if X.shape[1] == 1:
+        return np.array([[1.0]])
+
     X_centered = X - np.mean(X, axis=0)
     cov_matrix = np.cov(X_centered, rowvar=False)
     stddev = np.sqrt(np.diag(cov_matrix))
-    corr_matrix = cov_matrix / np.outer(stddev, stddev)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        corr_matrix = cov_matrix / np.outer(stddev, stddev)
     return corr_matrix
 
 def block_singularity_check(X, tol=1e-10):
@@ -397,8 +442,11 @@ def block_singularity_check(X, tol=1e-10):
     min_eig = float(eigvals.min())
     return min_eig, min_eig <= tol
 
-def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
+def singularity_report(X_M1, X_M2, y_real, tol=1e-10, return_printing_required=False):
     """Return min eigenvalue and singularity flag for blocks and combinations."""
+    if np.asarray(y_real).ndim == 1:
+        y_real = np.asarray(y_real).reshape(-1, 1)
+
     blocks = {
         "M1": X_M1,
         "M2": X_M2,
@@ -411,7 +459,7 @@ def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
     report = {}
     printing_required = False
     for name, block in blocks.items():
-        min_eig, is_singular = block_singularity_check(block, tol)
+        min_eig, is_singular = block_singularity_check(correlation_matrix(block), tol)
         report[name] = {"min_eigval": min_eig, "is_singular": is_singular}
         if is_singular:
             printing_required = True
@@ -420,7 +468,9 @@ def singularity_report(X_M1, X_M2, y_real, tol=1e-10):
         for name, info in report.items():
             status = "SINGULAR" if info["is_singular"] else "OK"
             print(f"Block {name}: min eigenvalue = {info['min_eigval']:.2e} -> {status}")
-    return report,printing_required
+    if return_printing_required:
+        return report, printing_required
+    return report
 
 def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
     def cross_correlation(X, Y):
@@ -458,6 +508,9 @@ def diagnostic_plots(X_M1, X_M2, y_real, method, mixing_dimension):
 
 
 def vif_summary(X):
+    from sklearn.discriminant_analysis import StandardScaler
+    from statsmodels.stats.outliers_influence import variance_inflation_factor
+
     if len(X.shape) == 2:
           X = np.expand_dims(X, axis=0)
     max_vif_list = []
@@ -513,7 +566,14 @@ def eigvenvalue_summary(X):
     print("Max eigenvalue:", np.max(eigvals))
     print("Eigenvalue ratio (max/min):", np.max(eigvals)/np.min(eigvals))
 
-def compare_results(vp_results,pid_results,mi_results):
+def _get_first(mapping, *keys):
+    for key in keys:
+        if key in mapping:
+            return mapping[key]
+    raise KeyError(f"None of these keys were found: {keys}")
+
+
+def compare_results(vp_results,pid_results,mi_results=None):
     """Compare Variance Partitioning and Partial Information Decomposition results.
     Parameters
     ----------
@@ -521,30 +581,313 @@ def compare_results(vp_results,pid_results,mi_results):
         Results from variance partitioning.
     pid_results : dict
         Results from Partial Information Decomposition.
-    mi_results : dict
-        Mutual information results from PID.
+    mi_results : dict, optional
+        Mutual information results from PID. If omitted, MI totals are inferred
+        from PID components.
 
     Returns
     -------
     None
     """
+    unique_x1 = _get_first(pid_results, "unq0", "unq1")
+    if "unq0" in pid_results:
+        unique_x2 = pid_results["unq1"]
+    else:
+        unique_x2 = _get_first(pid_results, "unq2", "unq1")
+    red = _get_first(pid_results, "red")
+    syn = _get_first(pid_results, "syn")
+
+    if mi_results is None:
+        mi_x1 = unique_x1 + red
+        mi_x2 = unique_x2 + red
+        mi_x12 = unique_x1 + unique_x2 + red + syn
+    else:
+        mi_x1 = _get_first(mi_results, "I(M1;T)", "I(M0;T)")
+        mi_x2 = _get_first(mi_results, "I(M2;T)", "I(M1;T)")
+        mi_x12 = _get_first(mi_results, "I(M1,M2;T)", "I(M0,M1;T)")
+
     print("\n" + "="*70)
     print("Comparison of Variance Partitioning and PID Results")
     print("="*70)
     print("Results:")
-    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_results['I(M1;T)']:.4f}")
-    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_results['I(M2;T)']:.4f}")
-    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_results['I(M1,M2;T)']:.4f}")
-    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {pid_results['unq1']:.4f}")
-    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {pid_results['unq2']:.4f}")
-    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {pid_results['red']:.4f}")
-    print(f"Synergy (PID): {pid_results['syn']:.4f}")
+    print(f"M1 R² (VP): {vp_results['R²_X1']:.4f} | I(T;M1): {mi_x1:.4f}")
+    print(f"M2 R² (VP): {vp_results['R²_X2']:.4f} | I(T;M2): {mi_x2:.4f}")
+    print(f"Both M1 and M2 R² (VP): {vp_results['R²_X12']:.4f} | I(T;M1,M2): {mi_x12:.4f}")
+    print(f"\nUnique to M1 (VP): {vp_results['unique_X1']:.4f} | Unique(T;M1\\M2): {unique_x1:.4f}")
+    print(f"Unique to M2 (VP): {vp_results['unique_X2']:.4f} | Unique(T;M2\\M1): {unique_x2:.4f}")
+    print(f"Common (VP): {vp_results['common']:.4f} | Redundant (PID): {red:.4f}")
+    print(f"Synergy (PID): {syn:.4f}")
 
 
+def pid_comparison_table(results: dict, decimals: int = 4, print_table: bool = True):
+    """Print and return a compact table comparing PID and MI outputs."""
+    columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)"]
+    rows = []
+    for method, value in results.items():
+        pid, mi = value if isinstance(value, (tuple, list)) else (value["pid"], value["mi"])
+        rows.append({
+            "method": method,
+            "Red": pid.get("red"),
+            "Unq1": _get_first(pid, "unq1", "unq0"),
+            "Unq2": _get_first(pid, "unq2", "unq1"),
+            "Syn": pid.get("syn"),
+            "I(X1;T)": _get_first(mi, "bi_mi_1", "I(M1;T)", "I(M0;T)"),
+            "I(X2;T)": _get_first(mi, "bi_mi_2", "I(M2;T)", "I(M1;T)"),
+            "I(X1,X2;T)": _get_first(mi, "tri_mi", "I(M1,M2;T)", "I(M0,M1;T)"),
+        })
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+    if print_table:
+        display = [{k: (f"{v:.{decimals}f}" if isinstance(v, (int, float, np.number)) else str(v)) for k, v in row.items()} for row in rows]
+        widths = {col: max(len(col), *(len(row[col]) for row in display)) for col in columns}
+        line = " | ".join("-" * widths[col] for col in columns)
+        print("\nPID method comparison")
+        print(" | ".join(col.ljust(widths[col]) for col in columns))
+        print(line)
+        for row in display:
+            print(" | ".join(row[col].rjust(widths[col]) if col != "method" else row[col].ljust(widths[col]) for col in columns))
+    return rows
+
+
+def save_pid_comparison_table(results: dict, save_path: str, decimals: int = 4, title: str = "PID Method Comparison", config: dict = None):
+    """Save the PID comparison table as a clean matplotlib image."""
+    rows = pid_comparison_table(results, decimals=decimals, print_table=False)
+    columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)"]
+    cfg = config.get("parameters", config) if config else {}
+    legend_items = {
+        "n": cfg.get("n"),
+        "dx1": cfg.get("dx1", cfg.get("p")),
+        "dx2": cfg.get("dx2", cfg.get("p")),
+        "dt": cfg.get("dt", cfg.get("p")),
+        "seed": cfg.get("seed"),
+        "bias_correction": cfg.get("bias_correction"),
+    }
+    legend = " | ".join(f"{key}={value}" for key, value in legend_items.items() if value is not None)
+    cell_text = [
+        [f"{row[col]:.{decimals}f}" if isinstance(row[col], (int, float, np.number)) else row[col] for col in columns]
+        for row in rows
+    ]
+
+    fig_height = max(2.1, 0.42 * len(rows) + (1.55 if legend else 1.0))
+    fig, ax = plt.subplots(figsize=(10, fig_height))
+    ax.axis("off")
+    ax.set_position([0.03, 0.05, 0.94, 0.70 if legend else 0.82])
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=0.91)
+    if legend:
+        fig.text(0.5, 0.78, legend, ha="center", va="center", fontsize=9, color="#4b5563")
+    table = ax.table(cellText=cell_text, colLabels=columns, loc="center", cellLoc="center")
+    table.auto_set_font_size(False)
+    table.set_fontsize(9.5)
+    table.scale(1, 1.35)
+
+    for (row, _), cell in table.get_celld().items():
+        cell.set_edgecolor("#d1d5db")
+        if row == 0:
+            cell.set_facecolor("#111827")
+            cell.set_text_props(color="white", weight="bold")
+        else:
+            cell.set_facecolor("#f9fafb" if row % 2 else "white")
+
+    fig.savefig(save_path, bbox_inches="tight", dpi=200)
+    plt.close(fig)
+    return save_path
+
+
+def commonality_comparison_table(
+    results: dict,
+    decimals: int = 4,
+    print_table: bool = True,
+) -> list[dict]:
+    """Normalize, print, and return commonality-analysis result rows.
+
+    Inputs:
+        results: dict containing either one commonality payload or payloads
+            keyed by example name.
+        decimals: int, number of decimal places used in console output.
+        print_table: bool, whether to print the formatted comparison table.
+
+    Outputs:
+        list[dict], canonical rows retaining the example label as metadata and
+        containing R-squared scores, unique/common components, and unexplained
+        variance. The example label is not displayed as a table column.
+    """
+    columns = [
+        "R²_X1",
+        "R²_X2",
+        "R²_X12",
+        "Unique_X1",
+        "Unique_X2",
+        "Common",
+        "Unexplained",
+    ]
+    direct_payload_keys = {"R²_X1", "R2_X1", "r2_X1", "r2_x1"}
+    result_items = (
+        [("Commonality Analysis", results)]
+        if direct_payload_keys.intersection(results)
+        else list(results.items())
+    )
+
+    rows = []
+    for example, payload in result_items:
+        rows.append({
+            "Example": example,
+            "R²_X1": _get_first(payload, "R²_X1", "R2_X1", "r2_X1", "r2_x1"),
+            "R²_X2": _get_first(payload, "R²_X2", "R2_X2", "r2_X2", "r2_x2"),
+            "R²_X12": _get_first(
+                payload,
+                "R²_X12",
+                "R2_X12",
+                "r2_X12",
+                "r2_x12",
+            ),
+            "Unique_X1": _get_first(payload, "Unique_X1", "unique_X1", "unique_x1"),
+            "Unique_X2": _get_first(payload, "Unique_X2", "unique_X2", "unique_x2"),
+            "Common": _get_first(payload, "Common", "common", "common_X12"),
+            "Unexplained": _get_first(payload, "Unexplained", "unexplained"),
+        })
+
+    if print_table:
+        display = [
+            {
+                key: (
+                    f"{value:.{decimals}f}"
+                    if isinstance(value, (int, float, np.number))
+                    else str(value)
+                )
+                for key, value in row.items()
+            }
+            for row in rows
+        ]
+        widths = {
+            column: max(len(column), *(len(row[column]) for row in display))
+            for column in columns
+        }
+        line = " | ".join("-" * widths[column] for column in columns)
+        print("\nCommonality analysis comparison")
+        print(" | ".join(column.ljust(widths[column]) for column in columns))
+        print(line)
+        for row in display:
+            print(" | ".join(row[column].rjust(widths[column]) for column in columns))
+    return rows
+
+
+def save_commonality_comparison_table(
+    results: dict,
+    save_path: str,
+    decimals: int = 4,
+    title: str = "Commonality Analysis Comparison",
+    config: dict | None = None,
+) -> str:
+    """Save normalized commonality results as a Matplotlib table image.
+
+    Inputs:
+        results: dict containing one or more commonality payloads.
+        save_path: str, destination image path.
+        decimals: int, number of decimal places shown in table cells.
+        title: str, figure title.
+        config: dict | None, optional run configuration shown above the table.
+
+    Outputs:
+        str, the destination image path after the figure is saved.
+    """
+    rows = commonality_comparison_table(
+        results,
+        decimals=decimals,
+        print_table=False,
+    )
+    columns = [
+        "R²_X1",
+        "R²_X2",
+        "R²_X12",
+        "Unique_X1",
+        "Unique_X2",
+        "Common",
+        "Unexplained",
+    ]
+    cfg = config.get("parameters", config) if config else {}
+    legend_items = {
+        "n_samples": cfg.get("n_samples", cfg.get("n")),
+        "p": cfg.get("p"),
+        "seed": cfg.get("seed"),
+        "method": cfg.get("commonality_method", "ridge_cv"),
+        "scale_by_target_variance": cfg.get(
+            "commonality_scale_by_target_variance",
+            False,
+        ),
+    }
+    legend = " | ".join(
+        f"{key}={value}"
+        for key, value in legend_items.items()
+        if value is not None
+    )
+    cell_text = [
+        [
+            f"{row[column]:.{decimals}f}"
+            if isinstance(row[column], (int, float, np.number))
+            else row[column]
+            for column in columns
+        ]
+        for row in rows
+    ]
+
+    fig_height = max(2.1, 0.42 * len(rows) + (1.55 if legend else 1.0))
+    fig, ax = plt.subplots(figsize=(10, fig_height))
+    ax.axis("off")
+    ax.set_position([0.03, 0.05, 0.94, 0.70 if legend else 0.82])
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=0.91)
+    if legend:
+        fig.text(
+            0.5,
+            0.78,
+            legend,
+            ha="center",
+            va="center",
+            fontsize=9,
+            color="#4b5563",
+        )
+    table = ax.table(
+        cellText=cell_text,
+        colLabels=columns,
+        loc="center",
+        cellLoc="center",
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.35)
+
+    for (row, _), cell in table.get_celld().items():
+        cell.set_edgecolor("#d1d5db")
+        if row == 0:
+            cell.set_facecolor("#111827")
+            cell.set_text_props(color="white", weight="bold")
+        else:
+            cell.set_facecolor("#f9fafb" if row % 2 else "white")
+
+    fig.savefig(save_path, bbox_inches="tight", dpi=200)
+    plt.close(fig)
+    return save_path
+
+
+def commanility_analysis(
+    results: dict,
+    decimals: int = 4,
+    print_table: bool = True,
+) -> list[dict]:
+    """Call the commonality table formatter through its legacy misspelling.
+
+    Inputs:
+        results: dict containing one or more commonality payloads.
+        decimals: int, number of decimal places used in console output.
+        print_table: bool, whether to print the formatted table.
+
+    Outputs:
+        list[dict], canonical rows from commonality_comparison_table.
+    """
+    return commonality_comparison_table(
+        results,
+        decimals=decimals,
+        print_table=print_table,
+    )
+
 
 
 def plot_mi_heatmap(
@@ -587,6 +930,8 @@ def plot_mi_heatmap(
     cmap : str
         Matplotlib colormap name.
     """
+    import pandas as pd
+
     df = pd.read_csv(csv_path)
 
     # Remove possible unnamed index columns
@@ -694,6 +1039,8 @@ def plot_all_mi_heatmaps(
     mi_sample_no_bias_mean, mi_sample_no_bias_std,
     mi_sample_with_bias_mean, mi_sample_with_bias_std
     """
+
+    import pandas as pd
 
     df = pd.read_csv(csv_path)
 
@@ -831,6 +1178,7 @@ def plot_all_mi_heatmaps(
 
 
 def plot_block_heatmap(csv_path, save_path=None):
+    import pandas as pd
 
     df = pd.read_csv(csv_path)
     df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
@@ -959,3 +1307,28 @@ def oas_cov_torch(S: torch.Tensor, N: int) -> torch.Tensor:
     # Apply shrinkage
     S_shrunk = (1.0 - alpha) * S + alpha * T
     return S_shrunk
+
+
+def residual_rvs(rv_list:list,predictor_index=0):
+    """Given a list of random variables (Torch.Tensors),
+    returns a list where we predict the second rv using the first rv and return the residuls. 
+    
+    input: 
+        list of  two random variables [rv1, rv2]
+    
+    output:
+        [rv1,residual of rv2 after regressing out rv1]"""
+
+    
+    if len(rv_list) != 2:
+        raise ValueError("This function is designed for exactly two random variables.")
+    
+    target_index = 1 - predictor_index
+    predictor = rv_list[predictor_index]
+    target = rv_list[target_index]
+
+    _,model_fit = compute_ridge_cv_r2(predictor, target)
+
+    target_pred = model_fit.predict(predictor)
+    residual = target - target_pred
+    return [predictor, residual]

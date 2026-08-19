@@ -14,19 +14,6 @@ create_cov_matrix = PID_util.create_cov_matrix
 Venkatesh et al 2023. (NeurIPS-2023-gaussian-partial-information-decomposition-bias-correction-and-application-to-high-dimensional-data-Paper-Conference)
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
 
-
-@pytest.fixture #It marks the function random_data() as a data provider.
-def random_data():
-    """Fixture to provide random tensors for testing."""
-    N = 100
-    d_t = 1
-    d_m1 = 1
-    d_m2 = 1
-    T = torch.randn(N, d_t)
-    M1 = torch.randn(N, d_m1)
-    M2 = torch.randn(N, d_m2)
-    return T, M1, M2
-
 def test_output_keys(random_data):
     """Check if all required keys are present."""
     T, M1, M2 = random_data
