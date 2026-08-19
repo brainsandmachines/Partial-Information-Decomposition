@@ -1,18 +1,12 @@
-import torch
 import numpy as np
-from sklearn.model_selection import LeaveOneOut
-from zarr import config
-from PID_util import *
-import pandas as pd
-from joblib import Parallel, delayed
-import time
-import sys
-from pathlib import Path
-from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import on_covariance
-root = Path(__file__).resolve().parents[1]
-sys.path.append(str(root))
-from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.jackknife import *
-from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.bootstrap import *
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.bootstrap import (
+    bootstrap_func,
+    bootstrap_resample,
+)
+from Partial_Information_Decomposition.Idep.non_parametric_bias_corr.jackknife import (
+    jackkinfe_func,
+    jackknife_resample,
+)
 
 
 
@@ -33,7 +27,6 @@ def resampleing(resample_inputs: dict,rng) -> dict:
 
 def calculate_statistic(config:dict,calc_func:callable ,population:dict,rng:np.random.Generator) -> dict:
     #Extract data
-    seed = config['seed']
     #Calculate statistic on the population
     statistic = calc_func(population, rng)
     return {'statistic': statistic, 'org_pop': population['org_pop'],}

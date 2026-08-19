@@ -11,7 +11,10 @@ import numpy as np
 import torch
 import yaml
 
-from story_math_utils import calculate_story_mi_values
+try:
+    from .story_math_utils import calculate_story_mi_values
+except ImportError:  # pragma: no cover - direct script compatibility
+    from story_math_utils import calculate_story_mi_values
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
@@ -24,6 +27,26 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from Partial_Information_Decomposition.PID_util import save_pid_comparison_table
+
+
+def pid_method_display_name(method: str) -> str:
+    """Convert a configured PID method identifier to its table label.
+
+    Inputs:
+        method: str, configured PID dispatch identifier such as ``eigen`` or
+            ``flow``.
+
+    Outputs:
+        str, stable display label used by result tables and seed CSV files.
+    """
+    method_key = method.lower()
+    labels = {
+        "eigen": "Analytical BROJA",
+        "eigen_pid": "Analytical BROJA",
+        "flow": "Flow",
+        "flow_pid": "Flow",
+    }
+    return labels.get(method_key, method.title())
 
 
 def truth_pid_suppression(
@@ -82,7 +105,7 @@ def run_pid_story(
     function_to_run: Callable,
     truth_func: Callable | None = None,
     methods: tuple[str, ...] = ("tilde", "delta", "flow"),
-) -> dict:
+) -> tuple[dict, list[np.ndarray]]:
     """Run one RVs_Story generator through selected PID methods.
 
     Inputs:
@@ -92,7 +115,8 @@ def run_pid_story(
         methods: tuple[str, ...], PID methods passed to pid_calc.
 
     Outputs:
-        dict, result rows keyed by display name such as "Tilde" and "Delta".
+        tuple containing the PID result rows and the generated NumPy random
+        variables ordered as [X1, X2, T].
     """
     from Partial_Information_Decomposition.PID_calc import pid_calc
 
@@ -115,7 +139,7 @@ def run_pid_story(
         results["True Values"] = true_values
 
     for method in config['methods']:
-        results[method.title() if method != "flow" else "Flow"] = pid_calc(
+        results[pid_method_display_name(method)] = pid_calc(
             run_config,
             sources,
             target,
@@ -126,7 +150,9 @@ def run_pid_story(
         )
         print(f"\nFinished calculating PID with {method} method")
         print("=" * 70)
-    return results
+    # [(n_samples, dx1), (n_samples, dx2), (n_samples, dt)]
+    # -> [(n_samples, dx1), (n_samples, dx2), (n_samples, dt)]
+    return results, [x1, x2, t]
 
 
 def load_story_config(config_path: str | Path | None = None) -> dict:
@@ -162,7 +188,7 @@ def save_single_example(
     """
 
     params = config["parameters"]
-    results = run_pid_story(params, function_to_run, truth_func=truth_func)
+    results, _ = run_pid_story(params, function_to_run, truth_func=truth_func)
     output_path = Path(params["results_dir"]) / output_name
     save_pid_comparison_table(results, save_path=str(output_path), config=config)
     return results

@@ -1,17 +1,11 @@
 import torch
 import numpy as np
-import pandas as pd
-import sys
-import os
-import time
-from pathlib import Path
-from PID_util import *
-from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import build_m7_terms, build_m8_terms, on_covariance
-root = Path(__file__).resolve().parents[1]
-sys.path.append(str(root)) 
-from PID_util import *
-
-
+from Partial_Information_Decomposition.PID_util import para_create_cov_matrix
+from Partial_Information_Decomposition.Idep.covariance_utils import (
+    build_m7_terms,
+    build_m8_terms,
+)
+from Partial_Information_Decomposition.Idep.covariance_shrinkage import on_covariance
 _BOOTSTRAP_COUNT_KEYS = (
     'n_bootstrap',
     'n_bootstraps',
@@ -157,7 +151,6 @@ def bootstrap_resample(config: dict) -> list:
     mean = torch.zeros(d, dtype=torch.float64, device=device)
     dist = torch.distributions.MultivariateNormal(mean, covariance_matrix=Sigma_model)
     samples = dist.sample((B, N))
-    cov_list = []
 
     centered = samples - samples.mean(dim=1, keepdim=True)
     cov_bootstrap = centered.transpose(1, 2) @ centered / (N - 1)
@@ -174,7 +167,6 @@ def bootstrap_resample(config: dict) -> list:
 
 def bootstrap_whiten(config: dict, cov_dict: dict) -> torch.Tensor:
     """Project batched covariance estimates onto the M7/M8 whitened model space."""
-    device = config.get('device', 'cpu')
     if config['model'] == 'M8':
         terms_dict = build_m8_terms(config, cov_dict, whiten='whiten_ver', para=True)
 

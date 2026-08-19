@@ -1,15 +1,10 @@
 import torch
 import numpy as np
-import pandas as pd
-import sys
-import os
-import time
-from pathlib import Path
-from PID_util import *
-root = Path(__file__).resolve().parents[1]
-sys.path.append(str(root)) 
-from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import *
-from PID_util import *
+
+from Partial_Information_Decomposition.PID_util import (
+    para_create_cov_matrix,
+    para_whiten_block,
+)
 
 def jackkinfe_func(config,cov_loo,calculate_statistic_func):
     """Calculate the jackknife bias correction for a given statistic calculated on leave-one-out covariance matrices.
@@ -27,8 +22,6 @@ def jackkinfe_func(config,cov_loo,calculate_statistic_func):
     raw_value = config['sample_statistic']
     raw_value = raw_value['nume'].item() if type(raw_value) == dict else raw_value
     n2 = config['n2']
-    n1 = config['n1']
-    n0 = config['n0']
     df = config['n_samples'] - 2 - n2
     bias = (df) * (values_mean - raw_value)
     return bias
@@ -97,9 +90,9 @@ def jackknife_resample(config:dict) -> list:
     return Sigma_full, cov_loo_all_whiten
 
 def jackknife_whiten(config,m7_cov_dict):
-    Q = para_whiten_block(m7_cov_dict['cov_x0'], m7_cov_dict['cross_x0_x2'], m7_cov_dict['cov_x2']).to(config['device'])
-    R = para_whiten_block(m7_cov_dict['cov_x1'], m7_cov_dict['cross_x1_x2'], m7_cov_dict['cov_x2']).to(config['device'])
-    P = para_whiten_block(m7_cov_dict['cov_x0'], m7_cov_dict['cross_x0_x1'], m7_cov_dict['cov_x1']).to(config['device'])
+    Q = para_whiten_block(m7_cov_dict['cov_x1'], m7_cov_dict['cross_x1_xt'], m7_cov_dict['cov_xt']).to(config['device'])
+    R = para_whiten_block(m7_cov_dict['cov_x2'], m7_cov_dict['cross_x2_xt'], m7_cov_dict['cov_xt']).to(config['device'])
+    P = para_whiten_block(m7_cov_dict['cov_x1'], m7_cov_dict['cross_x1_x2'], m7_cov_dict['cov_x2']).to(config['device'])
 
     if config['model'] == 'M7':
         P = Q @ R.mT 

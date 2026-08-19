@@ -17,6 +17,7 @@ import torch
 from external.mayas_project.features_and_encoding.feat_ext_and_encoding import (
     prepare_model_context,
 )
+from pipeline.analysis.anlysis_utils import to_deepdive_model_name
 from pipeline.pipeline_phases.choosing_layer import overall_best_layer
 from pipeline.pipeline_phases.feature_manipulations import (
     load_ridge_alphas,
@@ -25,11 +26,6 @@ from pipeline.pipeline_phases.feature_manipulations import (
 
 
 repo_root = Path(__file__).resolve().parents[4]
-
-DEEPDIVE_MODEL_NAME_CONVERSIONS: dict[str, str] = {
-    "ViT-B_32_clip": "ViT-B/32_clip",
-    "ViT-L_14_clip": "ViT-L/14_clip",
-}
 
 PAIRWISE_RESULT_COLUMNS: list[str] = [
     "model_1",
@@ -72,23 +68,6 @@ class RidgeModelArtifacts:
     layer_index: int
     alphas_path: Path
     alphas: np.ndarray
-
-
-def to_deepdive_model_name(model_name: str) -> str:
-    """Convert a stored model alias to the canonical DeepDive identifier.
-
-    Inputs:
-        model_name: str identifier used by artifacts and pairwise results.
-
-    Outputs:
-        str identifier accepted by DeepDive, unchanged when no alias is needed.
-    """
-
-    deepdive_model_name = DEEPDIVE_MODEL_NAME_CONVERSIONS.get(model_name, model_name)
-    if deepdive_model_name != model_name:
-        print(f"Changed model name: {model_name} -> {deepdive_model_name}")
-    return deepdive_model_name
-
 
 def safe_model_name(model_name: str) -> str:
     """Replace path separators in a model identifier for artifact filenames.

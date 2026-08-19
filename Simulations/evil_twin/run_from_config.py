@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 import sys
 
@@ -34,15 +35,17 @@ CONFIG = {
     "seeds": [0],
     "n_samples": 10000,
     "dimension": 100,
-    "methods": ("eigen",'tilde','idep'),
+    "methods": ("eigen", "tilde", "idep"),
     "bias_correction": False,
     "device": "cpu",
     "output_dir": "simulation_results/evil_twin_config",
     "csv_prefix": "evil_twin",
     "overwrite_outputs": True,
+    "flow_epochs": 50,
+    "flow_verbose": False,
 }
 
-SUPPORTED_METHODS = ("idep", "tilde", "delta",'eigen')
+SUPPORTED_METHODS = ("idep", "tilde", "delta", "eigen", "flow")
 
 
 def validate_config(config: dict) -> None:
@@ -106,6 +109,11 @@ def validate_config(config: dict) -> None:
         raise TypeError("CONFIG['csv_prefix'] must be a non-empty string")
     if not isinstance(config["overwrite_outputs"], bool):
         raise TypeError("CONFIG['overwrite_outputs'] must be True or False")
+    flow_epochs = config.get("flow_epochs", 50)
+    if not isinstance(flow_epochs, int) or isinstance(flow_epochs, bool) or flow_epochs < 1:
+        raise ValueError("CONFIG['flow_epochs'] must be a positive integer")
+    if not isinstance(config.get("flow_verbose", False), bool):
+        raise TypeError("CONFIG['flow_verbose'] must be True or False")
 
 
 def uncorrected_delta_pid(
@@ -170,7 +178,7 @@ def calculate_pid(
         sources: list[torch.Tensor], two source sample matrices.
         target: list[torch.Tensor], one target sample matrix.
         generator: torch.Generator, seeded generator for reproducible PID calls.
-        method: str, one of "idep", "tilde", or "delta".
+        method: str, one of the methods listed in ``SUPPORTED_METHODS``.
 
     Outputs:
         tuple[dict, dict], PID components and mutual-information values in bits.
@@ -224,8 +232,8 @@ def run_from_config(config: dict) -> dict:
         n=n_samples,
         p=dimension,
         device=device,
-        flow_epochs=0,
-        flow_verbose=False,
+        flow_epochs=config.get("flow_epochs", 50),
+        flow_verbose=config.get("flow_verbose", False),
     )
     pid_config["bias_correction"] = config["bias_correction"]
 
@@ -288,16 +296,83 @@ def run_from_config(config: dict) -> dict:
     }
 
 
-def main() -> dict:
-    """Run the module-level evil-twin configuration.
+def parse_args() -> argparse.Namespace:
+    """Parse optional overrides for the consolidated evil-twin runner.
 
     Inputs:
-        No inputs. Uses the module-level CONFIG dictionary.
+        No inputs; values are read from the process command line.
+
+    Outputs:
+        argparse.Namespace containing optional CONFIG overrides.
+    """
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--seeds", nargs="+", type=int)
+    parser.add_argument("--n-samples", "--n", dest="n_samples", type=int)
+    parser.add_argument("--dimension", "--p", dest="dimension", type=int)
+    parser.add_argument("--methods", nargs="+", choices=SUPPORTED_METHODS)
+    parser.add_argument("--device")
+    parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--csv-prefix")
+    parser.add_argument("--flow-epochs", type=int)
+    parser.add_argument(
+        "--bias-correction",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    parser.add_argument(
+        "--overwrite-outputs",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    parser.add_argument(
+        "--flow-verbose",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    return parser.parse_args()
+
+
+def config_from_args(args: argparse.Namespace) -> dict:
+    """Apply explicitly supplied command-line values to ``CONFIG``.
+
+    Inputs:
+        args: argparse.Namespace returned by ``parse_args``.
+
+    Outputs:
+        dict containing an independent, validated experiment configuration.
+    """
+
+    config = dict(CONFIG)
+    for key in (
+        "seeds",
+        "n_samples",
+        "dimension",
+        "methods",
+        "bias_correction",
+        "device",
+        "output_dir",
+        "csv_prefix",
+        "overwrite_outputs",
+        "flow_epochs",
+        "flow_verbose",
+    ):
+        value = getattr(args, key)
+        if value is not None:
+            config[key] = value
+    return config
+
+
+def main() -> dict:
+    """Run the evil-twin experiment with CONFIG and command-line overrides.
+
+    Inputs:
+        No inputs. Uses the module-level CONFIG plus explicit CLI values.
 
     Outputs:
         dict, containing nested results by seed/method/twin and written CSV paths.
     """
-    return run_from_config(CONFIG)
+    return run_from_config(config_from_args(parse_args()))
 
 
 if __name__ == "__main__":

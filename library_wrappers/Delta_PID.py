@@ -8,9 +8,21 @@ import os
 from pathlib import Path
 
 try:
-    from .wrapper_utils import add_gpid_src_to_path, parse_sizes
+    from .wrapper_utils import (
+        BASE_PID_COLUMNS,
+        add_gpid_src_to_path,
+        covariance_example_context,
+        parse_sizes,
+        run_covariance_pid_wrapper,
+    )
 except ImportError:  # pragma: no cover - script-style import fallback
-    from wrapper_utils import add_gpid_src_to_path, parse_sizes
+    from wrapper_utils import (
+        BASE_PID_COLUMNS,
+        add_gpid_src_to_path,
+        covariance_example_context,
+        parse_sizes,
+        run_covariance_pid_wrapper,
+    )
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
@@ -19,31 +31,9 @@ GPID_SRC = add_gpid_src_to_path()
 
 from gpid import estimate
 
-from wrapper_utils import BASE_PID_COLUMNS, covariance_example_context, parse_sizes, run_covariance_pid_wrapper
-
-
 DEFAULT_MATRIX_CSV = Path(__file__).resolve().parent / "evil_twin_whitened_correlation_1_1_1.csv"
 DEFAULT_OUTPUT = "delta_evil_twin.csv"
 SIMPLE_OUTPUT = "delta_simple_gaussian.csv"
-
-PID_COLUMNS = [
-    "unique_source1",
-    "unique_source2",
-    "redundancy",
-    "synergy",
-    "I_source1_target",
-    "I_source2_target",
-    "joint_mutual_information",
-    "interaction_information",
-]
-
-
-def parse_sizes(value: str) -> tuple[int, int, int]:
-    sizes = tuple(int(part.strip()) for part in value.split(","))
-    if len(sizes) != 3 or any(size <= 0 for size in sizes):
-        raise argparse.ArgumentTypeError("--sizes must look like 1,1,1")
-    return sizes
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(

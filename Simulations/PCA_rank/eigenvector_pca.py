@@ -1,13 +1,17 @@
-import csv
+"""Numerical eigenvector PCA cross-validation and loading estimators."""
+
 from dataclasses import dataclass
-import hashlib
-import json
-import os
 from pathlib import Path
 import time
 from typing import Callable
 
 import numpy as np
+
+from Simulations.PCA_rank.eigenvector_pca_wrapper import (
+    build_checkpoint_metadata,
+    load_eigenvector_pca_checkpoint,
+    write_eigenvector_pca_checkpoint,
+)
 
 SKLEARN_IMPORT_ERROR = None
 try:
@@ -31,20 +35,6 @@ except Exception as error:
     ROWWISE_PCA_IMPORT_ERROR = error
 
 PCAFitFunction = Callable[[np.ndarray, int], np.ndarray]
-CHECKPOINT_VERSION = "1"
-CHECKPOINT_META_FIELDS = [
-    "checkpoint_version",
-    "data_hash",
-    "n_samples",
-    "n_features",
-    "max_components",
-    "center",
-    "scale",
-    "include_zero_components",
-    "method_pca",
-    "eps",
-    "pca_fit_fn",
-]
 
 
 @dataclass
@@ -72,153 +62,6 @@ def fit_pca_loadings_svd(
     return Vt[:n_components, :].T
 
 
-def _checkpoint_fields(max_components: int) -> tuple[list[str], list[str]]:
-    """Build checkpoint CSV columns.
-
-    Input: max_components is int, largest component count evaluated by CV.
-    Output: tuple of all field names and PRESS-only field names.
-    """
-    press_fields = [f"press_{component}" for component in range(max_components + 1)]
-    return [*CHECKPOINT_META_FIELDS, "sample_index", *press_fields], press_fields
-
-
-def _checkpoint_metadata(
-    X: np.ndarray,
-    max_components: int,
-    pca_fit_fn: PCAFitFunction,
-    center: bool,
-    scale: bool,
-    include_zero_components: bool,
-    method_pca: str | None,
-    eps: float,
-) -> dict[str, str]:
-    """Build strict checkpoint metadata.
-
-    Input: X is np.ndarray; max_components is int; pca_fit_fn is PCAFitFunction;
-        center, scale, and include_zero_components are bool; method_pca is str
-        or None; eps is float.
-    Output: dict[str, str] of CSV-safe values that must match to resume.
-    """
-    n_samples, n_features = X.shape
-    X_hash = hashlib.sha256()
-    contiguous = np.ascontiguousarray(X)
-    X_hash.update(str(contiguous.dtype).encode("utf-8"))
-    X_hash.update(json.dumps(contiguous.shape).encode("utf-8"))
-    X_hash.update(contiguous.tobytes())
-    fit_name = getattr(
-        pca_fit_fn,
-        "__qualname__",
-        getattr(pca_fit_fn, "__name__", type(pca_fit_fn).__qualname__),
-    )
-    return {
-        "checkpoint_version": CHECKPOINT_VERSION,
-        "data_hash": X_hash.hexdigest(),
-        "n_samples": str(n_samples),
-        "n_features": str(n_features),
-        "max_components": str(max_components),
-        "center": json.dumps(center),
-        "scale": json.dumps(scale),
-        "include_zero_components": json.dumps(include_zero_components),
-        "method_pca": json.dumps(method_pca),
-        "eps": repr(float(eps)),
-        "pca_fit_fn": f"{getattr(pca_fit_fn, '__module__', type(pca_fit_fn).__module__)}.{fit_name}",
-    }
-
-
-def _load_eigenvector_pca_checkpoint(
-    checkpoint_csv_path: str | Path,
-    metadata: dict[str, str],
-    max_components: int,
-) -> dict[int, np.ndarray]:
-    """Load a compatible eigenvector PCA checkpoint.
-
-    Input: checkpoint_csv_path is str or Path; metadata is dict[str, str];
-        max_components is int.
-    Output: dict[int, np.ndarray] mapping sample index to PRESS contribution.
-    """
-    path = Path(checkpoint_csv_path)
-    if not path.exists():
-        return {}
-
-    expected_fieldnames, press_fields = _checkpoint_fields(max_components)
-    completed_press: dict[int, np.ndarray] = {}
-    n_samples = int(metadata["n_samples"])
-
-    with path.open("r", newline="", encoding="utf-8") as csv_file:
-        reader = csv.DictReader(csv_file)
-        if reader.fieldnames != expected_fieldnames:
-            raise ValueError(
-                f"Checkpoint CSV has an incompatible schema: {path}. "
-                f"Expected columns: {expected_fieldnames}"
-                )
-
-        for row_number, row in enumerate(reader, start=2):
-            mismatch = next(
-                (key for key, value in metadata.items() if row.get(key) != value),
-                None,
-            )
-            if mismatch is not None:
-                raise ValueError(
-                    f"Checkpoint CSV is incompatible at row {row_number}: "
-                    f"{mismatch}={row.get(mismatch)!r}, expected {metadata[mismatch]!r}."
-                )
-
-            sample_index = int(row["sample_index"])
-            if sample_index < 0 or sample_index >= n_samples:
-                raise ValueError(
-                    f"Checkpoint CSV contains invalid sample_index={sample_index} "
-                    f"at row {row_number}."
-                )
-            if sample_index in completed_press:
-                raise ValueError(
-                    f"Checkpoint CSV contains duplicate sample_index={sample_index}."
-                )
-
-            completed_press[sample_index] = np.array(
-                [float(row[field]) for field in press_fields],
-                dtype=float,
-            )
-    return completed_press
-
-
-def _write_eigenvector_pca_checkpoint(
-    checkpoint_csv_path: str | Path,
-    metadata: dict[str, str],
-    completed_press: dict[int, np.ndarray],
-    max_components: int,
-) -> None:
-    """Atomically write completed eigenvector PCA checkpoint rows.
-
-    Input: checkpoint_csv_path is str or Path; metadata is dict[str, str];
-        completed_press is dict[int, np.ndarray]; max_components is int.
-    Output: None. The destination CSV is atomically replaced.
-    """
-    path = Path(checkpoint_csv_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    fieldnames, press_fields = _checkpoint_fields(max_components)
-
-    try:
-        with temp_path.open("w", newline="", encoding="utf-8") as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-            writer.writeheader()
-            for sample_index, press in sorted(completed_press.items()):
-                writer.writerow({
-                    **metadata,
-                    "sample_index": str(sample_index),
-                    **{
-                        field: repr(float(value))
-                        for field, value in zip(press_fields, press)
-                    },
-                })
-            csv_file.flush()
-            os.fsync(csv_file.fileno())
-        os.replace(temp_path, path)
-    finally:
-        if temp_path.exists():
-            temp_path.unlink()
-
-
 def _eigenvector_pca_cv_sample_press(
     X: np.ndarray,
     sample_index: int,
@@ -235,7 +78,9 @@ def _eigenvector_pca_cv_sample_press(
     Input: X is np.ndarray; sample_index and max_components are int;
         pca_fit_fn is PCAFitFunction; center, scale, and
         include_zero_components are bool; method_pca is str or None; eps is float.
-    Output: np.ndarray of shape (max_components + 1,).
+    Output: np.ndarray of shape (max_components + 1,). Orthonormal loadings use
+        the vectorized leverage formula; non-orthonormal loadings fall back to
+        the direct per-feature pseudoinverse calculation.
     """
     n_samples, n_features = X.shape
     sample_press = np.zeros(max_components + 1, dtype=float)
@@ -273,20 +118,29 @@ def _eigenvector_pca_cv_sample_press(
                 f"but expected {(n_features, f)}."
             )
 
+        tolerance = max(1e-8, eps)
+        is_orthonormal = np.allclose(
+            P.T @ P,
+            np.eye(f),
+            rtol=1e-7,
+            atol=tolerance,
+        )
+        if is_orthonormal:
+            raw_error = x_test - (x_test @ P) @ P.T
+            leverage = np.sum(P * P, axis=1)
+            denominator = 1.0 - leverage
+            if np.all(np.abs(denominator) > tolerance):
+                loo_error = raw_error / denominator
+                sample_press[f] = np.sum(loo_error ** 2)
+                continue
+
         for j in range(n_features):
             x_i_minus_j = np.delete(x_test, j)
             P_minus_j = np.delete(P, j, axis=0)
             p_j = P[j, :]
             gram = P_minus_j.T @ P_minus_j
-
-            t_hat = (
-                x_i_minus_j
-                @ P_minus_j
-                @ np.linalg.pinv(gram, rcond=eps)
-            )
-
-            x_hat_ij = t_hat @ p_j
-            error = x_test[j] - x_hat_ij
+            t_hat = x_i_minus_j @ P_minus_j @ np.linalg.pinv(gram, rcond=eps)
+            error = x_test[j] - t_hat @ p_j
             sample_press[f] += error ** 2
 
     return sample_press
@@ -340,7 +194,7 @@ def eigenvector_pca_cv(
     completed_press: dict[int, np.ndarray] = {}
 
     if checkpoint_csv_path is not None:
-        metadata = _checkpoint_metadata(
+        metadata = build_checkpoint_metadata(
             X,
             max_components,
             pca_fit_fn,
@@ -350,7 +204,7 @@ def eigenvector_pca_cv(
             method_pca,
             eps,
         )
-        completed_press = _load_eigenvector_pca_checkpoint(
+        completed_press = load_eigenvector_pca_checkpoint(
             checkpoint_csv_path,
             metadata,
             max_components,
@@ -381,7 +235,7 @@ def eigenvector_pca_cv(
         completed_press[i] = sample_press
 
         if checkpoint_csv_path is not None:
-            _write_eigenvector_pca_checkpoint(
+            write_eigenvector_pca_checkpoint(
                 checkpoint_csv_path,
                 metadata,
                 completed_press,

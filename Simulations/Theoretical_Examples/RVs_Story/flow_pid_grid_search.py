@@ -1,5 +1,4 @@
 import argparse
-import ast
 import csv
 import os
 import sys
@@ -9,21 +8,33 @@ from pathlib import Path
 import numpy as np
 import torch
 import yaml
-from torch.utils.data import TensorDataset
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 
 ROOT = Path(__file__).resolve().parents[3]
-STORY_ROOT = Path(__file__).resolve().parent
 FLOW_PID_ROOT = ROOT / "external" / "flow-pid"
 for path in (ROOT, FLOW_PID_ROOT):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-from Partial_Information_Decomposition.PID_util import create_cov_matrix
-from Partial_Information_Decomposition.mi_functions import calculate_mi_raw
 from Partial_Information_Decomposition.PID_calc import flow_pid_wrapper
+from Simulations.Theoretical_Examples.RVs_Story.regular_examples.equal_unique import (
+    equal_unique,
+)
+from Simulations.Theoretical_Examples.RVs_Story.story_pid_utils import (
+    truth_pid_equal_unique,
+    truth_pid_suppression,
+)
+from Simulations.Theoretical_Examples.RVs_Story.suppresion_examples.full_suppresion import (
+    full_suppresion,
+)
+from Simulations.Theoretical_Examples.RVs_Story.suppresion_examples.unq12_zero import (
+    unq12_zero,
+)
+from Simulations.Theoretical_Examples.RVs_Story.suppresion_examples.unq2_zero import (
+    unq2_zero,
+)
 
 
 FLOW_GRID = {
@@ -35,58 +46,36 @@ FLOW_GRID = {
 
 EXAMPLES = {
     "equal_unique": {
-        "file": STORY_ROOT / "regular_examples" / "equal_unique.py",
-        "function": "equal_unique",
-        "truth": STORY_ROOT / "regular_examples" / "core_model.py",
+        "generator": equal_unique,
+        "truth": truth_pid_equal_unique,
     },
     "full_suppresion": {
-        "file": STORY_ROOT / "suppresion_examples" / "full_suppresion.py",
-        "function": "full_suppresion",
-        "truth": STORY_ROOT / "suppresion_examples" / "core_model.py",
+        "generator": full_suppresion,
+        "truth": truth_pid_suppression,
     },
     "unq2_zero": {
-        "file": STORY_ROOT / "suppresion_examples" / "unq2_zero.py",
-        "function": "unq2_zero",
-        "truth": STORY_ROOT / "suppresion_examples" / "core_model.py",
+        "generator": unq2_zero,
+        "truth": truth_pid_suppression,
     },
     "unq12_zero": {
-        "file": STORY_ROOT / "suppresion_examples" / "unq12_zero.py",
-        "function": "unq12_zero",
-        "truth": STORY_ROOT / "suppresion_examples" / "core_model.py",
+        "generator": unq12_zero,
+        "truth": truth_pid_suppression,
     },
 }
 
 
-def load_functions(path, names, namespace):
-    """Load only selected function definitions from a file, avoiding top-level imports."""
-    tree = ast.parse(path.read_text(encoding="utf-8"))
-    selected = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name in names]
-    module = ast.Module(body=selected, type_ignores=[])
-    ast.fix_missing_locations(module)
-    exec(compile(module, str(path), "exec"), namespace)
-    return {name: namespace[name] for name in names}
-
-
 def load_example_and_truth(example_name):
+    """Return the registered sample generator and analytical truth function.
+
+    Inputs:
+        example_name: str key in ``EXAMPLES``.
+
+    Outputs:
+        tuple of generator and truth callables used by the Flow-PID grid search.
+    """
+
     spec = EXAMPLES[example_name]
-    generator = load_functions(spec["file"], [spec["function"]], {"np": np})[spec["function"]]
-    bias_funcs = load_functions(
-        ROOT / "Partial_Information_Decomposition" / "bias_functions.py",
-        ["logdet_wishart_bias", "mi_wishahrt_bias"],
-        {"torch": torch},
-    )
-    truth = load_functions(
-        spec["truth"],
-        ["true_mi_pid"],
-        {
-            "torch": torch,
-            "np": np,
-            "create_cov_matrix": create_cov_matrix,
-            "calculate_mi_raw": calculate_mi_raw,
-            "mi_wishahrt_bias": bias_funcs["mi_wishahrt_bias"],
-        },
-    )["true_mi_pid"]
-    return generator, truth
+    return spec["generator"], spec["truth"]
 
 
 def grid_items(grid):

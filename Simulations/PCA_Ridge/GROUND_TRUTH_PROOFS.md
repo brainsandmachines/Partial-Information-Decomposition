@@ -5,9 +5,7 @@
 This document proves how the population ground truth is calculated for the
 `RAW`, `PCA`, and `RIDGE CV` routes in:
 
-- `all_above_zero_pca_ridge.py`
-- `con_all_above_zero_pca_ridge.py`
-- `equal_unique_pca_ridge.py`
+- the registered scenarios in `scenarios.py`, run through `run_pca_ridge.py`
 - the Sonic experiment in `pid_feature_middleware.py`
 
 All population covariances are constructed in the observable order

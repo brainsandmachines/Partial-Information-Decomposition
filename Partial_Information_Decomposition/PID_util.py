@@ -671,10 +671,185 @@ def save_pid_comparison_table(results: dict, save_path: str, decimals: int = 4, 
     fig, ax = plt.subplots(figsize=(10, fig_height))
     ax.axis("off")
     ax.set_position([0.03, 0.05, 0.94, 0.70 if legend else 0.82])
-    fig.suptitle(title, fontsize=14, fontweight="bold", y=0.96)
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=0.91)
     if legend:
-        fig.text(0.5, 0.875, legend, ha="center", va="center", fontsize=9, color="#4b5563")
+        fig.text(0.5, 0.78, legend, ha="center", va="center", fontsize=9, color="#4b5563")
     table = ax.table(cellText=cell_text, colLabels=columns, loc="center", cellLoc="center")
+    table.auto_set_font_size(False)
+    table.set_fontsize(9.5)
+    table.scale(1, 1.35)
+
+    for (row, _), cell in table.get_celld().items():
+        cell.set_edgecolor("#d1d5db")
+        if row == 0:
+            cell.set_facecolor("#111827")
+            cell.set_text_props(color="white", weight="bold")
+        else:
+            cell.set_facecolor("#f9fafb" if row % 2 else "white")
+
+    fig.savefig(save_path, bbox_inches="tight", dpi=200)
+    plt.close(fig)
+    return save_path
+
+
+def commonality_comparison_table(
+    results: dict,
+    decimals: int = 4,
+    print_table: bool = True,
+) -> list[dict]:
+    """Normalize, print, and return commonality-analysis result rows.
+
+    Inputs:
+        results: dict containing either one commonality payload or payloads
+            keyed by example name.
+        decimals: int, number of decimal places used in console output.
+        print_table: bool, whether to print the formatted comparison table.
+
+    Outputs:
+        list[dict], canonical rows retaining the example label as metadata and
+        containing R-squared scores, unique/common components, and unexplained
+        variance. The example label is not displayed as a table column.
+    """
+    columns = [
+        "R²_X1",
+        "R²_X2",
+        "R²_X12",
+        "Unique_X1",
+        "Unique_X2",
+        "Common",
+        "Unexplained",
+    ]
+    direct_payload_keys = {"R²_X1", "R2_X1", "r2_X1", "r2_x1"}
+    result_items = (
+        [("Commonality Analysis", results)]
+        if direct_payload_keys.intersection(results)
+        else list(results.items())
+    )
+
+    rows = []
+    for example, payload in result_items:
+        rows.append({
+            "Example": example,
+            "R²_X1": _get_first(payload, "R²_X1", "R2_X1", "r2_X1", "r2_x1"),
+            "R²_X2": _get_first(payload, "R²_X2", "R2_X2", "r2_X2", "r2_x2"),
+            "R²_X12": _get_first(
+                payload,
+                "R²_X12",
+                "R2_X12",
+                "r2_X12",
+                "r2_x12",
+            ),
+            "Unique_X1": _get_first(payload, "Unique_X1", "unique_X1", "unique_x1"),
+            "Unique_X2": _get_first(payload, "Unique_X2", "unique_X2", "unique_x2"),
+            "Common": _get_first(payload, "Common", "common", "common_X12"),
+            "Unexplained": _get_first(payload, "Unexplained", "unexplained"),
+        })
+
+    if print_table:
+        display = [
+            {
+                key: (
+                    f"{value:.{decimals}f}"
+                    if isinstance(value, (int, float, np.number))
+                    else str(value)
+                )
+                for key, value in row.items()
+            }
+            for row in rows
+        ]
+        widths = {
+            column: max(len(column), *(len(row[column]) for row in display))
+            for column in columns
+        }
+        line = " | ".join("-" * widths[column] for column in columns)
+        print("\nCommonality analysis comparison")
+        print(" | ".join(column.ljust(widths[column]) for column in columns))
+        print(line)
+        for row in display:
+            print(" | ".join(row[column].rjust(widths[column]) for column in columns))
+    return rows
+
+
+def save_commonality_comparison_table(
+    results: dict,
+    save_path: str,
+    decimals: int = 4,
+    title: str = "Commonality Analysis Comparison",
+    config: dict | None = None,
+) -> str:
+    """Save normalized commonality results as a Matplotlib table image.
+
+    Inputs:
+        results: dict containing one or more commonality payloads.
+        save_path: str, destination image path.
+        decimals: int, number of decimal places shown in table cells.
+        title: str, figure title.
+        config: dict | None, optional run configuration shown above the table.
+
+    Outputs:
+        str, the destination image path after the figure is saved.
+    """
+    rows = commonality_comparison_table(
+        results,
+        decimals=decimals,
+        print_table=False,
+    )
+    columns = [
+        "R²_X1",
+        "R²_X2",
+        "R²_X12",
+        "Unique_X1",
+        "Unique_X2",
+        "Common",
+        "Unexplained",
+    ]
+    cfg = config.get("parameters", config) if config else {}
+    legend_items = {
+        "n_samples": cfg.get("n_samples", cfg.get("n")),
+        "p": cfg.get("p"),
+        "seed": cfg.get("seed"),
+        "method": cfg.get("commonality_method", "ridge_cv"),
+        "scale_by_target_variance": cfg.get(
+            "commonality_scale_by_target_variance",
+            False,
+        ),
+    }
+    legend = " | ".join(
+        f"{key}={value}"
+        for key, value in legend_items.items()
+        if value is not None
+    )
+    cell_text = [
+        [
+            f"{row[column]:.{decimals}f}"
+            if isinstance(row[column], (int, float, np.number))
+            else row[column]
+            for column in columns
+        ]
+        for row in rows
+    ]
+
+    fig_height = max(2.1, 0.42 * len(rows) + (1.55 if legend else 1.0))
+    fig, ax = plt.subplots(figsize=(10, fig_height))
+    ax.axis("off")
+    ax.set_position([0.03, 0.05, 0.94, 0.70 if legend else 0.82])
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=0.91)
+    if legend:
+        fig.text(
+            0.5,
+            0.78,
+            legend,
+            ha="center",
+            va="center",
+            fontsize=9,
+            color="#4b5563",
+        )
+    table = ax.table(
+        cellText=cell_text,
+        colLabels=columns,
+        loc="center",
+        cellLoc="center",
+    )
     table.auto_set_font_size(False)
     table.set_fontsize(10)
     table.scale(1, 1.35)
@@ -690,6 +865,28 @@ def save_pid_comparison_table(results: dict, save_path: str, decimals: int = 4, 
     fig.savefig(save_path, bbox_inches="tight", dpi=200)
     plt.close(fig)
     return save_path
+
+
+def commanility_analysis(
+    results: dict,
+    decimals: int = 4,
+    print_table: bool = True,
+) -> list[dict]:
+    """Call the commonality table formatter through its legacy misspelling.
+
+    Inputs:
+        results: dict containing one or more commonality payloads.
+        decimals: int, number of decimal places used in console output.
+        print_table: bool, whether to print the formatted table.
+
+    Outputs:
+        list[dict], canonical rows from commonality_comparison_table.
+    """
+    return commonality_comparison_table(
+        results,
+        decimals=decimals,
+        print_table=print_table,
+    )
 
 
 

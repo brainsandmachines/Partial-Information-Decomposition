@@ -463,8 +463,9 @@ def run_pid_feature_comparison(
                 target=[pid_target],
                 method=pid_method,
             )
-            for key, value in {**pid, **mi}.items():
-                sampled_values[route][key].append(float(value))
+            combined_results = {**pid, **mi}
+            for key in RESULT_KEYS:
+                sampled_values[route][key].append(float(combined_results[key]))
 
     plot_results = {}
     for route in routes:

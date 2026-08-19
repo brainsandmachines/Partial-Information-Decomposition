@@ -1,18 +1,21 @@
 import torch 
 from pathlib import Path
 import sys
-import os
 import yaml
-import pandas as pd
 from heatmap_plot import plot_pid_and_mi_heatmaps_from_csv
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from PID_calc import pid_calc
-from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import make_random_true_cov
-from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import already_exists_in_csv, make_pre_config, sample_data_from_cov, flatten_pid_results,append_row_to_csv
+from Partial_Information_Decomposition.Idep.covariance_utils import make_random_true_cov
+from Partial_Information_Decomposition.Idep.simulation_utils import (
+    already_exists_in_csv,
+    append_row_to_csv,
+    flatten_pid_results,
+    make_pre_config,
+    sample_data_from_cov,
+)
 from my_utils import Tee
 from mi_functions import calculate_mi_raw
-from PID_util import reorder_cov_blocks
 
 log = open("Simulation_DeltaVsIIdepVsBroja.log", "w")
 
@@ -112,7 +115,6 @@ def trials_simulation(config,title):
     len_N = len(N_values)
     len_P = len(P_values)
     i = 1
-    rows = []
     output_csv = config.get("output_csv", "pid_results.csv")
 
     for N in N_values:
@@ -153,9 +155,6 @@ def trials_simulation(config,title):
                 append_row_to_csv(row,output_folder=output_csv,csv_title=title)
 
             
-                df = pd.DataFrame(rows)
-
-
     print(f"\nSaved PID results to: {output_csv}")
 
     return output_csv
@@ -173,7 +172,7 @@ def main(config,single=True,multi=False,exp_name=None):
         
         for pid_ver in config['pid_ver']:
             #print(f"\nRunning PID simulation for {pid_ver}...")
-            pid_results = pid_simulation(config,rng, m8_true_cov,pid_ver)
+            pid_simulation(config,rng, m8_true_cov,pid_ver)
             #print(f"Finished PID simulation for {pid_ver}.")
 
     elif multi:

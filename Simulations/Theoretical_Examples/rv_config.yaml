@@ -6,7 +6,7 @@
 
 parameters: 
   description: "A direct Gaussian covariance with known equivalent source-target channels; both population unique-information terms are zero."
-  n_samples: 1000
+  n_samples: 1000000
   p: 50 #The same feature dimension for all varaibles
   noise_std: 1.0
   seed: 42
@@ -17,7 +17,11 @@ parameters:
   n_flows: 4
   bits: True
   device: "cuda"
-  methods: ['tilde']
+  methods: ['eigen']
+  commonality_analysis: true
+  commonality_method: "ridge_cv"
+  commonality_alphas: [0.01, 0.1, 1.0, 10.0]
+  commonality_scale_by_target_variance: false
 
 
 covariance:

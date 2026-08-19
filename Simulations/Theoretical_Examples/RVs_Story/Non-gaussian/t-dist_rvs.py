@@ -4,10 +4,12 @@ from pathlib import Path
 import sys
 
 import numpy as np
-from story_pid_utils import load_story_config, save_single_example
+
 STORY_ROOT = Path(__file__).resolve().parents[1]
 if str(STORY_ROOT) not in sys.path:
     sys.path.append(str(STORY_ROOT))
+
+from story_pid_utils import load_story_config, save_single_example
 
 
 def standardized_t(rng, df, size):
@@ -76,7 +78,5 @@ def unq12_zero(rng, n, p, noise_std, df=5):
 
 
 if __name__ == "__main__":
-
-
     config = load_story_config()
     save_single_example(config, unq12_zero, "2.0unq12_zero_t.png", truth_func=None)

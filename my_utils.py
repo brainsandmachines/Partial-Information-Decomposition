@@ -871,16 +871,6 @@ def get_config(config_path: Path | str) -> dict:
         return json.load(f)
     
 
-def _to_numpy_samples(data):
-    """Convert torch/numpy samples to the numpy format expected by flow-pid."""
-    if isinstance(data, torch.Tensor):
-        data = data.detach().cpu().numpy()
-    data = np.asarray(data)
-    if data.ndim == 1:
-        data = data.reshape(-1, 1)
-    return data
-
-
 def inspect_function(function:Callable[..., Any], input_name:str) -> bool:
     """Inspect a function's signature to check if it accepts a specific input name.
 

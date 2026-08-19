@@ -8,7 +8,7 @@ from functools import partial
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))
 from Partial_Information_Decomposition.PID_util import create_cov_matrix
-from Partial_Information_Decomposition.Idep.Idep_Simulations.simulation_wrapper import create_m7_cov
+from Partial_Information_Decomposition.Idep.covariance_utils import create_m7_cov
 from Partial_Information_Decomposition.mi_functions import calcualte_mi
 from external.gpid.src.gpid import tilde_pid
 

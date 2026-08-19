@@ -4,18 +4,7 @@ from __future__ import annotations
 
 import csv
 from pathlib import Path
-import sys
 
-import torch
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-from Partial_Information_Decomposition.PID_calc import pid_calc
-from Simulations.evil_twin.covariance_example import evil_twin_example_torch
-
-DEFAULT_METHODS = ("idep", "tilde", "delta", "flow")
 CSV_FIELDS = (
     "seed",
     "twin",
@@ -64,25 +53,6 @@ def method_csv_path(output_dir: Path, method: str, prefix: str = "evil_twin_pid"
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir / f"{prefix}_{method}.csv"
-
-
-def append_rows_to_csv(path: Path, rows: list[dict]) -> Path:
-    """Append rows to a CSV file, creating the header when needed.
-
-    Inputs:
-        path: Path, CSV file path.
-        rows: list[dict], rows keyed by CSV_FIELDS.
-
-    Outputs:
-        Path, the CSV path that was written.
-    """
-    write_header = not path.exists()
-    with path.open("a", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
-        if write_header:
-            writer.writeheader()
-        writer.writerows(rows)
-    return path
 
 
 def write_rows_to_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> Path:
@@ -189,51 +159,6 @@ def error_row(seed: int, twin: str, method: str, n: int, p: int, error: Exceptio
         }
     )
     return row
-
-
-def run_seed(seed: int, config: dict, methods: tuple[str, ...], output_dir: Path, csv_prefix: str) -> dict:
-    """Run all requested PID methods for one evil-twin seed and save CSV rows.
-
-    Inputs:
-        seed: int, seed used for sample generation.
-        config: dict, PID_calc-compatible configuration containing n_samples, dimensions, and device.
-        methods: tuple[str, ...], PID method names accepted by pid_calc.
-        output_dir: Path, directory where method CSV files are stored.
-        csv_prefix: str, filename prefix for output CSVs.
-
-    Outputs:
-        dict, nested results keyed by method and twin with PID_calc outputs or errors.
-    """
-    device = config["device"]
-    generator = torch.Generator(device=device).manual_seed(seed)
-    data = evil_twin_example_torch(
-        generator=generator,
-        n=config["n_samples"],
-        p=config["dx1"],
-        device=device,
-        dtype=torch.float64,
-    )
-
-    seed_results = {}
-    for method in methods:
-        method_rows = []
-        seed_results[method] = {}
-        for twin, (x1, x2, target) in data.items():
-            try:
-                pid, mi = pid_calc(
-                    config=config,
-                    sources=[x1, x2],
-                    target=[target],
-                    rng=generator,
-                    method=method,
-                )
-                seed_results[method][twin] = {"pid": pid, "mi": mi}
-                method_rows.append(result_row(seed, twin, method, config["n_samples"], config["dx1"], pid, mi))
-            except Exception as error:
-                seed_results[method][twin] = {"error": error}
-                method_rows.append(error_row(seed, twin, method, config["n_samples"], config["dx1"], error))
-        append_rows_to_csv(method_csv_path(output_dir, method, csv_prefix), method_rows)
-    return seed_results
 
 
 def summary_fieldnames(twins: tuple[str, ...] = SUMMARY_TWINS) -> list[str]:
@@ -458,52 +383,3 @@ def format_summary_table(rows: list[dict], decimals: int = 6) -> str:
         for row in formatted_rows
     ]
     return "\n".join([header_line, divider, *body])
-
-
-def run_evil_twin_pid_sweep(
-    seeds: list[int],
-    n: int = 1000,
-    p: int = 1,
-    methods: tuple[str, ...] = DEFAULT_METHODS,
-    output_dir: Path | str = Path("simulation_results/evil_twin_pid"),
-    device: str = "cpu",
-    flow_epochs: int = 250,
-    flow_verbose: bool = False,
-    csv_prefix: str = "evil_twin_pid",
-) -> dict:
-    """Run PID_calc methods on Sonic and Shadow across multiple seeds.
-
-    Inputs:
-        seeds: list[int], seeds to run.
-        n: int, number of samples per seed.
-        p: int, dimension of each source and target random variable.
-        methods: tuple[str, ...], PID method names accepted by pid_calc.
-        output_dir: Path | str, directory where method CSV files are stored.
-        device: str, torch device name.
-        flow_epochs: int, number of training epochs for flow PID.
-        flow_verbose: bool, whether flow PID should print training logs.
-        csv_prefix: str, filename prefix for method CSV files.
-
-    Outputs:
-        dict, nested in-memory results keyed by seed, method, and twin.
-    """
-    output_path = Path(output_dir)
-    config = make_pid_config(n, p, device, flow_epochs, flow_verbose)
-    all_results = {}
-    for seed in seeds:
-        all_results[seed] = run_seed(seed, config, methods, output_path, csv_prefix)
-    summary_rows = mean_summary_rows(
-        all_results,
-        methods,
-        n_samples=n,
-        dimension=p,
-        bias_correction=config["bias_correction"],
-    )
-    summary_path = save_summary_csv(output_path, csv_prefix, summary_rows)
-    image_paths = save_summary_table_images(summary_rows, output_path, csv_prefix, config)
-    print("\nMean PID/MI summary across seeds")
-    print(format_summary_table(summary_rows))
-    print(f"\nSaved summary CSV to: {summary_path}")
-    for image_path in image_paths:
-        print(f"Saved summary image to: {image_path}")
-    return all_results

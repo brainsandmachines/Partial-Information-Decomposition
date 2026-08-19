@@ -25,10 +25,6 @@ from my_utils import (
     save_csv_column_means
 )
 
-from Partial_Information_Decomposition.Idep.Idep_Simulations.Simulation_utils import CCA_reduction
-
-
-
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
 and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
 
@@ -103,8 +99,6 @@ def test_suppression(N=1000,P=1,suppression_strength=0.5,rng_seed=1,mode='simple
     # std_scaling_summary(T)
     # --- compute PID ---
 
-    #cca_output = CCA_reduction(device=M1_raw.device, rv_list=[M1_raw,M2_raw], n_components=M1_raw.shape[1]//3)
-    #M1, M2 = cca_output['X0'], cca_output['X1']
     #M1_resid = crossfit_residualize(M1_raw, M2_raw, n_splits=5, seed=rng_seed)
     #Change to tensors: 
     M1 = torch.tensor(M1_raw)
