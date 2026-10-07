@@ -27,7 +27,7 @@ from Simulations.Theoretical_Examples.Covariance.cov_functions import change_cov
 from Simulations.Theoretical_Examples.Covariance.save_results import save_sample_simulation_results_table
 
 RESULT_KEYS = ("red", "unq1", "unq2", "syn", "bi_mi_1", "bi_mi_2", "tri_mi")
-COVARIANCE_PID_METHODS = ("tilde", "thin", "thin_pid")
+COVARIANCE_PID_METHODS = ("eigen", "eigen_pid")
 
 
 def pca_target(
@@ -279,7 +279,7 @@ def calculate_theoretical_pid(
         covariance: torch.Tensor ordered as [X1, X2, T].
         dims: list[int] containing [dim_X1, dim_X2, dim_T].
         method: str covariance-compatible PID method; configured simulations
-            use Tilde or Thin-PID.
+            use Eigen PID.
 
     Outputs:
         dict[str, float]: red, unq1, unq2, syn, and the three MI values in bits.
@@ -296,7 +296,7 @@ def calculate_theoretical_pid(
         "bi_mi_2": float(mi_nats["bi_mi_2_t"] / np.log(2)),
         "tri_mi": float(mi_nats["tri_mi"] / np.log(2)),
     }
-    pid_dtype = torch.float32 if method in ("thin", "thin_pid") else torch.float64
+    pid_dtype = torch.float64
     pid_covariance = change_covariance_order(correlation, [2, 0, 1], dims).to(pid_dtype)  # [X1, X2, T] correlation -> [T, X1, X2] correlation
     source_1 = torch.zeros((2, dims[0]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_X1)
     source_2 = torch.zeros((2, dims[1]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_X2)
@@ -308,7 +308,7 @@ def calculate_theoretical_pid(
         covariance=pid_covariance,
         method=method,
     )
-    ground_truth.update({key: float(value) for key, value in pid.items()})
+    ground_truth.update({key: float(pid[key]) for key in ("red", "unq1", "unq2", "syn")})
     return ground_truth
 
 
@@ -400,7 +400,7 @@ def run_pid_feature_comparison(
         n_components: int retained PCA target/source dimensions.
         n_trials: int number of consecutive seeds to run.
         base_seed: int first trial seed; trial k uses base_seed + k.
-        pid_method: str configured covariance method: Tilde or Thin-PID.
+        pid_method: str configured covariance method: Eigen PID.
         bias_correction: bool passed unchanged to sampled PID calls.
         experiment_name: str label printed for each route.
         plot_path: str | Path output image path.
@@ -525,7 +525,7 @@ def build_sonic_covariance(p: int) -> torch.Tensor:
 if __name__ == "__main__":
     n_samples, n_train, n_components, p = 10000, 9000, 10, 70
     n_trials, base_seed = 2, 0
-    pid_method, bias_correction = "tilde", True
+    pid_method, bias_correction = "eigen_pid", True
     population_covariance = build_sonic_covariance(p)  # (3, 3) construction -> (3*p, 3*p)
     run_pid_feature_comparison(
         lambda seed: evil_twin_example_torch(

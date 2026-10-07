@@ -12,7 +12,7 @@ root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
 from encoding_model.commonality import commonality_analysis
 from toy_examples.toy_example import run_experiment
-from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.PID_calc import pid_calc
 from Partial_Information_Decomposition.PID_util import compare_results
 from my_utils import (
     Tee,
@@ -26,7 +26,7 @@ from my_utils import (
 )
 
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
-and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
+and computes Variance Partitioning and Partial Information Decomposition using Eigen PID."""
 
 log = open("p1_pidvsvp.log", "w")
 
@@ -80,7 +80,7 @@ def test_suppression(N=1000,P=1,suppression_strength=0.5,rng_seed=1,mode='simple
 
     Returns
     -------
-    Partial Information Decomposition (using Idep method) results printed to console.
+    Partial Information Decomposition (using Eigen PID) results printed to console.
     Varaince Partitioning results are returned from run_experiment function.
     """
 
@@ -108,9 +108,8 @@ def test_suppression(N=1000,P=1,suppression_strength=0.5,rng_seed=1,mode='simple
     sources = [M1,M2]
     
     targets = [T]
-    idep_class = Idep_multivariate_gauss(rng=rng_torch, sources=sources, targets=targets, 
-                                         bias_correction=False)
-    pid , mi = idep_class.idep()
+    pid, mi = pid_calc(config={"bias_correction": False}, rng=rng_torch,
+                       sources=sources, target=targets)
     return vp_results,pid,mi
 
 
@@ -122,15 +121,15 @@ def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
     Parameters
     ----------
     pid_results : dict
-        Dictionary containing PID components (unq0, unq1, red, syn).
+        Dictionary containing PID components (unq1, unq2, red, syn).
     title : str
         Title for the plot.
     """
     if pid_results is not None:
     # Extract the main PID components
         components = {
-            'Unique(M1)': pid_results.get('unq0', 0),
-            'Unique(M2)': pid_results.get('unq1', 0),
+            'Unique(M1)': pid_results.get('unq1', 0),
+            'Unique(M2)': pid_results.get('unq2', 0),
             'Redundant': pid_results.get('red', 0),
             'Synergy': pid_results.get('syn', 0)
             
@@ -138,9 +137,9 @@ def plot_pid_results(mi_results= None, pid_results=None, sub_title=None):
         title = "PID Components"
     elif mi_results is not None:
         components = {
-            'I(M1;T)': mi_results.get('I(M0;T)', 0),
-            'I(M2;T)': mi_results.get('I(M1;T)', 0),
-            'I(M1,M2;T)': mi_results.get('I(M0,M1;T)', 0)
+            'I(M1;T)': mi_results.get('bi_mi_1', 0),
+            'I(M2;T)': mi_results.get('bi_mi_2', 0),
+            'I(M1,M2;T)': mi_results.get('tri_mi', 0)
         }
         title = "Mutual Information Components"
     else:

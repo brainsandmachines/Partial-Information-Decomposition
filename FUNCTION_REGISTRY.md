@@ -14,94 +14,40 @@ Generated from the current AST. Paths, signatures, and line numbers reflect the 
 
 ## Folder Overview
 
-- `Eigen_PID_Simulations/`: 2 Python files.
-- `Lorenz_bias_corr/`: 2 Python files.
 - `MultivariateStatistics/`: 7 Python files.
-- `Partial_Information_Decomposition/`: 8 Python files.
-- `Partial_Information_Decomposition/Idep/`: 7 Python files.
-- `Partial_Information_Decomposition/Idep/non_parametric_bias_corr/`: 3 Python files.
+- `Partial_Information_Decomposition/`: 5 Python files.
 - `Simulations/Encoder_simulation/`: 3 Python files.
 - `Simulations/PCA_Ridge/`: 3 Python files.
 - `Simulations/PCA_rank/`: 5 Python files.
 - `Simulations/Theoretical_Examples/Covariance/`: 5 Python files.
-- `Simulations/Theoretical_Examples/Covariance/results_covariance/Sweeps_comp2/`: 1 Python file.
-- `Simulations/Theoretical_Examples/RVs_Story/`: 4 Python files.
-- `Simulations/Theoretical_Examples/RVs_Story/Non-gaussian/`: 1 Python file.
+- `Simulations/Theoretical_Examples/RVs_Story/`: 3 Python files.
+- `Simulations/Theoretical_Examples/RVs_Story/Non-gaussian/`: 1 Python files.
 - `Simulations/Theoretical_Examples/RVs_Story/regular_examples/`: 4 Python files.
 - `Simulations/Theoretical_Examples/RVs_Story/suppresion_examples/`: 4 Python files.
 - `Simulations/evil_twin/`: 5 Python files.
 - `data/`: 3 Python files.
-- `encoding_model/`: 10 Python files.
-- `library_wrappers/`: 11 Python files.
+- `encoding_model/`: 9 Python files.
+- `library_wrappers/`: 1 Python file.
 - `pipeline/`: 3 Python files.
-- `pipeline/analysis/`: 1 Python file.
+- `pipeline/analysis/`: 1 Python files.
 - `pipeline/analysis/pca_analysis/all_models_pairwise/`: 3 Python files.
 - `pipeline/analysis/pca_analysis/function_as_pc/`: 2 Python files.
-- `pipeline/analysis/pca_analysis/permuation_analysis/`: 1 Python file.
+- `pipeline/analysis/pca_analysis/permuation_analysis/`: 1 Python files.
 - `pipeline/analysis/pca_analysis/unique_search_outputs/`: 3 Python files.
 - `pipeline/analysis/ridge_analysis/`: 2 Python files.
 - `pipeline/full_OTC/`: 2 Python files.
 - `pipeline/pipeline_phases/`: 6 Python files.
-- `pipeline/plotting/`: 1 Python file.
-- `pipeline/ridge_find_alpha/`: 1 Python file.
+- `pipeline/plotting/`: 1 Python files.
+- `pipeline/ridge_find_alpha/`: 1 Python files.
 - `pipeline/subj_PCs/`: 3 Python files.
 - `pipeline/toy_examples/`: 2 Python files.
 - `pipeline/voxel_experiments/`: 2 Python files.
 - `repository root/`: 2 Python files.
-- `source_conwell_code/`: 1 Python file.
+- `source_conwell_code/`: 1 Python files.
 - `source_conwell_code/pressures/`: 3 Python files.
 - `source_conwell_code/pressures/brain_data/`: 3 Python files.
 - `supression_effect/`: 4 Python files.
 - `toy_examples/`: 7 Python files.
-
-## Eigen_PID_Simulations
-
-### `Eigen_PID_Simulations/gammaSTAR_as_inpunt.py`
-
-File description: Compare native and Eigen-PID Gamma-star optimizer initializations.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `load_optimizer_modules (line 71)` | No inputs | dict[str, tuple[str, Any]] | Load the GPID and Thin-PID modules used by the replay experiment. | Scope: reusable/public. Related: load_exact_gauss_thin_pid. |
-| `generate_gaussian_system (line 86)` | random_generator: np.random.Generator, dimension: int | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate one balanced Gaussian target/source covariance system. | Scope: reusable/public. |
-| `construct_native_couplings (line 128)` | channel_x: np.ndarray, channel_y: np.ndarray, thin_pid_module: Any | dict[str, np.ndarray] | Construct the native feasible optimizer coupling for each PID method. | Scope: reusable/public. |
-| `run_experiment (line 156)` | No inputs | list[dict[str, Any]] | Run all cases while printing repeat and dimension-sweep durations. | Scope: reusable/public. Related: load_optimizer_modules, add_paired_comparisons, generate_gaussian_system, construct_native_couplings. |
-| `main (line 265)` | No inputs | Path | Run the experiment and save its CSV, plots, and hyperparameters. | Scope: entry point. Related: run_experiment, save_results_csv, plot_iteration_comparison, plot_pid_comparison. |
-
-### `Eigen_PID_Simulations/gamma_star_reporting.py`
-
-File description: CSV and figure helpers for the Gamma-star initialization experiment.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `create_result_row (line 21)` | experiment_metadata: Mapping[str, Any], run_metadata: Mapping[str, Any], eigen_result: Any, eigen_coupling: Any, convergence: Mapping[str, Any] | ResultRow | Create one CSV-ready optimizer-versus-Eigen result row. | Scope: reusable/public. |
-| `add_paired_comparisons (line 116)` | result_rows: Sequence[Mapping[str, Any]] | list[ResultRow] | Add native-minus-Gamma update differences to paired result rows. | Scope: reusable/public. |
-| `save_results_csv (line 156)` | result_rows: Sequence[Mapping[str, Any]], path: str \| Path | Path | Write all detailed experiment rows to one CSV file. | Scope: reusable/public. |
-| `save_hyperparameters_yaml (line 179)` | hyperparameters: Mapping[str, Any], path: str \| Path | Path | Write experiment hyperparameters to a reproducibility YAML file. | Scope: reusable/public. |
-| `print_experiment_summary (line 199)` | result_rows: Sequence[Mapping[str, Any]], csv_path: str \| Path | None | Print convergence counts and method-versus-Eigen error summaries. | Scope: reusable/public. |
-| `_result_matrix (line 270)` | result_rows: Sequence[Mapping[str, Any]], dimensions: Sequence[int], repeats: int, method: str, initialization: str, field: str | np.ndarray | Arrange one scalar result field into a dimension-by-repeat matrix. | Scope: private helper. |
-| `_masked_summary (line 303)` | values: np.ndarray, valid_mask: np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray] | Compute median, minimum, and maximum over valid repeats. | Scope: private helper. Conventions: float64. |
-| `plot_iteration_comparison (line 325)` | result_rows: Sequence[Mapping[str, Any]], dimensions: Sequence[int], repeats: int, methods: Sequence[str], initializations: Sequence[str] | Figure | Plot raw optimizer update counts for both initializations. | Scope: reusable/public. Related: _result_matrix, _masked_summary. |
-| `plot_pid_comparison (line 405)` | result_rows: Sequence[Mapping[str, Any]], dimensions: Sequence[int], repeats: int, methods: Sequence[str], initializations: Sequence[str] | Figure | Plot raw PID atoms and native-minus-Gamma-star atom differences. | Scope: reusable/public. Related: _result_matrix, _masked_summary. |
-| `save_figure (line 591)` | figure: Figure, path: str \| Path, dpi: int=300 | Path | Save one Matplotlib figure to disk. | Scope: reusable/public. |
-| `show_figures (line 615)` | No inputs | None | Display all currently open Matplotlib figures and return ''None''. | Scope: reusable/public. |
-
-
-## Lorenz_bias_corr
-
-### `Lorenz_bias_corr/figure5B_recreatation.py`
-
-File description: Recreate Lorenz Figure 5B and add a Lorenz-corrected Eigen-PID curve.
-
-No functions, methods, or classes defined in this file.
-
-### `Lorenz_bias_corr/plot_figure5b_runtime.py`
-
-File description: Plot Figure 5B method runtimes as a function of simulation dimension.
-
-No functions, methods, or classes defined in this file.
-
-
 ## MultivariateStatistics
 
 ### `MultivariateStatistics/Q1_part1.py`
@@ -164,156 +110,17 @@ File description: No module docstring; inspect before reuse.
 | `em_algorithm (line 16)` | theta_initial, uc_sample, c_samples, tolerance=1e-08, max_iterations=1000 | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: expected_censord_func, m_step. |
 
 
-## Partial_Information_Decomposition/Idep
-
-### `Partial_Information_Decomposition/Idep/Idep_multivariate_gauss.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `Idep_multivariate_gauss (line 29)` | class | Idep_multivariate_gauss instance | No docstring; verify behavior, types, and conventions before reuse. | Scope: class. Related: dependency_matrix, compute_Idep, pid_values, create_cov_matrix. Conventions: bias-correction aware. |
-| `Idep_multivariate_gauss.__init__ (line 30)` | self, config, rng=None, sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None, base_e: bool=True, bias_correction: bool=False | No explicit return; likely None / side effects | Initialize the Idep multivariate gaussian class | Scope: method/nested helper. Related: create_cov_matrix, whiten_block, bias_func. Conventions: bias-correction aware. |
-| `Idep_multivariate_gauss.create_model_M (line 126)` | self, block1: Optional[torch.tensor]=None, block2: Optional[torch.tensor]=None, block3: Optional[torch.tensor]=None | torch.tensor | This function will create the dependency matrix for the given blocks | Scope: method/nested helper. |
-| `Idep_multivariate_gauss.dependency_matrix (line 150)` | self, constraints: list, cov_matrix: Optional[torch.tensor]=None, cov_dict: Optional[dict]=None | dict | This function will create the dependency matrix for the given constraint | Scope: method/nested helper. Related: create_model_M. |
-| `Idep_multivariate_gauss.compute_Idep (line 214)` | self | dict | This function calcualtes the mutual information for a given covariance matrix - U models in the lattice | Scope: method/nested helper. |
-| `Idep_multivariate_gauss.pid_values (line 261)` | self, unique_1, unique_2 | Unannotated return value; inspect implementation before reuse | This function will compute the PID values using the I_dep values input: unique_0, unique_1 are the unique informations for source 0 and source 1 output: a dictionary with the PID values keys: 'red', 'unq1', 'unq2', 'syn' | Scope: method/nested helper. Related: logdet_wishart_bias. Conventions: bias-correction aware. |
-| `Idep_multivariate_gauss.idep (line 309)` | self, cov_matrix: Optional[torch.tensor]=None | dict | This function will compute the full Idep PID decomposition | Scope: method/nested helper. Related: dependency_matrix, compute_Idep, pid_values. |
-
-### `Partial_Information_Decomposition/Idep/Idep_simulations.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `pid_simulation (line 25)` | config, rng, cov, pid_ver, true_values=None | Unannotated return value; inspect implementation before reuse | Run PID simulation with know ground truth PID values from the covariance matrix sample for the true covariance matrix, calculate the PID using the specified method, and return the results along with the ground truth PID values calculated from the covariance matrix. | Scope: reusable/public. Related: pid_calc, sample_data_from_cov. |
-| `trials_simulation (line 107)` | config, title | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: make_random_true_cov, calculate_mi_raw, already_exists_in_csv, pid_simulation. |
-| `main (line 164)` | config, single=True, multi=False, exp_name=None | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: make_random_true_cov, pid_simulation, trials_simulation. |
-
-### `Partial_Information_Decomposition/Idep/Idep_univariabe_gauss.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `Idep_univariate_gauss (line 18)` | class | Idep_univariate_gauss instance | No docstring; verify behavior, types, and conventions before reuse. | Scope: class. Related: dependency_matrix, compute_Idep, pid_values, create_cov_matrix. |
-| `Idep_univariate_gauss.__init__ (line 19)` | self, sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None | No explicit return; likely None / side effects | Initialize the Idep univariate gaussian class | Scope: method/nested helper. Related: create_cov_matrix. |
-| `Idep_univariate_gauss.dependency_matrix (line 46)` | self, constraints: list, cov_matrix: Optional[torch.tensor]=None, cov_dict: Optional[dict]=None | dict | This function will create the dependency matrix for the given constraint | Scope: method/nested helper. |
-| `Idep_univariate_gauss.compute_Idep (line 116)` | self, unique: list=[0, 1] | dict | This function calcualtes the mutual information for a given covariance matrix - U models in the lattice | Scope: method/nested helper. |
-| `Idep_univariate_gauss.pid_values (line 170)` | self, unique_0, unique_1 | Unannotated return value; inspect implementation before reuse | This function will compute the PID values using the I_dep values input: unique_0, unique_1 are the unique informations for source 0 and source 1 output: a dictionary with the PID values keys: 'red', 'unq0', 'unq1', 'syn' | Scope: method/nested helper. |
-| `Idep_univariate_gauss.idep (line 197)` | self, cov_matrix: Optional[torch.tensor]=None | dict | This function will compute the full Idep PID decomposition | Scope: method/nested helper. Related: dependency_matrix, compute_Idep, pid_values. |
-| `test_idep_gauss_q0_example (line 221)` | p=0.3, r=0.5, tol=1e-08 | No explicit return; likely None / side effects | Test Example 1 from the paper: q = corr(X0, Y) = 0 p = corr(X0, X1) != 0 r = corr(X1, Y) != 0 | Scope: reusable/public. Related: idep. |
-| `check_idep_gauss_r0_example (line 271)` | p=0.3, q=0.5, tol=1e-08 | No explicit return; likely None / side effects | Example 2 from the paper: r = corr(X1, Y) = 0 p = corr(X0, X1) != 0 q = corr(X0, Y) != 0 | Scope: reusable/public. Related: idep. |
-| `check_idep_gauss_p0_example (line 323)` | q=0.3, r=0.5, tol=1e-08 | No explicit return; likely None / side effects | Example 3 from the paper: p = corr(X0, X1) = 0 q = corr(X0, Y) != 0 r = corr(X1, Y) != 0 | Scope: reusable/public. Related: idep. |
-| `tests (line 375)` | No inputs | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: dependency_matrix, compute_Idep. |
-
-### `Partial_Information_Decomposition/Idep/covariance_shrinkage.py`
-
-File description: Optional covariance-shrinkage operations used by resampling corrections.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `ledoit_wolf_cov (line 10)` | samples: np.ndarray | np.ndarray | Estimate a covariance matrix with Ledoit–Wolf shrinkage. | Scope: reusable/public. Related: fit. |
-| `oracle_shrinkage_cov (line 23)` | samples: np.ndarray, assume_centered: bool=False, return_shrinkage: bool=False | np.ndarray \| tuple[np.ndarray, float] | Estimate covariance with Oracle Approximating Shrinkage. | Scope: reusable/public. Related: fit. |
-| `shrunk_cov (line 46)` | samples: np.ndarray, alpha: float=0.1 | np.ndarray | Estimate covariance with a fixed shrinkage coefficient. | Scope: reusable/public. Related: fit. |
-| `on_covariance (line 60)` | config: dict, covariance: torch.Tensor | dict[str, torch.Tensor] | Apply the configured shrinkage method to one or more covariance matrices. | Scope: reusable/public. Related: ledoit_wolf_cov, oracle_shrinkage_cov, shrunk_cov. |
-
-### `Partial_Information_Decomposition/Idep/covariance_utils.py`
-
-File description: Reusable covariance construction and shrinkage helpers for Idep code.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `build_m8_terms (line 14)` | config: dict, covariance_blocks: dict, whiten: str='whiten_ver', para: bool=False | dict[str, torch.Tensor] | Construct M8 covariance terms from covariance blocks. | Scope: reusable/public. Conventions: whitening-sensitive. |
-| `build_m7_terms (line 98)` | config: dict, covariance_blocks: dict, whiten: str='whiten_ver', para: bool=False | dict[str, torch.Tensor] | Construct M7 covariance terms from covariance blocks. | Scope: reusable/public. Related: para_whiten_block. Conventions: whitening-sensitive. |
-| `create_cov_m8 (line 170)` | config: dict, p_block: torch.Tensor, q_block: torch.Tensor, r_block: torch.Tensor | torch.Tensor | Create an M8 covariance from P, Q, and R cross-blocks. | Scope: reusable/public. |
-| `create_m7_cov (line 204)` | config: dict, cov_m8: torch.Tensor, whitening_normalize: bool=True | torch.Tensor | Construct the corresponding M7 covariance from an M8 covariance. | Scope: reusable/public. Related: create_cov_matrix, whiten_block. Conventions: order [X1, X2, T], whitening-sensitive. |
-| `make_random_true_cov (line 241)` | config: dict, rng: torch.Generator \| None=None | tuple[torch.Tensor, torch.Tensor] | Generate a positive-definite M8 covariance and corresponding M7 model. | Scope: reusable/public. Related: create_cov_m8, create_m7_cov, calcualte_mi. |
-
-
-## Partial_Information_Decomposition/Idep/non_parametric_bias_corr
-
-### `Partial_Information_Decomposition/Idep/non_parametric_bias_corr/bootstrap.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `_get_bootstrap_count (line 19)` | config: dict | int | Infer the number of bootstrap replicates from config. | Scope: private helper. |
-| `_to_tensor_list (line 35)` | rvs_list: list, device: str \| torch.device | list[torch.Tensor] | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. Conventions: float64. |
-| `_estimate_fitted_model_cov (line 45)` | config: dict | torch.Tensor | Return the fitted covariance used by the parametric bootstrap. | Scope: private helper. Related: _to_tensor_list, para_create_cov_matrix, bootstrap_whiten. Conventions: whitening-sensitive. |
-| `bootstrap_func (line 76)` | config: dict, cov_bootstrap: torch.Tensor, calculate_statistic_func: callable | Unannotated return value; inspect implementation before reuse | Estimate parametric-bootstrap bias for a statistic. | Scope: reusable/public. Related: _get_bootstrap_count. |
-| `bootstrap_resample (line 129)` | config: dict | list | Generate parametric-bootstrap covariance estimates. | Scope: reusable/public. Related: _get_bootstrap_count, _estimate_fitted_model_cov, para_create_cov_matrix, bootstrap_whiten. Conventions: whitening-sensitive. |
-| `bootstrap_whiten (line 168)` | config: dict, cov_dict: dict | torch.Tensor | Project batched covariance estimates onto the M7/M8 whitened model space. | Scope: reusable/public. Related: build_m8_terms, build_m7_terms. Conventions: whitening-sensitive. |
-
-### `Partial_Information_Decomposition/Idep/non_parametric_bias_corr/jackknife.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `jackkinfe_func (line 9)` | config, cov_loo, calculate_statistic_func | Unannotated return value; inspect implementation before reuse | Calculate the jackknife bias correction for a given statistic calculated on leave-one-out covariance matrices. | Scope: reusable/public. Conventions: bias-correction aware. |
-| `jackknife_resample (line 29)` | config: dict | list | Compute the full covnarice matrix across smaples and the covariance matrix of the left out ovbesrvation. Using the formula for covariance matrix Σ(-j)=N-2/(S(-j)-(1/N)*s(-j)s(-j)T) Where S(-j)=S-ZjZjT and s(-j)=s-Zj | Scope: reusable/public. Related: para_create_cov_matrix, jackknife_whiten. |
-| `jackknife_whiten (line 92)` | config, m7_cov_dict | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: para_whiten_block. Conventions: whitening-sensitive. |
-
-### `Partial_Information_Decomposition/Idep/non_parametric_bias_corr/resampling_wrapper.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `resampleing (line 14)` | resample_inputs: dict, rng | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `calculate_statistic (line 28)` | config: dict, calc_func: callable, population: dict, rng: np.random.Generator | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `calculate_bias (line 35)` | config: dict, statistic_dict: dict, bias_func: callable | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: bias_func. |
-| `bias_resampling (line 44)` | config: dict, calc_func: callable=None | dict | This function will calculate the statistics value and it's and will return a dictionary with the following keys: | Scope: reusable/public. Related: bias_func. |
-
-
-## Partial_Information_Decomposition/Idep
-
-### `Partial_Information_Decomposition/Idep/parallel_Idep_multivariate_gauss.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `para_Idep_multivariate_gauss (line 23)` | class | para_Idep_multivariate_gauss instance | No docstring; verify behavior, types, and conventions before reuse. | Scope: class. Related: compute_Idep, pid_values, para_create_cov_matrix, whiten_block. Conventions: bias-correction aware. |
-| `para_Idep_multivariate_gauss.__init__ (line 24)` | self, N=None, df=None, device='cuda', sources: Optional[list]=None, targets: Optional[list]=None, cov_matrix: Optional[torch.tensor]=None, dims: Optional[list]=None, bias_correction: bool=False | No explicit return; likely None / side effects | Initialize the Idep multivariate gaussian class | Scope: method/nested helper. Related: para_create_cov_matrix, whiten_block. Conventions: bias-correction aware. |
-| `para_Idep_multivariate_gauss.compute_Idep (line 110)` | self | dict | This function calcualtes the mutual information for a given covariance matrix - U models in the lattice | Scope: method/nested helper. |
-| `para_Idep_multivariate_gauss.pid_values (line 167)` | self, unique_1, unique_2 | Unannotated return value; inspect implementation before reuse | This function will compute the PID values using the I_dep values input: unique_0, unique_1 are the unique informations for source 0 and source 1 output: a dictionary with the PID values keys: 'red', 'unq1', 'unq2', 'syn' | Scope: method/nested helper. Conventions: whitening-sensitive. |
-| `para_Idep_multivariate_gauss.idep (line 195)` | self, cov_matrix: Optional[torch.tensor]=None | dict | This function will compute the full Idep PID decomposition | Scope: method/nested helper. Related: compute_Idep, pid_values. |
-
-### `Partial_Information_Decomposition/Idep/simulation_utils.py`
-
-File description: Small reusable data and result helpers retained from legacy Idep simulations.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `to_python_scalar (line 15)` | value: Any | Any | Convert torch/NumPy scalar-like values to serializable Python values. | Scope: reusable/public. |
-| `flatten_pid_results (line 35)` | pid_results: dict | dict[str, Any] | Flatten one level of nested PID result dictionaries. | Scope: reusable/public. Related: to_python_scalar. |
-| `get_pid_ver_csv_path (line 55)` | output_folder: str \| Path, pid_ver: str, csv_title: str='pid_results' | Path | Build the result CSV path for one PID definition. | Scope: reusable/public. Related: safe_filename. |
-| `append_row_to_csv (line 76)` | row: dict, output_folder: str \| Path, csv_title: str='pid_results' | Path | Append one simulation row to its PID-specific CSV. | Scope: reusable/public. Related: get_pid_ver_csv_path. |
-| `already_exists_in_csv (line 104)` | output_folder: str \| Path, n_samples: int, dimensions: tuple[int, int, int] \| list[int], pid_ver: str, seed: int, csv_title: str='pid_results' | bool | Check whether one exact simulation setting is already recorded. | Scope: reusable/public. Related: get_pid_ver_csv_path. |
-| `sample_data_from_cov (line 144)` | config: dict, true_cov: torch.Tensor, rng: np.random.Generator \| torch.Generator \| None=None | tuple[torch.Tensor, list[torch.Tensor]] | Sample Gaussian RVs and their unbiased empirical covariance. | Scope: reusable/public. Conventions: order [X1, X2, T]. |
-| `make_pre_config (line 177)` | exp: str, mi_config: dict, mi0_config: dict, above0_m7_mi_config: dict, above0_m8_mi_config: dict, n_p_config: dict, unknown_config: dict, de_config: dict \| None=None | dict | Merge the configuration fragments for one Idep simulation regime. | Scope: reusable/public. |
-
-
 ## Partial_Information_Decomposition
 
 ### `Partial_Information_Decomposition/PID_calc.py`
 
-File description: No module docstring; inspect before reuse.
+File description: Eigen PID calculation with the project's existing sample/covariance interface.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `mi_wishart_bias (line 38)` | dims: list, n_samples: int | Unannotated return value; inspect implementation before reuse | Calculate Gaussian MI Wishart biases without loading simulation dependencies. | Scope: reusable/public. |
-| `pid_calc (line 71)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None, param_bias=False | Unannotated return value; inspect implementation before reuse | Dispatch standard PID inputs to Idep, Tilde, Delta, Thin, Flow, or Gaussian Eigen-PID and return '(pid, mi)'. Eigen-PID is selected with 'method="eigen"' or 'method="eigen_pid"'. | Scope: reusable/public. Related: pid_idep_wrapper, pid_tilde_wrapper, delta_wrapper, thin_pid_wrapper. |
-| `pid_idep_wrapper (line 140)` | config, sources=None, target=None, covariance=None, rng=None, on_rvs=None | Unannotated return value; inspect implementation before reuse | This function is a wrapper to PID calculated by Idep_multivariate_gauss class, which implements the Idep PID calculation for multivariate Gaussian variables. This wrapper allows us to use the same input format for both Idep and BROJA implementations, and also allows us to apply transformations to the random variables before PID calculation if needed. if covariance is provided, it will used to calculate the PID directly from the covariance matrix without sampling. If covariance is not provided, the PID will be calculated from the sampled data covariance. | Scope: reusable/public. Related: idep. |
-| `pid_tilde_wrapper (line 168)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None, param_bias=False | Unannotated return value; inspect implementation before reuse | Calculate Gaussian BROJA/Tilde PID with an optional objective correction. | Scope: reusable/public. Related: create_cov_matrix, lorenz_gaussian_obj_debias, permutation_null_debias. Conventions: order [T, X1, X2]. |
-| `delta_wrapper (line 331)` | config, sources, target, covariance, rng, on_rvs | Unannotated return value; inspect implementation before reuse | This function is a wrapper to PID calculated by BROJA and implemented by Venkatesh et al. 2023 Because Idep and BROJA have different input format, this wrapper converts the input format to fit the BROJA implementation and then calls the PID calculation function. and calculates the PID using BROJA definition and calculation from Venkateh et al. 2023. | Scope: reusable/public. Related: create_cov_matrix, calculate_mi_raw, mi_wishart_bias. |
-| `_to_numpy_samples (line 387)` | data | Unannotated return value; inspect implementation before reuse | Convert torch/numpy samples to the numpy format expected by flow-pid. | Scope: private helper. |
-| `thin_pid_wrapper (line 397)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | Unannotated return value; inspect implementation before reuse | Calculate Thin-PID from samples or covariance using the standard PID inputs. | Scope: reusable/public. Related: load_exact_gauss_thin_pid, create_cov_matrix. |
-| `eigen_pid_wrapper (line 428)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.Generator, on_rvs: callable=None | Unannotated return value; inspect implementation before reuse | Calculate Gaussian Eigen-PID using the standard PID_calc inputs. | Scope: reusable/public. Related: create_cov_matrix. Conventions: order [T, X1, X2], bias-correction aware. |
-| `flow_pid_wrapper (line 539)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.random.Generator, on_rvs: callable=None | Unannotated return value; inspect implementation before reuse | Wrapper for flow-pid. | Scope: reusable/public. Related: load_exact_gauss_thin_pid, load_flow_pid, _to_numpy_samples. Conventions: bias-correction aware. |
+| `pid_calc (line 21)` | config=None, sources=None, target=None, rng=torch.Generator().manual_seed(56), method=None, on_rvs: callable=None, covariance: torch.Tensor=None, param_bias=False | tuple[dict, dict]: PID atoms/metadata and MI, in bits | Calculate Eigen PID while preserving the existing calling convention. | Scope: reusable/public. Related: eigen_pid_wrapper. Conventions: covariance order [T, X1, X2], output bits, only eigen/eigen_pid. |
+| `eigen_pid_wrapper (line 51)` | config: dict, sources: list, target: list, covariance: torch.Tensor, rng: torch.Generator, on_rvs: callable=None, param_bias: bool=False | tuple[dict, dict]: PID atoms/metadata and MI, in bits | Adapt the installed eigen_pid estimator to the project's PID/MI schema. | Scope: reusable/public. Conventions: order [T, X1, X2], bias-correction aware. Related: create_cov_matrix, permutation_null_debias. Local analytic/permutation corrections retained; combined correction delegates to eigen_pid. |
+
 
 ### `Partial_Information_Decomposition/PID_util.py`
 
@@ -328,33 +135,31 @@ File description: No module docstring; inspect before reuse.
 | `create_cov_matrix (line 87)` | rvs: list=[], verbose=False, Sigma=None, dims: list=None, device='cpu', check_singular=True | Unannotated return value; inspect implementation before reuse | This function will create the covariance matrix for the three variables M1,M2,T input: M1,M2,T are torch tensors of shape (N,p) rvs is a list of the three variables [M1,M2,T] N is the number of observations, p is the dimension of each observation. | Scope: reusable/public. Related: eigvenvalue_summary, block_singularity_check. |
 | `reorder_cov_blocks (line 152)` | Sigma: torch.Tensor, dims: dict[str, int], old_order: list[str], new_order: list[str] | torch.Tensor | Reorder covariance matrix blocks according to variable names. | Scope: reusable/public. Conventions: order [X1, X2, T], order [T, X1, X2]. |
 | `para_create_cov_matrix (line 193)` | dims, Sigmas=None, verbose=False | Unannotated return value; inspect implementation before reuse | This function will create the covariance matrix for the three variables M1,M2,T | Scope: reusable/public. |
-| `old_para_create_cov_matrix (line 241)` | dims, Sigmas=None, verbose=False | Unannotated return value; inspect implementation before reuse | This function will create the covariance matrix for the three variables M1,M2,T input: M1,M2,T are torch tensors of shape (N,p) rvs is a list of the three variables [M1,M2,T] N is the number of observations, p is the dimension of each observation. | Scope: reusable/public. |
-| `whiten_block (line 290)` | Sigma_xx: torch.Tensor, Sigma_xy: torch.Tensor, Sigma_yy: torch.Tensor | torch.Tensor | return Ux^{-T} @ Sigma_xy @ Uy^{-1} where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular. | Scope: reusable/public. Conventions: whitening-sensitive. |
-| `para_whiten_block (line 307)` | Sigma_xx: torch.Tensor, Sigma_xy: torch.Tensor, Sigma_yy: torch.Tensor | torch.Tensor | Computes: Ux^{-T} @ Sigma_xy @ Uy^{-1} where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular. Supports batched inputs of shape (N, d, d). | Scope: reusable/public. Related: whiten_block. Conventions: whitening-sensitive. |
-| `plot_cov_blocks (line 332)` | cov_dict, x0_dim, x1_dim, x2_dim, *, title='Covariance (block view)', cmap='Blues', vmin=None, vmax=None, fine_grid=False, show_colorbar=True | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `standardize (line 373)` | X: torch.Tensor, eps: float=1e-12 | torch.Tensor | Standardize columns of X to zero mean and unit variance. | Scope: reusable/public. |
-| `assert_full_rank (line 385)` | X: torch.Tensor, jitter=0 | None | Assert that the input matrix X is full rank. | Scope: reusable/public. |
-| `correlation_matrix (line 409)` | X | Unannotated return value; inspect implementation before reuse | Compute the correlation matrix of the columns of X. | Scope: reusable/public. |
-| `block_singularity_check (line 424)` | X, tol=1e-10 | Unannotated return value; inspect implementation before reuse | Check if a block is singular or ill-conditioned. | Scope: reusable/public. |
-| `singularity_report (line 445)` | X_M1, X_M2, y_real, tol=1e-10, return_printing_required=False | Unannotated return value; inspect implementation before reuse | Return min eigenvalue and singularity flag for blocks and combinations. | Scope: reusable/public. Related: block_singularity_check, correlation_matrix. |
-| `diagnostic_plots (line 475)` | X_M1, X_M2, y_real, method, mixing_dimension | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: cross_correlation. |
-| `diagnostic_plots.cross_correlation (line 476)` | X, Y | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: method/nested helper. |
-| `vif_summary (line 510)` | X | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `std_scaling_summary (line 542)` | X | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `eigvenvalue_summary (line 561)` | X | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `_get_first (line 569)` | mapping, *keys | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
-| `compare_results (line 576)` | vp_results, pid_results, mi_results=None | No explicit return; likely None / side effects | Compare Variance Partitioning and Partial Information Decomposition results. | Scope: reusable/public. Related: _get_first. |
-| `pid_comparison_table (line 622)` | results: dict, decimals: int=4, print_table: bool=True | Unannotated return value; inspect implementation before reuse | Print and return a compact table comparing PID and MI outputs. | Scope: reusable/public. Related: _get_first. |
-| `save_pid_comparison_table (line 651)` | results: dict, save_path: str, decimals: int=4, title: str='PID Method Comparison', config: dict=None | Unannotated return value; inspect implementation before reuse | Save the PID comparison table as a clean matplotlib image with compact title, run-metadata placement, and slightly reduced table text for longer method labels. | Scope: reusable/public. Related: pid_comparison_table. |
-| `commonality_comparison_table (line 695)` | results: dict, decimals: int=4, print_table: bool=True | list[dict] | Normalize key variants and optionally print commonality-analysis values without displaying the internal example-label column. | Scope: reusable/public rendering helper. Related: _get_first, save_commonality_comparison_table, commanility_analysis. Conventions: returned rows retain example metadata and accept R²/unique/common key capitalization variants. |
-| `save_commonality_comparison_table (line 773)` | results: dict, save_path: str, decimals: int=4, title: str='Commonality Analysis Comparison', config: dict \| None=None | str | Save normalized commonality values without an Example column as a Matplotlib table with run metadata. | Scope: reusable/public rendering helper. Related: commonality_comparison_table. |
-| `commanility_analysis (line 870)` | results: dict, decimals: int=4, print_table: bool=True | list[dict] | Preserve the legacy misspelled commonality-table entry point. | Scope: backward-compatible public wrapper. Related: commonality_comparison_table. |
-| `plot_mi_heatmap (line 893)` | csv_path, value_col, *, n_col='N', p_col='p', figsize=(7, 5), title=None, save_path=None, annotate=True, fmt='.3f', cmap='viridis' | No explicit return; likely None / side effects | Plot a block heatmap from an averaged CSV. | Scope: reusable/public. |
-| `plot_all_mi_heatmaps (line 1013)` | csv_path, title='Mutual Information Heatmaps', *, n_col='N', p_col='p', figsize=(16, 5), save_path=None, annotate=True, mean_fmt='.2f', std_fmt='.2f', log_scale=False, cmap='viridis', annotation_mode='pm', fontsize=9, aggfunc='mean' | No explicit return; likely None / side effects | Plot theoretical, naive, and bias-corrected MI heatmaps in one figure. | Scope: reusable/public. |
-| `plot_block_heatmap (line 1180)` | csv_path, save_path=None | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `anchored_oas_shrinkage (line 1240)` | Sigma_full: torch.Tensor, cov_loo_all: torch.Tensor, n_samples: int | Unannotated return value; inspect implementation before reuse | Calculates OAS parameters ONCE on the full matrix, and applies the EXACT SAME linear shrinkage to all LOO matrices. | Scope: reusable/public. |
-| `oas_cov_torch (line 1281)` | S: torch.Tensor, N: int | torch.Tensor | Apply Oracle Approximating Shrinkage (OAS) to a covariance matrix. Requires ONLY the sample covariance matrix S and sample size N. | Scope: reusable/public. |
-| `residual_rvs (line 1312)` | rv_list: list, predictor_index=0 | Unannotated return value; inspect implementation before reuse | Given a list of random variables (Torch.Tensors), returns a list where we predict the second rv using the first rv and return the residuls. | Scope: reusable/public. Related: compute_ridge_cv_r2. |
+| `whiten_block (line 241)` | Sigma_xx: torch.Tensor, Sigma_xy: torch.Tensor, Sigma_yy: torch.Tensor | torch.Tensor | return Ux^{-T} @ Sigma_xy @ Uy^{-1} where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular. | Scope: reusable/public. Conventions: whitening-sensitive. |
+| `plot_cov_blocks (line 258)` | cov_dict, x0_dim, x1_dim, x2_dim, *, title='Covariance (block view)', cmap='Blues', vmin=None, vmax=None, fine_grid=False, show_colorbar=True | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `standardize (line 299)` | X: torch.Tensor, eps: float=1e-12 | torch.Tensor | Standardize columns of X to zero mean and unit variance. | Scope: reusable/public. |
+| `assert_full_rank (line 311)` | X: torch.Tensor, jitter=0 | None | Assert that the input matrix X is full rank. | Scope: reusable/public. |
+| `correlation_matrix (line 335)` | X | Unannotated return value; inspect implementation before reuse | Compute the correlation matrix of the columns of X. | Scope: reusable/public. |
+| `block_singularity_check (line 350)` | X, tol=1e-10 | Unannotated return value; inspect implementation before reuse | Check if a block is singular or ill-conditioned. | Scope: reusable/public. |
+| `singularity_report (line 371)` | X_M1, X_M2, y_real, tol=1e-10, return_printing_required=False | Unannotated return value; inspect implementation before reuse | Return min eigenvalue and singularity flag for blocks and combinations. | Scope: reusable/public. Related: block_singularity_check, correlation_matrix. |
+| `diagnostic_plots (line 401)` | X_M1, X_M2, y_real, method, mixing_dimension | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: cross_correlation. |
+| `diagnostic_plots.cross_correlation (line 402)` | X, Y | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: method/nested helper. |
+| `vif_summary (line 436)` | X | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `std_scaling_summary (line 468)` | X | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `eigvenvalue_summary (line 487)` | X | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `_get_first (line 495)` | mapping, *keys | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
+| `compare_results (line 502)` | vp_results, pid_results, mi_results=None | No explicit return; likely None / side effects | Compare Variance Partitioning and Partial Information Decomposition results. | Scope: reusable/public. Related: _get_first. |
+| `pid_comparison_table (line 548)` | results: dict, decimals: int=4, print_table: bool=True | Unannotated return value; inspect implementation before reuse | Print and return a compact table comparing PID and MI outputs. | Scope: reusable/public. Related: _get_first. |
+| `save_pid_comparison_table (line 577)` | results: dict, save_path: str, decimals: int=4, title: str='PID Method Comparison', config: dict=None | Unannotated return value; inspect implementation before reuse | Save the PID comparison table as a clean matplotlib image with compact title, run-metadata placement, and slightly reduced table text for longer method labels. | Scope: reusable/public. Related: pid_comparison_table. |
+| `commonality_comparison_table (line 621)` | results: dict, decimals: int=4, print_table: bool=True | list[dict] | Normalize key variants and optionally print commonality-analysis values without displaying the internal example-label column. | Scope: reusable/public rendering helper. Related: _get_first, save_commonality_comparison_table, commanility_analysis. Conventions: returned rows retain example metadata and accept R²/unique/common key capitalization variants. |
+| `save_commonality_comparison_table (line 699)` | results: dict, save_path: str, decimals: int=4, title: str='Commonality Analysis Comparison', config: dict \| None=None | str | Save normalized commonality values without an Example column as a Matplotlib table with run metadata. | Scope: reusable/public rendering helper. Related: commonality_comparison_table. |
+| `commanility_analysis (line 796)` | results: dict, decimals: int=4, print_table: bool=True | list[dict] | Preserve the legacy misspelled commonality-table entry point. | Scope: backward-compatible public wrapper. Related: commonality_comparison_table. |
+| `plot_mi_heatmap (line 819)` | csv_path, value_col, *, n_col='N', p_col='p', figsize=(7, 5), title=None, save_path=None, annotate=True, fmt='.3f', cmap='viridis' | No explicit return; likely None / side effects | Plot a block heatmap from an averaged CSV. | Scope: reusable/public. |
+| `plot_all_mi_heatmaps (line 939)` | csv_path, title='Mutual Information Heatmaps', *, n_col='N', p_col='p', figsize=(16, 5), save_path=None, annotate=True, mean_fmt='.2f', std_fmt='.2f', log_scale=False, cmap='viridis', annotation_mode='pm', fontsize=9, aggfunc='mean' | No explicit return; likely None / side effects | Plot theoretical, naive, and bias-corrected MI heatmaps in one figure. | Scope: reusable/public. |
+| `plot_block_heatmap (line 1106)` | csv_path, save_path=None | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `anchored_oas_shrinkage (line 1166)` | Sigma_full: torch.Tensor, cov_loo_all: torch.Tensor, n_samples: int | Unannotated return value; inspect implementation before reuse | Calculates OAS parameters ONCE on the full matrix, and applies the EXACT SAME linear shrinkage to all LOO matrices. | Scope: reusable/public. |
+| `oas_cov_torch (line 1207)` | S: torch.Tensor, N: int | torch.Tensor | Apply Oracle Approximating Shrinkage (OAS) to a covariance matrix. Requires ONLY the sample covariance matrix S and sample size N. | Scope: reusable/public. |
+| `residual_rvs (line 1238)` | rv_list: list, predictor_index=0 | Unannotated return value; inspect implementation before reuse | Given a list of random variables (Torch.Tensors), returns a list where we predict the second rv using the first rv and return the residuls. | Scope: reusable/public. Related: compute_ridge_cv_r2. |
 
 ### `Partial_Information_Decomposition/__init__.py`
 
@@ -368,34 +173,11 @@ File description: No module docstring; inspect before reuse.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `logdet_wishart_bias (line 22)` | df: int, d: int | float | Exact finite-sample bias for log\|S\| when S is the unbiased sample covariance from Gaussian data and (df) * S ~ Wishart_d(Sigma, df). | Scope: reusable/public. Conventions: float64. |
-| `mi_wishart_bias (line 42)` | dims: list, n_samples: int | Unannotated return value; inspect implementation before reuse | Bias correction for Gaussian mutual information estimates from unbiased sample covariance. | Scope: reusable/public. Related: logdet_wishart_bias. Conventions: order [X1, X2, T]. |
-| `permuteation_debiased (line 101)` | config, term='nume' | Unannotated return value; inspect implementation before reuse | Evaluate an M7 MI term from permuted '[X1, X2, T]' samples, reusing the already-whitened M7 covariance blocks directly. | Scope: reusable/public. Related: create_cov_matrix, create_m7_cov, calcualte_mi. Conventions: whitening-sensitive. |
-| `broja_venkatesh_bias (line 124)` | config | Unannotated return value; inspect implementation before reuse | Calculate one raw Gaussian BROJA statistic for permutation debiasing. | Scope: reusable/public. Related: create_cov_matrix. Conventions: bias-correction aware. |
-| `permutation_null_debias (line 168)` | config, func | Unannotated return value; inspect implementation before reuse | Debias an MI-like estimator by subtracting its permutation null floor. | Scope: reusable/public. |
-| `unique_bias (line 241)` | config, functions_dict: dict=None | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `bias_func (line 261)` | config, model | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: logdet_wishart_bias, permutation_null_debias. |
-| `parametric_bootstrap_obj_debias (line 291)` | config: dict, covariance=None, raw_obj: float \| None=None, statistic: str='obj' | dict | Estimate Gaussian BROJA objective or synergy bias by parametric bootstrap. | Scope: reusable/public. Related: create_cov_matrix. Conventions: order [T, X1, X2]. |
-| `lorenz_gaussian_obj_debias (line 634)` | config: dict, covariance=None, raw_obj: float \| None=None | dict | Apply the Lorenz et al. Gaussian merged correction to raw BROJA ''obj''. | Scope: reusable/public. Related: parametric_bootstrap_obj_debias, permutation_null_debias, mi_wishart_bias, create_cov_matrix. Conventions: order [T, X1, X2]. |
-| `equal_direct_wishart_control_obj_debias (line 965)` | config: dict, covariance, raw_obj: float \| None=None | dict | Estimate bias of the raw Venkatesh objective under a known direct tie. | Scope: reusable/public. Related: mi_wishart_bias. Conventions: order [T, X1, X2]. |
-| `equivalent_channels_obj_debias (line 1341)` | config: dict, covariance=None, raw_obj: float \| None=None | dict | Debias Gaussian BROJA PID under a known equivalent-channel constraint. | Scope: reusable/public. Related: mi_wishart_bias, create_cov_matrix. Conventions: order [T, X1, X2]. |
+| `logdet_wishart_bias (line 12)` | df: int, d: int | float | Exact finite-sample bias for log\|S\| when S is the unbiased sample covariance from Gaussian data and (df) * S ~ Wishart_d(Sigma, df). | Scope: reusable/public. Conventions: float64. |
+| `mi_wishart_bias (line 32)` | dims: list, n_samples: int | Unannotated return value; inspect implementation before reuse | Bias correction for Gaussian mutual information estimates from unbiased sample covariance. | Scope: reusable/public. Conventions: order [X1, X2, T]. Related: logdet_wishart_bias. |
+| `broja_eigen_bias (line 90)` | config | Unannotated return value; inspect implementation before reuse | Calculate one raw Gaussian BROJA statistic for permutation debiasing. | Scope: reusable/public. Conventions: bias-correction aware. Related: create_cov_matrix. |
+| `permutation_null_debias (line 125)` | config, func | Unannotated return value; inspect implementation before reuse | Debias an MI-like estimator by subtracting its permutation null floor. | Scope: reusable/public. |
 
-### `Partial_Information_Decomposition/heatmap_plot.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `title_case_words (line 101)` | value | Unannotated return value; inspect implementation before reuse | Convert names like: 'idep_gaussian' -> 'Idep Gaussian' 'm7_pid' -> 'M7 PID' | Scope: reusable/public. |
-| `make_full_title (line 132)` | base_title, pid_ver_name, component_name | Unannotated return value; inspect implementation before reuse | Build the full plot title. | Scope: reusable/public. |
-| `find_column (line 149)` | df, component_key, stat_name | Unannotated return value; inspect implementation before reuse | Find the correct column for a component and statistic. | Scope: reusable/public. |
-| `make_p_column (line 202)` | df, p_col='p' | Unannotated return value; inspect implementation before reuse | Create a p-like column from dx1, dx2, dt if p does not already exist. | Scope: reusable/public. |
-| `display_p_label (line 230)` | v | Unannotated return value; inspect implementation before reuse | Pretty display for p values on the y-axis. | Scope: reusable/public. |
-| `sort_p_index (line 244)` | values | Unannotated return value; inspect implementation before reuse | Sort p values numerically when they are tuples like: (dx1, dx2, dt) | Scope: reusable/public. |
-| `sort_p_index.key (line 250)` | v | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: method/nested helper. |
-| `optional_pivot_table (line 258)` | df, *, index, columns, values, aggfunc, reference_index, reference_columns | Unannotated return value; inspect implementation before reuse | Build a pivot table for an optional statistic and align it with the mean matrix. | Scope: reusable/public. |
-| `plot_single_component_heatmap (line 287)` | df, *, pid_ver, component_key, base_title=None, x_col='N', y_col='p', aggfunc='last', cmap='viridis', figsize=(9, 7), save_dir=None, show=True, mean_fmt='.3f', std_fmt='.3f' | Unannotated return value; inspect implementation before reuse | Plot one heatmap for one PID version and one component. | Scope: reusable/public. Related: title_case_words, find_column, optional_pivot_table, make_full_title. |
-| `plot_pid_and_mi_heatmaps_from_csv (line 508)` | csv_path, *, base_title=None, save_dir=None, pid_versions=None, components=('red', 'unq1', 'unq2', 'syn', 'mi_x1_t', 'mi_x2_t', 'mi_x1x2_t', 'mi_m7', 'mi_m8'), x_col='N', y_col='p', seed=None, aggfunc='last', cmap='viridis', figsize=(9, 7), show=True | Unannotated return value; inspect implementation before reuse | Read a checkpoint CSV and create heatmaps for PID components and mutual information values. | Scope: reusable/public. Related: make_p_column, plot_single_component_heatmap. |
 
 ### `Partial_Information_Decomposition/mi_functions.py`
 
@@ -413,23 +195,6 @@ File description: No module docstring; inspect before reuse.
 | `mi_wrapper (line 252)` | config, sigma_dict, whiten_terms_dict, tri_variate=True | Unannotated return value; inspect implementation before reuse | This function is a wrapper for the mutual information calculation functions. It takes in the config and sigma_dict and calls the appropriate function based on the mi_type argument. | Scope: reusable/public. Related: calcualte_mi, calculate_mi_lr. Conventions: whitening-sensitive. |
 | `pid_components (line 277)` | pid_config, print_results=False | Unannotated return value; inspect implementation before reuse | Calculate PID components with the known components. | Scope: reusable/public. |
 
-### `Partial_Information_Decomposition/output_utils.py`
-
-File description: Small output/path helpers shared by PID plotting and simulation code.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `safe_filename (line 4)` | name | Unannotated return value; inspect implementation before reuse | Return the filename exactly as given. Nothing is deleted or replaced. | Scope: reusable/public. |
-
-### `Partial_Information_Decomposition/tilde_ohad.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `calculate_tilde_union_info (line 22)` | hx, hy, reg=1e-07, max_iters=20000, verbose=False | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-
-
 ## Simulations/Encoder_simulation
 
 ### `Simulations/Encoder_simulation/Both_Unique_Encodrs.py`
@@ -440,8 +205,9 @@ File description: No module docstring; inspect before reuse.
 |---|---|---|---|---|
 | `get_run_config (line 20)` | No inputs | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
 | `creature_featurs (line 46)` | rng, snr, unique_ratio, features, signal, redundant_dim=None | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
-| `run_single_seed (line 76)` | seed: int, config: dict, features: torch.Tensor, fmri_dict: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: prepare_inputs, create_predictions, creature_featurs, commonality_analysis. |
-| `main (line 105)` | No inputs | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: get_run_config, load_model_and_fmri, run_configured_multiseed, run_single_seed. |
+| `run_single_seed (line 76)` | seed: int, config: dict, features: torch.Tensor, fmri_dict: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: prepare_inputs, create_predictions, creature_featurs, commonality_analysis, pid_calc, extract_all_components. |
+| `main (line 104)` | No inputs | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: get_run_config, load_model_and_fmri, run_configured_multiseed, run_single_seed. |
+
 
 ### `Simulations/Encoder_simulation/both_unique.py`
 
@@ -453,9 +219,10 @@ File description: No module docstring; inspect before reuse.
 | `half_permute (line 36)` | rng, features, snr=10 | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
 | `orthogonal_vectors (line 57)` | rng, n, p, features, noise=None, singal=None, unique_ratio=None, function=None | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
 | `feature_creation (line 98)` | rng, unique_ratio, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | Unannotated return value; inspect implementation before reuse | Creates dummy predictors and a target | Scope: task-specific. Related: half_permute, orthogonal_vectors. |
-| `test_both_unique (line 139)` | rng, unique_ratio, n=1024, p=100, snr=10.0, method='standard' | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: feature_creation, commonality_analysis, idep. Conventions: bias-correction aware. |
+| `test_both_unique (line 139)` | rng, unique_ratio, n=1024, p=100, snr=10.0, method='standard' | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Conventions: bias-correction aware. Related: feature_creation, commonality_analysis, pid_calc. |
 | `run_single_seed (line 150)` | seed: int, config: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: test_both_unique, extract_all_components. |
 | `main (line 164)` | No inputs | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: get_run_config, run_configured_multiseed. |
+
 
 ### `Simulations/Encoder_simulation/turned_off_unqiue.py`
 
@@ -465,10 +232,10 @@ File description: No module docstring; inspect before reuse.
 |---|---|---|---|---|
 | `get_run_config (line 28)` | No inputs | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
 | `feature_creation (line 48)` | rng, r_str, u1_str, u2_str, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | Unannotated return value; inspect implementation before reuse | Creates dummy predictors and a target | Scope: task-specific. |
-| `test (line 86)` | rng, r_str, u1_str, u2_str, n=1024, p=100, snr=10.0, method='standard' | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: feature_creation, standardize_np, commonality_analysis, extract_betas. |
+| `test (line 86)` | rng, r_str, u1_str, u2_str, n=1024, p=100, snr=10.0, method='standard' | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: feature_creation, standardize_np, commonality_analysis, extract_betas, pid_calc. |
 | `extract_betas (line 101)` | ca_results | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
 | `run_single_seed (line 120)` | seed: int, config: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: test, extract_all_components. |
-| `test_regularization_term (line 140)` | seed: int, config: dict | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: feature_creation, standardize_np, commonality_analysis, idep. |
+| `test_regularization_term (line 140)` | seed: int, config: dict | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: feature_creation, standardize_np, commonality_analysis, pid_calc. |
 | `save_term_results_csv (line 169)` | x_axis: str, term_results: dict, output_csv_path: str \| Path | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: extract_all_components. |
 | `test_u2str (line 195)` | seed: int, config: dict, final_ratio: float | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: test. |
 | `plot_keys_vs_alpha (line 226)` | csv_path: Union[str, Path], keys: Sequence[str], *, x_col: str='alpha', sort_alpha: bool=False, logx: bool=False, figsize: tuple[float, float]=(8, 4.5), marker: Optional[str]=None, save_path: Optional[Union[str, Path]]=None | None | Plot selected columns (keys) vs x_col from a CSV file. | Scope: task-specific. |
@@ -490,10 +257,11 @@ File description: Shared PCA, Ridge-CV, theoretical-PID, and trial-loop helpers.
 | `expand_independent_covariance (line 195)` | coordinate_covariance: torch.Tensor, n_replicas: int | torch.Tensor | Expand independent coordinate covariance into grouped variable order. | Scope: task-specific. Conventions: order [X1, X2, T]. |
 | `transform_population_covariance (line 219)` | covariance: torch.Tensor, linear_maps: tuple[np.ndarray, np.ndarray, np.ndarray] | torch.Tensor | Propagate [X1, X2, T] covariance through three fitted linear maps. | Scope: task-specific. Conventions: order [X1, X2, T], float64. |
 | `standardize_covariance (line 246)` | covariance: torch.Tensor | torch.Tensor | Convert a covariance to a correlation matrix without changing PID. | Scope: task-specific. Conventions: float64. |
-| `calculate_theoretical_pid (line 271)` | covariance: torch.Tensor, dims: list[int], method: str | dict[str, float] | Calculate exact Gaussian PID and MI values from a population covariance. | Scope: task-specific. Related: standardize_covariance, calculate_mi_raw, pid_calc, change_covariance_order. Conventions: order [X1, X2, T]. |
-| `prepare_pid_routes (line 315)` | source_1: Any, source_2: Any, target: Any, shared_mask: np.ndarray, n_components: int, seed: int, population_covariance: torch.Tensor, population_dims: list[int] | dict[str, tuple[tuple[np.ndarray, np.ndarray, np.ndarray], torch.Tensor]] | Prepare held-out PID arrays and exact route population covariances. | Scope: task-specific. Related: pca_target, pca_sources, ridge_sources_on_target, transform_population_covariance. Conventions: order [X1, X2, T]. |
-| `run_pid_feature_comparison (line 375)` | sample_for_seed: Callable[[int], tuple[Any, Any, Any]], population_covariance: torch.Tensor, population_dims: list[int], *, n_samples: int, n_train: int, n_components: int, n_trials: int, base_seed: int, pid_method: str, bias_correction: bool, experiment_name: str, plot_path: str \| Path, plot_title: str, metadata: dict[str, Any] \| None=None | dict[str, dict[str, dict[str, float]]] | Run a seeded RAW/PCA/Ridge-CV PID comparison and save its table plot. | Scope: task-specific. Related: calculate_theoretical_pid, save_sample_simulation_results_table, prepare_pid_routes, print_pid_mi. Conventions: order [X1, X2, T], bias-correction aware. |
-| `build_sonic_covariance (line 507)` | p: int | torch.Tensor | Build the full Sonic covariance in grouped [X1, X2, T] order. | Scope: task-specific. Related: expand_independent_covariance. Conventions: order [X1, X2, T], float64. |
+| `calculate_theoretical_pid (line 271)` | covariance: torch.Tensor, dims: list[int], method: str | dict[str, float] | Calculate exact Gaussian PID and MI values from a population covariance. | Scope: task-specific. Conventions: order [X1, X2, T]. Related: standardize_covariance, calculate_mi_raw, pid_calc, change_covariance_order. |
+| `prepare_pid_routes (line 315)` | source_1: Any, source_2: Any, target: Any, shared_mask: np.ndarray, n_components: int, seed: int, population_covariance: torch.Tensor, population_dims: list[int] | dict[str, tuple[tuple[np.ndarray, np.ndarray, np.ndarray], torch.Tensor]] | Prepare held-out PID arrays and exact route population covariances. | Scope: task-specific. Conventions: order [X1, X2, T]. Related: pca_target, pca_sources, ridge_sources_on_target, transform_population_covariance. |
+| `run_pid_feature_comparison (line 375)` | sample_for_seed: Callable[[int], tuple[Any, Any, Any]], population_covariance: torch.Tensor, population_dims: list[int], *, n_samples: int, n_train: int, n_components: int, n_trials: int, base_seed: int, pid_method: str, bias_correction: bool, experiment_name: str, plot_path: str \| Path, plot_title: str, metadata: dict[str, Any] \| None=None | dict[str, dict[str, dict[str, float]]] | Run a seeded RAW/PCA/Ridge-CV PID comparison and save its table plot. | Scope: task-specific. Conventions: order [X1, X2, T], bias-correction aware. Related: calculate_theoretical_pid, save_sample_simulation_results_table, prepare_pid_routes, print_pid_mi, pid_calc, standardize_np. |
+| `build_sonic_covariance (line 507)` | p: int | torch.Tensor | Build the full Sonic covariance in grouped [X1, X2, T] order. | Scope: task-specific. Conventions: order [X1, X2, T], float64. Related: expand_independent_covariance. |
+
 
 ### `Simulations/PCA_Ridge/run_pca_ridge.py`
 
@@ -513,12 +281,12 @@ File description: Scenario definitions shared by the consolidated PCA–Ridge ru
 |---|---|---|---|---|
 | `PcaRidgeScenario (line 32)` | class | PcaRidgeScenario instance | Describe one PCA–Ridge simulation without duplicating runner code. | Scope: class. |
 | `concatenated_equal_unique (line 63)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate equal unique information in separate concatenated target blocks. | Scope: task-specific. |
-| `build_all_above_zero_covariance (line 94)` | p: int, noise_std: float, unique1_weight: float, unique2_weight: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the all-above-zero covariance in grouped ''[X1, X2, T]'' order. | Scope: task-specific. Related: expand_independent_covariance. Conventions: order [X1, X2, T], float64. |
-| `build_concatenated_all_above_zero_covariance (line 143)` | p: int, noise_std: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the concatenated all-above-zero covariance. | Scope: task-specific. Related: expand_independent_covariance. Conventions: float64. |
-| `build_concatenated_equal_unique_covariance (line 180)` | p: int, noise_std: float | torch.Tensor | Build the concatenated equal-unique covariance. | Scope: task-specific. Related: expand_independent_covariance. Conventions: float64. |
-| `build_equal_unique_covariance (line 210)` | p: int, noise_std: float | torch.Tensor | Build the equal-unique covariance. | Scope: task-specific. Related: expand_independent_covariance. Conventions: float64. |
-| `build_full_suppresion_covariance (line 232)` | p: int, noise_std: float | torch.Tensor | Build the full-suppression covariance. | Scope: task-specific. Related: expand_independent_covariance. Conventions: float64. |
-| `build_unq2_zero_covariance (line 255)` | p: int, noise_std: float | torch.Tensor | Build the zero-source-2-unique covariance. | Scope: task-specific. Related: expand_independent_covariance. Conventions: float64. |
+| `build_all_above_zero_covariance (line 94)` | p: int, noise_std: float, unique1_weight: float, unique2_weight: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the all-above-zero covariance in grouped ``[X1, X2, T]`` order. | Scope: task-specific. Conventions: order [X1, X2, T], float64. Related: expand_independent_covariance. |
+| `build_concatenated_all_above_zero_covariance (line 143)` | p: int, noise_std: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the concatenated all-above-zero covariance. | Scope: task-specific. Conventions: float64. Related: expand_independent_covariance. |
+| `build_concatenated_equal_unique_covariance (line 180)` | p: int, noise_std: float | torch.Tensor | Build the concatenated equal-unique covariance. | Scope: task-specific. Conventions: float64. Related: expand_independent_covariance. |
+| `build_equal_unique_covariance (line 210)` | p: int, noise_std: float | torch.Tensor | Build the equal-unique covariance. | Scope: task-specific. Conventions: float64. Related: expand_independent_covariance. |
+| `build_full_suppresion_covariance (line 232)` | p: int, noise_std: float | torch.Tensor | Build the full-suppression covariance. | Scope: task-specific. Conventions: float64. Related: expand_independent_covariance. |
+| `build_unq2_zero_covariance (line 255)` | p: int, noise_std: float | torch.Tensor | Build the zero-source-2-unique covariance. | Scope: task-specific. Conventions: float64. Related: expand_independent_covariance. |
 | `get_scenario (line 364)` | name: str | PcaRidgeScenario | Return one registered PCA–Ridge scenario. | Scope: task-specific. |
 
 
@@ -580,18 +348,19 @@ File description: No module docstring; inspect before reuse.
 
 ### `Simulations/Theoretical_Examples/Covariance/compare_multidim_gaussian_pid.py`
 
-File description: Compare population Gaussian PID methods on a flexible channel model.
+File description: Evaluate Eigen PID on the existing population Gaussian channel model.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `save_run_constants (line 93)` | yaml_path: str \| Path | Path | Save every uppercase script constant as a YAML run snapshot. | Scope: task-specific. |
-| `validate_parameters (line 140)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | None | Validate dimensions, gains, and source-noise variances. | Scope: task-specific. |
-| `build_channel_matrix (line 192)` | source_dim: int, target_dim: int, special_gain: float, special_coordinate: int | torch.Tensor | Build a rectangular channel by repeating a two-coordinate gain block. | Scope: task-specific. Related: rectangular_identity. Conventions: float64. |
-| `build_population_covariance (line 226)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | torch.Tensor | Construct the theoretical Gaussian covariance in ''[T, X1, X2]'' order. | Scope: task-specific. Related: validate_parameters, build_channel_matrix. Conventions: order [T, X1, X2], float64. |
-| `run_pid_methods (line 292)` | covariance: torch.Tensor, target_dim: int, source1_dim: int, source2_dim: int | dict[str, dict[str, float]] | Run GPID Tilde, Thin-PID, and Eigen-PID on one population covariance. | Scope: task-specific. Related: pid_calc. Conventions: order [T, X1, X2]. |
-| `run_dimension_sweep (line 348)` | dimension_to_sweep: str, dimension_values: list[int], target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float, csv_path: str \| Path | list[dict[str, float \| int \| str]] | Run and checkpoint PID methods while changing one variable dimension. | Scope: task-specific. Related: write_rows_to_csv, build_population_covariance, run_pid_methods. |
-| `plot_dimension_sweep_csv (line 441)` | csv_path: str \| Path, plot_path: str \| Path, speedup_plot_path: str \| Path | tuple[Path, Path] | Plot result curves and direct Eigen-PID speedups from the sweep CSV. | Scope: task-specific. |
-| `main (line 616)` | No inputs | tuple[Path, Path, Path, Path] | Save constants, run the sweep, and save result and speedup plots. | Scope: entry point. Related: save_run_constants, run_dimension_sweep, plot_dimension_sweep_csv. |
+| `save_run_constants (line 83)` | yaml_path: str \| Path | Path | Save every uppercase script constant as a YAML run snapshot. | Scope: task-specific. |
+| `validate_parameters (line 127)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | None | Validate dimensions, gains, and source-noise variances. | Scope: task-specific. |
+| `build_channel_matrix (line 179)` | source_dim: int, target_dim: int, special_gain: float, special_coordinate: int | torch.Tensor | Build a rectangular channel by repeating a two-coordinate gain block. | Scope: task-specific. Conventions: float64. Related: rectangular_identity. |
+| `build_population_covariance (line 213)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | torch.Tensor | Construct the theoretical Gaussian covariance in ``[T, X1, X2]`` order. | Scope: task-specific. Conventions: order [T, X1, X2], float64. Related: validate_parameters, build_channel_matrix. |
+| `run_pid_methods (line 279)` | covariance: torch.Tensor, target_dim: int, source1_dim: int, source2_dim: int | dict[str, dict[str, float]] | Run Eigen PID on one population covariance. | Scope: task-specific. Conventions: order [T, X1, X2]. Related: pid_calc. |
+| `run_dimension_sweep (line 334)` | dimension_to_sweep: str, dimension_values: list[int], target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float, csv_path: str \| Path | list[dict[str, float \| int \| str]] | Run and checkpoint PID methods while changing one variable dimension. | Scope: task-specific. Related: write_rows_to_csv, build_population_covariance, run_pid_methods. |
+| `plot_dimension_sweep_csv (line 422)` | csv_path: str \| Path, plot_path: str \| Path | Path | Plot the Eigen PID atoms, mutual information, and runtime curves. | Scope: task-specific. |
+| `main (line 511)` | No inputs | tuple[Path, Path, Path] | Run the existing covariance sweep using Eigen PID. | Scope: entry point. Related: save_run_constants, run_dimension_sweep, plot_dimension_sweep_csv. |
+
 
 ### `Simulations/Theoretical_Examples/Covariance/cov_functions.py`
 
@@ -607,15 +376,6 @@ File description: No module docstring; inspect before reuse.
 | `change_covariance_order (line 252)` | cov: torch.Tensor, new_order: list[int], dims: list[int] | torch.Tensor | Permute the covariance matrix to change the order of variables. | Scope: task-specific. Related: create_cov_matrix. |
 
 
-## Simulations/Theoretical_Examples/Covariance/results_covariance/Sweeps_comp2
-
-### `Simulations/Theoretical_Examples/Covariance/results_covariance/Sweeps_comp2/run_sweeps_comp2.py`
-
-File description: Run the second theoretical PID timing sweep in its own tmux session.
-
-No functions, methods, or classes defined in this file.
-
-
 ## Simulations/Theoretical_Examples/Covariance
 
 ### `Simulations/Theoretical_Examples/Covariance/run_gaussian_pid_examples.py`
@@ -626,11 +386,12 @@ File description: Benchmark Gaussian PID methods repeatedly on theoretical covar
 |---|---|---|---|---|
 | `one_dimensional_target_example (line 135)` | No inputs | ExampleConfig | Return the example whose target is one-dimensional. | Scope: task-specific. |
 | `run_method (line 157)` | covariance: torch.Tensor, example: ExampleConfig, runtime_repeat: int, label: str, method: str | dict[str, object] | Time one PID method call on a theoretical covariance. | Scope: task-specific. Related: pid_calc. |
-| `check_theoretical_example (line 230)` | example: ExampleConfig, rows: list[dict[str, object]] | None | Verify the promised theoretical behavior before saving results. | Scope: task-specific. |
-| `summarize_results (line 268)` | rows: list[dict[str, object]], examples: list[ExampleConfig] | list[dict[str, object]] | Calculate PID and runtime statistics across timing repetitions. | Scope: task-specific. |
-| `plot_results (line 309)` | rows: list[dict[str, object]], examples: list[ExampleConfig], path: str \| Path | Path | Plot theoretical PID values and runtime mean ± sample SD. | Scope: task-specific. |
-| `save_hyperparameters (line 377)` | path: str \| Path, examples: list[ExampleConfig], outputs: dict[str, str] | Path | Save all non-path settings and output paths as YAML. | Scope: task-specific. |
-| `main (line 404)` | results_csv_path: str \| Path=RESULTS_CSV, summary_csv_path: str \| Path=SUMMARY_CSV, plot_path: str \| Path=PLOT_PATH, yaml_path: str \| Path=YAML_PATH | tuple[Path, Path, Path, Path] | Benchmark every theoretical covariance over repeated method calls. | Scope: entry point. Related: write_rows_to_csv, summarize_results, plot_results, save_hyperparameters. |
+| `check_theoretical_example (line 229)` | example: ExampleConfig, rows: list[dict[str, object]] | None | Verify the promised theoretical behavior before saving results. | Scope: task-specific. |
+| `summarize_results (line 263)` | rows: list[dict[str, object]], examples: list[ExampleConfig] | list[dict[str, object]] | Calculate PID and runtime statistics across timing repetitions. | Scope: task-specific. |
+| `plot_results (line 304)` | rows: list[dict[str, object]], examples: list[ExampleConfig], path: str \| Path | Path | Plot theoretical PID values and runtime mean ± sample SD. | Scope: task-specific. |
+| `save_hyperparameters (line 370)` | path: str \| Path, examples: list[ExampleConfig], outputs: dict[str, str] | Path | Save all non-path settings and output paths as YAML. | Scope: task-specific. |
+| `main (line 397)` | results_csv_path: str \| Path=RESULTS_CSV, summary_csv_path: str \| Path=SUMMARY_CSV, plot_path: str \| Path=PLOT_PATH, yaml_path: str \| Path=YAML_PATH | tuple[Path, Path, Path, Path] | Benchmark every theoretical covariance over repeated method calls. | Scope: entry point. Related: write_rows_to_csv, summarize_results, plot_results, save_hyperparameters, one_dimensional_target_example, build_population_covariance. |
+
 
 ### `Simulations/Theoretical_Examples/Covariance/sample_simulation.py`
 
@@ -638,10 +399,11 @@ File description: No module docstring; inspect before reuse.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `calculate_sample_whitened_wishart_mi_bits (line 67)` | sources: list[torch.Tensor], target: list[torch.Tensor] | dict[str, float] | Calculate raw and Wishart-corrected sample Gaussian MIs in bits. | Scope: task-specific. Related: create_cov_matrix, whiten_block, calcualte_mi, mi_wishart_bias. Conventions: whitening-sensitive. |
+| `calculate_sample_whitened_wishart_mi_bits (line 67)` | sources: list[torch.Tensor], target: list[torch.Tensor] | dict[str, float] | Calculate raw and Wishart-corrected sample Gaussian MIs in bits. | Scope: task-specific. Conventions: whitening-sensitive. Related: create_cov_matrix, whiten_block, calcualte_mi, mi_wishart_bias. |
 | `load_config (line 196)` | config_path: str \| Path=DEFAULT_CONFIG_PATH | dict | Load configuration from YAML file. | Scope: task-specific. |
 | `csv_save (line 202)` | config: dict, experiment_name: str, method: str, theoretical_values: tuple, sampled_values: dict | Path | Save theoretical and sampled PID/MI component values to one method CSV. | Scope: task-specific. |
-| `simulation (line 238)` | config: dict, methods: list, experiment_name: str \| None=None | dict | Run theoretical-covariance PID calculations and sampled trial summaries. | Scope: task-specific. Related: change_covariance_order, calculate_mi_raw, make_both_unique_true_cov_from_config, make_direct_true_cov_from_config. |
+| `simulation (line 238)` | config: dict, methods: list, experiment_name: str \| None=None | dict | Run theoretical-covariance PID calculations and sampled trial summaries. | Scope: task-specific. Related: change_covariance_order, calculate_mi_raw, make_both_unique_true_cov_from_config, make_direct_true_cov_from_config, pid_calc, sample_from_cov. |
+
 
 ### `Simulations/Theoretical_Examples/Covariance/save_results.py`
 
@@ -663,25 +425,6 @@ File description: Student-t non-Gaussian RV examples.
 | `standardized_t (line 15)` | rng, df, size | Unannotated return value; inspect implementation before reuse | Sample a variance-one Student-t random variable. | Scope: task-specific. |
 | `unq2_zero_t (line 31)` | rng, n, p, noise_std, df=5 | Unannotated return value; inspect implementation before reuse | Generate a Student-t version of the zero-source-2-unique example. | Scope: task-specific. Related: standardized_t. |
 | `unq12_zero (line 55)` | rng, n, p, noise_std, df=5 | Unannotated return value; inspect implementation before reuse | Generate a Student-t version of the zero-both-unique example. | Scope: task-specific. Related: standardized_t. |
-
-
-## Simulations/Theoretical_Examples/RVs_Story
-
-### `Simulations/Theoretical_Examples/RVs_Story/flow_pid_grid_search.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `load_example_and_truth (line 67)` | example_name | Unannotated return value; inspect implementation before reuse | Return the registered sample generator and analytical truth function. | Scope: task-specific. |
-| `grid_items (line 81)` | grid | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
-| `standardize_train_val (line 87)` | train, val | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
-| `make_folds (line 96)` | n, k_folds, seed | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
-| `true_synergy (line 104)` | truth_func, x1, x2, t | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
-| `write_csv (line 111)` | path, rows, fieldnames | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. |
-| `run_grid_search (line 119)` | config, example_name, k_folds, grid, results_dir, device | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: task-specific. Related: load_example_and_truth, make_folds, standardize_train_val, flow_pid_wrapper. |
-| `parse_args (line 241)` | No inputs | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. |
-| `main (line 256)` | No inputs | No explicit return; likely None / side effects | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: parse_args, run_grid_search. |
 
 
 ## Simulations/Theoretical_Examples/RVs_Story/regular_examples
@@ -727,16 +470,17 @@ File description: Seed-loop and CSV helpers for RVs_Story example batches.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `_as_float (line 53)` | value | float | Convert scalar numeric values from tensors or Python numbers to float. | Scope: private helper. |
-| `csv_path (line 65)` | results_dir: Path, example: str, method: str | Path | Build the per-example, per-method PID seed CSV path. | Scope: task-specific. |
-| `commonality_csv_path (line 81)` | results_dir: Path, example: str=COMMONALITY_KEY | Path | Build the shared per-seed commonality CSV path. | Scope: task-specific persistence helper. |
-| `csv_has_seed (line 95)` | path: Path, seed: int, example: str \| None=None | bool | Check whether a seed, optionally for one named example, is present in a CSV. | Scope: task-specific resume helper. |
-| `seed_is_done (line 116)` | seed: int, example_names: list[str], results_dir: Path, methods=PID_METHODS, require_commonality: bool=False | bool | Check whether all expected PID rows and, when enabled, commonality rows exist for a seed. | Scope: task-specific. Related: csv_has_seed, csv_path, commonality_csv_path. |
-| `loop_examples (line 148)` | config: dict, functions_to_run: list[Callable], example_names: list[str], main_func: Callable, save_image: bool=True | dict | Run each RV example, preserve its PID results, and optionally calculate commonality from the same generated RVs. | Scope: task-specific. Related: commonality_analysis, save_pid_comparison_table. Conventions: RV order [X1, X2, T]. |
-| `save_seed_csvs (line 198)` | seed: int, all_results: dict, results_dir: Path, save_commonality_csv: bool=False | None | Upsert one seed of PID results and optional example-labelled commonality results into CSV checkpoints. | Scope: task-specific. Related: pid_comparison_table, csv_path, commonality_csv_path, _as_float. |
-| `mean_results_from_csvs (line 272)` | results_dir: Path, example: str, seeds: list[int] | dict | Average saved True Values, Tilde, Delta, Analytical BROJA, and Flow seed CSVs back into a PID result dictionary. | Scope: task-specific. Related: csv_path, pid_method_display_name. |
-| `mean_commonality_from_csvs (line 300)` | results_dir: Path, example: str, seeds: list[int] | dict | Average one example's commonality rows across selected seeds using canonical result keys. | Scope: task-specific. Related: commonality_csv_path. |
-| `loop_examples_over_seeds (line 337)` | config: dict, functions_to_run: list[Callable], example_names: list[str], main_func: Callable, num_seeds: int \| None=None, seeds: list[int] \| None=None | dict | Run examples over seeds, checkpoint PID/commonality rows, and save averaged figures with concise titles and canonical PID display labels. | Scope: task-specific. Related: seed_is_done, loop_examples, save_seed_csvs, mean_results_from_csvs, mean_commonality_from_csvs, pid_method_display_name. |
+| `_as_float (line 50)` | value | float | Convert scalar numeric values from tensors or Python numbers to float. | Scope: private helper. |
+| `csv_path (line 62)` | results_dir: Path, example: str, method: str | Path | Build the per-example, per-method seed CSV path. | Scope: task-specific. |
+| `commonality_csv_path (line 78)` | results_dir: Path, example: str=COMMONALITY_KEY | Path | Build the shared per-seed commonality CSV path. | Scope: task-specific persistence helper. |
+| `csv_has_seed (line 92)` | path: Path, seed: int, example: str \| None=None | bool | Check whether a seed, optionally for one example, is in a CSV. | Scope: task-specific resume helper. |
+| `seed_is_done (line 113)` | seed: int, example_names: list[str], results_dir: Path, methods=PID_METHODS, require_commonality: bool=False | bool | Check whether all expected example/method CSV rows exist for a seed. | Scope: task-specific. Related: commonality_csv_path, csv_has_seed, csv_path. |
+| `loop_examples (line 145)` | config: dict, functions_to_run: list[Callable], example_names: list[str], main_func: Callable, save_image: bool=True | dict | Run a list of RV examples once with one config. | Scope: task-specific. Conventions: RV order [X1, X2, T]. Related: save_pid_comparison_table, commonality_analysis. |
+| `save_seed_csvs (line 195)` | seed: int, all_results: dict, results_dir: Path, save_commonality_csv: bool=False | None | Save one seed of PID and optional commonality results to CSV. | Scope: task-specific. Related: pid_comparison_table, commonality_csv_path, csv_path, _as_float. |
+| `mean_results_from_csvs (line 269)` | results_dir: Path, example: str, seeds: list[int] | dict | Average saved seed CSVs back into a PID result dictionary. | Scope: task-specific. Related: csv_path. |
+| `mean_commonality_from_csvs (line 297)` | results_dir: Path, example: str, seeds: list[int] | dict | Average one example's saved commonality rows across selected seeds. | Scope: task-specific. Related: commonality_csv_path. |
+| `loop_examples_over_seeds (line 334)` | config: dict, functions_to_run: list[Callable], example_names: list[str], main_func: Callable, num_seeds: int \| None=None, seeds: list[int] \| None=None | dict | Run examples over seeds, save seed CSVs, then save averaged figures. | Scope: task-specific. Related: seed_is_done, loop_examples, save_seed_csvs, mean_results_from_csvs, save_pid_comparison_table, pid_method_display_name. |
+
 
 ### `Simulations/Theoretical_Examples/RVs_Story/story_math_utils.py`
 
@@ -752,12 +496,12 @@ File description: Shared PID execution helpers for the RVs_Story examples.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `pid_method_display_name (line 32)` | method: str | str | Convert PID dispatch identifiers to stable result-table and CSV labels, including `eigen`/`eigen_pid` as `Analytical BROJA`. | Scope: reusable RVs_Story display helper. Related: run_pid_story, loop_examples_over_seeds. |
-| `truth_pid_suppression (line 52)` | sources: list[torch.Tensor], target: list[torch.Tensor], covariance=None | tuple[dict, dict] | Compute the Gaussian truth row for suppression-style examples. | Scope: task-specific. Related: calculate_story_mi_values. |
-| `truth_pid_equal_unique (line 75)` | sources: list[torch.Tensor], target: list[torch.Tensor], covariance=None | tuple[dict, dict] | Compute the Gaussian truth row for equal-unique regular examples. | Scope: task-specific. Related: calculate_story_mi_values. |
-| `run_pid_story (line 103)` | config: dict, function_to_run: Callable, truth_func: Callable \| None=None, methods: tuple[str, ...]=('tilde', 'delta', 'flow') | tuple[dict, list[np.ndarray]] | Run one RVs_Story generator through selected PID methods, apply canonical display labels, and return the generated RVs for downstream commonality analysis. | Scope: task-specific. Related: pid_calc, pid_method_display_name, loop_examples. Conventions: returned RV order [X1, X2, T], samples by features. |
-| `load_story_config (line 158)` | config_path: str \| Path \| None=None | dict | Load the RVs_Story YAML configuration. | Scope: task-specific. |
-| `save_single_example (line 172)` | config: dict, function_to_run: Callable, output_name: str, truth_func: Callable \| None=None | dict | Run one example, unpack the shared runner result, and save its PID comparison figure. | Scope: task-specific. Related: run_pid_story, save_pid_comparison_table. |
+| `pid_method_display_name (line 32)` | method: str | str | Convert a configured PID method identifier to its table label. | Scope: reusable RVs_Story display helper. |
+| `truth_pid_suppression (line 50)` | sources: list[torch.Tensor], target: list[torch.Tensor], covariance=None | tuple[dict, dict] | Compute the Gaussian truth row for suppression-style examples. | Scope: task-specific. Related: calculate_story_mi_values. |
+| `truth_pid_equal_unique (line 73)` | sources: list[torch.Tensor], target: list[torch.Tensor], covariance=None | tuple[dict, dict] | Compute the Gaussian truth row for equal-unique regular examples. | Scope: task-specific. Related: calculate_story_mi_values. |
+| `run_pid_story (line 101)` | config: dict, function_to_run: Callable, truth_func: Callable \| None=None, methods: tuple[str, ...]=('eigen_pid',) | tuple[dict, list[np.ndarray]] | Run one RVs_Story generator through selected PID methods. | Scope: task-specific. Conventions: returned RV order [X1, X2, T], samples by features. Related: pid_calc, pid_method_display_name. |
+| `load_story_config (line 156)` | config_path: str \| Path \| None=None | dict | Load the RVs_Story YAML configuration. | Scope: task-specific. |
+| `save_single_example (line 170)` | config: dict, function_to_run: Callable, output_name: str, truth_func: Callable \| None=None | dict | Run one example and save its PID comparison figure. | Scope: task-specific. Related: run_pid_story, save_pid_comparison_table. |
 
 
 ## Simulations/Theoretical_Examples/RVs_Story/suppresion_examples
@@ -822,17 +566,18 @@ File description: Seed-loop and CSV helpers for evil-twin PID_calc sweeps.
 | `summary_csv_path (line 29)` | output_dir: Path, prefix: str='evil_twin_pid' | Path | Build the output CSV path for the mean summary table. | Scope: task-specific. |
 | `method_csv_path (line 43)` | output_dir: Path, method: str, prefix: str='evil_twin_pid' | Path | Build the output CSV path for one PID method. | Scope: task-specific. |
 | `write_rows_to_csv (line 58)` | path: Path, rows: list[dict], fieldnames: list[str] | Path | Write a complete CSV table, replacing any existing file. | Scope: task-specific. |
-| `make_pid_config (line 77)` | n: int, p: int, device: str, flow_epochs: int, flow_verbose: bool | dict | Create the config dictionary expected by PID_calc wrappers. | Scope: task-specific. |
-| `result_row (line 102)` | seed: int, twin: str, method: str, n: int, p: int, pid: dict, mi: dict | dict | Create a successful result row for one twin and PID method. | Scope: task-specific. |
-| `error_row (line 135)` | seed: int, twin: str, method: str, n: int, p: int, error: Exception | dict | Create an error row for one failed twin and PID method. | Scope: task-specific. |
-| `summary_fieldnames (line 164)` | twins: tuple[str, ...]=SUMMARY_TWINS | list[str] | Build ordered column names for the mean summary table. | Scope: task-specific. |
-| `mean_summary_rows (line 180)` | seed_results: dict, methods: tuple[str, ...], n_samples: int, dimension: int, bias_correction: bool, twins: tuple[str, ...]=SUMMARY_TWINS | list[dict] | Calculate mean PID and MI values across seeds for each method. | Scope: task-specific. Conventions: bias-correction aware. |
-| `save_summary_csv (line 237)` | output_dir: Path, prefix: str, rows: list[dict] | Path | Save the mean summary table to a CSV file. | Scope: task-specific. Related: write_rows_to_csv, summary_csv_path, summary_fieldnames. |
-| `summary_image_path (line 251)` | output_dir: Path, prefix: str, twin: str | Path | Build the output image path for one twin's mean summary table. | Scope: task-specific. |
-| `summary_rows_to_pid_results (line 266)` | rows: list[dict], twin: str | dict | Convert mean summary rows to the PID result shape used by RVs_Story tables. | Scope: task-specific. |
-| `save_summary_table_images (line 295)` | rows: list[dict], output_dir: Path, prefix: str, config: dict, twins: tuple[str, ...]=SUMMARY_TWINS | list[Path] | Save RVs_Story-style PID comparison images for the mean summary. | Scope: task-specific. Related: summary_rows_to_pid_results, summary_image_path, save_pid_comparison_table. |
-| `format_summary_value (line 340)` | value, decimals: int | str | Format one summary table cell for terminal output. | Scope: task-specific. |
-| `format_summary_table (line 357)` | rows: list[dict], decimals: int=6 | str | Format summary rows as an aligned plain-text table. | Scope: task-specific. Related: summary_fieldnames, format_summary_value. |
+| `make_pid_config (line 77)` | n: int, p: int, device: str | dict | Create the config dictionary expected by PID_calc wrappers. | Scope: task-specific. |
+| `result_row (line 98)` | seed: int, twin: str, method: str, n: int, p: int, pid: dict, mi: dict | dict | Create a successful result row for one twin and PID method. | Scope: task-specific. |
+| `error_row (line 131)` | seed: int, twin: str, method: str, n: int, p: int, error: Exception | dict | Create an error row for one failed twin and PID method. | Scope: task-specific. |
+| `summary_fieldnames (line 160)` | twins: tuple[str, ...]=SUMMARY_TWINS | list[str] | Build ordered column names for the mean summary table. | Scope: task-specific. |
+| `mean_summary_rows (line 176)` | seed_results: dict, methods: tuple[str, ...], n_samples: int, dimension: int, bias_correction: bool, twins: tuple[str, ...]=SUMMARY_TWINS | list[dict] | Calculate mean PID and MI values across seeds for each method. | Scope: task-specific. Conventions: bias-correction aware. |
+| `save_summary_csv (line 233)` | output_dir: Path, prefix: str, rows: list[dict] | Path | Save the mean summary table to a CSV file. | Scope: task-specific. Related: write_rows_to_csv, summary_csv_path, summary_fieldnames. |
+| `summary_image_path (line 247)` | output_dir: Path, prefix: str, twin: str | Path | Build the output image path for one twin's mean summary table. | Scope: task-specific. |
+| `summary_rows_to_pid_results (line 262)` | rows: list[dict], twin: str | dict | Convert mean summary rows to the PID result shape used by RVs_Story tables. | Scope: task-specific. |
+| `save_summary_table_images (line 291)` | rows: list[dict], output_dir: Path, prefix: str, config: dict, twins: tuple[str, ...]=SUMMARY_TWINS | list[Path] | Save RVs_Story-style PID comparison images for the mean summary. | Scope: task-specific. Related: summary_rows_to_pid_results, summary_image_path, save_pid_comparison_table. |
+| `format_summary_value (line 336)` | value, decimals: int | str | Format one summary table cell for terminal output. | Scope: task-specific. |
+| `format_summary_table (line 353)` | rows: list[dict], decimals: int=6 | str | Format summary rows as an aligned plain-text table. | Scope: task-specific. Related: summary_fieldnames, format_summary_value. |
+
 
 ### `Simulations/evil_twin/plot_summary_csv.py`
 
@@ -850,13 +595,12 @@ File description: Run the evil-twin PID experiment from an editable Python confi
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `validate_config (line 51)` | config: dict | None | Validate the editable evil-twin experiment configuration. | Scope: task-specific. Conventions: bias-correction aware. |
-| `uncorrected_delta_pid (line 119)` | config: dict, sources: list[torch.Tensor], target: list[torch.Tensor] | tuple[dict, dict] | Calculate raw Delta PID without applying Wishart bias correction. | Scope: task-specific. Related: create_cov_matrix. |
-| `calculate_pid (line 167)` | config: dict, sources: list[torch.Tensor], target: list[torch.Tensor], generator: torch.Generator, method: str | tuple[dict, dict] | Run one configured PID method on one evil-twin sample set. | Scope: task-specific. Related: pid_calc, uncorrected_delta_pid. |
-| `run_from_config (line 197)` | config: dict | dict | Run the configured evil-twin experiment and save method and summary CSVs. | Scope: task-specific. Related: validate_config, make_pid_config, mean_summary_rows, save_summary_csv. |
-| `parse_args (line 299)` | No inputs | argparse.Namespace | Parse optional overrides for the consolidated evil-twin runner. | Scope: entry point. |
-| `config_from_args (line 336)` | args: argparse.Namespace | dict | Apply explicitly supplied command-line values to ''CONFIG''. | Scope: task-specific. Conventions: bias-correction aware. |
-| `main (line 366)` | No inputs | dict | Run the evil-twin experiment with CONFIG and command-line overrides. | Scope: entry point. Related: run_from_config, config_from_args, parse_args. |
+| `validate_config (line 47)` | config: dict | None | Validate the editable evil-twin experiment configuration. | Scope: task-specific. Conventions: bias-correction aware. |
+| `calculate_pid (line 110)` | config: dict, sources: list[torch.Tensor], target: list[torch.Tensor], generator: torch.Generator, method: str | tuple[dict, dict] | Run one configured PID method on one evil-twin sample set. | Scope: task-specific. Related: pid_calc. |
+| `run_from_config (line 138)` | config: dict | dict | Run the configured evil-twin experiment and save method and summary CSVs. | Scope: task-specific. Related: validate_config, make_pid_config, mean_summary_rows, save_summary_csv, method_csv_path, summary_csv_path. |
+| `parse_args (line 238)` | No inputs | argparse.Namespace | Parse optional overrides for the consolidated evil-twin runner. | Scope: entry point. |
+| `config_from_args (line 269)` | args: argparse.Namespace | dict | Apply explicitly supplied command-line values to ``CONFIG``. | Scope: task-specific. Conventions: bias-correction aware. |
+| `main (line 297)` | No inputs | dict | Run the evil-twin experiment with CONFIG and command-line overrides. | Scope: entry point. Related: run_from_config, config_from_args, parse_args. |
 
 
 ## repository root
@@ -959,14 +703,6 @@ File description: No module docstring; inspect before reuse.
 | `encoding_model.validate (line 82)` | self, reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, features_val | Unannotated return value; inspect implementation before reuse | "This funciton validates the encoding model on the validation set and returns the correlation scores for each hemisphere. | Scope: method/nested helper. |
 | `encoding_model.run_model (line 110)` | self, train_imgs_dataloader, val_imgs_dataloader, lh_fmri_train, rh_fmri_train, lh_fmri_val, rh_fmri_val, batch_size=100, ncomponents=None | Unannotated return value; inspect implementation before reuse | This function runs the entire encoding model pipeline: feature extraction, training, validation without testing. | Scope: method/nested helper. Related: extract_features, train, fit_pca, validate. |
 
-### `encoding_model/grid_search.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `grid_search_ols (line 51)` | method, suppresions_strengths_list, snr_list, mixing_dimensions_list, signal | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: create_supression_model, commonality_analysis. |
-
 ### `encoding_model/pred_pipeline.py`
 
 File description: No module docstring; inspect before reuse.
@@ -1017,121 +753,6 @@ File description: No module docstring; inspect before reuse.
 
 ## library_wrappers
 
-### `library_wrappers/Delta_PID.py`
-
-File description: Wrapper for the gpid Gaussian delta PID definition.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_args (line 38)` | No inputs | argparse.Namespace | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. |
-| `simple_example_args (line 54)` | No inputs | argparse.Namespace | Small debug example: source1 and source2 are noisy copies of one target. | Scope: reusable/public. |
-| `main (line 65)` | No inputs | int | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: simple_example_args, parse_args, covariance_example_context, run_covariance_pid_wrapper. |
-
-### `library_wrappers/Flow_PID.py`
-
-File description: Wrapper for warrenzha/flow-pid's normalizing-flow PID estimator.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_args (line 36)` | No inputs | argparse.Namespace | Parse CLI arguments for Flow-PID on raw sample matrices. | Scope: entry point. |
-| `simple_example_args (line 77)` | No inputs | argparse.Namespace | Small debug example: train Flow-PID on samples from the shared Gaussian case. | Scope: reusable/public. |
-| `load_flow_pid (line 99)` | No inputs | Unannotated return value; inspect implementation before reuse | Load and return flow-pid's original ''flow_pid'' function. | Scope: reusable/public. Related: load_module. |
-| `read_samples (line 131)` | path: Path, expected_columns: int \| None=None | np.ndarray | Read a two-dimensional sample CSV with rows as observations. | Scope: reusable/public. |
-| `split_combined_samples (line 145)` | samples: np.ndarray, sizes: tuple[int, int, int] | tuple[np.ndarray, np.ndarray, np.ndarray] | Split [source1, source2, target] samples into flow-pid's (target, source1, source2). | Scope: reusable/public. |
-| `load_input_arrays (line 157)` | args: argparse.Namespace | tuple[np.ndarray, np.ndarray, np.ndarray] | Load target/M, source1/X, and source2/Y sample arrays. | Scope: reusable/public. Related: read_samples, simple_gaussian_samples, split_combined_samples. |
-| `validate_training_args (line 183)` | args: argparse.Namespace | None | Validate Flow-PID training hyperparameters. | Scope: reusable/public. |
-| `main (line 195)` | No inputs | int | Load raw samples, train flow-pid's estimator, and save PID components. | Scope: entry point. Related: validate_training_args, load_input_arrays, load_flow_pid, pid_result_row. |
-
-### `library_wrappers/IG_R.py`
-
-File description: Small Python wrapper for JWKay/PID/IGFuns.R.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_correlation (line 149)` | value: str | float | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `parse_args (line 159)` | No inputs | argparse.Namespace | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. |
-| `simple_example_args (line 182)` | No inputs | argparse.Namespace | Small debug example: run IG on the shared 1D Gaussian covariance. | Scope: reusable/public. |
-| `apply_example_defaults (line 203)` | args: argparse.Namespace | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: set_evil_twin_inputs. |
-| `set_evil_twin_inputs (line 224)` | args: argparse.Namespace | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `set_simple_gaussian_inputs (line 237)` | args: argparse.Namespace, matrix_csv: Path | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: write_simple_gaussian_covariance. |
-| `ig_source_candidates (line 250)` | pid_repo: Path \| None | list[Path] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `find_ig_source (line 254)` | args: argparse.Namespace | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: ig_source_candidates. |
-| `require_shape (line 270)` | path: Path, expected: tuple[int, int], label: str | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: csv_shape. |
-| `validate_inputs (line 278)` | args: argparse.Namespace | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: require_shape. |
-| `run_r (line 314)` | args: argparse.Namespace | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: run, write_scalar_csv. |
-| `write_scalar_csv (line 376)` | path: Path, value: float | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `add_standard_table (line 381)` | result: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `write_result (line 401)` | result: dict, output: Path \| None | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `print_result (line 411)` | result: dict | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `main (line 418)` | No inputs | int | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: apply_example_defaults, find_ig_source, validate_inputs, add_standard_table. |
-
-### `library_wrappers/Idep_R.py`
-
-File description: Small Python wrapper for JWKay/PID/IdepGauss.R.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_args (line 153)` | No inputs | argparse.Namespace | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. |
-| `csv_shape (line 171)` | path: Path | tuple[int, int] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `validate_matrix_args (line 190)` | args: argparse.Namespace | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: csv_shape. |
-| `absolute_path (line 203)` | value: str | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `main (line 210)` | No inputs | int | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: simple_example_args, parse_args, validate_matrix_args, absolute_path. |
-
-### `library_wrappers/Thin_PID.py`
-
-File description: Wrapper for warrenzha/flow-pid's exact Gaussian Thin-PID definition.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_args (line 31)` | No inputs | argparse.Namespace | Parse CLI arguments for running Thin-PID on a covariance/correlation CSV. | Scope: entry point. |
-| `simple_example_args (line 56)` | No inputs | argparse.Namespace | Small debug example: source1 and source2 are noisy copies of one target. | Scope: reusable/public. |
-| `load_exact_gauss_thin_pid (line 69)` | No inputs | Unannotated return value; inspect implementation before reuse | Load and return flow-pid's original ''exact_gauss_thin_pid'' function. | Scope: reusable/public. Related: load_module. Conventions: whitening-sensitive. |
-| `main (line 99)` | No inputs | int | Load input, run flow-pid Thin-PID, and save the result CSV. | Scope: entry point. Related: simple_example_args, parse_args, covariance_example_context, run_covariance_pid_wrapper. |
-
-### `library_wrappers/Tilde_PID.py`
-
-File description: Wrapper for the gpid Gaussian tilde PID definition.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_args (line 39)` | No inputs | argparse.Namespace | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. |
-| `simple_example_args (line 56)` | No inputs | argparse.Namespace | Small debug example: source1 and source2 are noisy copies of one target. | Scope: reusable/public. |
-| `main (line 68)` | No inputs | int | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: simple_example_args, parse_args, covariance_example_context, run_covariance_pid_wrapper. |
-
-### `library_wrappers/check_evil_twin_all.py`
-
-File description: Run the IG and Idep evil-twin checks and combine their PID tables.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `parse_args (line 39)` | No inputs | argparse.Namespace | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. |
-| `run (line 49)` | command: list[str], label: str, verbose: bool | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `require_file (line 70)` | path: Path, label: str | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `load_ig_rows (line 75)` | path: Path | list[dict[str, str]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: normalize_rows. |
-| `load_idep_rows (line 80)` | path: Path | list[dict[str, str]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: normalize_rows. |
-| `load_single_row_csv (line 107)` | path: Path | list[dict[str, str]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: normalize_rows. |
-| `normalize_rows (line 115)` | rows: list[dict] | list[dict[str, str]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `write_csv (line 130)` | rows: list[dict[str, str]], path: Path | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `write_svg (line 138)` | rows: list[dict[str, str]], path: Path | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: esc. |
-| `write_svg.esc (line 161)` | value: object | str | No docstring; verify behavior, types, and conventions before reuse. | Scope: method/nested helper. |
-| `print_table (line 205)` | rows: list[dict[str, str]] | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `main (line 220)` | No inputs | int | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: parse_args, require_file, run, load_ig_rows. |
-
-### `library_wrappers/compare_gpid_canonical.py`
-
-File description: Compare GPID canonical examples by direct GPID calls and PID_calc wrappers.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `canonical_examples (line 38)` | No inputs | list[dict[str, object]] | Build the canonical covariance examples from external/gpid/scripts. | Scope: reusable/public. Related: add. |
-| `canonical_examples.add (line 51)` | desc: str, case_id: int, cov: np.ndarray, sigma: float=np.nan, rho: float=np.nan | None | Append one canonical example to the local case list. | Scope: method/nested helper. |
-| `unpack_gpid (line 92)` | values: tuple[float, ...] | dict[str, float] | Convert one GPID return tuple into named components. | Scope: reusable/public. |
-| `unpack_wrapper (line 106)` | pid: dict[str, float], mi: dict[str, float] | dict[str, float] | Convert one PID_calc wrapper output into named components. | Scope: reusable/public. |
-| `pid_calc (line 120)` | method: str, cov: np.ndarray, dm: int, dx: int, dy: int | dict[str, float] | Run one canonical covariance through the matching PID_calc wrapper. | Scope: reusable/public. Related: unpack_wrapper. Conventions: bias-correction aware. |
-| `compare (line 140)` | No inputs | list[dict[str, object]] | Compare direct GPID calls with PID_calc wrappers for all canonical examples. | Scope: reusable/public. Related: canonical_examples, unpack_gpid, pid_calc. |
-| `print_summary (line 174)` | rows: list[dict[str, object]] | None | Print the maximum absolute difference per method and component. | Scope: reusable/public. |
-| `main (line 193)` | No inputs | int | Run the canonical GPID comparison command. | Scope: entry point. Related: parse_args, print_summary, compare. |
-
 ### `library_wrappers/missmda_ncp.py`
 
 File description: Minimal in-process Python wrapper for R's ''missMDA::estim_ncpPCA''.
@@ -1139,42 +760,6 @@ File description: Minimal in-process Python wrapper for R's ''missMDA::estim_ncp
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
 | `estimate_ncp_pca (line 22)` | data, ncp_min=0, ncp_max=5, method='Regularized', scale=True, method_cv='gcv', nbsim=100, p_na=0.05, threshold=0.0001, seed=None, rscript=RSCRIPT, verbose=False | Unannotated return value; inspect implementation before reuse | Call ''missMDA::estim_ncpPCA'' on a Python sample table. | Scope: reusable/public. |
-
-### `library_wrappers/r_idep_client.py`
-
-File description: Programmatic Python client for JWKay/PID/IdepGauss.R.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `RIdePResult (line 93)` | class | RIdePResult instance | No docstring; verify behavior, types, and conventions before reuse. | Scope: class. |
-| `_to_2d_float_rows (line 100)` | matrix: Any | list[list[float]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
-| `_write_matrix_csv (line 117)` | path: Path, rows: Sequence[Sequence[float]] | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
-| `_read_result_csv (line 123)` | path: Path, stdout: str, stderr: str, *, bits_to_nats: bool | RIdePResult | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
-| `run_idep_from_covariance (line 148)` | sigma: Any, sizes: Sequence[int], *, rscript: str \| Path \| None=None, idep_url: str=DEFAULT_IDEP_URL, local_idep: str \| Path \| None='IdepGauss.R', bits_to_nats: bool=True, keep_temp: bool=False | RIdePResult | Run R idepGM(sizes, sigma) and return named Idep/MMI atoms. | Scope: reusable/public. Related: _to_2d_float_rows, _resolve_local_idep, _write_matrix_csv, run. |
-| `run_idep_for_cases (line 220)` | case_covariances: Mapping[str, Any], sizes: Sequence[int], **kwargs: Any | dict[str, RIdePResult] | Run R Idep/MMI for several named covariance matrices. | Scope: reusable/public. Related: run_idep_from_covariance. |
-| `atoms_as_ordered_values (line 232)` | values: Mapping[str, float] | list[float] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `_resolve_local_idep (line 236)` | local_idep: str \| Path \| None | str | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
-
-### `library_wrappers/wrapper_utils.py`
-
-File description: Shared utilities for the Python PID covariance wrappers.
-
-| Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
-|---|---|---|---|---|
-| `add_gpid_src_to_path (line 55)` | repo_root: Path \| None=None | Path | Put external/gpid/src on sys.path for script-style wrapper imports. | Scope: reusable/public. |
-| `parse_sizes (line 66)` | value: str | tuple[int, int, int] | Parse source1,source2,target dimensions and reject invalid values. | Scope: reusable/public. |
-| `read_matrix (line 77)` | path: Path | np.ndarray | Read a square covariance or correlation matrix from a CSV file. | Scope: reusable/public. |
-| `validate_covariance (line 87)` | matrix: np.ndarray, expected_shape: tuple[int, int] | None | Validate shape and basic covariance/correlation symmetry. | Scope: reusable/public. |
-| `source_source_target_to_target_source_source (line 95)` | matrix: np.ndarray, sizes: tuple[int, int, int] | np.ndarray | Reorder a [source1, source2, target] matrix to [target, source1, source2]. | Scope: reusable/public. Related: validate_covariance. |
-| `write_simple_gaussian_covariance (line 104)` | path: Path | None | Write the shared simple [source1, source2, target] Gaussian covariance example. | Scope: reusable/public. |
-| `simple_gaussian_samples (line 110)` | num_samples: int, seed: int | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate raw samples from the shared simple Gaussian example. | Scope: reusable/public. |
-| `covariance_example_context (line 130)` | args: argparse.Namespace | Unannotated return value; inspect implementation before reuse | Temporarily attach the shared simple covariance example to wrapper args. | Scope: reusable/public. Related: write_simple_gaussian_covariance. |
-| `pid_result_row (line 145)` | values: tuple[float, ...], case: str, pid_definition: str, *, include_union_objective: bool=False | dict[str, object] | Convert a Gaussian PID tuple into the local one-row CSV schema. | Scope: reusable/public. |
-| `write_pid_row (line 172)` | row: dict[str, object], path: Path, columns: list[str] | None | Write one standardized PID result row to a CSV file. | Scope: reusable/public. |
-| `print_pid_result (line 181)` | row: dict[str, object], columns: list[str] | None | Print one PID result in a compact debug table. | Scope: reusable/public. |
-| `load_module (line 213)` | module_name: str, path: Path | types.ModuleType | Load one source file as a module without importing package __init__ files. | Scope: reusable/public. |
-| `run_covariance_pid_wrapper (line 224)` | args: argparse.Namespace, solver: Callable[..., tuple[float, ...]] \| None=None, *, pid_definition: str, columns: list[str], solver_loader: Callable[[], Callable[..., tuple[float, ...]]] \| None=None, solver_kwargs: dict[str, object] \| None=None, include_union_objective: bool=False, verbose_history: bool=False, read_message: bool=False, call_message: str \| None=None, written_message: str \| None=None | int | Run the common covariance-wrapper flow and write a one-row PID CSV. | Scope: reusable/public. Related: read_matrix, source_source_target_to_target_source_source, pid_result_row, print_pid_result. |
-
 
 ## repository root
 
@@ -1213,14 +798,13 @@ File description: No module docstring; inspect before reuse.
 | `save_seed_summary_csv (line 505)` | summary: dict, config: dict | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: get_seed_summary_csv_path, _normalize_config_value. |
 | `run_multi_seed_experiment (line 544)` | config: dict, per_seed_runner: Callable[[int, dict], dict] | tuple[dict, list[dict]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: load_seed_run_checkpoint, add, append_seed_run_checkpoint, summarize_seed_results. |
 | `run_configured_multiseed (line 595)` | config: dict, per_seed_runner: Callable[[int, dict], dict] | tuple[dict, list[dict], Path, Path] | Run a configured multi-seed experiment and handle the standard reporting. | Scope: reusable/public. Related: run_multi_seed_experiment, print_seed_summary, get_seed_runs_csv_path, save_seed_summary_csv. |
-| `create_distribution_plot (line 619)` | data: list[float], title: str, xlabel: str, ylabel: str, save_path: Path, bins: int=30, kde: bool=True | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `create_distribution_plot_with_colors (line 652)` | data: list[float], title: str, xlabel: str, ylabel: str, save_path: Path, bins: int=30, kde: bool=True, bar_color: str='#4C72B0', kde_color: str='#DD8452', bar_alpha: float=0.65, xlim: tuple[float, float] \| None=None | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `_load_results_dataframe (line 703)` | path: Path | pd.DataFrame | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
-| `load_hist_kde_and_change_colors (line 729)` | csv_path: Path \| str, column: str, output_path: Path \| str, bins: int=30, bar_color: str='#4C72B0', kde_color: str='#DD8452', bar_alpha: float=0.65 | Path \| None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: _load_results_dataframe, create_distribution_plot_with_colors. |
-| `create_test_histograms_with_kde (line 766)` | csv_path: Path \| str, output_dir: Path \| str, columns: list[str] \| None=None, bins: int=30, bar_color: str='#4C72B0', kde_color: str='#DD8452', bar_alpha: float=0.6, shared_x_axis: bool=True, shared_x_axis_groups: list[list[str]]=[['CA_R²_X1', 'CA_R²_X2', 'CA_R²_X12'], ['CA_unique_X1', 'CA_unique_X2', 'CA_common'], ['PID_red'], ['PID_unq1', 'PID_unq2'], ['PID_syn'], ['I(M1;T)', 'I(M2;T)', '"I(M1,M2;T)"']] | list[Path] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: _load_results_dataframe, create_distribution_plot_with_colors, _compute_xlim, add. |
-| `create_test_histograms_with_kde._compute_xlim (line 804)` | arrays: list[np.ndarray] | tuple[float, float] \| None | No docstring; verify behavior, types, and conventions before reuse. | Scope: method/nested helper. |
-| `get_config (line 866)` | config_path: Path \| str | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `inspect_function (line 874)` | function: Callable[..., Any], input_name: str | bool | Inspect a function's signature to check if it accepts a specific input name. | Scope: reusable/public. |
+| `create_distribution_plot_with_colors (line 619)` | data: list[float], title: str, xlabel: str, ylabel: str, save_path: Path, bins: int=30, kde: bool=True, bar_color: str='#4C72B0', kde_color: str='#DD8452', bar_alpha: float=0.65, xlim: tuple[float, float] \| None=None | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `_load_results_dataframe (line 670)` | path: Path | pd.DataFrame | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
+| `load_hist_kde_and_change_colors (line 696)` | csv_path: Path \| str, column: str, output_path: Path \| str, bins: int=30, bar_color: str='#4C72B0', kde_color: str='#DD8452', bar_alpha: float=0.65 | Path \| None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: _load_results_dataframe, create_distribution_plot_with_colors. |
+| `create_test_histograms_with_kde (line 733)` | csv_path: Path \| str, output_dir: Path \| str, columns: list[str] \| None=None, bins: int=30, bar_color: str='#4C72B0', kde_color: str='#DD8452', bar_alpha: float=0.6, shared_x_axis: bool=True, shared_x_axis_groups: list[list[str]]=[['CA_R²_X1', 'CA_R²_X2', 'CA_R²_X12'], ['CA_unique_X1', 'CA_unique_X2', 'CA_common'], ['PID_red'], ['PID_unq1', 'PID_unq2'], ['PID_syn'], ['I(M1;T)', 'I(M2;T)', '"I(M1,M2;T)"']] | list[Path] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: _load_results_dataframe, create_distribution_plot_with_colors, _compute_xlim, add. |
+| `create_test_histograms_with_kde._compute_xlim (line 771)` | arrays: list[np.ndarray] | tuple[float, float] \| None | No docstring; verify behavior, types, and conventions before reuse. | Scope: method/nested helper. |
+| `get_config (line 833)` | config_path: Path \| str | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `inspect_function (line 841)` | function: Callable[..., Any], input_name: str | bool | Inspect a function's signature to check if it accepts a specific input name. | Scope: reusable/public. |
 
 
 ## pipeline/analysis
@@ -1245,8 +829,9 @@ File description: Run deterministic OTC PID comparisons across unordered model p
 |---|---|---|---|---|
 | `target_pca (line 85)` | target_context: np.ndarray, n_components: int, random_state: int | np.ndarray | PCA target, train target on unique images and return projected target for shared images. | Scope: task-specific. Conventions: float64. |
 | `pca_model (line 107)` | features: np.ndarray, shared_mask: np.ndarray, n_components: int, random_state: int | np.ndarray | Fit source PCA on unique images and project shared images. | Scope: task-specific. Related: fit. |
-| `extract_model_projection (line 144)` | model_name: str, target_context: dict[str, Any], choose_layer_kwargs: dict[str, Any], feature_extraction_kwargs: dict[str, Any], n_components: int, random_state: int | tuple[np.ndarray, int] | Extract one selected model layer and return its memory-safe PCA projection. | Scope: task-specific. Related: overall_best_layer, pca_model, batching. Conventions: float64. |
-| `run_pairwise_pid_pipeline (line 253)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Path | Run OTC PID once per unordered model pair and checkpoint results to CSV. | Scope: task-specific. Related: resolve_pipeline_function, target_pca, add, extract_model_projection. |
+| `extract_model_projection (line 144)` | model_name: str, target_context: dict[str, Any], choose_layer_kwargs: dict[str, Any], feature_extraction_kwargs: dict[str, Any], n_components: int, random_state: int | tuple[np.ndarray, int] | Extract one selected model layer and return its memory-safe PCA projection. | Scope: task-specific. Conventions: float64. Related: overall_best_layer, pca_model, batching. |
+| `run_pairwise_pid_pipeline (line 253)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Path | Run OTC PID once per unordered model pair and checkpoint results to CSV. | Scope: task-specific. Related: resolve_pipeline_function, target_pca, extract_model_projection. |
+
 
 ### `pipeline/analysis/pca_analysis/all_models_pairwise/ridge_pair_wise_comp.py`
 
@@ -1287,8 +872,9 @@ File description: Calculate PID and mutual information as target PCs are accumul
 |---|---|---|---|---|
 | `_prepare_source_for_pid (line 33)` | source: np.ndarray, train_target: np.ndarray, shared_mask: np.ndarray, ridge: bool | np.ndarray | Prepare one model source for PID on the held-out shared images. | Scope: private helper. Related: find_alpha_per_pc, pca_source. |
 | `_save_pair_results (line 60)` | pair_results: dict[int, dict[str, Any]], model_1: str, model_2: str, results_dir: str \| Path | Path | Save the PC-dependent PID and MI results for one model pair. | Scope: private helper. |
-| `pc_function_analysis (line 88)` | config: dict[str, Any], functions: PIDPipelineFunctions, model1_name: list[str], model2_name: list[str], pc_path: str \| Path, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, results_dir: str \| Path \| None=None, plot_dir: str \| Path \| None=None | dict[str, dict[str, dict[int, dict[str, Any]]]] | Calculate PID and MI for each model pair and cumulative target-PC count. | Scope: task-specific. Related: prepare_target, prepare_ridge_target, feature_extraction, _prepare_source_for_pid. |
+| `pc_function_analysis (line 88)` | config: dict[str, Any], functions: PIDPipelineFunctions, model1_name: list[str], model2_name: list[str], pc_path: str \| Path, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_path: str \| Path, results_dir: str \| Path \| None=None, plot_dir: str \| Path \| None=None | dict[str, dict[str, dict[int, dict[str, Any]]]] | Calculate PID and MI for each model pair and cumulative target-PC count. | Scope: task-specific. Related: prepare_target, prepare_ridge_target, PIDPipeline, feature_extraction, _prepare_source_for_pid, print_pid_mi. |
 | `main (line 232)` | No inputs | None | Load the PC-function YAML, run all model pairs, and save their plots. | Scope: entry point. Related: pipeline_functions_from_config, pc_function_analysis. |
+
 
 ### `pipeline/analysis/pca_analysis/function_as_pc/plot_pc_results.py`
 
@@ -1344,8 +930,8 @@ File description: Search source-1 PCA component subsets for source-1 unique PID 
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `run_pid_pc_subset_search (line 25)` | target: Any, source_1: Any, source_2: Any, pid_callable: Callable[..., Any] \| None=None, *, cmi_threshold: float=1e-06, unique_threshold: float=1e-06, beam_width: int=5, max_subset_size: int=3, initial_subset_size: int=1, initial_subset_count: int \| None=None, floating_tolerance: float=1e-09, max_runtime_seconds: float=600, rng_seed: int=56, pid_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, use_floating_backward: bool=True | dict[str, Any] | Run beam search over source_1 PCA columns for source-1 unique PID. | Scope: task-specific. Related: _as_2d_array, _initial_subsets, _gaussian_cmi_bits, _top_rows. |
-| `_initial_subsets (line 189)` | candidates: list[int], subset_size: int, subset_count: int \| None, rng_seed: int | list[tuple[int, ...]] | Create initial source_1 PC subsets for the beam search. | Scope: private helper. Related: add. |
+| `run_pid_pc_subset_search (line 25)` | target: Any, source_1: Any, source_2: Any, pid_callable: Callable[..., Any] \| None=None, *, cmi_threshold: float=1e-06, unique_threshold: float=1e-06, beam_width: int=5, max_subset_size: int=3, initial_subset_size: int=1, initial_subset_count: int \| None=None, floating_tolerance: float=1e-09, max_runtime_seconds: float=600, rng_seed: int=56, pid_kwargs: dict[str, Any] \| None=None, all_csv_path: str \| Path \| None=None, best_csv_path: str \| Path \| None=None, use_floating_backward: bool=True | dict[str, Any] | Run beam search over source_1 PCA columns for source-1 unique PID. | Scope: task-specific. Related: _as_2d_array, PIDPipeline, _initial_subsets, _gaussian_cmi_bits, PIDPipelineFunctions, _top_rows. |
+| `_initial_subsets (line 189)` | candidates: list[int], subset_size: int, subset_count: int \| None, rng_seed: int | list[tuple[int, ...]] | Create initial source_1 PC subsets for the beam search. | Scope: private helper. |
 | `_as_2d_array (line 210)` | value: Any, name: str | np.ndarray | Convert one input to a finite non-empty 2D float array. | Scope: private helper. |
 | `_gaussian_cmi_bits (line 225)` | x: np.ndarray, y: np.ndarray, z: np.ndarray, eps: float=1e-10 | float | Calculate Gaussian conditional MI I(x; y \| z) in bits. | Scope: private helper. Related: _conditional_cov, _logdet. |
 | `_conditional_cov (line 242)` | cov_a: np.ndarray, cross_ab: np.ndarray, cov_b: np.ndarray, eps: float | np.ndarray | Compute covariance of variable a conditioned on variable b. | Scope: private helper. |
@@ -1499,13 +1085,13 @@ File description: No module docstring; inspect before reuse.
 
 ### `pipeline/pipeline_utils.py`
 
-File description: Utility helpers used by the thin PID pipeline orchestrator.
+File description: Utility helpers used by the PID pipeline orchestrator.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
 | `choose_random_sources (line 19)` | sources_list: list[str], size: int=2, replace: bool=False | np.ndarray | Randomly select a source from the list of available sources. | Scope: task-specific. |
-| `run_configured_pid_pipeline (line 35)` | config: dict[str, Any], function_registry: dict[str, PipelineFunction], choose_layer_kwargs: dict[str, Any] \| None=None | dict[str, Any] | Run PIDPipeline from a config dictionary and function registry. | Scope: task-specific. Related: pipeline_functions_from_config, run. |
-| `pipeline_functions_from_config (line 68)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction] | PIDPipelineFunctions | Resolve configured function names into PIDPipelineFunctions. | Scope: task-specific. Related: resolve_pipeline_function. |
+| `run_configured_pid_pipeline (line 35)` | config: dict[str, Any], function_registry: dict[str, PipelineFunction], choose_layer_kwargs: dict[str, Any] \| None=None | dict[str, Any] | Run PIDPipeline from a config dictionary and function registry. | Scope: task-specific. Related: pipeline_functions_from_config, PIDPipeline, run. |
+| `pipeline_functions_from_config (line 68)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction] | PIDPipelineFunctions | Resolve configured function names into PIDPipelineFunctions. | Scope: task-specific. Related: PIDPipelineFunctions, resolve_pipeline_function. |
 | `resolve_pipeline_function (line 95)` | function_config: dict[str, Any], function_registry: dict[str, PipelineFunction], step_name: str, required: bool | PipelineFunction \| None | Resolve one configured pipeline step name from a registry. | Scope: task-specific. |
 | `validate_pipeline_config_sections (line 124)` | config: dict[str, Any], required_sections: tuple[str, ...] | None | Validate that required config sections exist. | Scope: task-specific. |
 | `nsd_sources (line 140)` | model_name_1: str, model_name_2: str | dict[str, dict[str, Any]] | Load two model contexts and expose them under X1 and X2. | Scope: task-specific. Related: prepare_sources. |
@@ -1515,7 +1101,7 @@ File description: Utility helpers used by the thin PID pipeline orchestrator.
 | `overall_best_layer_for_sources (line 236)` | sources: dict[str, dict[str, Any]], path_to_results: str \| Path | dict[str, int] | Select each source model's overall best OTC layer from one CSV file. | Scope: task-specific. Related: _model_name_for_source, overall_best_layer, _overall_best_layer_model_names. |
 | `nsd_feature_extraction (line 267)` | source_context: dict[str, Any], layer_index: int, target_context: dict[str, Any], batch_size_process: int=128, batch_size_dataloader: int=128 | Any | Extract features for one NSD source and selected layer. | Scope: task-specific. Related: feature_extraction. |
 | `pca_each_source (line 298)` | source_1: Any, source_2: Any, target: Any, n_components_source_1: int, n_components_source_2: int, n_components_target: int | tuple[Any, Any] | Apply PCA separately to source_1 and source_2. | Scope: task-specific. Related: pca_projection. |
-| `pid_calc_adapter (line 336)` | target: Any, source_1: Any, source_2: Any, method: str, config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | dict[str, Any] | Call pid_calc using the strict PIDPipeline array order. | Scope: task-specific. Related: _as_2d_tensor, pid_calc. |
+| `pid_calc_adapter (line 336)` | target: Any, source_1: Any, source_2: Any, method: str='eigen_pid', config: dict[str, Any] \| None=None, rng_seed: int=56, **pid_kwargs: Any | dict[str, Any] | Call pid_calc using the strict PIDPipeline array order. | Scope: task-specific. Related: _as_2d_tensor, pid_calc. |
 | `print_pid_mi_adapter (line 385)` | pid_results: dict[str, Any], context: dict[str, Any], **report_kwargs: Any | Any | Print PID and MI outputs from pid_calc_adapter. | Scope: task-specific. Related: print_pid_mi. |
 | `_as_2d_tensor (line 403)` | value: Any | Any | Convert samples to a 2D torch tensor. | Scope: private helper. |
 | `_random_layer_index_for_source (line 424)` | sources: dict[str, dict[str, Any]], source_name: str, rng: np.random.Generator | int | Select one random layer index for one source context. | Scope: private helper. Related: source_context, random_layer_selection. |
@@ -1754,14 +1340,15 @@ File description: No module docstring; inspect before reuse.
 | `_append_project_root_to_path (line 8)` | No inputs | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: private helper. |
 | `get_run_config (line 37)` | No inputs | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
 | `load_model_and_fmri (line 63)` | config: dict | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: train_save_or_load. |
-| `prepare_inputs (line 70)` | config: dict, real_features: np.ndarray, fmri_dict: dict | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: get_specific_roi_fmri, create_encoder. |
-| `run_suppression_pipeline (line 94)` | config: dict, selected_features: np.ndarray, encoder, verbose: bool=True | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: create_predictions, create_supression_model, commonality_analysis, idep. |
-| `save_all_seed_runs_results (line 129)` | seed_rows: list[dict], config: dict | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: get_seed_runs_csv_path, append_seed_run_checkpoint. |
-| `run_single_seed (line 149)` | seed: int, config: dict, real_features: np.ndarray, fmri_dict: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: prepare_inputs, run_suppression_pipeline, extract_all_components. |
-| `run_encoding_multi_seed_experiment (line 168)` | config: dict | tuple[dict, list[dict]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: load_model_and_fmri, run_multi_seed_experiment, run_single_seed. |
-| `save_seed_summary (line 181)` | summary: dict, config: dict | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: save_seed_summary_csv. |
-| `print_results (line 185)` | outputs: dict, mi: dict, pid: dict | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
-| `main (line 199)` | No inputs | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: get_run_config, load_model_and_fmri, run_configured_multiseed, run_single_seed. |
+| `prepare_inputs (line 70)` | config: dict, real_features: np.ndarray, fmri_dict: dict | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: argObj, get_specific_roi_fmri, create_encoder. |
+| `run_suppression_pipeline (line 94)` | config: dict, selected_features: np.ndarray, encoder, verbose: bool=True | Unannotated return value; inspect implementation before reuse | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: create_predictions, create_supression_model, commonality_analysis, pid_calc. |
+| `save_all_seed_runs_results (line 128)` | seed_rows: list[dict], config: dict | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: get_seed_runs_csv_path, append_seed_run_checkpoint. |
+| `run_single_seed (line 148)` | seed: int, config: dict, real_features: np.ndarray, fmri_dict: dict | dict | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: prepare_inputs, run_suppression_pipeline, extract_all_components. |
+| `run_encoding_multi_seed_experiment (line 167)` | config: dict | tuple[dict, list[dict]] | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: load_model_and_fmri, run_multi_seed_experiment, run_single_seed. |
+| `save_seed_summary (line 180)` | summary: dict, config: dict | Path | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. Related: save_seed_summary_csv. |
+| `print_results (line 184)` | outputs: dict, mi: dict, pid: dict | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: reusable/public. |
+| `main (line 198)` | No inputs | None | No docstring; verify behavior, types, and conventions before reuse. | Scope: entry point. Related: get_run_config, load_model_and_fmri, run_configured_multiseed, run_single_seed. |
+
 
 ### `supression_effect/__init__.py`
 
@@ -1775,9 +1362,10 @@ File description: No module docstring; inspect before reuse.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `gauss_simple_example (line 23)` | N=1000, P=1, rng_seed=1, noise_seed=1, simple_example=True, snr=1.0, method='ridge_cv', mixing_dimension=None | Unannotated return value; inspect implementation before reuse | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. | Scope: reusable/public. Related: run_experiment, idep. |
-| `check_supression_effect (line 76)` | vp_results, pid_results | Unannotated return value; inspect implementation before reuse | Check for suppression effect in the results. | Scope: reusable/public. |
-| `main (line 122)` | No inputs | No explicit return; likely None / side effects | Main function to run the Gaussian simple example and compare results. | Scope: entry point. Related: gauss_simple_example, compare_results, check_supression_effect. |
+| `gauss_simple_example (line 23)` | N=1000, P=1, rng_seed=1, noise_seed=1, simple_example=True, snr=1.0, method='ridge_cv', mixing_dimension=None | Unannotated return value; inspect implementation before reuse | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. Parameters ---------- N : int Number of samples. P : int Number of features. rng_seed : int Seed for the random number generator. noise_seed : int Seed for the noise generator. snr : float Signal-to-noise ratio. method : str Method for variance partitioning ('ols', 'ridge_cv', etc.). mixing_dimension : int or None Dimension of the mixing matrix. If None, no mixing is applied. | Scope: reusable/public. Related: run_experiment, pid_calc. |
+| `check_supression_effect (line 75)` | vp_results, pid_results | Unannotated return value; inspect implementation before reuse | Check for suppression effect in the results. Parameters ---------- vp_results : dict Results from variance partitioning. pid_results : dict Results from Partial Information Decomposition. | Scope: reusable/public. |
+| `main (line 121)` | No inputs | No explicit return; likely None / side effects | Main function to run the Gaussian simple example and compare results. | Scope: entry point. Related: gauss_simple_example, compare_results, check_supression_effect. |
+
 
 ### `supression_effect/supp_gauss_multivariate.py`
 
@@ -1785,13 +1373,13 @@ File description: No module docstring; inspect before reuse.
 
 | Callable | Inputs | Outputs | Purpose | Scope / relationships / conventions |
 |---|---|---|---|---|
-| `crossfit_residualize (line 42)` | Y_raw, X_raw, n_splits=5, seed=0 | Unannotated return value; inspect implementation before reuse | Residualize Y_raw against X_raw using cross-fitted linear regression. Returns residuals Y - E[Y\|X] predicted out-of-fold. | Scope: reusable/public. Related: fit. Conventions: float64. |
-| `test_suppression (line 60)` | N=1000, P=1, suppression_strength=0.5, rng_seed=1, mode='simple', snr=1.0, method='ridge_cv', mixing_dimension=None | Unannotated return value; inspect implementation before reuse | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. | Scope: reusable/public. Related: run_experiment, idep. |
-| `plot_pid_results (line 119)` | mi_results=None, pid_results=None, sub_title=None | No explicit return; likely None / side effects | Plot bar chart for PID results. | Scope: reusable/public. |
-| `get_seed_sweep_config (line 167)` | No inputs | dict | Configuration for fixed-parameter suppression simulations across seeds. | Scope: reusable/public. |
-| `run_single_seed_fixed (line 189)` | seed: int, config: dict | dict | Run one suppression experiment seed with all other parameters fixed. | Scope: reusable/public. Related: test_suppression, extract_all_components. |
-| `run_fixed_params_across_seeds (line 204)` | config: dict \| None=None | tuple[dict, list[dict]] | Sweep over seeds while keeping all other simulation parameters fixed, then save the per-seed results and mean/std summary. | Scope: reusable/public. Related: run_multi_seed_experiment, print_seed_summary, get_seed_runs_csv_path, save_seed_summary_csv. |
-| `main (line 232)` | No inputs | No explicit return; likely None / side effects | Main function to run the Gaussian simple example and compare results. | Scope: entry point. Related: test_suppression, compare_results. |
+| `crossfit_residualize (line 42)` | Y_raw, X_raw, n_splits=5, seed=0 | Unannotated return value; inspect implementation before reuse | Residualize Y_raw against X_raw using cross-fitted linear regression. Returns residuals Y - E[Y\|X] predicted out-of-fold. | Scope: reusable/public. Conventions: float64. Related: fit. |
+| `test_suppression (line 60)` | N=1000, P=1, suppression_strength=0.5, rng_seed=1, mode='simple', snr=1.0, method='ridge_cv', mixing_dimension=None | Unannotated return value; inspect implementation before reuse | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. Parameters ---------- N : int Number of samples. P : int Number of features. suppresion_strength : float Strength of suppression effect. rng_seed : int Seed for the random number generator. noise_seed : int Seed for the noise generator. snr : float Signal-to-noise ratio. method : str Method for variance partitioning ('ols', 'ridge_cv', etc.). mixing_dimension : int or None Dimension of the mixing matrix. If None, no mixing is applied. | Scope: reusable/public. Related: run_experiment, pid_calc. |
+| `plot_pid_results (line 118)` | mi_results=None, pid_results=None, sub_title=None | No explicit return; likely None / side effects | Plot bar chart for PID results. | Scope: reusable/public. |
+| `get_seed_sweep_config (line 166)` | No inputs | dict | Configuration for fixed-parameter suppression simulations across seeds. | Scope: reusable/public. |
+| `run_single_seed_fixed (line 188)` | seed: int, config: dict | dict | Run one suppression experiment seed with all other parameters fixed. | Scope: reusable/public. Related: test_suppression, extract_all_components. |
+| `run_fixed_params_across_seeds (line 203)` | config: dict \| None=None | tuple[dict, list[dict]] | Sweep over seeds while keeping all other simulation parameters fixed, then save the per-seed results and mean/std summary. | Scope: reusable/public. Related: run_multi_seed_experiment, print_seed_summary, get_seed_runs_csv_path, save_seed_summary_csv, get_seed_sweep_config. |
+| `main (line 231)` | No inputs | No explicit return; likely None / side effects | Main function to run the Gaussian simple example and compare results. | Scope: entry point. Related: test_suppression, compare_results. |
 
 
 ## toy_examples

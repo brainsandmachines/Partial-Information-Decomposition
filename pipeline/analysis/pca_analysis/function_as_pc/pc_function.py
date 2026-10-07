@@ -276,18 +276,18 @@ def main() -> None:
     #Create directories according ot bias correction and ridge settings
     if config["pid_kwargs"]["config"]["bias_correction"]:
         if config["feature_manipulation_kwargs"]["ridge"]:
-            configured_paths["results_dir"] = Path(config["results_dir"]) / f"R_B_tilde_{config['model1_name']}_{config['model2_name']}"
-            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"R_B_tilde_{config['model1_name']}_{config['model2_name' ]}"
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"R_B_eigen_pid_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"R_B_eigen_pid_{config['model1_name']}_{config['model2_name' ]}"
         else:
-            configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_B_tilde_{config['model1_name']}_{config['model2_name']}"
-            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_B_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_B_eigen_pid_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_B_eigen_pid_{config['model1_name']}_{config['model2_name']}"
     else:
         if config["feature_manipulation_kwargs"]["ridge"]:
-            configured_paths["results_dir"] = Path(config["results_dir"]) / f"R_NB_tilde_{config['model1_name']}_{config['model2_name']}"
-            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"R_NB_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"R_NB_eigen_pid_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"R_NB_eigen_pid_{config['model1_name']}_{config['model2_name']}"
         else:
-            configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_NB_tilde_{config['model1_name']}_{config['model2_name']}"
-            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_NB_tilde_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_NB_eigen_pid_{config['model1_name']}_{config['model2_name']}"
+            configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_NB_eigen_pid_{config['model1_name']}_{config['model2_name']}"
 
         
     pc_function_analysis(

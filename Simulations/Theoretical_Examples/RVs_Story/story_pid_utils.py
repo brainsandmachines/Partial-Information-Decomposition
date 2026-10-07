@@ -34,7 +34,7 @@ def pid_method_display_name(method: str) -> str:
 
     Inputs:
         method: str, configured PID dispatch identifier such as ``eigen`` or
-            ``flow``.
+            ``eigen_pid``.
 
     Outputs:
         str, stable display label used by result tables and seed CSV files.
@@ -43,8 +43,6 @@ def pid_method_display_name(method: str) -> str:
     labels = {
         "eigen": "Analytical BROJA",
         "eigen_pid": "Analytical BROJA",
-        "flow": "Flow",
-        "flow_pid": "Flow",
     }
     return labels.get(method_key, method.title())
 
@@ -104,7 +102,7 @@ def run_pid_story(
     config: dict,
     function_to_run: Callable,
     truth_func: Callable | None = None,
-    methods: tuple[str, ...] = ("tilde", "delta", "flow"),
+    methods: tuple[str, ...] = ("eigen_pid",),
 ) -> tuple[dict, list[np.ndarray]]:
     """Run one RVs_Story generator through selected PID methods.
 

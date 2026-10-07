@@ -32,10 +32,7 @@ except ImportError:  # pragma: no cover - direct script compatibility
 
 PID_METHODS = (
     "True Values",
-    "Tilde",
-    "Delta",
     "Analytical BROJA",
-    "Flow",
 )
 VALUE_KEYS = ("Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)")
 COMMONALITY_KEY = "Commonality_Analysis"

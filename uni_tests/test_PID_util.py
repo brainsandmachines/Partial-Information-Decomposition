@@ -10,7 +10,7 @@ from Partial_Information_Decomposition import PID_util
 
 create_cov_matrix = PID_util.create_cov_matrix
 
-"""This file tests the Idep implementation using known toy examples from:
+"""This file tests covariance utilities using known toy examples from:
 Venkatesh et al 2023. (NeurIPS-2023-gaussian-partial-information-decomposition-bias-correction-and-application-to-high-dimensional-data-Paper-Conference)
 Ince et al. 2018: (Exact Partial Information Decompositions for Gaussian Systems Based on Dependency Constraints)"""
 

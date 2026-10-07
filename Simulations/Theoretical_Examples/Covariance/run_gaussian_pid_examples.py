@@ -77,8 +77,8 @@ EXAMPLES = (
         source2_noise_variance=1.0,
     ),
     dict(
-        name="thin_pid_failure",
-        expectation="thin_nonfinite",
+        name="asymmetric_source_gains",
+        expectation="eigen_finite",
         sweep_variable="source1_dim",
         sweep_values=list(range(1, 1000, 50)),
         target_dim=2,
@@ -91,7 +91,7 @@ EXAMPLES = (
     ),
 )
 
-OUTPUT_DIR = Path(__file__).resolve().parent / "results_covariance" / "Sweeps_comp"
+OUTPUT_DIR = Path(__file__).resolve().parent / "results_covariance" / "Eigen_PID_sweeps"
 RESULTS_CSV = OUTPUT_DIR / "theoretical_timing_runs.csv"
 SUMMARY_CSV = OUTPUT_DIR / "theoretical_timing_summary.csv"
 PLOT_PATH = OUTPUT_DIR / "theoretical_pid_and_runtime_sweeps.png"
@@ -188,7 +188,6 @@ def run_method(
         "n_samples": 0,
         "bias_correction": False,
         "device": "cpu",
-        "eigen_pid_mode": "mathematical",
     }
     caught: list[warnings.WarningMessage] = []
     started = perf_counter()
@@ -257,10 +256,6 @@ def check_theoretical_example(
         and max(abs(float(eigen[key])) for key in ("unq1", "unq2")) > ZERO_TOLERANCE
     ):
         raise RuntimeError("Expected both unique atoms to be zero.")
-    if expectation == "thin_nonfinite" and any(
-        row["status"] not in {"nonfinite", "error"} for row in result["thin_pid"]
-    ):
-        raise RuntimeError("Expected Thin-PID to fail numerically.")
     if expectation == "target_dim_one" and int(example["target_dim"]) != 1:
         raise RuntimeError("Expected a one-dimensional target.")
 
@@ -349,8 +344,6 @@ def plot_results(rows: list[dict[str, object]], examples: list[ExampleConfig], p
                 margin = max(abs(center) * 0.05, 0.05)
                 axis.set_ylim(center - margin, center + margin)
             title = f"{example['name']}\n{metric_title}"
-            if example["expectation"] == "thin_nonfinite" and metric != "runtime_seconds":
-                title += " (Thin non-finite)"
             axis.set(
                 title=title,
                 xlabel=str(example["sweep_variable"]),

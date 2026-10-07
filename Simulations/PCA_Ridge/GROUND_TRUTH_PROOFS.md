@@ -467,7 +467,7 @@ transformation. Consequently,
 \]
 
 The normalization therefore leaves the theoretical ground truth unchanged
-while preventing Tilde's internal whitening from treating a tiny but
+while preventing numerical whitening from treating a tiny but
 non-zero Ridge prediction variance as exactly singular.
 
 The sampled PID inputs receive the corresponding operation directly:
@@ -612,10 +612,7 @@ If a learned map is rank deficient, its propagated covariance may be
 singular. A PID solver that requires positive definiteness should report that
 failure rather than silently changing the stated population covariance.
 
-The equal-unique simulation uses the existing Thin-PID numerical optimizer.
-That optimizer can emit `invalid value` and maximum-iteration warnings,
-including on the original scalar example, and the full \(p=70\) RAW problem
-can be slow. These are numerical convergence limitations of the configured
-solver, not changes to the population covariance proof. The code passes the
-full covariance without replacing it by a scaled scalar result; a warning
-therefore remains visible instead of being silently hidden.
+All simulations now use the installed Eigen PID estimator. The code still
+passes the full covariance without replacing it by a scaled scalar result.
+Covariance validation failures remain visible; this change of estimator
+does not change the population covariance proof.

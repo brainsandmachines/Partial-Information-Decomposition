@@ -15,7 +15,7 @@ _append_project_root_to_path()
 from encoding_model.algoanut_data import argObj
 from encoding_model.suppresion_model import train_save_or_load   
 from encoding_model.suppression_core import *
-from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.PID_calc import pid_calc
 from encoding_model.encoding_utils import get_specific_roi_fmri
 from Partial_Information_Decomposition.PID_util import *
 from my_utils import (
@@ -121,8 +121,7 @@ def run_suppression_pipeline(config: dict, selected_features: np.ndarray, encode
 
     sources = [m1, m2]
     targets = [t]
-    idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=True)
-    pid, mi = idep_class.idep()
+    pid, mi = pid_calc(config={"bias_correction": True}, sources=sources, target=targets)
     return ca, pid,mi
 
 
@@ -191,7 +190,7 @@ def print_results(outputs: dict, mi: dict, pid: dict) -> None:
     for key, value in mi.items():
         print(f"- {key}: {value:.4f}")
 
-    print("\nIdep PID results:")
+    print("\nEigen PID results:")
     for key, value in pid.items():
         print(f"- {key}: {value:.4f}")
 

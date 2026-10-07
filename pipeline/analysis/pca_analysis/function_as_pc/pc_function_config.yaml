@@ -37,7 +37,7 @@ feature_manipulation_kwargs:
   ridge: true
 
 pid_kwargs:
-  method: tilde
+  method: eigen_pid
   rng_seed: 39
   config:
     device: cuda

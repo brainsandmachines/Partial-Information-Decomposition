@@ -67,7 +67,7 @@ artifact_templates:
     filename_template: alphas2.0_per_pc_{safe_model_name}.npz
 
 pid_kwargs:
-  method: tilde
+  method: eigen_pid
   rng_seed: 88
   config:
     device: cuda

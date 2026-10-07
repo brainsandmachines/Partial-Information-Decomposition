@@ -452,9 +452,9 @@ def run_pairwise_pid_pipeline(
 if __name__ == "__main__":
     pcs_num = 50
     analysis_dir = Path(
-        "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid"
+        "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/eigen_pid"
     )
-    config_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/thin_pid_otc_pair_wise_comp.yaml')
+    config_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/eigen_pid/eigen_pid_otc_pair_wise_comp.yaml')
     csv_path = analysis_dir / f"{pcs_num}PCs_pairwise_pid_results.csv"
     plot_path = csv_path.parent / f"{pcs_num}PCs_pairwise_pid_results"
     with open(config_path, "r") as config_file:
@@ -471,8 +471,8 @@ if __name__ == "__main__":
         otc_config=otc_config,
         csv_path=csv_path,
     )
-    csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/{pcs_num}PCs_pairwise_pid_results.csv')
+    csv_path = Path(f'/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/eigen_pid/{pcs_num}PCs_pairwise_pid_results.csv')
     plot_pairwise_pid_matrices(
         csv_path=csv_path,
-        output_dir=f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/{pcs_num}PCs_pairwise_pid_results',
+        output_dir=f'/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/eigen_pid/{pcs_num}PCs_pairwise_pid_results',
     )

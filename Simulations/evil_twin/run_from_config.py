@@ -12,9 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from external.gpid.src.gpid import estimate
 from Partial_Information_Decomposition.PID_calc import pid_calc
-from Partial_Information_Decomposition.PID_util import create_cov_matrix
 from Simulations.evil_twin.covariance_example import evil_twin_example_torch
 from Simulations.evil_twin.evil_twin_pid_batch_utils import (
     CSV_FIELDS,
@@ -35,17 +33,15 @@ CONFIG = {
     "seeds": [0],
     "n_samples": 10000,
     "dimension": 100,
-    "methods": ("eigen", "tilde", "idep"),
+    "methods": ("eigen_pid",),
     "bias_correction": False,
     "device": "cpu",
     "output_dir": "simulation_results/evil_twin_config",
     "csv_prefix": "evil_twin",
     "overwrite_outputs": True,
-    "flow_epochs": 50,
-    "flow_verbose": False,
 }
 
-SUPPORTED_METHODS = ("idep", "tilde", "delta", "eigen", "flow")
+SUPPORTED_METHODS = ("eigen", "eigen_pid")
 
 
 def validate_config(config: dict) -> None:
@@ -109,59 +105,6 @@ def validate_config(config: dict) -> None:
         raise TypeError("CONFIG['csv_prefix'] must be a non-empty string")
     if not isinstance(config["overwrite_outputs"], bool):
         raise TypeError("CONFIG['overwrite_outputs'] must be True or False")
-    flow_epochs = config.get("flow_epochs", 50)
-    if not isinstance(flow_epochs, int) or isinstance(flow_epochs, bool) or flow_epochs < 1:
-        raise ValueError("CONFIG['flow_epochs'] must be a positive integer")
-    if not isinstance(config.get("flow_verbose", False), bool):
-        raise TypeError("CONFIG['flow_verbose'] must be True or False")
-
-
-def uncorrected_delta_pid(
-    config: dict,
-    sources: list[torch.Tensor],
-    target: list[torch.Tensor],
-) -> tuple[dict, dict]:
-    """Calculate raw Delta PID without applying Wishart bias correction.
-
-    Inputs:
-        config: dict, PID configuration containing dt, dx1, and dx2 dimensions.
-        sources: list[torch.Tensor], two sample matrices shaped
-            (n_samples, source_dimension).
-        target: list[torch.Tensor], one sample matrix shaped
-            (n_samples, target_dimension).
-
-    Outputs:
-        tuple[dict, dict], PID components and mutual-information values in bits.
-
-    Notes:
-        The existing Delta wrapper always subtracts Wishart bias for sample
-        inputs. This local path exposes the solver's raw values without changing
-        that shared wrapper.
-    """
-    dm = config["dt"]
-    dx = config["dx1"]
-    dy = config["dx2"]
-    covariance = create_cov_matrix([target[0], sources[0], sources[1]])["full_cov"]
-    output = estimate.approx_pid_from_cov(
-        covariance.detach().cpu().numpy(),
-        dm,
-        dx,
-        dy,
-        verbose=False,
-    )
-    imx, imy, imxy, _, _, uix, uiy, redundancy, synergy = output[:9]
-    pid = {
-        "red": redundancy,
-        "unq1": uix,
-        "unq2": uiy,
-        "syn": synergy,
-    }
-    mi = {
-        "tri_mi": imxy,
-        "bi_mi_1": imx,
-        "bi_mi_2": imy,
-    }
-    return pid, mi
 
 
 def calculate_pid(
@@ -183,8 +126,6 @@ def calculate_pid(
     Outputs:
         tuple[dict, dict], PID components and mutual-information values in bits.
     """
-    if method == "delta" and not config["bias_correction"]:
-        return uncorrected_delta_pid(config, sources, target)
     return pid_calc(
         config=config,
         sources=sources,
@@ -232,8 +173,6 @@ def run_from_config(config: dict) -> dict:
         n=n_samples,
         p=dimension,
         device=device,
-        flow_epochs=config.get("flow_epochs", 50),
-        flow_verbose=config.get("flow_verbose", False),
     )
     pid_config["bias_correction"] = config["bias_correction"]
 
@@ -314,7 +253,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--csv-prefix")
-    parser.add_argument("--flow-epochs", type=int)
     parser.add_argument(
         "--bias-correction",
         action=argparse.BooleanOptionalAction,
@@ -322,11 +260,6 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--overwrite-outputs",
-        action=argparse.BooleanOptionalAction,
-        default=None,
-    )
-    parser.add_argument(
-        "--flow-verbose",
         action=argparse.BooleanOptionalAction,
         default=None,
     )
@@ -354,8 +287,6 @@ def config_from_args(args: argparse.Namespace) -> dict:
         "output_dir",
         "csv_prefix",
         "overwrite_outputs",
-        "flow_epochs",
-        "flow_verbose",
     ):
         value = getattr(args, key)
         if value is not None:

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from Commonality_Analysis.CA import commonality_analysis
-from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.PID_calc import pid_calc
 from Partial_Information_Decomposition.PID_util import compare_results
 from my_utils import (
     create_test_histograms_with_kde,
@@ -94,7 +94,7 @@ def test(rng, r_str, u1_str, u2_str, n=1024, p=100, snr=10.0, method='standard')
     M1 = torch.tensor(M1)
     M2 = torch.tensor(M2)
     T = torch.tensor(y_real)
-    pid_results,mi_results = Idep_multivariate_gauss(sources=[M1, M2], targets=[T], bias_correction=True).idep()
+    pid_results,mi_results = pid_calc(config={"bias_correction": True}, sources=[M1, M2], target=[T])
 
     return ca_results,betas_dict, pid_results, mi_results
 
@@ -153,11 +153,11 @@ def test_regularization_term(seed: int, config: dict):
         if i % 100 == 0:
             print(f"Testing alpha={alpha:.5f} ({i+1}/{len(alphas)})")
         ca_results = CA.ca(M1, M2, y_real, method=config["method"], alphas=[alpha])
-        #Partial Information Decomposition with Idep 
+        # Partial Information Decomposition with Eigen PID
         X_M1 = torch.tensor(M1)
         X_M2 = torch.tensor(M2)
         T = torch.tensor(y_real)
-        pid_results,mi_results = Idep_multivariate_gauss(sources=[X_M1, X_M2], targets=[T], bias_correction=True).idep()
+        pid_results,mi_results = pid_calc(config={"bias_correction": True}, sources=[X_M1, X_M2], target=[T])
         alpha_results[alpha] = {
             "ca_results": ca_results,
             "pid_results": pid_results,

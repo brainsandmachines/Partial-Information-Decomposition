@@ -616,39 +616,6 @@ def run_configured_multiseed(
     return summary, seed_rows, all_runs_path, summary_path
 
 
-def create_distribution_plot(
-    data: list[float],
-    title: str,
-    xlabel: str,
-    ylabel: str,
-    save_path: Path,
-    bins: int = 30,
-    kde: bool = True,
-) -> None:
-    save_path = Path(save_path)
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    numeric_data = np.asarray(data, dtype=float)
-    numeric_data = numeric_data[np.isfinite(numeric_data)]
-    if numeric_data.size == 0:
-        return
-
-    mean_value = float(np.mean(numeric_data))
-    std_value = float(np.std(numeric_data, ddof=1)) if numeric_data.size > 1 else 0.0
-
-    plt.figure(figsize=(10, 6))
-    ax = sns.histplot(data=numeric_data, bins=bins, kde=kde)
-    legend_text = f"mean={mean_value:.6f}, std={std_value:.6f}"
-    ax.plot([], [], " ", label=legend_text)
-    ax.legend(loc="best", frameon=True)
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.grid(axis="y", alpha=0.75)
-    plt.tight_layout()
-    plt.savefig(save_path)
-    plt.close()
-
-
 def create_distribution_plot_with_colors(
     data: list[float],
     title: str,

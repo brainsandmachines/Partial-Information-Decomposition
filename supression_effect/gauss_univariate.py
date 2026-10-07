@@ -8,11 +8,11 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root))  
 from examples.toy_example import run_all_methods,run_experiment,commonality_analysis
-from Partial_Information_Decomposition.Idep.Idep_univariabe_gauss import Idep_univariate_gauss
+from Partial_Information_Decomposition.PID_calc import pid_calc
 from Partial_Information_Decomposition.PID_util import compare_results
 from my_utils import Tee
 """"This module implements the supression effect for gaussian univariate sorces and targets. 
-and computes Variance Partitioning and Partial Information Decomposition using the Idep method."""
+and computes Variance Partitioning and Partial Information Decomposition using Eigen PID."""
 
 log = open("pidvsvp.log", "w")
 
@@ -41,7 +41,7 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
 
     Returns
     -------
-    Partial Information Decomposition (using Idep method) results printed to console.
+    Partial Information Decomposition (using Eigen PID) results printed to console.
     Varaince Partitioning results are returned from run_experiment function.
     """
 
@@ -65,11 +65,10 @@ def gauss_simple_example(N=1000,P=1,rng_seed=1, noise_seed=1,simple_example=True
 
     sources = [M1,M2]
     targets = [T]
-    idep_class = Idep_univariate_gauss(sources,targets)
-    pid = idep_class.idep()
-    print("\nIdep PID results:")
-    for key, value in pid.items():
-        print(f"- {key}: {value:.4f}")
+    pid, _ = pid_calc(config={"bias_correction": False}, sources=sources, target=targets)
+    print("\nEigen PID results:")
+    for key in ("red", "unq1", "unq2", "syn"):
+        print(f"- {key}: {pid[key]:.4f}")
 
     return vp_results,pid
 
@@ -91,8 +90,8 @@ def check_supression_effect(vp_results,pid_results):
     unique_X1 = vp_results['unique_X1']
     unique_X2 = vp_results['unique_X2']
 
-    unq0 = pid_results['unq0']
-    unq1 = pid_results['unq1']
+    unq0 = pid_results['unq1']
+    unq1 = pid_results['unq2']
     syn = pid_results['syn']
 
     if np.isclose(R_X1,0) or R_X1 < 0 and unique_X1 > 0:

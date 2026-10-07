@@ -9,7 +9,7 @@ from my_utils import extract_all_components, run_configured_multiseed
 root = Path(__file__).resolve().parents[1]
 sys.path.append(str(root)) 
 from Commonality_Analysis.CA import commonality_analysis
-from Partial_Information_Decomposition.Idep.Idep_multivariate_gauss import Idep_multivariate_gauss
+from Partial_Information_Decomposition.PID_calc import pid_calc
 from supression_effect.Suppresed_Encoder import (load_model_and_fmri,prepare_inputs,load_model_and_fmri)
 from Partial_Information_Decomposition.PID_util import compare_results
 
@@ -95,8 +95,7 @@ def run_single_seed(seed:int, config:dict,features: torch.Tensor,fmri_dict:dict)
 
     sources = [m1, m2]
     targets = [t]
-    idep_class = Idep_multivariate_gauss(sources, targets, bias_correction=False)
-    pid_results, mi_results = idep_class.idep()
+    pid_results, mi_results = pid_calc(config={"bias_correction": False}, sources=sources, target=targets)
     return extract_all_components(ca_results, pid_results, mi_results)
 
 

@@ -63,7 +63,7 @@ def save_sample_simulation_results_table(
         "I(X2;T)": "own_imy_wishart_bits",
         "I(X1,X2;T)": "own_imxy_wishart_bits",
     }
-    method_names = {"flow": "Flow", "tilde": "Tilde", "delta": "Delta", "idep": "Idep"}
+    method_names = {"eigen": "Eigen PID", "eigen_pid": "Eigen PID"}
     metric_names = [
         ("Theoretical Covariance", "theoretical", "theoretical_values"),
         ("Mean Across Trials", "mean_sampled", "mean_sampled_values"),

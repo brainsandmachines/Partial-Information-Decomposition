@@ -1,4 +1,4 @@
-"""Utility helpers used by the thin PID pipeline orchestrator."""
+"""Utility helpers used by the PID pipeline orchestrator."""
 
 from __future__ import annotations
 
@@ -337,7 +337,7 @@ def pid_calc_adapter(
     target: Any,
     source_1: Any,
     source_2: Any,
-    method: str,
+    method: str = "eigen_pid",
     config: dict[str, Any] | None = None,
     rng_seed: int = 56,
     **pid_kwargs: Any,
@@ -379,7 +379,7 @@ def pid_calc_adapter(
         method=method,
         **pid_kwargs,
     )
-    return {"pid": pid, "mi": mi, "method": method}
+    return {"pid": pid, "mi": mi, "method": pid.get("method", method)}
 
 
 def print_pid_mi_adapter(pid_results: dict[str, Any], context: dict[str, Any], **report_kwargs: Any) -> Any:

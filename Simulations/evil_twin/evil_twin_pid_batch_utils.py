@@ -74,15 +74,13 @@ def write_rows_to_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> Pa
     return path
 
 
-def make_pid_config(n: int, p: int, device: str, flow_epochs: int, flow_verbose: bool) -> dict:
+def make_pid_config(n: int, p: int, device: str) -> dict:
     """Create the config dictionary expected by PID_calc wrappers.
 
     Inputs:
         n: int, number of samples.
         p: int, dimension of each source and target random variable.
         device: str, torch device name.
-        flow_epochs: int, number of epochs for the flow PID method.
-        flow_verbose: bool, whether flow PID should print training logs.
 
     Outputs:
         dict, PID_calc-compatible configuration.
@@ -94,8 +92,6 @@ def make_pid_config(n: int, p: int, device: str, flow_epochs: int, flow_verbose:
         "dt": p,
         "device": device,
         "bias_correction": True,
-        "n_epochs": flow_epochs,
-        "verbose": flow_verbose,
     }
 
 
@@ -288,7 +284,7 @@ def summary_rows_to_pid_results(rows: list[dict], twin: str) -> dict:
             "bi_mi_1": row[f"{twin}_bi_mi_1_mean"],
             "bi_mi_2": row[f"{twin}_bi_mi_2_mean"],
         }
-        results[row["method"].title() if row["method"] != "flow" else "Flow"] = (pid, mi)
+        results["Eigen PID"] = (pid, mi)
     return results
 
 

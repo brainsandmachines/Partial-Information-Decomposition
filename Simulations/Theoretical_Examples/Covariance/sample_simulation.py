@@ -293,14 +293,10 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
         'own_imxy_wishart_bits': population_imxy_bits,
     }
 
-    reorederd_methods = ['flow','Flow' ,'Tilde','tilde' ,'Delta','delta'] #They all assume the same order of variables, so they should be calculated with the same covariance, which is the reordered_cov. The rest of the methods should be calculated with the true_cov.
     theoretical_values = {}
     #Calculate true PID
     for method in methods:
-        if method in reorederd_methods:
-            cov = reordered_cov
-        else:            
-            cov = true_cov
+        cov = reordered_cov  # (D, D) [X1, X2, T] -> (D, D) [T, X1, X2]
         theoretical_pid, theoretical_mi = pid_calc(
             config,
             rng=rng,
@@ -327,18 +323,11 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
     }  # scalar trial count -> method/component NumPy arrays with shape (n_trials,)
 
     n_trials = config['n_trials']
-    bootstrap_seed_base = int(
-        config.get(
-            'obj_bootstrap_seed',
-            config.get('rng_seed', simulation_seed),
-        )
-    )
     for trial in range(n_trials):
         if trial % max(1, n_trials // 10) == 0:
             print(f"Trial {trial}/{n_trials} ({(trial / n_trials) * 100:.1f}%)")
         # Sample from the covariance and calculate PID for the samples
         sampled_cov, rvs = sample_from_cov(config,true_cov, config['n_samples'], rng)
-        reordered_sampled_cov = change_covariance_order(sampled_cov, new_order=[2,0,1], dims=dims)
         sources = [rvs[0], rvs[1]]
         target = [rvs[2]]
         own_sample_mi = calculate_sample_whitened_wishart_mi_bits(
@@ -346,26 +335,10 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
             target,
         )
         for method in methods:
-            if method in reorederd_methods:
-                cov = reordered_sampled_cov
-            else:
-                cov = sampled_cov
-            trial_config = config.copy()
-            trial_config['obj_bootstrap_seed'] = bootstrap_seed_base + trial
-            use_constrained_obj_correction = (
-                str(method).lower() == 'tilde'
-                and bool(config.get('param_bias', False))
-                and config.get('param_bias_method')
-                == 'equal_direct_wishart_control'
-            )
-            covariance_input = cov if use_constrained_obj_correction else None
-            if covariance_input is not None:
-                trial_config['covariance_is_sample'] = True
             pid_results, mi_results = pid_calc(
-                trial_config,
+                config,
                 sources=sources,
                 target=target,
-                covariance=covariance_input,
                 rng=rng,
                 method=method,
                 param_bias=config['param_bias'],
@@ -413,13 +386,10 @@ def simulation(config: dict, methods: list, experiment_name: str | None = None) 
 
 
 if __name__ == "__main__":
-    bias_methods = ['Venkatesh'] #, 'Lorenz'
+    bias_methods = ['Venkatesh']
     d = 80
     for bias_method in bias_methods:
-        if bias_method in ['Venkatesh']:
-            config_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/rv_config_without_lorenz.yaml')
-        elif bias_method in ['Lorenz']:
-            config_path = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/rv_config_lorenz.yaml')
+        config_path = Path(__file__).resolve().parents[1] / 'rv_config_analytic.yaml'
 
         loaded_config = load_config(config_path)
         config = {
@@ -431,11 +401,7 @@ if __name__ == "__main__":
         config['dx2'] = d
         config['dt'] = d
 
-        if bias_method in ['Lorenz']:
-            lorenz_value = f'{config["n_lorenz_resamples"]}_{config["n_lorenz_shuffles"]}'
-        else:
-            lorenz_value = '_'
-        exp_name = f"ZeroMIChannels_{bias_method}-Dim{d}_{lorenz_value}_trials{config['n_trials']}"
+        exp_name = f"ZeroMIChannels_{bias_method}-Dim{d}_trials{config['n_trials']}"
         results = simulation(config, config['methods'], experiment_name=exp_name)
 
         save_sample_simulation_results_table(

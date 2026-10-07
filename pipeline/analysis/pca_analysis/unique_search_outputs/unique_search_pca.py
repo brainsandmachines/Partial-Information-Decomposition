@@ -97,7 +97,7 @@ def run_pid_pc_subset_search(
         from pipeline.pipeline_utils import pid_calc_adapter
 
         pid_callable = pid_calc_adapter
-        pid_kwargs.setdefault("method", "tilde")
+        pid_kwargs.setdefault("method", "eigen_pid")
 
     pipeline = PIDPipeline(
         PIDPipelineFunctions(

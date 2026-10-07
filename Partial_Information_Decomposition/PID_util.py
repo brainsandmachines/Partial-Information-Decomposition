@@ -238,55 +238,6 @@ def para_create_cov_matrix(dims,Sigmas=None,verbose=False):
 
     return cov_dict
 
-def old_para_create_cov_matrix(dims,Sigmas=None,verbose=False):
-    """This function will create the covariance matrix for the three variables M1,M2,T
-    input: M1,M2,T are torch tensors of shape (N,p) 
-    rvs is a list of the three variables [M1,M2,T]
-    N is the number of observations, 
-    p is the dimension of each observation.
-
-    output: a len(rvs)*len(rvs)*p covariance matrix"""
-
-    cov_dict = {}
-    if verbose:
-        print(f"\nFull covariance matrix shape: {Sigmas.shape}")
-    x0_dim = dims[0]
-    x1_dim = dims[1]
-    x2_dim = dims[2] if len(dims) == 3 else 0
-
-    dt_dx1 = x0_dim + x1_dim
-    d_all = x0_dim + x1_dim + x2_dim
-
-    #Full covariance matrix
-    cov_dict['full_cov'] =  Sigmas #Full covariance matrix ΣX0X1X2
-    #Cross-Covariances:
-    cov_dict['cross_x0_x1'] = Sigmas[:,0:x0_dim, x0_dim:dt_dx1] #ΣX0,X1   
-    #Auto-Covariances
-    cov_dict['cov_x0'] = Sigmas[:,0:x0_dim, 0:x0_dim] #ΣX0
-    cov_dict['cov_x1'] = Sigmas[:,x0_dim:dt_dx1, x0_dim:dt_dx1] #ΣX1
-   
-    cov_dict['joint_x0_x1'] = Sigmas[:,0:dt_dx1, 0:dt_dx1]  #ΣX0X1
-
-
-    if len(dims) == 3:
-        #Cross-Covariances:
-        cov_dict['cross_x1_x2'] = Sigmas[:,x0_dim:dt_dx1, dt_dx1:d_all]#ΣX1,X2
-        cov_dict['cross_x12_x0'] = Sigmas[:,x0_dim:d_all, 0:x0_dim] #ΣX1X2,X0
-        cov_dict['cross_x0_x2'] = Sigmas[:,0:x0_dim, dt_dx1:d_all] #ΣX0,X2
-
-        #Auto-Covariances:
-        cov_dict['joint_x1_x2'] = Sigmas[:,x0_dim:d_all, x0_dim:d_all]  #ΣX1X2
-        cov_dict['cov_x2'] = Sigmas[:,dt_dx1:d_all, dt_dx1:d_all] #ΣX2
-
-        ##ΣX0,X2:
-        a = torch.cat((cov_dict['cov_x0'], cov_dict['cross_x0_x2']),dim=2)
-        b = torch.cat((cov_dict['cross_x0_x2'].mT, cov_dict['cov_x2']),dim=2)
-        cov_dict['auto_x02'] = torch.cat((a,b),dim=1)
-
-
-    return cov_dict
-
-
 def whiten_block(
                     Sigma_xx: torch.Tensor,
                     Sigma_xy: torch.Tensor,
@@ -303,31 +254,6 @@ def whiten_block(
 
     return K
 
-
-def para_whiten_block(
-                Sigma_xx: torch.Tensor,
-                Sigma_xy: torch.Tensor,
-                Sigma_yy: torch.Tensor) -> torch.Tensor:
-    """
-    Computes: Ux^{-T} @ Sigma_xy @ Uy^{-1}
-    where Sigma_xx = Ux^T Ux, Sigma_yy = Uy^T Uy, and Ux,Uy are upper triangular.
-    Supports batched inputs of shape (N, d, d).
-    """
-    if Sigma_xx.ndim == 2 and Sigma_yy.ndim == 2 and Sigma_xy.ndim == 2:
-        return whiten_block(Sigma_xx, Sigma_xy, Sigma_yy)
-    # Use .mT to transpose only the last two dimensions (matrix transpose)
-    Ux = torch.linalg.cholesky(Sigma_xx).mT
-    Uy = torch.linalg.cholesky(Sigma_yy).mT
-
-    # Uy.mT is lower triangular. 
-    # solve_triangular computes X where Uy.mT @ X = Sigma_xy.mT
-    tmp = torch.linalg.solve_triangular(Uy.mT, Sigma_xy.mT, upper=False).mT
-    
-    # Ux.mT is lower triangular.
-    # solve_triangular computes Y where Ux.mT @ Y = tmp
-    K = torch.linalg.solve_triangular(Ux.mT, tmp, upper=False)
-
-    return K
 
 def plot_cov_blocks(cov_dict, x0_dim, x1_dim, x2_dim,
                     *, title="Covariance (block view)",

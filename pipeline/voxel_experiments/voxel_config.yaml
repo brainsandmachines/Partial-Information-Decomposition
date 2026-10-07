@@ -39,7 +39,7 @@ feature_manipulation_kwargs:
   n_components_target: 1
 
 pid_kwargs:
-  method: tilde
+  method: eigen_pid
   rng_seed: 56
   config:
     device: 'cuda'

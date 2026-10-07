@@ -1,8 +1,6 @@
-"""Compare population Gaussian PID methods on a flexible channel model.
+"""Evaluate Eigen PID on the existing population Gaussian channel model.
 
-This is the covariance-only counterpart of ``external/flow-pid/examples/gpid/
-multi_dim.py``. It does not draw samples or train the normalizing-flow PID
-estimator. Edit the constants below to change the experiment.
+Edit the constants below to change the covariance-only dimension sweep.
 """
 
 from __future__ import annotations
@@ -50,23 +48,16 @@ SOURCE1_NOISE_VARIANCE = 1.0
 SOURCE2_NOISE_VARIANCE = 1.0
 DEVICE = "cpu"
 BIAS_CORRECTION = False
-EIGEN_PID_MODE = "mathematical"
 N_SAMPLES = 0
 COVARIANCE_ORDER = ("T", "X1", "X2")
 PLOT_FIGSIZE = (19, 9)
-SPEEDUP_PLOT_FIGSIZE = (11, 6)
 PLOT_DPI = 200
-OUTPUT_DIR = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/thin_pid_nonfinite_eigen_pid_solution')
+OUTPUT_DIR = Path('/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/Simulations/Theoretical_Examples/Covariance/results_covariance/eigen_pid_dimension_sweep')
 CSV_PATH = OUTPUT_DIR / "dimension_sweep_results.csv"
 PLOT_PATH = OUTPUT_DIR / "dimension_sweep_results.png"
-SPEEDUP_PLOT_PATH = OUTPUT_DIR / "eigen_pid_speedup.png"
 YAML_PATH = OUTPUT_DIR / "dimension_sweep_constants.yaml"
 
-METHODS = (
-    ("gpid_tilde", "tilde"),
-    ("thin_pid", "thin"),
-    ("eigen_pid", "eigen"),
-)
+METHODS = (("eigen_pid", "eigen_pid"),)
 VALUE_COLUMNS = (
     "redundancy",
     "unique_source1",
@@ -86,7 +77,6 @@ CSV_COLUMNS = (
     "minimum_eigenvalue",
     *VALUE_COLUMNS,
     "runtime_seconds",
-    "max_abs_diff_vs_eigen",
 )
 
 
@@ -116,16 +106,13 @@ def save_run_constants(yaml_path: str | Path) -> Path:
         "SOURCE2_NOISE_VARIANCE": SOURCE2_NOISE_VARIANCE,
         "DEVICE": DEVICE,
         "BIAS_CORRECTION": BIAS_CORRECTION,
-        "EIGEN_PID_MODE": EIGEN_PID_MODE,
         "N_SAMPLES": N_SAMPLES,
         "COVARIANCE_ORDER": list(COVARIANCE_ORDER),
         "PLOT_FIGSIZE": list(PLOT_FIGSIZE),
-        "SPEEDUP_PLOT_FIGSIZE": list(SPEEDUP_PLOT_FIGSIZE),
         "PLOT_DPI": PLOT_DPI,
         "OUTPUT_DIR": str(OUTPUT_DIR),
         "CSV_PATH": str(CSV_PATH),
         "PLOT_PATH": str(PLOT_PATH),
-        "SPEEDUP_PLOT_PATH": str(SPEEDUP_PLOT_PATH),
         "YAML_PATH": str(YAML_PATH),
         "METHODS": [list(method) for method in METHODS],
         "VALUE_COLUMNS": list(VALUE_COLUMNS),
@@ -295,7 +282,7 @@ def run_pid_methods(
     source1_dim: int,
     source2_dim: int,
 ) -> dict[str, dict[str, float]]:
-    """Run GPID Tilde, Thin-PID, and Eigen-PID on one population covariance.
+    """Run Eigen PID on one population covariance.
 
     Inputs:
         covariance: torch.Tensor ordered ``[T, X1, X2]`` with shape
@@ -315,7 +302,6 @@ def run_pid_methods(
         "n_samples": N_SAMPLES,
         "bias_correction": BIAS_CORRECTION,
         "device": DEVICE,
-        "eigen_pid_mode": EIGEN_PID_MODE,
     }
     results: dict[str, dict[str, float]] = {}
     for label, method in METHODS:
@@ -415,7 +401,6 @@ def run_dimension_sweep(
             dimensions["source1"],
             dimensions["source2"],
         )
-        eigen_values = method_results["eigen_pid"]
         minimum_eigenvalue = float(torch.linalg.eigvalsh(covariance).min())
         for method, result in method_results.items():
             rows.append(
@@ -428,10 +413,6 @@ def run_dimension_sweep(
                     "method": method,
                     "minimum_eigenvalue": minimum_eigenvalue,
                     **result,
-                    "max_abs_diff_vs_eigen": max(
-                        abs(result[column] - eigen_values[column])
-                        for column in VALUE_COLUMNS
-                    ),
                 }
             )
         write_rows_to_csv(csv_path, rows, list(CSV_COLUMNS))
@@ -441,25 +422,17 @@ def run_dimension_sweep(
 def plot_dimension_sweep_csv(
     csv_path: str | Path,
     plot_path: str | Path,
-    speedup_plot_path: str | Path,
-) -> tuple[Path, Path]:
-    """Plot result curves and direct Eigen-PID speedups from the sweep CSV.
+) -> Path:
+    """Plot the Eigen PID atoms, mutual information, and runtime curves.
 
     Inputs:
-        csv_path: str or Path, completed dimension-sweep CSV.
-        plot_path: str or Path, destination PNG file.
-        speedup_plot_path: str or Path, primary destination for Eigen-PID
-            runtime speedups relative to GPID Tilde and Thin-PID. Matching SVG
-            and PDF files are saved beside it for use in papers.
-
+        csv_path: str or Path containing the dimension-sweep CSV.
+        plot_path: str or Path specifying the output figure.
     Outputs:
-        tuple[Path, Path]: locations of the saved eight-panel result figure and
-        the primary direct Eigen-PID speedup figure. The returned speedup path
-        also has SVG and PDF counterparts with the same stem.
+        Path of the saved result figure.
     """
     csv_path = Path(csv_path)
     plot_path = Path(plot_path)
-    speedup_plot_path = Path(speedup_plot_path)
     if not csv_path.exists():
         raise FileNotFoundError(f"Dimension-sweep CSV does not exist: {csv_path}")
 
@@ -532,97 +505,16 @@ def plot_dimension_sweep_csv(
     figure.savefig(plot_path, dpi=PLOT_DPI, bbox_inches="tight")
     plt.close(figure)
 
-    runtime_by_dimension: dict[int, dict[str, float]] = {}
-    for row in rows:
-        swept_dimension = int(row["swept_dimension"])
-        method = row["method"]
-        runtime_seconds = float(row["runtime_seconds"])
-        if not np.isfinite(runtime_seconds) or runtime_seconds <= 0.0:
-            raise ValueError(
-                "Runtime values must be finite and positive to calculate "
-                f"speedup, got {runtime_seconds!r} for {method} at dimension "
-                f"{swept_dimension}."
-            )
-        runtime_by_dimension.setdefault(swept_dimension, {})[method] = runtime_seconds
-
-    required_methods = {"gpid_tilde", "thin_pid", "eigen_pid"}
-    complete_dimensions = sorted(
-        dimension
-        for dimension, runtimes in runtime_by_dimension.items()
-        if required_methods.issubset(runtimes)
-    )
-    if not complete_dimensions:
-        raise ValueError(
-            "The CSV has no dimension containing runtimes for gpid_tilde, "
-            "thin_pid, and eigen_pid."
-        )
-
-    speedup_figure, speedup_axis = plt.subplots(figsize=SPEEDUP_PLOT_FIGSIZE)  # one speedup plot -> figure and scalar axis
-    dimensions = np.asarray(complete_dimensions, dtype=int)  # completed dimension values -> (n_dimensions,)
-    comparisons = (
-        ("gpid_tilde", "Eigen-PID vs GPID Tilde", "#2563eb"),
-        ("thin_pid", "Eigen-PID vs Thin-PID", "#d97706"),
-    )
-    for baseline_method, label, color in comparisons:
-        speedups = np.asarray(
-            [
-                runtime_by_dimension[dimension][baseline_method]
-                / runtime_by_dimension[dimension]["eigen_pid"]
-                for dimension in complete_dimensions
-            ],
-            dtype=float,
-        )  # method and Eigen-PID runtimes -> (n_dimensions,)
-        speedup_axis.plot(
-            dimensions,
-            speedups,
-            marker="o",
-            markersize=4,
-            linewidth=2.0,
-            color=color,
-            label=label,
-        )
-
-    speedup_axis.axhline(
-        1.0,
-        color="#525252",
-        linestyle="--",
-        linewidth=1.2,
-        label="Same runtime (1x)",
-    )
-    speedup_axis.set_title("How much faster is Eigen-PID?")
-    speedup_axis.set_xlabel("Dimensions")
-    speedup_axis.set_ylabel("Eigen-PID speedup (x faster)")
-    speedup_axis.set_ylim(bottom=0.0)
-    speedup_axis.ticklabel_format(axis="y", style="plain", useOffset=False)
-    speedup_axis.grid(True, alpha=0.3)
-    speedup_axis.legend(frameon=False)
-    speedup_figure.tight_layout()
-    speedup_plot_path.parent.mkdir(parents=True, exist_ok=True)
-    speedup_figure.savefig(
-        speedup_plot_path,
-        dpi=PLOT_DPI,
-        bbox_inches="tight",
-    )
-    for vector_plot_path in (
-        speedup_plot_path.with_suffix(".svg"),
-        speedup_plot_path.with_suffix(".pdf"),
-    ):
-        if vector_plot_path != speedup_plot_path:
-            speedup_figure.savefig(vector_plot_path, bbox_inches="tight")
-    plt.close(speedup_figure)
-    return plot_path, speedup_plot_path
+    return plot_path
 
 
-def main() -> tuple[Path, Path, Path, Path]:
-    """Save constants, run the sweep, and save result and speedup plots.
+def main() -> tuple[Path, Path, Path]:
+    """Run the existing covariance sweep using Eigen PID.
 
     Inputs:
-        None. Uses the editable module constants.
-
+        None; uses the editable module constants.
     Outputs:
-        tuple[Path, Path, Path, Path]: paths to the completed CSV, result PNG,
-        primary Eigen-PID speedup plot, and YAML constants snapshot. SVG and
-        PDF versions of the speedup plot are saved beside the primary plot.
+        tuple[Path, Path, Path]: CSV, result figure, and YAML snapshot paths.
     """
     yaml_path = save_run_constants(YAML_PATH)
     run_dimension_sweep(
@@ -637,12 +529,11 @@ def main() -> tuple[Path, Path, Path, Path]:
         SOURCE2_NOISE_VARIANCE,
         CSV_PATH,
     )
-    plot_path, speedup_plot_path = plot_dimension_sweep_csv(
+    plot_path = plot_dimension_sweep_csv(
         CSV_PATH,
         PLOT_PATH,
-        SPEEDUP_PLOT_PATH,
     )
-    return CSV_PATH, plot_path, speedup_plot_path, yaml_path
+    return CSV_PATH, plot_path, yaml_path
 
 
 if __name__ == "__main__":

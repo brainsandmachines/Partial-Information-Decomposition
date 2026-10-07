@@ -73,7 +73,7 @@ hydra:
     subdir: ${hydra.job.num}_${sources_kwargs.model_name_1}_vs_${sources_kwargs.model_name_2}
     
 pid_kwargs:
-  method: tilde
+  method: eigen_pid
   rng_seed: 88
   config:
     device: cuda

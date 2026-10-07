@@ -236,8 +236,8 @@ def comulative_sum(array: np.ndarray) -> np.ndarray:
 if __name__ == "__main__":
 
 
-    csv_path = "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/70PCs_pairwise_pid_results.csv"
-    out_path = "/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/analysis/pca_analysis/all_models_pairwise/thin_pid/results/70PCs_thin_PCAonly.png"
+    csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/eigen_pid/70PCs_pairwise_pid_results.csv"
+    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca_analysis/all_models_pairwise/eigen_pid/results/70PCs_eigen_pid_PCAonly.png"
 
     plot_pairwise_pid_matrices(
         csv_path=csv_path,
