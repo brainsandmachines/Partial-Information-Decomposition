@@ -19,20 +19,16 @@ Generated from the current AST after the repository reorganization. Paths, signa
 - `pipeline/`: 3 Python files.
 - `pipeline/analysis/`: 1 Python file.
 - `pipeline/analysis/pairwise/`: 3 Python files.
-- `pipeline/analysis/pca/`: 6 Python files.
+- `pipeline/analysis/pca/`: 4 Python files.
 - `pipeline/analysis/predictivity/`: 2 Python files.
 - `pipeline/examples/`: 2 Python files.
 - `pipeline/experiments/`: 4 Python files.
 - `pipeline/pca/`: 5 Python files.
 - `pipeline/phases/`: 4 Python files.
-- `simulations/`: 1 Python file.
+- `simulations/`: 4 Python files.
+- `simulations/evil_twin/`: 4 Python files.
 - `simulations/pca/rank/`: 5 Python files.
 - `simulations/pca/ridge/`: 3 Python files.
-- `simulations/theoretical/evil_twin/`: 4 Python files.
-- `simulations/theoretical/random_variables/`: 4 Python files.
-- `simulations/theoretical/random_variables/non_gaussian/`: 1 Python file.
-- `simulations/theoretical/random_variables/regular_examples/`: 4 Python files.
-- `simulations/theoretical/random_variables/suppression_examples/`: 4 Python files.
 
 ## `pid/__init__.py`
 
@@ -144,22 +140,6 @@ File description: Run deterministic OTC PID comparisons across unordered model p
 | `extract_model_projection (line 144)` | model_name: str, target_context: dict[str, Any], choose_layer_kwargs: dict[str, Any], feature_extraction_kwargs: dict[str, Any], n_components: int, random_state: int | tuple[np.ndarray, int] | Extract one selected model layer and return its memory-safe PCA projection. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
 | `run_pairwise_pid_pipeline (line 253)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \\| Path | Path | Run OTC PID once per unordered model pair and checkpoint results to CSV. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
 
-## `pipeline/analysis/pca/otc_unique_search.py`
-
-File description: Run PCA unique-information subset search on full OTC data and two sources.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `run_otc_unique_search_pca (line 27)` | config: dict[str, Any] \\| str \\| Path, max_source_components: int, *, search_source: str='X1', search_kwargs: dict[str, Any] \\| None=None, all_csv_path: str \\| Path \\| None=None, best_csv_path: str \\| Path \\| None=None, pid_callable: Callable[..., Any] \\| None=None | dict[str, Any] | Load OTC/source arrays, fix target/other-source PCs, and search one source. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `run_otc_unique_search_from_yaml (line 77)` | config_path: str \\| Path=DEFAULT_SEARCH_CONFIG | dict[str, Any] | Run OTC unique search from one YAML analysis config file. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `_load_config (line 98)` | config: dict[str, Any] \\| str \\| Path | dict[str, Any] | Load an OTC config dictionary or YAML file. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_resolve_path (line 113)` | value: str \\| Path \\| None, base_dir: Path | Path \| None | Resolve optional YAML paths relative to the YAML file directory. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_load_otc_arrays (line 126)` | config: dict[str, Any] | dict[str, Any] | Run PIDPipeline only through target/source/layer/feature extraction. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_skip_pid (line 148)` | target: Any, source_1: Any, source_2: Any, **pid_kwargs: Any | None | Satisfy PIDPipeline while loading arrays without running PID. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_pca_search_inputs (line 159)` | context: dict[str, Any], config: dict[str, Any], search_source: str, max_source_components: int | tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]] | Project target, searched source, and fixed source for subset search. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_project_or_keep (line 191)` | features: Any, n_components: int \\| None, name: str | np.ndarray | Apply PCA when requested, capping components to the valid matrix size. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `main (line 216)` | config_path: str \\| Path \\| None=None | None | Run OTC PCA unique search from a YAML config file. | Scope: entry point. Conventions: verify PCA fitting split and component convention. |
-
 ## `pipeline/analysis/pca/pc_function.py`
 
 File description: Calculate PID and mutual information as target PCs are accumulated.
@@ -195,26 +175,6 @@ File description: Plot PID and mutual information as target PCs are accumulated.
 |---|---|---|---|---|
 | `plot_pc_results_from_pickle (line 26)` | pkl_path: str \\| Path, model_name: str, output_dir: str \\| Path, name: str \\| None=None | tuple[Path, Path] | Load one model pair's PC results and save its plots. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
 | `plot_pid_mi_as_function_of_pcs (line 73)` | pair_results: dict[int, dict[str, Any]], model_1_name: str, model_2_name: str, output_dir: str \\| Path, name: str \\| None=None | tuple[Path, Path] | Plot absolute and trivariate-MI-normalized results for one model pair. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify random-variable order and logarithm base; verify PCA fitting split and component convention. |
-
-## `pipeline/analysis/pca/unique_search.py`
-
-File description: Search source-1 PCA component subsets for source-1 unique PID information.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `run_pid_pc_subset_search (line 25)` | target: Any, source_1: Any, source_2: Any, pid_callable: Callable[..., Any] \\| None=None, *, cmi_threshold: float=1e-06, unique_threshold: float=1e-06, beam_width: int=5, max_subset_size: int=3, initial_subset_size: int=1, initial_subset_count: int \\| None=None, floating_tolerance: float=1e-09, max_runtime_seconds: float=600, rng_seed: int=56, pid_kwargs: dict[str, Any] \\| None=None, all_csv_path: str \\| Path \\| None=None, best_csv_path: str \\| Path \\| None=None, use_floating_backward: bool=True | dict[str, Any] | Run beam search over source_1 PCA columns for source-1 unique PID. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_initial_subsets (line 189)` | candidates: list[int], subset_size: int, subset_count: int \\| None, rng_seed: int | list[tuple[int, ...]] | Create initial source_1 PC subsets for the beam search. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_as_2d_array (line 210)` | value: Any, name: str | np.ndarray | Convert one input to a finite non-empty 2D float array. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_gaussian_cmi_bits (line 225)` | x: np.ndarray, y: np.ndarray, z: np.ndarray, eps: float=1e-10 | float | Calculate Gaussian conditional MI I(x; y \| z) in bits. | Scope: private helper. Conventions: verify covariance order, whitening state, dtype, and device; verify random-variable order and logarithm base; verify PCA fitting split and component convention. |
-| `_conditional_cov (line 242)` | cov_a: np.ndarray, cross_ab: np.ndarray, cov_b: np.ndarray, eps: float | np.ndarray | Compute covariance of variable a conditioned on variable b. | Scope: private helper. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention. |
-| `_logdet (line 253)` | matrix: np.ndarray, eps: float | float | Return a stable log determinant for a covariance-like matrix. | Scope: private helper. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention. |
-| `_evaluate_subset (line 266)` | subset: tuple[int, ...], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \\| Path \\| None, unique_threshold: float, start: float, cmi_score: float \\| None | dict[str, Any] | Evaluate one source_1 PC subset with PIDPipeline and cache the result. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_floating_backward (line 310)` | row: dict[str, Any], target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pipeline: PIDPipeline, pid_kwargs: dict[str, Any], cache: dict[tuple[int, ...], dict[str, Any]], all_csv_path: str \\| Path \\| None, unique_threshold: float, tolerance: float, start: float, max_runtime_seconds: float | dict[str, Any] | Prune PCs whose removal does not meaningfully reduce unique information. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_pid_components (line 346)` | pid_result: Any | dict[str, Any] | Extract a PID component dictionary from common project PID result shapes. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `_to_float (line 362)` | value: Any | float | Convert numeric scalar-like values to float. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_top_rows (line 372)` | rows: list[dict[str, Any]], beam_width: int | list[dict[str, Any]] | Keep highest-unique rows, de-duplicated by subset. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_append_csv_row (line 383)` | path: str \\| Path \\| None, subset: tuple[int, ...], start: float, status: str, *, cmi_score: float \\| None=None, row: dict[str, Any] \\| None=None | None | Append one compact row to a CSV file, creating the header when needed. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `_toy_pid (line 425)` | target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, **pid_kwargs: Any | dict[str, dict[str, float]] | Return a tiny Gaussian-CMI-based PID-like result for local smoke runs. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
 
 ## `pipeline/analysis/predictivity/pc_index_predictions.py`
 
@@ -556,23 +516,22 @@ File description: Scenario definitions shared by the consolidated PCA–Ridge ru
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `PcaRidgeScenario (line 32)` | See class definition | PcaRidgeScenario instance | Describe one PCA–Ridge simulation without duplicating runner code. | Scope: class. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `concatenated_equal_unique (line 63)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate equal unique information in separate concatenated target blocks. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `build_all_above_zero_covariance (line 94)` | p: int, noise_std: float, unique1_weight: float, unique2_weight: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the all-above-zero covariance in grouped ``[X1, X2, T]`` order. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `build_concatenated_all_above_zero_covariance (line 143)` | p: int, noise_std: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the concatenated all-above-zero covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `build_concatenated_equal_unique_covariance (line 180)` | p: int, noise_std: float | torch.Tensor | Build the concatenated equal-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `build_equal_unique_covariance (line 210)` | p: int, noise_std: float | torch.Tensor | Build the equal-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `build_full_suppresion_covariance (line 232)` | p: int, noise_std: float | torch.Tensor | Build the full-suppression covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `build_unq2_zero_covariance (line 255)` | p: int, noise_std: float | torch.Tensor | Build the zero-source-2-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `get_scenario (line 364)` | name: str | PcaRidgeScenario | Return one registered PCA–Ridge scenario. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `PcaRidgeScenario (line 26)` | See class definition | PcaRidgeScenario instance | Describe one PCA–Ridge simulation without duplicating runner code. | Scope: class. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `build_all_above_zero_covariance (line 57)` | p: int, noise_std: float, unique1_weight: float, unique2_weight: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the all-above-zero covariance in grouped ``[X1, X2, T]`` order. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `build_concatenated_all_above_zero_covariance (line 106)` | p: int, noise_std: float, redundant_weight: float, shared_noise_weight: float | torch.Tensor | Build the concatenated all-above-zero covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `build_concatenated_equal_unique_covariance (line 143)` | p: int, noise_std: float | torch.Tensor | Build the concatenated equal-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `build_equal_unique_covariance (line 173)` | p: int, noise_std: float | torch.Tensor | Build the equal-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `build_full_suppression_covariance (line 195)` | p: int, noise_std: float | torch.Tensor | Build the full-suppression covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `build_unq2_zero_covariance (line 218)` | p: int, noise_std: float | torch.Tensor | Build the zero-source-2-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `get_scenario (line 327)` | name: str | PcaRidgeScenario | Return one registered PCA–Ridge scenario. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
 
-## `simulations/theoretical/evil_twin/__init__.py`
+## `simulations/evil_twin/__init__.py`
 
 File description: Sonic/Shadow evil-twin covariance examples.
 
 No functions or classes defined in this file.
 
-## `simulations/theoretical/evil_twin/covariance_example.py`
+## `simulations/evil_twin/covariance_example.py`
 
 File description: Torch Sonic/Shadow evil-twin covariance example.
 
@@ -584,7 +543,7 @@ File description: Torch Sonic/Shadow evil-twin covariance example.
 | `evil_twin_example_torch.randn_scaled (line 88)` | var_total | Unannotated | No docstring; inspect implementation before reuse. | Scope: method/nested helper. Conventions: verify covariance order, whitening state, dtype, and device. |
 | `run_covariance_comparison (line 126)` | n=1000, p=300, seed=0, device='cpu', dtype=torch.float64, atol=0.05, rtol=0.05, verbose=True | Unannotated | Generate Sonic/Shadow samples and compare their empirical covariances. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
 
-## `simulations/theoretical/evil_twin/plot_results.py`
+## `simulations/evil_twin/plot_results.py`
 
 File description: Plot Sonic and Shadow PID atoms from an evil-twin results CSV.
 
@@ -593,7 +552,7 @@ File description: Plot Sonic and Shadow PID atoms from an evil-twin results CSV.
 | `plot_pid_atoms (line 33)` | results_csv: Path \\| str, output_path: Path \\| str \\| None=None | Path | Plot mean redundancy, both unique-information atoms, and synergy for Sonic and Shadow. | Scope: reusable/public. Conventions: successful rows are averaged across seeds; values are Eigen-PID bits with sources ordered X1, X2 and target T. |
 | `main (line 138)` | config: dict \\| None=None | Path | Plot the configured evil-twin results CSV. | Scope: entry point. Conventions: verify input CSV metadata and output path. |
 
-## `simulations/theoretical/evil_twin/run_from_config.py`
+## `simulations/evil_twin/run_from_config.py`
 
 File description: Run the Sonic/Shadow Eigen-PID experiment from an editable configuration.
 
@@ -607,129 +566,34 @@ File description: Run the Sonic/Shadow Eigen-PID experiment from an editable con
 | `config_from_args (line 306)` | args: argparse.Namespace | dict | Apply explicitly supplied command-line values to `CONFIG`. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `main (line 332)` |  | dict | Run the configured evil-twin experiment. | Scope: entry point. Conventions: verify PID definition, source/target order, and bit units. |
 
-## `simulations/theoretical/random_variables/non_gaussian/t_dist_rvs.py`
+## `simulations/random_variables.py`
 
-File description: Student-t non-Gaussian RV examples.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `standardized_t (line 15)` | rng, df, size | Unannotated | Sample a variance-one Student-t random variable. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `unq2_zero_t (line 31)` | rng, n, p, noise_std, df=5 | Unannotated | Generate a Student-t version of the zero-source-2-unique example. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `unq12_zero (line 55)` | rng, n, p, noise_std, df=5 | Unannotated | Generate a Student-t version of the zero-both-unique example. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/theoretical/random_variables/regular_examples/all_above_zero.py`
-
-File description: Regular examples with balanced unique information.
+File description: Sample generators shared by simulation scenarios.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `all_above_zero_weighted (line 15)` | rng, n, p, noise_std, unique1_weight=5.0, unique2_weight=5.0, redundant_weight=1.0, shared_noise_weight=1.0 | Unannotated | Gaussian example where all PID components should be above zero, | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `con_all_above_zero_weighted (line 71)` | rng, n, p, noise_std, unique1_weight=5.0, unique2_weight=5.0, redundant_weight=1.0, shared_noise_weight=1.0 | Unannotated | Concatenated Gaussian example where all PID components should be above zero, | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
+| `all_above_zero_weighted (line 6)` | rng: np.random.Generator, n: int, p: int, noise_std: float, unique1_weight: float=5.0, unique2_weight: float=5.0, redundant_weight: float=1.0, shared_noise_weight: float=1.0 | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a Gaussian example in which every PID atom can be positive. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `con_all_above_zero_weighted (line 61)` | rng: np.random.Generator, n: int, p: int, noise_std: float, unique1_weight: float=5.0, unique2_weight: float=5.0, redundant_weight: float=1.0, shared_noise_weight: float=1.0 | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate concatenated unique and redundant Gaussian blocks. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `equal_unique (line 105)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate independent source-specific signals with equal weights. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `concatenated_equal_unique (line 132)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate equal unique information in separate target blocks. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
 
-## `simulations/theoretical/random_variables/regular_examples/all_reg_examples.py`
+## `simulations/commonality.py`
 
-File description: Run all regular RVs_Story examples across seeds.
-
-No functions or classes defined in this file.
-
-## `simulations/theoretical/random_variables/regular_examples/equal_unique.py`
-
-File description: Regular examples with balanced unique information.
+File description: Commonality analysis for comparison with BROJA PID.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `equal_unique (line 15)` | rng, n, p, noise_std | Unannotated | Generate a Gaussian example with equal unique information in both sources. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `equal_unique2 (line 39)` | rng, n, p, noise_std, snr=1 | Unannotated | Generate a higher-dimensional equal-unique example from real features. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
+| `commonality_analysis (line 7)` | features_X1, features_X2, target, method='standard', alphas=None, scale_by_target_variance=False | dict | Decompose predictive power into unique, common, and unexplained terms. | Scope: reusable/public. Related: suppression examples. Conventions: sources are sample-by-feature arrays; methods are standard OLS or ridge_cv; this is variance partitioning, not PID. |
 
-## `simulations/theoretical/random_variables/regular_examples/no_mi.py`
+## `simulations/suppression_examples.py`
 
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `zero_MI (line 10)` | rng, n, p, noise_std | Unannotated | Generate a Gaussian example with equal unique information in both sources. | Scope: reusable/public. Conventions: verify random-variable order and logarithm base. |
-
-## `simulations/theoretical/random_variables/commonality.py`
-
-File description: Commonality analysis and its regression scoring helpers.
+File description: Gaussian suppression generators selectable by name.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `compute_ols_cv_r2 (line 6)` | X, y, return_model=False | Unannotated | Compute cross-validated R2 using near-zero-regularization RidgeCV. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling, alpha, and train/test conventions. |
-| `compute_ridge_cv_r2 (line 32)` | X, y, alphas=None, return_model=False | Unannotated | Compute cross-validated R2 using RidgeCV with efficient LOO cross-validation. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling, alpha, and train/test conventions. |
-| `compute_r2 (line 64)` | X, y, return_model=False | Unannotated | Compute in-sample R2 for OLS regression. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling and train/test conventions. |
-| `compute_lasso_cv_r2 (line 87)` | X, y | Unannotated | Compute in-sample R2 after fitting multi-output LassoCV. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling, alpha, and train/test conventions. |
-| `_ensure_2d (line 109)` | features | Unannotated | Require a two-dimensional feature matrix. | Scope: private helper. Conventions: samples are rows and features are columns. |
-| `_score_only (line 118)` | score_result | Unannotated | Extract a score from either a scalar or model-score tuple. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `commonality_analysis (line 124)` | features_X1, features_X2, target, method='standard', alphas=None, scale_by_target_variance=False | Unannotated | Decompose predictive power into unique, common, and unexplained components. | Scope: reusable/public. Conventions: sources are sample-by-feature arrays; verify scaling, alpha, and train/test conventions. |
-
-## `simulations/theoretical/random_variables/story_batch_utils.py`
-
-File description: Seed-loop and CSV helpers for RVs_Story example batches.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `_as_float (line 50)` | value | float | Convert scalar numeric values from tensors or Python numbers to float. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `csv_path (line 62)` | results_dir: Path, example: str, method: str | Path | Build the per-example, per-method seed CSV path. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `commonality_csv_path (line 78)` | results_dir: Path, example: str=COMMONALITY_KEY | Path | Build the shared per-seed commonality CSV path. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `csv_has_seed (line 92)` | path: Path, seed: int, example: str \\| None=None | bool | Check whether a seed, optionally for one example, is in a CSV. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `seed_is_done (line 113)` | seed: int, example_names: list[str], results_dir: Path, methods=PID_METHODS, require_commonality: bool=False | bool | Check whether all expected example/method CSV rows exist for a seed. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `loop_examples (line 145)` | config: dict, functions_to_run: list[Callable], example_names: list[str], main_func: Callable, save_image: bool=True | dict | Run a list of RV examples once with one config. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `save_seed_csvs (line 195)` | seed: int, all_results: dict, results_dir: Path, save_commonality_csv: bool=False | None | Save one seed of PID and optional commonality results to CSV. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `mean_results_from_csvs (line 269)` | results_dir: Path, example: str, seeds: list[int] | dict | Average saved seed CSVs back into a PID result dictionary. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `mean_commonality_from_csvs (line 297)` | results_dir: Path, example: str, seeds: list[int] | dict | Average one example's saved commonality rows across selected seeds. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `loop_examples_over_seeds (line 334)` | config: dict, functions_to_run: list[Callable], example_names: list[str], main_func: Callable, num_seeds: int \\| None=None, seeds: list[int] \\| None=None | dict | Run examples over seeds, save seed CSVs, then save averaged figures. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-
-## `simulations/theoretical/random_variables/story_math_utils.py`
-
-File description: Small adapters around shared MI and bias helpers for RVs_Story truth rows.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `calculate_story_mi_values (line 18)` | sources: list[torch.Tensor], target: list[torch.Tensor] | tuple[dict, dict] | Calculate raw Gaussian MI values and Wishart biases in bits. | Scope: reusable/public. Related: `gaussian_mutual_information`, `create_cov_matrix`. Conventions: samples ordered [X1, X2] and [T]; returned raw and bias dictionaries use legacy story keys but bit units. |
-
-## `simulations/theoretical/random_variables/story_pid_utils.py`
-
-File description: Shared PID execution helpers for the RVs_Story examples.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `pid_method_display_name (line 32)` | method: str | str | Convert a configured PID method identifier to its table label. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `truth_pid_suppression (line 50)` | sources: list[torch.Tensor], target: list[torch.Tensor], covariance=None | tuple[dict, dict] | Compute the Gaussian truth row for suppression-style examples. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `truth_pid_equal_unique (line 73)` | sources: list[torch.Tensor], target: list[torch.Tensor], covariance=None | tuple[dict, dict] | Compute the Gaussian truth row for equal-unique regular examples. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `run_pid_story (line 101)` | config: dict, function_to_run: Callable, truth_func: Callable \\| None=None, methods: tuple[str, ...]=('eigen_pid',) | tuple[dict, list[np.ndarray]] | Run one RVs_Story generator through selected PID methods. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `load_story_config (line 156)` | config_path: str \\| Path \\| None=None | dict | Load the RVs_Story YAML configuration. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `save_single_example (line 170)` | config: dict, function_to_run: Callable, output_name: str, truth_func: Callable \\| None=None | dict | Run one example and save its PID comparison figure. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-
-## `simulations/theoretical/random_variables/suppression_examples/all_supp_examples.py`
-
-File description: Run all suppression RVs_Story examples across seeds.
-
-No functions or classes defined in this file.
-
-## `simulations/theoretical/random_variables/suppression_examples/full_suppresion.py`
-
-File description: Full suppression Gaussian RV example.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `full_suppresion (line 15)` | rng, n, p, noise_std | Unannotated | Generate the full suppression example. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/theoretical/random_variables/suppression_examples/unq12_zero.py`
-
-File description: Suppression example where both sources have zero unique information.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `unq12_zero (line 15)` | rng, n, p, noise_std | Unannotated | Generate an example with zero source-1 and source-2 unique information. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/theoretical/random_variables/suppression_examples/unq2_zero.py`
-
-File description: Suppression example where source 2 has zero unique information.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `unq2_zero (line 15)` | rng, n, p, noise_std | Unannotated | Generate an example with zero source-2 unique information. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
+| `full_suppression (line 8)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate the full-suppression example. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: X2 is a pure suppressor; returns samples ordered [X1, X2, T]. |
+| `unq12_zero (line 37)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a suppression example with zero unique information in both sources. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `unq2_zero (line 67)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a suppression example with zero source-2 unique information. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
 
 ## `simulations/utils.py`
 

@@ -9,19 +9,13 @@ import numpy as np
 import torch
 
 from simulations.pca.ridge.pid_feature_middleware import expand_independent_covariance
-from simulations.theoretical.random_variables.regular_examples.all_above_zero import (
+from simulations.random_variables import (
     all_above_zero_weighted,
+    concatenated_equal_unique,
     con_all_above_zero_weighted,
-)
-from simulations.theoretical.random_variables.regular_examples.equal_unique import (
     equal_unique,
 )
-from simulations.theoretical.random_variables.suppression_examples.full_suppresion import (
-    full_suppresion,
-)
-from simulations.theoretical.random_variables.suppression_examples.unq2_zero import (
-    unq2_zero,
-)
+from simulations.suppression_examples import full_suppression, unq2_zero
 
 
 SampleGenerator = Callable[..., tuple[np.ndarray, np.ndarray, np.ndarray]]
@@ -58,37 +52,6 @@ class PcaRidgeScenario:
     plot_title: str
     generator_kwargs: Mapping[str, float]
     covariance_kwargs: Mapping[str, float]
-
-
-def concatenated_equal_unique(
-    rng: np.random.Generator,
-    n: int,
-    p: int,
-    noise_std: float,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Generate equal unique information in separate concatenated target blocks.
-
-    Inputs:
-        rng: np.random.Generator controlling every generated latent and noise.
-        n: int number of aligned samples.
-        p: int dimension of each U1 and U2 block.
-        noise_std: float standard deviation of each independent noise term.
-
-    Outputs:
-        tuple[np.ndarray, np.ndarray, np.ndarray] containing X1, X2, and T;
-        every array has shape ``(n, 2*p)`` and block order ``[U1, U2]``.
-    """
-
-    unique_1 = rng.standard_normal((n, p))  # scalar dimensions -> (n, p)
-    unique_2 = rng.standard_normal((n, p))  # scalar dimensions -> (n, p)
-    zeros = np.zeros_like(unique_1)  # (n, p) -> (n, p)
-    target_signal = np.hstack((unique_1, unique_2))  # two (n, p) -> (n, 2*p)
-    source_1_signal = np.hstack((unique_1, zeros))  # two (n, p) -> (n, 2*p)
-    source_2_signal = np.hstack((zeros, unique_2))  # two (n, p) -> (n, 2*p)
-    target = target_signal + noise_std * rng.standard_normal(target_signal.shape)  # (n, 2*p) -> (n, 2*p)
-    source_1 = source_1_signal + noise_std * rng.standard_normal(source_1_signal.shape)  # (n, 2*p) -> (n, 2*p)
-    source_2 = source_2_signal + noise_std * rng.standard_normal(source_2_signal.shape)  # (n, 2*p) -> (n, 2*p)
-    return source_1, source_2, target
 
 
 def build_all_above_zero_covariance(
@@ -229,7 +192,7 @@ def build_equal_unique_covariance(p: int, noise_std: float) -> torch.Tensor:
     return expand_independent_covariance(coordinate_covariance, p)  # (3, 3) -> (3*p, 3*p)
 
 
-def build_full_suppresion_covariance(p: int, noise_std: float) -> torch.Tensor:
+def build_full_suppression_covariance(p: int, noise_std: float) -> torch.Tensor:
     """Build the full-suppression covariance.
 
     Inputs:
@@ -334,14 +297,14 @@ SCENARIOS: dict[str, PcaRidgeScenario] = {
         generator_kwargs={},
         covariance_kwargs={},
     ),
-    "full_suppresion": PcaRidgeScenario(
-        generator=full_suppresion,
-        covariance_builder=build_full_suppresion_covariance,
+    "full_suppression": PcaRidgeScenario(
+        generator=full_suppression,
+        covariance_builder=build_full_suppression_covariance,
         dimension_multiplier=1,
         n_components=30,
         pid_method="eigen_pid",
         experiment_name="FULL SUPPRESSION",
-        plot_slug="full_suppresion",
+        plot_slug="full_suppression",
         plot_title="Full Suppression PID: RAW vs PCA vs Ridge CV",
         generator_kwargs={},
         covariance_kwargs={},

@@ -13,9 +13,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from simulations.theoretical.evil_twin.plot_results import plot_pid_atoms
+from simulations.evil_twin.plot_results import plot_pid_atoms
 from pid.calculation import pid_calc
-from simulations.theoretical.evil_twin.covariance_example import evil_twin_example_torch
+from simulations.evil_twin.covariance_example import evil_twin_example_torch
 
 
 CONFIG = {

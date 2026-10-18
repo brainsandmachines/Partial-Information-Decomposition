@@ -25,7 +25,7 @@ from pid.utils import (
 )
 from simulations.utils import standardize_np
 from pipeline.utils import print_pid_mi
-from simulations.theoretical.evil_twin.covariance_example import evil_twin_example_torch
+from simulations.evil_twin.covariance_example import evil_twin_example_torch
 
 RESULT_KEYS = ("red", "unq1", "unq2", "syn", "bi_mi_1", "bi_mi_2", "tri_mi")
 COVARIANCE_PID_METHODS = ("eigen", "eigen_pid")

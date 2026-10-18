@@ -284,3 +284,58 @@ Compile and inspect affected output when tools are available and the change affe
 Inspect the actual implementation before assuming that a proposed method is already in use. Follow repository instructions and the requested scope. Verify that stimulus alignment, preprocessing, training/evaluation separation, variable roles, and estimator assumptions match the intended analysis.
 
 The immediate goal is to build and validate the NSD model-comparison analysis, then use its information profiles to answer whether different DNN encoding models explain distinct components of cortical responses.
+
+## 9. Repository structure
+
+Search `FUNCTION_REGISTRY.md` before writing or changing a function; it lists every callable under `pid/`, `pipeline/`, and `simulations/` with signatures and conventions. Inspect the source before reuse.
+
+### Top-level layout
+
+| Path | Role |
+| --- | --- |
+| `pid/` | Estimator layer. `calculation.py` (`pid_calc`) wraps the installed `eigen_pid` package (`eigen_pid`, `debias_eigen_pid`); it is not implemented in this repository. `mutual_information.py` computes Gaussian MI with optional Wishart bias correction, `bias.py` holds the log-determinant bias terms, and `utils.py` contains covariance construction, shrinkage, comparison tables, and plotting helpers. |
+| `pipeline/` | Real-data NSD pipeline (see below). |
+| `simulations/` | Validation on synthetic Gaussian data with known ground truth (see below). |
+| `tests/` | Pytest suite for the PID wrapper, pipeline, commonality analysis, PCA checkpointing, missMDA wrapper, and experiment runners. |
+| `cluster/` | SLURM `sbatch` scripts, one per entry point; `instructions.txt` records the `pid_env` Conda environment and interactive-session commands. |
+| `docs/` | `data_paths.txt` (NSD OTC beta locations on the cluster), `model_errors.txt`, and `real_data_pid_pipeline_plan.pdf`, the plan used by the QA-reviewer skill. |
+| `external/` | Git submodules: `DeepDive` (DNN loading and feature extraction), `mayas_project` (NSD processing, OTC ROI, and per-model best-layer CSVs under `results_shared/encoding/best_layers/`), and `PID` (R code for Gaussian PIDs from the historical Idep work). |
+| `source_conwell_code/` | Local, git-ignored copy of Conwell et al.'s `pressures` code. |
+| `.codex/skills/` | `function-registry-reuse` and `real-data-pid-pipeline-qa-reviewer`. |
+
+### `pipeline/`
+
+- `pid_pipeline.py`: `PIDPipeline` runs these stages in order: `target_extraction`, `sources_extraction`, `choose_layer`, `feature_extraction`, optional `preprocess`, optional `feature_manipulation`, `pid_calculation`, and `pid_report`.
+- `utils.py`: resolves stage names from a YAML `functions:` block into callables. It also holds the NSD adapters, such as `nsd_sources`, `nsd_feature_extraction`, `pca_each_source`, and `pid_calc_adapter`.
+- `phases/`: stage implementations, including stimulus/target loading and feature extraction (`sources_target_features.py`), layer selection (`choosing_layer.py`), scaling and ridge preprocessing (`preprocessing_layer.py`), and PCA, ridge prediction, and other feature transforms (`feature_manipulations.py`).
+- `pca/`: neural-target preparation. `subject_pca.py` fits a subject PCA on unique-image responses and projects the shared images. `missmda_ncp.py` selects the component count, and `find_alpha.py` finds one ridge alpha per target PC for each model's best layer.
+- `analysis/pairwise/`: the main model-pair analyses. `prediction.py` runs prediction-level PID, which is the intended design. `representation.py` runs PID on PCA-reduced features instead.
+- `analysis/pca/`: PID and MI as functions of the number of target PCs, and permutation analysis.
+- `analysis/predictivity/`: ridge prediction correlation for each target PC.
+- `experiments/`: single-pair runners for full OTC and single voxels.
+- `examples/`: toy and smoke runs that need no data.
+- `plotting.py`: pairwise PID heatmaps.
+
+Most runners read a YAML config of the same name in the same folder, for example `prediction.py` reads `prediction.yaml`.
+
+Main prediction-level flow:
+
+1. `pipeline/pca/subject_pca.py` saves the fitted target PCA model.
+2. The best layer for each model is read from the Maya's-project CSV through `overall_best_layer`.
+3. `pipeline/pca/find_alpha.py` saves per-PC ridge alphas for each model.
+4. `pipeline/analysis/pairwise/prediction.py` runs every unfinished unordered model pair. For each pair it extracts features, fits ridge on the unique images, predicts the shared images, and runs Eigen-PID. Results go to a resumable CSV, and the script then plots the heatmaps.
+
+### `simulations/`
+
+- `suppression_examples.py`, `commonality.py`: suppression generators and variance partitioning, for the VP-versus-PID comparison.
+- `random_variables.py`: generators in which all atoms are positive, or both unique terms are equal.
+- `evil_twin/`: Sonic/Shadow construction, with identical covariance and different generative stories.
+- `pca/rank/`: PCA component-count selection on data with a known rank.
+- `pca/ridge/`: checks whether the PCA and ridge routes preserve PID, using exact per-trial ground truth (`GROUND_TRUTH_PROOFS.md`).
+
+### Conventions and cautions
+
+- **Variable order differs by layer.** `pid_calc` uses `[T, X1, X2]`, the simulation generators and covariances use `[X1, X2, T]`, and the Eigen-PID derivation uses `[M, X, Y]`. Check the order at every boundary.
+- **Units.** PID and MI outputs are in bits.
+- **Ignored outputs.** Generated artifacts are git-ignored: `pipeline/pca/saved_pcs/`, `pipeline/pca/results/`, `simulation_results/`, and logs.
+- **Absolute paths.** Several YAML configs, `__main__` blocks, and `sbatch` scripts use cluster paths under `/groups/golan_neurogroup/...` and checkout paths under `/home/ohadshee/Desktop/Partial-Information-Decomposition`. Verify these paths before running elsewhere.
