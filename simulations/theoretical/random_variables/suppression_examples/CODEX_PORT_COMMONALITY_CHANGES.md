@@ -13,6 +13,7 @@ Use this note as a direct handoff to replicate the same behavior on another mach
 ## Files Changed
 
 - [simulations/theoretical/random_variables/story_batch_utils.py](simulations/theoretical/random_variables/story_batch_utils.py)
+- [simulations/theoretical/random_variables/commonality.py](simulations/theoretical/random_variables/commonality.py)
 - [simulations/theoretical/random_variables/story_pid_utils.py](simulations/theoretical/random_variables/story_pid_utils.py)
 - [pid/PID_util.py](pid/PID_util.py)
 - [simulations/theoretical/rv_config.yaml](simulations/theoretical/rv_config.yaml)
@@ -25,7 +26,7 @@ Use this note as a direct handoff to replicate the same behavior on another mach
 Add import near top:
 
 ```python
-from simulations.encoding.model.commonality import commonality_analysis
+from simulations.theoretical.random_variables.commonality import commonality_analysis
 ```
 
 ### In loop_examples(...)

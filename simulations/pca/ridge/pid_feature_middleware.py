@@ -20,12 +20,12 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from pid.calculation import pid_calc
 from pid.mutual_information import gaussian_mutual_information
-from pid.utils import create_cov_matrix
+from pid.utils import (
+    create_cov_matrix, reorder_cov_blocks, save_sample_simulation_results_table,
+)
 from simulations.utils import standardize_np
 from pipeline.utils import print_pid_mi
 from simulations.theoretical.evil_twin.covariance_example import evil_twin_example_torch
-from simulations.theoretical.covariance.cov_functions import change_covariance_order
-from simulations.theoretical.covariance.save_results import save_sample_simulation_results_table
 
 RESULT_KEYS = ("red", "unq1", "unq2", "syn", "bi_mi_1", "bi_mi_2", "tri_mi")
 COVARIANCE_PID_METHODS = ("eigen", "eigen_pid")
@@ -308,7 +308,7 @@ def calculate_theoretical_pid(
         )["raw_bits"],
     }
     pid_dtype = torch.float64
-    pid_covariance = change_covariance_order(correlation, [2, 0, 1], dims).to(pid_dtype)  # [X1, X2, T] correlation -> [T, X1, X2] correlation
+    pid_covariance = reorder_cov_blocks(correlation, dict(zip(("X1", "X2", "T"), dims)), ["X1", "X2", "T"], ["T", "X1", "X2"]).to(pid_dtype)  # [X1, X2, T] correlation -> [T, X1, X2] correlation
     source_1 = torch.zeros((2, dims[0]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_X1)
     source_2 = torch.zeros((2, dims[1]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_X2)
     target = torch.zeros((2, dims[2]), dtype=pid_dtype)  # scalar placeholder -> (2, dim_T)

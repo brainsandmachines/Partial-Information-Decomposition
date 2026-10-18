@@ -79,4 +79,4 @@ def unq12_zero(rng, n, p, noise_std, df=5):
 
 if __name__ == "__main__":
     config = load_story_config()
-    save_single_example(config, unq12_zero, "2.0unq12_zero_t.png", truth_func=None)
+    save_single_example(config, unq12_zero, "2.0unq12_zero_t", truth_func=None)

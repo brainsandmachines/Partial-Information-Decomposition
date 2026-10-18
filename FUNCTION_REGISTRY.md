@@ -26,15 +26,10 @@ Generated from the current AST after the repository reorganization. Paths, signa
 - `pipeline/pca/`: 5 Python files.
 - `pipeline/phases/`: 4 Python files.
 - `simulations/`: 1 Python file.
-- `simulations/encoding/examples/`: 7 Python files.
-- `simulations/encoding/experiments/`: 3 Python files.
-- `simulations/encoding/model/`: 9 Python files.
-- `simulations/encoding/suppression/`: 4 Python files.
 - `simulations/pca/rank/`: 5 Python files.
 - `simulations/pca/ridge/`: 3 Python files.
-- `simulations/theoretical/covariance/`: 5 Python files.
-- `simulations/theoretical/evil_twin/`: 5 Python files.
-- `simulations/theoretical/random_variables/`: 3 Python files.
+- `simulations/theoretical/evil_twin/`: 4 Python files.
+- `simulations/theoretical/random_variables/`: 4 Python files.
 - `simulations/theoretical/random_variables/non_gaussian/`: 1 Python file.
 - `simulations/theoretical/random_variables/regular_examples/`: 4 Python files.
 - `simulations/theoretical/random_variables/suppression_examples/`: 4 Python files.
@@ -108,6 +103,7 @@ File description: No module docstring; inspect before reuse.
 | `anchored_oas_shrinkage (line 1166)` | Sigma_full: torch.Tensor, cov_loo_all: torch.Tensor, n_samples: int | Unannotated | Calculates OAS parameters ONCE on the full matrix, | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
 | `oas_cov_torch (line 1207)` | S: torch.Tensor, N: int | torch.Tensor | Apply Oracle Approximating Shrinkage (OAS) to a covariance matrix. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
 | `residual_rvs (line 1238)` | rv_list: list, predictor_index=0 | Unannotated | Given a list of random variables (Torch.Tensors), | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
+| `save_sample_simulation_results_table (line 1263)` | results: dict, config: dict, save_path: str \\| pathlib.Path, decimals: int=4, title: str='PID Method Comparison', dpi: int=200 | pathlib.Path | Save sample-simulation PID/MI summaries as a styled table image. | Scope: reusable/public. Related: PCA–Ridge simulation reporting. Conventions: verify PID definition, source/target order, and bit units. |
 
 ## `pipeline/analysis/pairwise/prediction.py`
 
@@ -475,280 +471,6 @@ File description: Utility helpers used by the PID pipeline orchestrator.
 | `choose_one_layer (line 536)` | layer_func: Callable[..., Any], source_context_value: Any, layer_kwargs: dict[str, Any] | Any | Choose one layer by adapting to the common layer-selection helper signatures. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `ridge_preprocessing (line 565)` | source_1: Any, source_2: Any, target: Any, rng, test_size, **preprocess_kwargs: Any | tuple[Any, Any, Any] | Apply ridge regression preprocessing to sources and target. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
 
-## `simulations/encoding/examples/feature_correlation.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `main (line 16)` |  | Unannotated | Run the 2x3 factorial experiment design. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/examples/simple_problems.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `bern_pair_as_channels (line 8)` | p1=0.5, p2=0.5 | Unannotated | Convert two independent Bernoulli(p1), Bernoulli(p2) into | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `dist_from_tensor (line 59)` | Q, names=('S', 'X', 'Y') | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/examples/split_signal.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `main (line 16)` |  | Unannotated | Run the 2x3 factorial experiment design. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/examples/suppression_pipeline_example.py`
-
-File description: Example script demonstrating the use of the suppression analysis pipeline. This script shows how to: 1. Load or generate model features 2. Train regression models (or use existing ones) 3. Create predictions as targets 4. Generate suppression models 5. Perform commonality analysis
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `example_with_synthetic_data (line 24)` |  | Unannotated | Example using synthetic data to demonstrate the pipeline. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `example_with_pretrained_models (line 109)` |  | Unannotated | Example showing how to use the pipeline with pre-trained models. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/examples/suppression_toy_runner.py`
-
-File description: Shared runners for suppression toy examples.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `generate_correlated_features (line 12)` | n, p, rho, rng | Unannotated | Generate samples with an AR(1)-style covariance structure. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `_apply_mixing (line 19)` | rng, X_M1, X_M2, mixing_dimension | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: verify random-variable order and logarithm base. |
-| `_split_signal_sources (line 28)` | rng, n, p, snr | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_feature_correlation_sources (line 50)` | rng, n, p, snr, rho | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `build_toy_sources (line 69)` | rng, n, p, snr, experiment_kind, rho=1 | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_toy_experiment (line 80)` | rng, n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', experiment_kind=SPLIT_SIGNAL, rho=1 | Unannotated | Run one toy suppression/commonality experiment. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_all_toy_methods (line 128)` | rng_seed, n, p, mixing_dimension, snr, experiment_kind, methods=DEFAULT_METHODS, report_negative_common=False, rho=1 | Unannotated | Run all requested commonality methods with a fixed seed. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_default_factorial_scenarios (line 172)` | experiment_kind, n=1000, p=100, seed=42, report_negative_common=False | Unannotated | Run the standard low/high SNR by mixing-dimension toy scenarios. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/examples/theoretical_covariance.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `make_spd_matrix (line 15)` | p, rng, eig_min=0.5, eig_max=2.0 | Unannotated | Create a random symmetric positive definite covariance matrix. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `check_spd (line 30)` | Sigma, name='Sigma', tol=1e-10 | Unannotated | Check whether a matrix is symmetric positive definite. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `theoretical_covariance_multivariate (line 52)` | Sigma_R, Sigma_U, Sigma_N, Sigma_eps, order=('X1', 'X2', 'Y') | Unannotated | Theoretical covariance for the multivariate generative process: | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `simulate_multivariate_process (line 123)` | n, Sigma_R, Sigma_U, Sigma_N, Sigma_eps, rng=None | Unannotated | Simulate: | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `extract_covariance_blocks (line 161)` | Sigma_full, p | Unannotated | Extract covariance blocks assuming order [X1, X2, Y]. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `whiten_theoretical_covariance_blocks (line 187)` | Sigma_full, p, device='cpu', dtype=torch.float64 | Unannotated | Given the full covariance matrix of [X1, X2, Y], | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `validate_multivariate_covariance (line 281)` | n=1000000, p=5, seed=123, device='cpu' | Unannotated | Validate the theoretical covariance by simulation, | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-
-## `simulations/encoding/examples/toy_example.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `unq2_zero_with_red_unq1_syn (line 15)` | rng, n, p, noise_std=0.9 | Unannotated | Continuous Gaussian-like example where theoretically: | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_experiment (line 91)` | rng, suppresion_strength, mode='permuted', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | Unannotated | Run commonality analysis experiment. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `run_ridge_toy_method (line 175)` | rng_seed, n, p, mixing_dimension, snr | Unannotated | Run the ridge-CV analysis for this specialized toy example. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `main (line 196)` |  | Unannotated | Run the 2x3 factorial experiment design. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-| `plot_components (line 240)` | comp_dict, title='Variance Decomposition' | Unannotated | Plot bar chart for component dictionary. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `gauss_simple_example (line 259)` |  | Unannotated | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/experiments/both_unique.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `get_run_config (line 20)` |  | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `half_permute (line 36)` | rng, features, snr=10 | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `orthogonal_vectors (line 57)` | rng, n, p, features, noise=None, singal=None, unique_ratio=None, function=None | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `feature_creation (line 98)` | rng, unique_ratio, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | Unannotated | Creates dummy predictors and a target | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `test_both_unique (line 139)` | rng, unique_ratio, n=1024, p=100, snr=10.0, method='standard' | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_single_seed (line 150)` | seed: int, config: dict | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 164)` |  | Unannotated | No docstring; inspect implementation before reuse. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/experiments/both_unique_encoders.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `get_run_config (line 20)` |  | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `creature_featurs (line 46)` | rng, snr, unique_ratio, features, signal, redundant_dim=None | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_single_seed (line 76)` | seed: int, config: dict, features: torch.Tensor, fmri_dict: dict | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 104)` |  | Unannotated | No docstring; inspect implementation before reuse. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/experiments/turned_off_unique.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `get_run_config (line 28)` |  | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `feature_creation (line 48)` | rng, r_str, u1_str, u2_str, unique_method='orthogonal', n=1024, p=100, mixing_dimension=None, snr=10.0, method='standard', show_diagnostic_plots=False | Unannotated | Creates dummy predictors and a target | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `test (line 86)` | rng, r_str, u1_str, u2_str, n=1024, p=100, snr=10.0, method='standard' | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `extract_betas (line 101)` | ca_results | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_single_seed (line 120)` | seed: int, config: dict | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `test_regularization_term (line 140)` | seed: int, config: dict | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `save_term_results_csv (line 169)` | x_axis: str, term_results: dict, output_csv_path: str \\| Path | Path | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `test_u2str (line 195)` | seed: int, config: dict, final_ratio: float | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `plot_keys_vs_alpha (line 226)` | csv_path: Union[str, Path], keys: Sequence[str], *, x_col: str='alpha', sort_alpha: bool=False, logx: bool=False, figsize: tuple[float, float]=(8, 4.5), marker: Optional[str]=None, save_path: Optional[Union[str, Path]]=None | None | Plot selected columns (keys) vs x_col from a CSV file. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `main (line 290)` |  | Unannotated | No docstring; inspect implementation before reuse. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/model/__init__.py`
-
-File description: No module docstring; inspect before reuse.
-
-No functions or classes defined in this file.
-
-## `simulations/encoding/model/algoanut_data.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `argObj (line 26)` | self, data_dir, parent_submission_dir, subj | argObj instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: inspect implementation assumptions before reuse. |
-| `argObj.__init__ (line 27)` | self, data_dir, parent_submission_dir, subj | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `load_data_algonauts (line 41)` | paths_dict, args=None, subj=1, plot_fmri=False | Unannotated | Load fMRI data and image file lists for a given subject. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/model/commonality.py`
-
-File description: Shared commonality analysis utilities.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `_ensure_2d (line 13)` | features | Unannotated | Raise value error if features are not 2D: | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_score_only (line 22)` | score_result | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `commonality_analysis (line 28)` | features_X1, features_X2, target, method='standard', alphas=None, scale_by_target_variance=False | Unannotated | Decompose predictive power into unique, common, and unexplained components. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-
-## `simulations/encoding/model/encoding_utils.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `ImageDataset (line 23)` | self, imgs_paths, idxs, transform | ImageDataset instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: inspect implementation assumptions before reuse. |
-| `ImageDataset.__init__ (line 24)` | self, imgs_paths, idxs, transform | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `ImageDataset.__len__ (line 31)` | self | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `ImageDataset.__getitem__ (line 34)` | self, idx | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `plot_fmri (line 44)` | path, args, hemi, title='' | Unannotated | Plot fMRI data on a brain surface and save the figure. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `fmri_response_image (line 76)` | path, args, hemisphere, img_idx, train_img_dir, train_img_list, lh_fmri, rh_fmri | Unannotated | This function outputs the fmri response that matches the image shown. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `split_dataset (line 128)` | train_img_list, test_img_list, rand_seed=5, train_p=90 | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `fmri_data_loader (line 153)` | lh_fmri, rh_fmri, train_img_list, test_img_list, train_img_dir, test_img_dir, batch_size=500, train_p=90 | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `map_correlation_to_rois (line 203)` | args, lh_correlation, rh_correlation, hemisphere | Unannotated | Map correlation values to ROIs. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `roi_fmri_data (line 240)` | args, lh_fmri, rh_fmri | Unannotated | Map fMRI data to ROIs. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `get_specific_roi_fmri (line 294)` | args, lh_fmri, rh_fmri, roi_name | Unannotated | Get fMRI data for a specific ROI. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `visualize_encdoing_accuaracy (line 312)` | args, lh_correlation, rh_correlation, correlation_path, plot=True | Unannotated | Visualize encoding accuracy with a bar graph and return ROI correlation values and | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `save_corellation (line 396)` | roi_names, lh_correlation, rh_correlation, correlation_path, experiment_name | Unannotated | Save correlation values to .npy files. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `save_model (line 425)` | folder_path, model_name, save_dict, reg_lh: Optional[ndarray]=None, reg_rh: Optional[ndarray]=None, features_val_pred_lh: Optional[List]=None, features_val_pred_rh: Optional[List]=None, features_train: Optional[ndarray]=None, features_val_trained: Optional[ndarray]=None, predict_array: Optional[ndarray]=None, roi_names: Optional[List]=None, lh_correlation: Optional[ndarray]=None, rh_correlation: Optional[ndarray]=None | Unannotated | Save the trained encoding model. with its corellation values and roi names and figs` | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/model/fmri_model.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `encoding_model (line 14)` | self, device, model: str='alexnet', model_layer: str='features.2', model_path: str='pytorch/vision:v0.10.0', features: Optional[np.ndarray]=None, n_features=None | encoding_model instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: inspect implementation assumptions before reuse. |
-| `encoding_model.__init__ (line 15)` | self, device, model: str='alexnet', model_layer: str='features.2', model_path: str='pytorch/vision:v0.10.0', features: Optional[np.ndarray]=None, n_features=None | Unannotated | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `encoding_model.fit_pca (line 40)` | self, dataloader, batch_size=100, ncomponents=100 | Unannotated | No docstring; inspect implementation before reuse. | Scope: method/nested helper. Conventions: verify PCA fitting split and component convention. |
-| `encoding_model.extract_features (line 51)` | self, dataloader, pca | Unannotated | No docstring; inspect implementation before reuse. | Scope: method/nested helper. Conventions: inspect implementation assumptions before reuse. |
-| `encoding_model.train (line 61)` | self, train_data_loader, lh_fmri_train, rh_fmri_train, features_train: Optional[np.ndarray]=None, alphas: Optional[np.ndarray]=None | Unannotated | No docstring; inspect implementation before reuse. | Scope: method/nested helper. Conventions: inspect implementation assumptions before reuse. |
-| `encoding_model.validate (line 82)` | self, reg_lh, reg_rh, lh_fmri_val, rh_fmri_val, features_val | Unannotated | "This funciton validates the encoding model on the validation set and returns the correlation scores for each hemisphere. | Scope: method/nested helper. Conventions: inspect implementation assumptions before reuse. |
-| `encoding_model.run_model (line 110)` | self, train_imgs_dataloader, val_imgs_dataloader, lh_fmri_train, rh_fmri_train, lh_fmri_val, rh_fmri_val, batch_size=100, ncomponents=None | Unannotated | This function runs the entire encoding model pipeline: feature extraction, training, validation without testing. | Scope: method/nested helper. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/model/pred_pipeline.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `pipeline (line 20)` | data_dir, parent_submission_dir, subj, args, layer_name='features.2', model=None, features=None, only_validate=False, train_p=80, data_fmri=None, data_imgs=None | Unannotated | Main pipeline to run the encoding model on Algonauts data for a given subject. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `trained_model (line 99)` | layer_name, model, model_name, train_p | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `just_validate (line 128)` | layer_name, model | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/model/regression_metrics.py`
-
-File description: Shared regression scoring helpers for encoding and toy examples.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `compute_ols_cv_r2 (line 6)` | X, y, return_model=False | Unannotated | Compute cross-validated R2 using leave-one-out cross-validation. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `compute_ridge_cv_r2 (line 32)` | X, y, alphas=None, return_model=False | Unannotated | Compute cross-validated R2 using RidgeCV with efficient LOO cross-validation. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `compute_r2 (line 64)` | X, y, return_model=False | Unannotated | Compute in-sample R2 for OLS regression. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `compute_lasso_cv_r2 (line 87)` | X, y | Unannotated | Compute in-sample R2 after fitting multi-output LassoCV. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/model/suppression_core.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `create_predictions (line 12)` | reg_lh, reg_rh, features | Unannotated | Create fMRI predictions using trained regression models. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `create_encoder (line 28)` | rng, features, target, n_features | Unannotated | Create and train a linear regression encoder. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `permutate_models (line 59)` | rng, features, suppression_strength | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `noise_component (line 80)` | rng, features, suppression_strength, permutation | Unannotated | Create suppresion model using only noise component. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `create_supression_model (line 106)` | rng, signal, suppresion_method, features, suppression_strength=0.5, snr=1.0, mixing_dimension=None | Unannotated | Create suppression model features X_M1 and X_M2 based on the given parameters. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_all_methods (line 146)` | rng_seed, suppresion_method, mixing_dimension, snr, suppression_strength, models_and_features_dict=None | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `suppression_analysis_pipeline (line 164)` | features, reg_lh=None, reg_rh=None, hemisphere='both', suppression_strength=0.5, snr=1.0, mixing_dimension=None, suppresion_method='permutate', analysis_methods=['standard', 'ols_cv', 'ridge_cv'], rng_seed=None, alphas=None | Unannotated | Complete pipeline that takes model features, creates predictions via regression, | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `grid_search_suppression_analysis (line 306)` | features, reg_lh=None, reg_rh=None, suppression_strength_list=None, snr_list=None, mixing_dimension_list=None, rng_seed_list=None, hemisphere='both', suppresion_method='permutate', output_dir='./grid_search_results', grid_name='NoName', verbose=True | Unannotated | Perform a grid search over suppression analysis parameters using ridge regression. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-
-## `simulations/encoding/model/suppression_model.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `real_model_func (line 52)` | model, layer_name, model_path, batch_size, ncomponents, train_data_loader | Unannotated | Create and train the real encoding model using fMRI data and image features. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `train_save_or_load (line 81)` | folder_path=None, model_name=None, path_to_load=None | Unannotated | Load a trained encoding model from disk. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 100)` | dict, suppression_strength=0.5, rng_seed=0 | Unannotated | Run the 2x3 factorial experiment design. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-| `test_run (line 164)` | run_name, save_dir, features, fmri_dict, rng_seeds, suppression_method, suppression_strength=[0.5], n_samples=[1000], n_features=[100], snr=[1.0], mixing_dimension=[None] | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/suppression/__init__.py`
-
-File description: No module docstring; inspect before reuse.
-
-No functions or classes defined in this file.
-
-## `simulations/encoding/suppression/gaussian_multivariate.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `crossfit_residualize (line 42)` | Y_raw, X_raw, n_splits=5, seed=0 | Unannotated | Residualize Y_raw against X_raw using cross-fitted linear regression. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `test_suppression (line 60)` | N=1000, P=1, suppression_strength=0.5, rng_seed=1, mode='simple', snr=1.0, method='ridge_cv', mixing_dimension=None | Unannotated | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify scaling, alpha, and train/test conventions. |
-| `plot_pid_results (line 118)` | mi_results=None, pid_results=None, sub_title=None | Unannotated | Plot bar chart for PID results. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `get_seed_sweep_config (line 166)` |  | dict | Configuration for fixed-parameter suppression simulations across seeds. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_single_seed_fixed (line 188)` | seed: int, config: dict | dict | Run one suppression experiment seed with all other parameters fixed. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_fixed_params_across_seeds (line 203)` | config: dict \\| None=None | tuple[dict, list[dict]] | Sweep over seeds while keeping all other simulation parameters fixed, | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 231)` |  | Unannotated | Main function to run the Gaussian simple example and compare results. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/suppression/gaussian_univariate.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `gauss_simple_example (line 23)` | N=1000, P=1, rng_seed=1, noise_seed=1, simple_example=True, snr=1.0, method='ridge_cv', mixing_dimension=None | Unannotated | Run a simple Gaussian example with no mixing deminsion each experiement has different random seeds. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify scaling, alpha, and train/test conventions. |
-| `check_supression_effect (line 75)` | vp_results, pid_results | Unannotated | Check for suppression effect in the results. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `main (line 121)` |  | Unannotated | Main function to run the Gaussian simple example and compare results. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
-## `simulations/encoding/suppression/suppressed_encoder.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `_append_project_root_to_path (line 8)` |  | None | No docstring; inspect implementation before reuse. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `get_run_config (line 37)` |  | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `load_model_and_fmri (line 63)` | config: dict | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `prepare_inputs (line 70)` | config: dict, real_features: np.ndarray, fmri_dict: dict | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_suppression_pipeline (line 94)` | config: dict, selected_features: np.ndarray, encoder, verbose: bool=True | Unannotated | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `save_all_seed_runs_results (line 128)` | seed_rows: list[dict], config: dict | Path | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_single_seed (line 148)` | seed: int, config: dict, real_features: np.ndarray, fmri_dict: dict | dict | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `run_encoding_multi_seed_experiment (line 167)` | config: dict | tuple[dict, list[dict]] | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `save_seed_summary (line 180)` | summary: dict, config: dict | Path | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `print_results (line 184)` | outputs: dict, mi: dict, pid: dict | None | No docstring; inspect implementation before reuse. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 198)` |  | None | No docstring; inspect implementation before reuse. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
-
 ## `simulations/pca/rank/eigenvector_pca.py`
 
 File description: Numerical eigenvector PCA cross-validation and loading estimators.
@@ -844,67 +566,6 @@ File description: Scenario definitions shared by the consolidated PCA–Ridge ru
 | `build_unq2_zero_covariance (line 255)` | p: int, noise_std: float | torch.Tensor | Build the zero-source-2-unique covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
 | `get_scenario (line 364)` | name: str | PcaRidgeScenario | Return one registered PCA–Ridge scenario. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
 
-## `simulations/theoretical/covariance/compare_multidim_gaussian_pid.py`
-
-File description: Evaluate Eigen PID on the existing population Gaussian channel model. Edit the constants below to change the covariance-only dimension sweep.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `save_run_constants (line 83)` | yaml_path: str \\| Path | Path | Save every uppercase script constant as a YAML run snapshot. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `validate_parameters (line 127)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | None | Validate dimensions, gains, and source-noise variances. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `build_channel_matrix (line 179)` | source_dim: int, target_dim: int, special_gain: float, special_coordinate: int | torch.Tensor | Build a rectangular channel by repeating a two-coordinate gain block. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `build_population_covariance (line 213)` | target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float | torch.Tensor | Construct the theoretical Gaussian covariance in ``[T, X1, X2]`` order. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `run_pid_methods (line 279)` | covariance: torch.Tensor, target_dim: int, source1_dim: int, source2_dim: int | dict[str, dict[str, float]] | Run Eigen PID on one population covariance. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device; verify random-variable order and logarithm base. |
-| `run_dimension_sweep (line 334)` | dimension_to_sweep: str, dimension_values: list[int], target_dim: int, source1_dim: int, source2_dim: int, source1_gain: float, source2_gain: float, source1_noise_variance: float, source2_noise_variance: float, csv_path: str \\| Path | list[dict[str, float \| int \| str]] | Run and checkpoint PID methods while changing one variable dimension. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `plot_dimension_sweep_csv (line 422)` | csv_path: str \\| Path, plot_path: str \\| Path | Path | Plot the Eigen PID atoms, mutual information, and runtime curves. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device; verify random-variable order and logarithm base. |
-| `main (line 511)` |  | tuple[Path, Path, Path] | Run the existing covariance sweep using Eigen PID. | Scope: entry point. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-
-## `simulations/theoretical/covariance/cov_functions.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `make_random_true_cov (line 20)` | config: dict, rng: torch.Generator \\| None=None | np.ndarray | Construct a generic positive-definite Gaussian covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `rectangular_identity (line 85)` | d_a: int, d_b: int, dtype: torch.dtype=torch.float64, device: str \\| torch.device='cpu' | torch.Tensor | Create a rectangular identity-like matrix of shape (d_a, d_b). | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `make_direct_true_cov_from_config (line 109)` | config: dict, dtype: torch.dtype=torch.float64, eps: float=1e-10 | torch.Tensor | Create an interpretable covariance matrix for [X1, X2, T] | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `make_both_unique_true_cov_from_config (line 183)` | config: dict, rng: torch.Generator \\| None=None | torch.Tensor | Create the paper's Gaussian both-unique covariance in [X1, X2, T]. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `sample_from_cov (line 223)` | config, true_cov: torch.Tensor, n_samples: int, rng: torch.Generator | torch.Tensor | Sample from a Gaussian distribution with the given covariance. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `change_covariance_order (line 252)` | cov: torch.Tensor, new_order: list[int], dims: list[int] | torch.Tensor | Permute the covariance matrix to change the order of variables. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-
-## `simulations/theoretical/covariance/run_gaussian_pid_examples.py`
-
-File description: Benchmark Gaussian PID methods repeatedly on theoretical covariances.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `one_dimensional_target_example (line 135)` |  | ExampleConfig | Return the example whose target is one-dimensional. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `run_method (line 157)` | covariance: torch.Tensor, example: ExampleConfig, runtime_repeat: int, label: str, method: str | dict[str, object] | Time one PID method call on a theoretical covariance. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `check_theoretical_example (line 229)` | example: ExampleConfig, rows: list[dict[str, object]] | None | Verify the promised theoretical behavior before saving results. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `summarize_results (line 263)` | rows: list[dict[str, object]], examples: list[ExampleConfig] | list[dict[str, object]] | Calculate PID and runtime statistics across timing repetitions. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `plot_results (line 304)` | rows: list[dict[str, object]], examples: list[ExampleConfig], path: str \\| Path | Path | Plot theoretical PID values and runtime mean ± sample SD. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `save_hyperparameters (line 370)` | path: str \\| Path, examples: list[ExampleConfig], outputs: dict[str, str] | Path | Save all non-path settings and output paths as YAML. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `main (line 397)` | results_csv_path: str \\| Path=RESULTS_CSV, summary_csv_path: str \\| Path=SUMMARY_CSV, plot_path: str \\| Path=PLOT_PATH, yaml_path: str \\| Path=YAML_PATH | tuple[Path, Path, Path, Path] | Benchmark every theoretical covariance over repeated method calls. | Scope: entry point. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-
-## `simulations/theoretical/covariance/sample_simulation.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `calculate_sample_whitened_wishart_mi_bits (line 60)` | sources: list[torch.Tensor], target: list[torch.Tensor] | dict[str, float] | Calculate raw and Wishart-corrected sample Gaussian MIs in bits. | Scope: reusable/public. Related: `gaussian_mutual_information`, `create_cov_matrix`. Conventions: samples ordered [X1, X2] and [T]; corrected MI is not clipped. |
-| `load_config (line 135)` | config_path: str \\| Path=DEFAULT_CONFIG_PATH | dict | Load configuration from YAML file. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `csv_save (line 141)` | config: dict, experiment_name: str, method: str, theoretical_values: tuple, sampled_values: dict | Path | Save theoretical and sampled PID/MI component values to one method CSV. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-| `simulation (line 177)` | config: dict, methods: list, experiment_name: str \\| None=None | dict | Run theoretical-covariance PID calculations and sampled trial summaries. | Scope: reusable/public. Related: `gaussian_mutual_information`, `pid_calc`. Conventions: [X1, X2, T] population covariance is reordered to [T, X1, X2] only for Eigen-PID; MI outputs are bits. |
-
-## `simulations/theoretical/covariance/save_results.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `save_sample_simulation_results_table (line 15)` | results: dict, config: dict, save_path: str \\| Path, decimals: int=4, title: str='PID Method Comparison', dpi: int=200 | Path | Save sample-simulation PID/MI summaries as a styled table image. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify covariance order, whitening state, dtype, and device. |
-
 ## `simulations/theoretical/evil_twin/__init__.py`
 
 File description: Sonic/Shadow evil-twin covariance examples.
@@ -923,49 +584,28 @@ File description: Torch Sonic/Shadow evil-twin covariance example.
 | `evil_twin_example_torch.randn_scaled (line 88)` | var_total | Unannotated | No docstring; inspect implementation before reuse. | Scope: method/nested helper. Conventions: verify covariance order, whitening state, dtype, and device. |
 | `run_covariance_comparison (line 126)` | n=1000, p=300, seed=0, device='cpu', dtype=torch.float64, atol=0.05, rtol=0.05, verbose=True | Unannotated | Generate Sonic/Shadow samples and compare their empirical covariances. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device. |
 
-## `simulations/theoretical/evil_twin/evil_twin_pid_batch_utils.py`
+## `simulations/theoretical/evil_twin/plot_results.py`
 
-File description: Seed-loop and CSV helpers for evil-twin PID_calc sweeps.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `summary_csv_path (line 29)` | output_dir: Path, prefix: str='evil_twin_pid' | Path | Build the output CSV path for the mean summary table. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `method_csv_path (line 43)` | output_dir: Path, method: str, prefix: str='evil_twin_pid' | Path | Build the output CSV path for one PID method. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `write_rows_to_csv (line 58)` | path: Path, rows: list[dict], fieldnames: list[str] | Path | Write a complete CSV table, replacing any existing file. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `make_pid_config (line 77)` | n: int, p: int, device: str | dict | Create the config dictionary expected by PID_calc wrappers. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `result_row (line 98)` | seed: int, twin: str, method: str, n: int, p: int, pid: dict, mi: dict | dict | Create a successful result row for one twin and PID method. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify random-variable order and logarithm base. |
-| `error_row (line 131)` | seed: int, twin: str, method: str, n: int, p: int, error: Exception | dict | Create an error row for one failed twin and PID method. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `summary_fieldnames (line 160)` | twins: tuple[str, ...]=SUMMARY_TWINS | list[str] | Build ordered column names for the mean summary table. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `mean_summary_rows (line 176)` | seed_results: dict, methods: tuple[str, ...], n_samples: int, dimension: int, bias_correction: bool, twins: tuple[str, ...]=SUMMARY_TWINS | list[dict] | Calculate mean PID and MI values across seeds for each method. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `save_summary_csv (line 233)` | output_dir: Path, prefix: str, rows: list[dict] | Path | Save the mean summary table to a CSV file. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `summary_image_path (line 247)` | output_dir: Path, prefix: str, twin: str | Path | Build the output image path for one twin's mean summary table. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `summary_rows_to_pid_results (line 262)` | rows: list[dict], twin: str | dict | Convert mean summary rows to the PID result shape used by RVs_Story tables. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `save_summary_table_images (line 291)` | rows: list[dict], output_dir: Path, prefix: str, config: dict, twins: tuple[str, ...]=SUMMARY_TWINS | list[Path] | Save RVs_Story-style PID comparison images for the mean summary. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `format_summary_value (line 336)` | value, decimals: int | str | Format one summary table cell for terminal output. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `format_summary_table (line 353)` | rows: list[dict], decimals: int=6 | str | Format summary rows as an aligned plain-text table. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-
-## `simulations/theoretical/evil_twin/plot_summary_csv.py`
-
-File description: Render an evil-twin summary CSV in the shared simulation table style.
+File description: Plot Sonic and Shadow PID atoms from an evil-twin results CSV.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `load_summary_rows (line 37)` | summary_csv: Path \\| str | list[dict] | Load and validate rows from an evil-twin mean-summary CSV. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `plot_summary_csv (line 103)` | summary_csv: Path \\| str, output_dir: Path \\| str \\| None=None, prefix: str \\| None=None, n_samples: int \\| None=None, dimension: int \\| None=None, bias_correction: bool \\| None=None | list[Path] | Create Sonic and Shadow plots from an existing evil-twin summary CSV. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 174)` | config: dict \\| None=None | list[Path] | Render one configured evil-twin summary CSV and print output paths. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
+| `plot_pid_atoms (line 33)` | results_csv: Path \\| str, output_path: Path \\| str \\| None=None | Path | Plot mean redundancy, both unique-information atoms, and synergy for Sonic and Shadow. | Scope: reusable/public. Conventions: successful rows are averaged across seeds; values are Eigen-PID bits with sources ordered X1, X2 and target T. |
+| `main (line 138)` | config: dict \\| None=None | Path | Plot the configured evil-twin results CSV. | Scope: entry point. Conventions: verify input CSV metadata and output path. |
 
 ## `simulations/theoretical/evil_twin/run_from_config.py`
 
-File description: Run the evil-twin PID experiment from an editable Python configuration.
+File description: Run the Sonic/Shadow Eigen-PID experiment from an editable configuration.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `validate_config (line 47)` | config: dict | None | Validate the editable evil-twin experiment configuration. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `calculate_pid (line 110)` | config: dict, sources: list[torch.Tensor], target: list[torch.Tensor], generator: torch.Generator, method: str | tuple[dict, dict] | Run one configured PID method on one evil-twin sample set. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
-| `run_from_config (line 138)` | config: dict | dict | Run the configured evil-twin experiment and save method and summary CSVs. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `parse_args (line 238)` |  | argparse.Namespace | Parse optional overrides for the consolidated evil-twin runner. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `config_from_args (line 269)` | args: argparse.Namespace | dict | Apply explicitly supplied command-line values to ``CONFIG``. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
-| `main (line 297)` |  | dict | Run the evil-twin experiment with CONFIG and command-line overrides. | Scope: entry point. Conventions: inspect implementation assumptions before reuse. |
+| `validate_config (line 50)` | config: dict | None | Validate the editable evil-twin experiment configuration. | Scope: reusable/public. Conventions: requires enough samples for a full-rank joint empirical covariance. |
+| `result_row (line 101)` | seed: int, twin: str, n: int, p: int, bias_correction: bool, pid: dict, mi: dict | dict | Create one successful detailed Eigen-PID result row. | Scope: task-specific. Conventions: PID and MI values are in bits; sources are X1, X2 and target is T. |
+| `error_row (line 142)` | seed: int, twin: str, n: int, p: int, bias_correction: bool, error: Exception | dict | Create one failed evil-twin result row. | Scope: task-specific. Conventions: preserves experiment metadata and exception text. |
+| `run_from_config (line 178)` | config: dict | dict | Run Eigen-PID for Sonic and Shadow, save one detailed CSV, and plot all PID atoms. | Scope: reusable/public. Related: `pid_calc`, `plot_pid_atoms`. Conventions: bias_correction selects raw or corrected Eigen-PID; sources are X1, X2 and target is T. |
+| `parse_args (line 277)` |  | argparse.Namespace | Parse optional command-line overrides. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
+| `config_from_args (line 306)` | args: argparse.Namespace | dict | Apply explicitly supplied command-line values to `CONFIG`. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
+| `main (line 332)` |  | dict | Run the configured evil-twin experiment. | Scope: entry point. Conventions: verify PID definition, source/target order, and bit units. |
 
 ## `simulations/theoretical/random_variables/non_gaussian/t_dist_rvs.py`
 
@@ -1008,6 +648,20 @@ File description: No module docstring; inspect before reuse.
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
 | `zero_MI (line 10)` | rng, n, p, noise_std | Unannotated | Generate a Gaussian example with equal unique information in both sources. | Scope: reusable/public. Conventions: verify random-variable order and logarithm base. |
+
+## `simulations/theoretical/random_variables/commonality.py`
+
+File description: Commonality analysis and its regression scoring helpers.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `compute_ols_cv_r2 (line 6)` | X, y, return_model=False | Unannotated | Compute cross-validated R2 using near-zero-regularization RidgeCV. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling, alpha, and train/test conventions. |
+| `compute_ridge_cv_r2 (line 32)` | X, y, alphas=None, return_model=False | Unannotated | Compute cross-validated R2 using RidgeCV with efficient LOO cross-validation. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling, alpha, and train/test conventions. |
+| `compute_r2 (line 64)` | X, y, return_model=False | Unannotated | Compute in-sample R2 for OLS regression. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling and train/test conventions. |
+| `compute_lasso_cv_r2 (line 87)` | X, y | Unannotated | Compute in-sample R2 after fitting multi-output LassoCV. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: verify scaling, alpha, and train/test conventions. |
+| `_ensure_2d (line 109)` | features | Unannotated | Require a two-dimensional feature matrix. | Scope: private helper. Conventions: samples are rows and features are columns. |
+| `_score_only (line 118)` | score_result | Unannotated | Extract a score from either a scalar or model-score tuple. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
+| `commonality_analysis (line 124)` | features_X1, features_X2, target, method='standard', alphas=None, scale_by_target_variance=False | Unannotated | Decompose predictive power into unique, common, and unexplained components. | Scope: reusable/public. Conventions: sources are sample-by-feature arrays; verify scaling, alpha, and train/test conventions. |
 
 ## `simulations/theoretical/random_variables/story_batch_utils.py`
 

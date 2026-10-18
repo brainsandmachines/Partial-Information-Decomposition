@@ -19,7 +19,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from simulations.encoding.model.commonality import commonality_analysis
+from simulations.theoretical.random_variables.commonality import commonality_analysis
 from pid.utils import (
     pid_comparison_table,
     save_commonality_comparison_table,

@@ -1,8 +1,9 @@
-"""Run the evil-twin PID experiment from an editable Python configuration."""
+"""Run the Sonic/Shadow Eigen-PID experiment from an editable configuration."""
 
 from __future__ import annotations
 
 import argparse
+import csv
 from pathlib import Path
 import sys
 
@@ -12,28 +13,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from simulations.theoretical.evil_twin.plot_results import plot_pid_atoms
 from pid.calculation import pid_calc
 from simulations.theoretical.evil_twin.covariance_example import evil_twin_example_torch
-from simulations.theoretical.evil_twin.evil_twin_pid_batch_utils import (
-    CSV_FIELDS,
-    error_row,
-    format_summary_table,
-    make_pid_config,
-    mean_summary_rows,
-    method_csv_path,
-    result_row,
-    save_summary_csv,
-    summary_csv_path,
-    write_rows_to_csv,
-)
 
 
-# Edit only this dictionary to configure the experiment.
 CONFIG = {
     "seeds": [0],
     "n_samples": 10000,
     "dimension": 100,
-    "methods": ("eigen_pid",),
     "bias_correction": False,
     "device": "cpu",
     "output_dir": "simulation_results/evil_twin_config",
@@ -41,15 +29,30 @@ CONFIG = {
     "overwrite_outputs": True,
 }
 
-SUPPORTED_METHODS = ("eigen", "eigen_pid")
+CSV_FIELDS = (
+    "seed",
+    "twin",
+    "n",
+    "p",
+    "bias_correction",
+    "status",
+    "red",
+    "unq1",
+    "unq2",
+    "syn",
+    "tri_mi",
+    "bi_mi_1",
+    "bi_mi_2",
+    "error",
+)
 
 
 def validate_config(config: dict) -> None:
     """Validate the editable evil-twin experiment configuration.
 
     Inputs:
-        config: dict, experiment settings containing seeds, sample count,
-            dimension, methods, bias-correction mode, device, and output names.
+        config: dict containing seeds, sample count, dimension,
+            bias-correction mode, device, and output settings.
 
     Outputs:
         None. Raises TypeError or ValueError when a setting is invalid.
@@ -58,7 +61,6 @@ def validate_config(config: dict) -> None:
         "seeds",
         "n_samples",
         "dimension",
-        "methods",
         "bias_correction",
         "device",
         "output_dir",
@@ -84,17 +86,6 @@ def validate_config(config: dict) -> None:
     if n_samples <= 3 * dimension:
         raise ValueError("n_samples must exceed 3 * dimension for a full-rank empirical covariance")
 
-    methods = config["methods"]
-    if not isinstance(methods, (list, tuple)) or not methods:
-        raise TypeError("CONFIG['methods'] must be a non-empty list or tuple")
-    unsupported_methods = sorted(set(methods).difference(SUPPORTED_METHODS))
-    if unsupported_methods:
-        raise ValueError(
-            f"Unsupported methods: {unsupported_methods}. Supported methods: {SUPPORTED_METHODS}"
-        )
-    if len(set(methods)) != len(methods):
-        raise ValueError("CONFIG['methods'] must not contain duplicates")
-
     if not isinstance(config["bias_correction"], bool):
         raise TypeError("CONFIG['bias_correction'] must be True or False")
     if not isinstance(config["device"], str) or not config["device"]:
@@ -107,77 +98,123 @@ def validate_config(config: dict) -> None:
         raise TypeError("CONFIG['overwrite_outputs'] must be True or False")
 
 
-def calculate_pid(
-    config: dict,
-    sources: list[torch.Tensor],
-    target: list[torch.Tensor],
-    generator: torch.Generator,
-    method: str,
-) -> tuple[dict, dict]:
-    """Run one configured PID method on one evil-twin sample set.
+def result_row(
+    seed: int,
+    twin: str,
+    n: int,
+    p: int,
+    bias_correction: bool,
+    pid: dict,
+    mi: dict,
+) -> dict:
+    """Create one successful evil-twin result row.
 
     Inputs:
-        config: dict, PID configuration including dimensions and bias mode.
-        sources: list[torch.Tensor], two source sample matrices.
-        target: list[torch.Tensor], one target sample matrix.
-        generator: torch.Generator, seeded generator for reproducible PID calls.
-        method: str, one of the methods listed in ``SUPPORTED_METHODS``.
+        seed: int, sample-generation seed.
+        twin: str, sonic or shadow.
+        n: int, number of samples.
+        p: int, dimension of each random variable.
+        bias_correction: bool, whether Eigen-PID correction was enabled.
+        pid: dict, PID components returned by pid_calc.
+        mi: dict, mutual-information values returned by pid_calc.
 
     Outputs:
-        tuple[dict, dict], PID components and mutual-information values in bits.
+        dict, one detailed CSV row.
     """
-    return pid_calc(
-        config=config,
-        sources=sources,
-        target=target,
-        rng=generator,
-        method=method,
+    return {
+        "seed": seed,
+        "twin": twin,
+        "n": n,
+        "p": p,
+        "bias_correction": bias_correction,
+        "status": "ok",
+        "red": pid["red"],
+        "unq1": pid["unq1"],
+        "unq2": pid["unq2"],
+        "syn": pid["syn"],
+        "tri_mi": mi["tri_mi"],
+        "bi_mi_1": mi["bi_mi_1"],
+        "bi_mi_2": mi["bi_mi_2"],
+        "error": "",
+    }
+
+
+def error_row(
+    seed: int,
+    twin: str,
+    n: int,
+    p: int,
+    bias_correction: bool,
+    error: Exception,
+) -> dict:
+    """Create one failed evil-twin result row.
+
+    Inputs:
+        seed: int, sample-generation seed.
+        twin: str, sonic or shadow.
+        n: int, number of samples.
+        p: int, dimension of each random variable.
+        bias_correction: bool, whether Eigen-PID correction was enabled.
+        error: Exception raised during PID calculation.
+
+    Outputs:
+        dict, one detailed CSV row with error status and message.
+    """
+    row = {field: "" for field in CSV_FIELDS}
+    row.update(
+        {
+            "seed": seed,
+            "twin": twin,
+            "n": n,
+            "p": p,
+            "bias_correction": bias_correction,
+            "status": "error",
+            "error": f"{type(error).__name__}: {error}",
+        }
     )
+    return row
 
 
 def run_from_config(config: dict) -> dict:
-    """Run the configured evil-twin experiment and save method and summary CSVs.
+    """Run Eigen-PID for Sonic and Shadow, save one CSV, and plot all atoms.
 
     Inputs:
         config: dict, validated experiment configuration. The dimension applies
             equally to source 1, source 2, and the target.
 
     Outputs:
-        dict, containing nested results by seed/method/twin and written CSV paths.
+        dict containing results by seed and twin, the CSV path, and plot path.
     """
     validate_config(config)
 
     seeds = list(config["seeds"])
-    methods = tuple(config["methods"])
     n_samples = config["n_samples"]
     dimension = config["dimension"]
     device = config["device"]
     output_dir = Path(config["output_dir"])
-    bias_label = "bias_corrected" if config["bias_correction"] else "uncorrected"
-    csv_prefix = f"{config['csv_prefix']}_{bias_label}"
+    bias_correction = config["bias_correction"]
+    bias_label = "bias_corrected" if bias_correction else "uncorrected"
+    results_path = output_dir / f"{config['csv_prefix']}_{bias_label}.csv"
+    plot_path = results_path.with_name(f"{results_path.stem}_pid_atoms.png")
 
-    method_paths = {
-        method: method_csv_path(output_dir, method, csv_prefix)
-        for method in methods
-    }
-    expected_paths = [*method_paths.values(), summary_csv_path(output_dir, csv_prefix)]
     if not config["overwrite_outputs"]:
-        existing_paths = [str(path) for path in expected_paths if path.exists()]
+        existing_paths = [str(path) for path in (results_path, plot_path) if path.exists()]
         if existing_paths:
             raise FileExistsError(
                 "Output files already exist and overwrite_outputs is False: "
                 + ", ".join(existing_paths)
             )
 
-    pid_config = make_pid_config(
-        n=n_samples,
-        p=dimension,
-        device=device,
-    )
-    pid_config["bias_correction"] = config["bias_correction"]
-
+    pid_config = {
+        "n_samples": n_samples,
+        "dx1": dimension,
+        "dx2": dimension,
+        "dt": dimension,
+        "device": device,
+        "bias_correction": bias_correction,
+    }
     all_results = {}
-    rows_by_method = {method: [] for method in methods}
+    rows = []
     for seed in seeds:
         generator = torch.Generator(device=device).manual_seed(seed)
         twin_data = evil_twin_example_torch(
@@ -188,68 +225,68 @@ def run_from_config(config: dict) -> dict:
             dtype=torch.float64,
         )
         all_results[seed] = {}
-        for method in methods:
-            all_results[seed][method] = {}
-            for twin, (source1, source2, target) in twin_data.items():
-                try:
-                    pid, mi = calculate_pid(
-                        config=pid_config,
-                        sources=[source1, source2],
-                        target=[target],
-                        generator=generator,
-                        method=method,
-                    )
-                    all_results[seed][method][twin] = {"pid": pid, "mi": mi}
-                    row = result_row(seed, twin, method, n_samples, dimension, pid, mi)
-                except Exception as error:
-                    all_results[seed][method][twin] = {"error": error}
-                    row = error_row(seed, twin, method, n_samples, dimension, error)
-                rows_by_method[method].append(row)
+        for twin, (source1, source2, target) in twin_data.items():
+            try:
+                pid, mi = pid_calc(
+                    config=pid_config,
+                    sources=[source1, source2],
+                    target=[target],
+                    rng=generator,
+                )
+                all_results[seed][twin] = {"pid": pid, "mi": mi}
+                row = result_row(
+                    seed,
+                    twin,
+                    n_samples,
+                    dimension,
+                    bias_correction,
+                    pid,
+                    mi,
+                )
+            except Exception as error:
+                all_results[seed][twin] = {"error": error}
+                row = error_row(
+                    seed,
+                    twin,
+                    n_samples,
+                    dimension,
+                    bias_correction,
+                    error,
+                )
+            rows.append(row)
 
-    for method, rows in rows_by_method.items():
-        write_rows_to_csv(method_paths[method], rows, list(CSV_FIELDS))
-
-    summary_rows = mean_summary_rows(
-        all_results,
-        methods,
-        n_samples=n_samples,
-        dimension=dimension,
-        bias_correction=config["bias_correction"],
-    )
-    summary_path = save_summary_csv(output_dir, csv_prefix, summary_rows)
-    print("\nEvil-twin configuration")
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    with results_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+    saved_plot_path = plot_pid_atoms(results_path, plot_path)
     print(
-        f"seeds={seeds}, n_samples={n_samples}, dimension={dimension}, "
-        f"bias_correction={config['bias_correction']}"
+        f"Evil-twin Eigen-PID complete: seeds={seeds}, n_samples={n_samples}, "
+        f"dimension={dimension}, bias_correction={bias_correction}"
     )
-    print("\nMean PID/MI summary across seeds")
-    print(format_summary_table(summary_rows))
-    print(f"\nSaved summary CSV to: {summary_path}")
-    for method, path in method_paths.items():
-        print(f"Saved {method} rows to: {path}")
-
+    print(f"Saved detailed results to: {results_path}")
+    print(f"Saved PID atom plot to: {saved_plot_path}")
     return {
         "results": all_results,
-        "method_csvs": method_paths,
-        "summary_csv": summary_path,
+        "results_csv": results_path,
+        "plot": saved_plot_path,
     }
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse optional overrides for the consolidated evil-twin runner.
+    """Parse optional command-line overrides.
 
     Inputs:
         No inputs; values are read from the process command line.
 
     Outputs:
-        argparse.Namespace containing optional CONFIG overrides.
+        argparse.Namespace containing optional configuration overrides.
     """
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seeds", nargs="+", type=int)
     parser.add_argument("--n-samples", "--n", dest="n_samples", type=int)
     parser.add_argument("--dimension", "--p", dest="dimension", type=int)
-    parser.add_argument("--methods", nargs="+", choices=SUPPORTED_METHODS)
     parser.add_argument("--device")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--csv-prefix")
@@ -267,21 +304,19 @@ def parse_args() -> argparse.Namespace:
 
 
 def config_from_args(args: argparse.Namespace) -> dict:
-    """Apply explicitly supplied command-line values to ``CONFIG``.
+    """Apply explicitly supplied command-line values to CONFIG.
 
     Inputs:
-        args: argparse.Namespace returned by ``parse_args``.
+        args: argparse.Namespace returned by parse_args.
 
     Outputs:
-        dict containing an independent, validated experiment configuration.
+        dict, independent experiment configuration.
     """
-
     config = dict(CONFIG)
     for key in (
         "seeds",
         "n_samples",
         "dimension",
-        "methods",
         "bias_correction",
         "device",
         "output_dir",
@@ -295,13 +330,13 @@ def config_from_args(args: argparse.Namespace) -> dict:
 
 
 def main() -> dict:
-    """Run the evil-twin experiment with CONFIG and command-line overrides.
+    """Run the configured evil-twin experiment.
 
     Inputs:
-        No inputs. Uses the module-level CONFIG plus explicit CLI values.
+        No inputs. Uses the module-level CONFIG and command-line overrides.
 
     Outputs:
-        dict, containing nested results by seed/method/twin and written CSV paths.
+        dict containing results by seed and twin, the CSV path, and plot path.
     """
     return run_from_config(config_from_args(parse_args()))
 

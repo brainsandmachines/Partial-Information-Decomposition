@@ -14,19 +14,26 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from pid.calculation import pid_calc
+from pid.utils import reorder_cov_blocks
 from simulations.pca.ridge.pid_feature_middleware import calculate_theoretical_pid
-from simulations.theoretical.covariance.cov_functions import make_direct_true_cov_from_config, change_covariance_order
-from simulations.theoretical.covariance.sample_simulation import simulation
 
 
 def test_source_source_target_to_target_source_source() -> None:
     """Check the simulation covariance-order helper; no inputs or return value."""
     matrix = torch.tensor([[1.0, 0.1, 0.2], [0.1, 1.0, 0.3], [0.2, 0.3, 1.0]], dtype=torch.float64)
     # Nested list (3, 3) -> torch covariance (3, 3).
-    reordered = change_covariance_order(matrix, [2, 0, 1], [1, 1, 1])
+    reordered = reorder_cov_blocks(
+        matrix,
+        {"X1": 1, "X2": 1, "T": 1},
+        ["X1", "X2", "T"],
+        ["T", "X1", "X2"],
+    )  # (3, 3) [X1, X2, T] -> (3, 3) [T, X1, X2]
     # (3, 3) [X1, X2, T] -> (3, 3) [T, X1, X2]
     expected = matrix[[2, 0, 1]][:, [2, 0, 1]]  # (3, 3) -> reordered (3, 3)
     torch.testing.assert_close(reordered, expected)
+    theoretical = calculate_theoretical_pid(matrix, [1, 1, 1], "eigen_pid")
+    direct = eigen_pid(expected, 1, 1, 1)
+    assert theoretical["unq1"] == pytest.approx(float(direct["uix"]), abs=1e-10)
 
 
 @pytest.mark.parametrize("method", [None, "eigen", "eigen_pid"])
@@ -116,26 +123,6 @@ def test_bias_correction_requires_samples() -> None:
             config={"dt": 1, "dx1": 1, "dx2": 1, "bias_correction": True},
             covariance=covariance,
         )
-
-
-def test_covariance_experiment_consumers(tmp_path: Path) -> None:
-    """Run a tiny covariance experiment in tmp_path and check PCA result mapping."""
-    config = {
-        "dt": 1, "dx1": 2, "dx2": 3, "p_scale": 0.1, "q_scale": 0.5, "r_scale": 0.2,
-        "n_samples": 128, "n_trials": 2, "seed": 19, "device": "cpu",
-        "bias_correction": False, "output_dir": str(tmp_path),
-    }
-    results = simulation(config, ["eigen_pid"], experiment_name="migration_check")
-    covariance = make_direct_true_cov_from_config(config)  # config -> (6, 6) [X1, X2, T]
-    ordered = change_covariance_order(covariance, [2, 0, 1], [2, 3, 1])
-    # (6, 6) [X1, X2, T] -> (6, 6) [T, X1, X2]
-    expected = eigen_pid(ordered, 1, 2, 3)
-    theoretical, _ = results["eigen_pid"]["theoretical"]
-    assert theoretical["unq1"] == pytest.approx(float(expected["uix"]), abs=1e-10)
-    pca_truth = calculate_theoretical_pid(covariance, [2, 3, 1], "eigen_pid")
-    assert pca_truth["unq1"] == pytest.approx(theoretical["unq1"], abs=1e-10)
-    assert len(pca_truth) == 7
-    assert len(list(tmp_path.rglob("*.csv"))) == 1
 
 
 def test_source_transform_once() -> None:
