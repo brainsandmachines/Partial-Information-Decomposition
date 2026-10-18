@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from inspect import signature
 from typing import Any, Callable
 import numpy as np
-import my_utils
+
 @dataclass
 class PIDPipelineFunctions:
     """Store the user-selected functions for one PID pipeline run.
@@ -98,7 +99,7 @@ class PIDPipeline:
         elif func is None:
             return kwargs  # If the function is None, return the original kwargs
 
-        elif not my_utils.inspect_function(func, 'rng'):
+        elif 'rng' not in signature(func).parameters:
             return kwargs  # If the function does not accept 'rng', return the original kwargs
         
         updated_kwargs = {**kwargs, "rng": rng}

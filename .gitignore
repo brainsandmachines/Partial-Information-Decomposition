@@ -10,16 +10,14 @@ trained_models/
 **/between_models_cor/
 **/test_runs/
 **/simulation_results/
-Partial_Information_Decomposition/Idep/Idep_Simulations/figures/
 file_ignore/
-library_wrappers/evil_twin_check_outputs/
-Codex_opreations/
+simulations/theoretical/evil_twin/check_outputs/
 flow_pid/
-Simulations/Theoretical_Examples/Covariance/results_covariance/
+simulations/theoretical/covariance/results_covariance/
 pipeline/trash/
 subj01_results/
-pipeline/subj_PCs/saved_pcs/
-pipeline/ridge_find_alpha/results/
+pipeline/pca/saved_pcs/
+pipeline/pca/results/
 pca_by_variance=8000/
 MultivariateStatistics/
 

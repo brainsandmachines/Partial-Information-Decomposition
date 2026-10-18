@@ -1,0 +1,28 @@
+import sys
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[3]
+sys.path.append(str(root))
+from simulations.encoding.examples.suppression_toy_runner import (
+    SPLIT_SIGNAL,
+    run_default_factorial_scenarios,
+)
+
+
+# =============================================================================
+# 2x3 Factorial Design: SNR (low/high) x Mixing (none/invertible/lossy)
+# =============================================================================
+
+def main():
+    """Run the 2x3 factorial experiment design."""
+    run_default_factorial_scenarios(
+        experiment_kind=SPLIT_SIGNAL,
+        n=1000,
+        p=100,
+        seed=42,
+        report_negative_common=True,
+    )
+
+
+if __name__ == '__main__':
+    main()
