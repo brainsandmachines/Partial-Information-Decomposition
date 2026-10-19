@@ -20,7 +20,12 @@ pipeline/pca/saved_pcs/
 pipeline/pca/results/
 pca_by_variance=8000/
 MultivariateStatistics/
-cluster_instruction.txt/
+# Cluster scripts and instructions
+cluster/
+cluster_instruction.txt
+
+# Log files and directories
+logs/
 # Local test/tool caches and scheduler output
 .pytest_cache/
 .mypy_cache/
@@ -28,3 +33,4 @@ cluster_instruction.txt/
 *.log
 *.out
 *.err
+sinteractive_*_.out

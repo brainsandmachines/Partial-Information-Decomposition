@@ -323,7 +323,7 @@ def main(
     if layer_index is None:
         raise ValueError(f"No best layer found for model {source_name}. Please check the results CSV at {path_to_results}.")
 
-    features = nsd_feature_extraction(model_context,layer_index,unique_target_context,batch_size_process=28)
+    features = nsd_feature_extraction(model_context,layer_index,unique_target_context,batch_size_process=256)
 
     #Save memory
     del model_context
@@ -428,18 +428,18 @@ if __name__ == "__main__":
         'ResNet50-PIRL_selfsupervised','ResNet50-ClusterFit-16K-RotNet_selfsupervised','ResNet50-MoCoV2-BS256_selfsupervised'
         ]
     
-    n_pcs = 30  # Number of principal components to use for ridge regression
+    n_pcs = 100  # Number of principal components to use for ridge regression
     #Path to best layer results
     path_to_results = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv')
     
-    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/saved_pcs_nostandardization/pca_by_variance=8000/subj01_pca_model.pkl')
+    pc_path = Path('/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/subj01_pca_by_variance_max=1000/subj01_pca_model.pkl')
     
     hdf_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5')
     pkl_info_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl')
     neural_data_path = Path('/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr')
 
-    alphas_csv_path = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/results3/pcs{n_pcs}_all_models_alphas.csv')
-    output_dir = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/results3/pcs{n_pcs}_alphas_by_model.csv')
+    alphas_csv_path = Path(f'//home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/subj01_pca_by_variance_max=1000/model_alphas/pcs{n_pcs}_all_models_alphas.csv')
+    output_dir = Path(f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/subj01_pca_by_variance_max=1000/model_alphas/pcs{n_pcs}_alphas_by_model.csv')
         
     path_config = {
         "path_to_results": path_to_results,

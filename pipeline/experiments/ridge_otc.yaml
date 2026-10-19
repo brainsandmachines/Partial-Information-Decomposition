@@ -30,23 +30,23 @@ feature_extraction_kwargs:
 models:
   - nf_resnet50_classification
   - eca_nfnet_l0_classification
-  - resnet50_classification
-  - semnasnet_100_classification
-  - cspresnet50_classification
-  - mobilenetv3_large_100_classification
-  - ghostnet_100_classification
-  - convnext_base_classification
-  - xcit_nano_12_p8_224_classification
-  - xcit_nano_12_p16_224_classification
-  - swin_large_patch4_window7_224_classification
-  - jx_nest_tiny_classification
-  - pit_ti_224_classification
-  - vit_base_patch32_224_classification
-  - vit_base_patch16_224_classification
-  - tnt_s_patch16_224_classification
-  - crossvit_base_240_classification
-  - deit_base_patch16_224_classification
-  - levit_128_classification
+  # - resnet50_classification
+  # - semnasnet_100_classification
+  # - cspresnet50_classification
+  # - mobilenetv3_large_100_classification
+  # - ghostnet_100_classification
+  # - convnext_base_classification
+  # - xcit_nano_12_p8_224_classification
+  # - xcit_nano_12_p16_224_classification
+  # - swin_large_patch4_window7_224_classification
+  # - jx_nest_tiny_classification
+  # - pit_ti_224_classification
+  # - vit_base_patch32_224_classification
+  # - vit_base_patch16_224_classification
+  # - tnt_s_patch16_224_classification
+  # - crossvit_base_240_classification
+  # - deit_base_patch16_224_classification
+  # - levit_128_classification
 
 
   

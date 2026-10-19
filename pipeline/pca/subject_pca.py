@@ -22,7 +22,7 @@ from simulations.pca.rank.eigenvector_pca import eigenvector_pca_cv
 from pipeline.pca.missmda_ncp import estimate_ncp_pca
 
 
-max_features = 2000  # Maximum number of features to use for PCA
+max_features = 1000  # Maximum number of features to use for PCA
 
 def split_unique_shared(
     subj_id: str,
@@ -354,7 +354,17 @@ if __name__ == "__main__":
         "otc_betas_per_stim/subj01_OTC_betas_per_stimulus.zarr"
     )
 
-    save_path = f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca/saved_pcs_nostandardization/eigenvector_max={max_features}'
+    
+    path = f'/home/ohadshee/Desktop/Partial-Information-Decomposition/pipeline/pca'
+    #Check if path exists
+    assert Path(path).exists(), f"Path {path} does not exist."
+    pc_mode = "pca_by_variance"  #Options: "pca_by_variance", "eigenvector_CV", "missmda_CV"
+
+    exp_name = f"subj01_{pc_mode}_max={max_features}"
+    save_path = Path(path) / exp_name
+    save_path.mkdir(parents=True, exist_ok=True)
+
+    
     main(
         subj_id=subject_id,
         hdf_path=stimulus_hdf_path,
@@ -363,5 +373,5 @@ if __name__ == "__main__":
         variance_threshold=1.0,
         save_models_path=Path(save_path),
         max_features=max_features,
-        pca_mode="eigenvector_CV", #Options: "pca_by_variance", "eigenvector_CV", "missmda_CV"
+        pca_mode=pc_mode, #Options: "pca_by_variance", "eigenvector_CV", "missmda_CV"
     ) 
