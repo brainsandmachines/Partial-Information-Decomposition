@@ -290,7 +290,8 @@ def main(
 
     Outputs:
         tuple[np.ndarray, Pipeline] containing the per-PC alpha vector and the
-        fitted raw-input RidgeCV pipeline. No target or predictor variance
+        fitted raw-input RidgeCV model. Per-PC CV MSE, target variance, CV R²,
+        and alpha-grid boundary warnings are printed before returning.
     """
 
     target = prepare_target(hdf_path, pkl_info_path, neural_data_path)
@@ -358,7 +359,7 @@ def main(
             (source_name, int(layer_index), pc_index, float(alpha))
             for pc_index, alpha in enumerate(alphas_per_pc, start=1)
         )
-        print("\nSelected alpha and cross-validation score for each PC:")
+        print("\nSelected alpha and cross-validation diagnostics for each PC:")
 
 
     
@@ -372,20 +373,55 @@ def main(
         dtype=np.float64,
     )
 
+    target_variance_per_pc = np.var(pca_target, axis=0)
+    cv_mse_per_pc = -scores_per_pc
+    cv_r2_per_pc = np.full_like(cv_mse_per_pc, np.nan)
+    nonzero_variance = target_variance_per_pc > 0
+    cv_r2_per_pc[nonzero_variance] = (
+        1.0
+        - cv_mse_per_pc[nonzero_variance]
+        / target_variance_per_pc[nonzero_variance]
+    )
+
+    alpha_grid = np.asarray(ridge_model.alphas, dtype=np.float64)
+    lower_alpha = float(np.min(alpha_grid))
+    upper_alpha = float(np.max(alpha_grid))
+
     print("Finished finding best ridge alphas for each target PC.✅")
-    for pc_index, (alpha, score) in enumerate(
-        zip(alphas_per_pc, scores_per_pc),
+    for pc_index, (alpha, cv_mse, target_variance, cv_r2) in enumerate(
+        zip(
+            alphas_per_pc,
+            cv_mse_per_pc,
+            target_variance_per_pc,
+            cv_r2_per_pc,
+        ),
         start=1,
     ):
+        boundary_warning = ""
+        if np.isclose(alpha, lower_alpha, rtol=1e-12, atol=0.0):
+            boundary_warning = " [WARNING: lower alpha-grid boundary]"
+        elif np.isclose(alpha, upper_alpha, rtol=1e-12, atol=0.0):
+            boundary_warning = " [WARNING: upper alpha-grid boundary]"
+
         print(
             f"\nPC {pc_index:>3}: "
             f"alpha = {alpha:.6g}, "
-            f"CV score = {score:.6f}"
+            f"CV MSE = {cv_mse:.6f}, "
+            f"target variance = {target_variance:.6f}, "
+            f"CV R² = {cv_r2:.6f}"
+            f"{boundary_warning}"
         )
 
-    mean_score = float(np.mean(scores_per_pc))
-
-    print(f"\nMean cross-validation score across PCs: {mean_score:.6f}")
+    total_target_variance = float(np.sum(target_variance_per_pc))
+    aggregate_cv_r2 = (
+        1.0 - float(np.sum(cv_mse_per_pc)) / total_target_variance
+        if total_target_variance > 0
+        else np.nan
+    )
+    print(
+        "\nVariance-weighted cross-validation R² across PCs: "
+        f"{aggregate_cv_r2:.6f}"
+    )
 
 
     print(f"\n======================================================================================")
