@@ -29,6 +29,7 @@ Generated from the current AST after the repository reorganization. Paths, signa
 - `simulations/evil_twin/`: 4 Python files.
 - `simulations/pca/rank/`: 5 Python files.
 - `simulations/pca/ridge/`: 3 Python files.
+- `simulations/rsa_vs_pid/`: 3 Python files.
 
 ## `pid/__init__.py`
 
@@ -567,6 +568,45 @@ File description: Run the Sonic/Shadow Eigen-PID experiment from an editable con
 | `parse_args (line 277)` |  | argparse.Namespace | Parse optional command-line overrides. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `config_from_args (line 306)` | args: argparse.Namespace | dict | Apply explicitly supplied command-line values to `CONFIG`. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `main (line 332)` |  | dict | Run the configured evil-twin experiment. | Scope: entry point. Conventions: verify PID definition, source/target order, and bit units. |
+
+## `simulations/rsa_vs_pid/__init__.py`
+
+File description: Gaussian experiment comparing Pearson-RDM RSA with BROJA unique information.
+
+No functions or classes defined in this file.
+
+## `simulations/rsa_vs_pid/run_rsa_vs_pid.py`
+
+File description: Compare Pearson-RDM RSA and Gaussian BROJA unique information on sources that differ only along the all-ones direction.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `validate_config (line 81)` | config: dict | None | Validate the experiment configuration. | Scope: task-specific. Conventions: requires n >= 3d + 1 for every grid point (full-rank (3d, 3d) sample covariance). |
+| `sample_shift_invariant_example (line 129)` | rng: np.random.Generator, n: int, d: int, noise_variance: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Sample T = Z + M1 + eps_T, X = Z + M1 + eps_X, Y = Z + N1 + eps_Y with Z ~ N(0, I - 11^T/d). | Scope: task-specific. Conventions: returns samples ordered [X1, X2, T], each (n, d) float64; fixed draw order G, M, N, eps_T, eps_X, eps_Y. |
+| `rsa_scores (line 165)` | target: np.ndarray, x: np.ndarray, y: np.ndarray | dict[str, float] | Spearman RSA between rsatoolbox correlation-distance RDMs of T and each source. | Scope: reusable/public. Related: rsatoolbox `calc_rdm(method="correlation")`, `compare(method="spearman")`. Conventions: rows are stimuli, columns are features. |
+| `run_trial (line 201)` | dimension: int, n_samples: int, trial: int, seed: int, config: dict | dict | Run RSA and bias-corrected Gaussian BROJA PID on the same samples and validate shapes, covariance, finiteness, and PID identities. | Scope: task-specific. Related: `pid_calc`, `create_cov_matrix`. Conventions: PID order [T, X1=X, X2=Y]; outputs bits; unsuffixed atoms are `debias_eigen_pid` combined estimates, `_raw` atoms are uncorrected. |
+| `summarize_trials (line 322)` | trials_csv: str \| Path, summary_csv: str \| Path | Path | Long-format per-(d, n) mean, median, SD, and 25th/75th percentiles across trials of every metric. | Scope: task-specific. Conventions: q25/q75 describe the trial spread (IQR), not a CI of the mean; `frac_positive` only for delta_ui columns. |
+| `run_experiment (line 365)` | config: dict | dict[str, Path] | Run the (d, n, trial) grid, write the trial CSV incrementally, summarize, and plot. | Scope: entry point helper. Conventions: seed = base_seed + condition_index * n_trials + trial; relative output_dir resolves from the repository root. |
+| `parse_args (line 416)` |  | argparse.Namespace | Parse optional command-line overrides. | Scope: entry point. |
+| `config_from_args (line 435)` | args: argparse.Namespace | dict | Apply command-line overrides to a copy of `CONFIG`. | Scope: entry point. |
+| `main (line 452)` |  | dict[str, Path] | Run the configured experiment. | Scope: entry point. |
+
+## `simulations/rsa_vs_pid/plot_results.py`
+
+File description: Plot RSA scores, BROJA PID atoms, and their paired differences from saved CSVs.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `_load_results (line 69)` | trials_csv: str \| Path, summary_csv: str \| Path | tuple[pd.DataFrame, pd.DataFrame] | Load trial and summary CSVs; index the summary by (dimension, n_samples, metric). | Scope: private helper. |
+| `_condition_grid (line 85)` | trials: pd.DataFrame | tuple[list[int], list[int]] | Return the sorted dimensions and sample sizes. | Scope: private helper. |
+| `_summary_series (line 97)` | summary: pd.DataFrame, dimension: int, sample_sizes: list[int], metric: str | dict[str, np.ndarray] | Read median, 25th/75th percentiles, and SD of one metric across sample sizes. | Scope: private helper. |
+| `_jitter (line 119)` | rng: np.random.Generator, center: float, count: int, width: float=0.07 | np.ndarray | Horizontal jitter around a categorical x position. | Scope: private helper. |
+| `_finish_n_axis (line 134)` | ax: plt.Axes, sample_sizes: list[int] | None | Label a categorical sample-size x-axis. | Scope: private helper. |
+| `plot_rsa_comparison (line 150)` | trials_csv: str \| Path, summary_csv: str \| Path, output_path: str \| Path | Path | Figure 1: RSA(T, X), RSA(T, Y), and delta RSA across n per dimension. | Scope: task-specific. |
+| `plot_pid_decomposition (line 229)` | trials_csv: str \| Path, summary_csv: str \| Path, output_path: str \| Path | Path | Figure 2: box plots of corrected PID atoms with raw medians, per dimension and n. | Scope: task-specific. Conventions: bits; X1 = X, X2 = Y. |
+| `plot_rsa_vs_unique (line 298)` | trials_csv: str \| Path, summary_csv: str \| Path, output_path: str \| Path | Path | Figure 3: per-trial (delta RSA, corrected delta UI) scatter with per-n median and 25th-75th percentiles. | Scope: task-specific. Conventions: separate axes for Spearman units and bits. |
+| `plot_all (line 363)` | trials_csv: str \| Path, summary_csv: str \| Path, output_dir: str \| Path | dict[str, Path] | Create all three figures. | Scope: task-specific. |
+| `main (line 385)` | config: dict \| None=None | dict[str, Path] | Plot the configured CSVs. | Scope: entry point. |
 
 ## `simulations/random_variables.py`
 
