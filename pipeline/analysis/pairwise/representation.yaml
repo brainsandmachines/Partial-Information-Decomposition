@@ -1,3 +1,9 @@
+# Representation-level pairwise PID: X1 and X2 are PCA projections of each
+# model's best-layer features (PCA fitted on the unique images, applied to the
+# shared images). Run:
+#   python pipeline/analysis/pairwise/pairwise.py --config pipeline/analysis/pairwise/representation.yaml
+source_mode: representation
+
 functions:
   target_extraction: prepare_target
   sources_extraction: nsd_sources
@@ -8,6 +14,50 @@ functions:
   pid_calculation: pid_calc
   pid_report: print_pid_mi
 
+# Symmetric candidate list: every unfinished unordered pair is processed once.
+models:
+  - levit_128_classification
+  - coat_lite_tiny_classification
+  - visformer_small_classification
+  - convit_base_classification
+  - RN50_clip
+  - RN101_clip
+  - ResNet50-SimCLR_selfsupervised
+  - ResNet50-DeepClusterV2-2x224_selfsupervised
+  - ResNet50-SwAV-BS4096-2x224_selfsupervised
+  - ResNet50-PIRL_selfsupervised
+  - ResNet50-ClusterFit-16K-RotNet_selfsupervised
+  - ResNet50-MoCoV2-BS256_selfsupervised
+  - nf_resnet50_classification
+  - hardcorenas_f_classification
+  - eca_nfnet_l0_classification
+  - resnet50_classification
+  - semnasnet_100_classification
+  - cspresnet50_classification
+  - mobilenetv3_large_100_classification
+  - ghostnet_100_classification
+  - convnext_base_classification
+  - xcit_nano_12_p8_224_classification
+  - xcit_nano_12_p16_224_classification
+  - swin_large_patch4_window7_224_classification
+  - jx_nest_tiny_classification
+  - pit_ti_224_classification
+  - vit_base_patch32_224_classification
+  - vit_base_patch16_224_classification
+  - tnt_s_patch16_224_classification
+  - crossvit_base_240_classification
+  - deit_base_patch16_224_classification
+  - dino_vitb16_selfsupervised
+  # - ViT-B_32_clip
+  # - ViT-L_14_clip
+
+metadata:
+  subj_id: subj01
+
+execution:
+  # Each model is extracted and projected in the main thread.
+  prefetch_next_model: false
+
 target_kwargs:
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5
   pkl_info_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata/experiments/nsd/nsd_stim_info_merged.pkl
@@ -15,11 +65,13 @@ target_kwargs:
   n_samples: null
 
 sources_kwargs:
+  # Retained for compatibility with the standard OTC config. The pairwise
+  # runner loads each required model directly from the models list above.
   model_name_1: crossvit_base_240_classification
   model_name_2: ResNet50-SimCLR_selfsupervised
 
 choose_layer_kwargs:
-  path_to_results: /home/ohadshee/Desktop/Partial-Information-Decomposition/external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
+  path_to_results: external/mayas_project/results_shared/encoding/best_layers/subj01_OTC_all_models_best_layer_overall.csv
 
 feature_extraction_kwargs:
   batch_size_process: 128
@@ -27,14 +79,12 @@ feature_extraction_kwargs:
   use_srp: false
   srp_n_components: null
 
-preprocess_kwargs:
-  n_components_target : 50
-
+# PCA sizes. Both sources must match the target so PID compares arrays of the
+# same shape (n_shared_images, n_components).
 feature_manipulation_kwargs:
   n_components_source_1: 50
   n_components_source_2: 50
   n_components_target: 50
-
 
 pid_kwargs:
   method: eigen_pid
@@ -44,4 +94,7 @@ pid_kwargs:
     bias_correction: True
 
 report_kwargs: {}
-only_shared: true
+
+output:
+  csv_path: pipeline/analysis/pairwise/results/50PCs_pairwise_pid_results.csv
+  plot_dir: pipeline/analysis/pairwise/results/50PCs_pairwise_pid_results

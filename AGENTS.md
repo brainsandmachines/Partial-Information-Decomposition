@@ -309,21 +309,21 @@ Search `FUNCTION_REGISTRY.md` before writing or changing a function; it lists ev
 - `utils.py`: resolves stage names from a YAML `functions:` block into callables. It also holds the NSD adapters, such as `nsd_sources`, `nsd_feature_extraction`, `pca_each_source`, and `pid_calc_adapter`.
 - `phases/`: stage implementations, including stimulus/target loading and feature extraction (`sources_target_features.py`), layer selection (`choosing_layer.py`), scaling and ridge preprocessing (`preprocessing_layer.py`), and PCA, ridge prediction, and other feature transforms (`feature_manipulations.py`).
 - `pca/`: neural-target preparation. `subject_pca.py` fits a subject PCA on unique-image responses and projects the shared images. `missmda_ncp.py` selects the component count, and `find_alpha.py` finds one ridge alpha per target PC for each model's best layer.
-- `analysis/pairwise/`: the main model-pair analyses. `prediction.py` runs prediction-level PID, which is the intended design. `representation.py` runs PID on PCA-reduced features instead.
+- `analysis/pairwise/`: the main model-pair analysis. One runner, `pairwise.py`, runs every model pair; `source_mode` in its YAML selects the sources. `prediction.yaml` (the intended design) uses held-out ridge predictions of the target PCs. `representation.yaml` uses PCA projections of the model features. Shared helpers and both source preparers live in `pairwise_utils.py`.
 - `analysis/pca/`: PID and MI as functions of the number of target PCs, and permutation analysis.
 - `analysis/predictivity/`: ridge prediction correlation for each target PC.
 - `experiments/`: single-pair runners for full OTC and single voxels.
 - `examples/`: toy and smoke runs that need no data.
 - `plotting.py`: pairwise PID heatmaps.
 
-Most runners read a YAML config of the same name in the same folder, for example `prediction.py` reads `prediction.yaml`.
+Most runners read a YAML config of the same name in the same folder, for example `pc_function.py` reads `pc_function.yaml`. `pairwise.py` takes `--config` instead and defaults to `prediction.yaml`.
 
 Main prediction-level flow:
 
 1. `pipeline/pca/subject_pca.py` saves the fitted target PCA model.
 2. The best layer for each model is read from the Maya's-project CSV through `overall_best_layer`.
 3. `pipeline/pca/find_alpha.py` saves per-PC ridge alphas for each model.
-4. `pipeline/analysis/pairwise/prediction.py` runs every unfinished unordered model pair. For each pair it extracts features, fits ridge on the unique images, predicts the shared images, and runs Eigen-PID. Results go to a resumable CSV, and the script then plots the heatmaps.
+4. `pipeline/analysis/pairwise/pairwise.py --config pipeline/analysis/pairwise/prediction.yaml` runs every unfinished unordered model pair. For each pair it extracts features, fits ridge on the unique images, predicts the shared images, and runs Eigen-PID. Results go to a resumable CSV, and the script then plots the heatmaps.
 
 ### `simulations/`
 

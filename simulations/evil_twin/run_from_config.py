@@ -8,22 +8,25 @@ from pathlib import Path
 import sys
 
 import torch
-
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from simulations.evil_twin.plot_results import plot_pid_atoms
+from simulations.evil_twin.covariance_example import evil_twin_example_torch
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from simulations.evil_twin.plot_results import plot_pid_atoms
+
 from pid.calculation import pid_calc
-from simulations.evil_twin.covariance_example import evil_twin_example_torch
 
 
 CONFIG = {
     "seeds": [0],
-    "n_samples": 10000,
+    "n_samples": 1000000,
     "dimension": 100,
     "bias_correction": False,
-    "device": "cpu",
+    "device": "cuda",
     "output_dir": "simulation_results/evil_twin_config",
     "csv_prefix": "evil_twin",
     "overwrite_outputs": True,

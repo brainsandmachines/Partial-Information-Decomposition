@@ -17,8 +17,8 @@ import pytest
 from sklearn.decomposition import PCA
 from sklearn.linear_model import Ridge
 
-from pipeline.analysis.pairwise import prediction as ridge_pair_wise_comp
-from pipeline.analysis.pairwise import prediction_utils as ridge_pairwise_utils
+from pipeline.analysis.pairwise import pairwise as ridge_pair_wise_comp
+from pipeline.analysis.pairwise import pairwise_utils as ridge_pairwise_utils
 from pipeline.pca import find_alpha
 from pipeline.phases import feature_manipulations
 
@@ -870,7 +870,7 @@ class _RunnerHarness:
                 "pid_report": "synthetic_report",
             },
             "metadata": {"subj_id": "synthetic-subject"},
-            "execution": {"prefetch_ridge_predictions": prefetch_enabled},
+            "execution": {"prefetch_next_model": prefetch_enabled},
             "target_kwargs": {"n_samples": 6},
             "choose_layer_kwargs": {
                 "path_to_results": str(self.layer_results_path)
@@ -895,6 +895,11 @@ class _RunnerHarness:
 
         monkeypatch.setattr(
             ridge_pair_wise_comp,
+            "resolve_pipeline_function",
+            self.resolve_pipeline_function,
+        )
+        monkeypatch.setattr(
+            ridge_pairwise_utils,
             "resolve_pipeline_function",
             self.resolve_pipeline_function,
         )
@@ -1601,12 +1606,12 @@ def test_pairwise_runner_partial_and_full_resume_load_only_needed_models(
     [
         pytest.param(
             "worker",
-            "Prefetched ridge prediction failed for 'model-c'",
+            "Prefetched source preparation failed for 'model-c'",
             id="worker-failure",
         ),
         pytest.param(
             "ridge",
-            "Prefetched ridge prediction failed for 'model-c'",
+            "Prefetched source preparation failed for 'model-c'",
             id="ridge-failure",
         ),
         pytest.param(
@@ -1725,3 +1730,407 @@ def test_pairwise_main_plots_the_exact_runner_returned_csv(
         csv_path=returned_csv,
         output_dir=plot_dir,
     )
+
+
+_REPRESENTATION_SHARED_MASK = np.array([False, False, False, False, True, True])
+# The four unique rows have zero mean and vary only along axes 0 and 1, with
+# variances 9 and 1, so a PCA fitted on them alone has components +-e0 and
+# +-e1. The two shared rows add a large axis-2 value that would dominate the
+# first component if the shared images leaked into the PCA fit.
+_REPRESENTATION_BASE = np.array(
+    [
+        [-3.0, -1.0, 0.0],
+        [3.0, -1.0, 0.0],
+        [-3.0, 1.0, 0.0],
+        [3.0, 1.0, 0.0],
+        [2.0, 0.5, 100.0],
+        [-1.0, -0.25, -100.0],
+    ]
+)
+# Absolute projections of the shared rows onto +-e0 and +-e1: (n_shared, 2).
+_REPRESENTATION_EXPECTED_ABS = np.array([[2.0, 0.5], [1.0, 0.25]])
+
+
+class _RepresentationHarness:
+    """Install deterministic fakes around the pairwise runner in representation mode.
+
+    Inputs:
+        monkeypatch: pytest.MonkeyPatch replacing target loading, model loading,
+            feature batches, layer lookup, and PID.
+        tmp_path: Path holding the empty best-layer CSV.
+        model_names: list[str] of synthetic model identifiers; model i has
+            features (i + 1) * _REPRESENTATION_BASE.
+        n_source_2_components: int PCA size requested for source 2; source 1
+            and the target always request 2.
+
+    Outputs:
+        A harness whose ``run`` method invokes the real runner and whose
+        counters record target loads, model loads, feature batches, and the
+        ordered PID inputs.
+    """
+
+    def __init__(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+        model_names: list[str],
+        *,
+        n_source_2_components: int = 2,
+    ) -> None:
+        """Create the configuration, state trackers, and patches.
+
+        Inputs:
+            monkeypatch: pytest.MonkeyPatch applying reversible test doubles.
+            tmp_path: Path receiving the empty best-layer CSV.
+            model_names: list[str] defining deterministic model values/order.
+            n_source_2_components: int PCA size requested for source 2.
+
+        Outputs:
+            None. The initialized object owns all test state and configuration.
+        """
+
+        self.model_names = list(model_names)
+        self.model_values = {
+            model_name: float(model_index + 1)
+            for model_index, model_name in enumerate(self.model_names)
+        }
+        self.counts: Counter[str] = Counter()
+        self.pid_inputs: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []
+        self.hdf_file = Mock(name="synthetic_hdf_file")
+        layer_results_path = tmp_path / "best_layers.csv"
+        layer_results_path.touch()
+
+        self.config: dict[str, Any] = {
+            "source_mode": "representation",
+            "functions": {
+                "target_extraction": "synthetic_target",
+                "pid_calculation": "synthetic_pid",
+            },
+            "metadata": {"subj_id": "synthetic-subject"},
+            "execution": {"prefetch_next_model": False},
+            "target_kwargs": {},
+            "choose_layer_kwargs": {"path_to_results": str(layer_results_path)},
+            "feature_extraction_kwargs": {
+                "batch_size_process": 4,
+                "batch_size_dataloader": 2,
+                "use_srp": False,
+                "srp_n_components": None,
+            },
+            "feature_manipulation_kwargs": {
+                "n_components_source_1": 2,
+                "n_components_source_2": n_source_2_components,
+                "n_components_target": 2,
+            },
+            "pid_kwargs": {
+                "method": "synthetic-method",
+                "rng_seed": 11,
+                "config": {"bias_correction": False},
+            },
+            "report_kwargs": {},
+        }
+
+        monkeypatch.setattr(
+            ridge_pair_wise_comp,
+            "resolve_pipeline_function",
+            self.resolve_pipeline_function,
+        )
+        monkeypatch.setattr(
+            ridge_pairwise_utils, "overall_best_layer", self.overall_best_layer
+        )
+        monkeypatch.setattr(
+            ridge_pairwise_utils, "prepare_model_context", self.prepare_model_context
+        )
+        monkeypatch.setattr(
+            ridge_pairwise_utils,
+            "get_layer_feature_count",
+            self.get_layer_feature_count,
+        )
+        monkeypatch.setattr(ridge_pairwise_utils, "batching", self.batching)
+        monkeypatch.setattr(ridge_pairwise_utils.gc, "collect", Mock(return_value=0))
+        monkeypatch.setattr(
+            ridge_pairwise_utils.torch.cuda,
+            "is_available",
+            Mock(return_value=False),
+        )
+
+    def resolve_pipeline_function(
+        self,
+        function_config: dict[str, Any],
+        registry: dict[str, Any],
+        step_name: str,
+        *,
+        required: bool,
+    ) -> Any:
+        """Resolve runner pipeline phases to deterministic harness methods.
+
+        Inputs:
+            function_config: dict[str, Any] accepted for signature compatibility.
+            registry: dict[str, Any] accepted for signature compatibility.
+            step_name: str naming the requested configured phase.
+            required: bool accepted for signature compatibility.
+
+        Outputs:
+            Bound callable for target extraction or PID, otherwise None.
+        """
+
+        del function_config, registry, required
+        return {
+            "target_extraction": self.target_extraction,
+            "pid_calculation": self.pid_calculation,
+        }.get(step_name)
+
+    def target_extraction(self, **kwargs: Any) -> dict[str, Any]:
+        """Return the six-image synthetic target context.
+
+        Inputs:
+            **kwargs: Any configured target options, accepted but not used.
+
+        Outputs:
+            dict[str, Any] with a (6, 3) target, the shared mask, image ids,
+            stimuli, and a closeable HDF handle.
+        """
+
+        del kwargs
+        self.counts["target_extraction"] += 1
+        return {
+            "target": _REPRESENTATION_BASE.copy(),
+            "shared1000_subj": _REPRESENTATION_SHARED_MASK.copy(),
+            "hdf_file": self.hdf_file,
+            "image_ids_for_subj": np.arange(6),
+            "stim": "synthetic-stimuli",
+        }
+
+    def overall_best_layer(
+        self,
+        model_name: str,
+        path_to_results: str,
+    ) -> dict[str, int]:
+        """Select a deterministic valid layer for one synthetic model.
+
+        Inputs:
+            model_name: str identifying the requested model.
+            path_to_results: str accepted for compatibility with layer lookup.
+
+        Outputs:
+            dict[str, int] with the model's list position under ``l``.
+        """
+
+        del path_to_results
+        self.counts[f"layer:{model_name}"] += 1
+        return {"l": self.model_names.index(model_name)}
+
+    def prepare_model_context(self, model_name: str) -> dict[str, Any]:
+        """Create one synthetic model context.
+
+        Inputs:
+            model_name: str canonical synthetic model identifier to load.
+
+        Outputs:
+            dict[str, Any] with the model name, a placeholder model, one named
+            layer per synthetic model, and no image transforms.
+        """
+
+        self.counts[f"load:{model_name}"] += 1
+        return {
+            "model_name": model_name,
+            "model": Mock(name=f"model-object-{model_name}"),
+            "layers_ordered": [f"layer-{index}" for index in range(len(self.model_names))],
+            "image_transforms": None,
+        }
+
+    def get_layer_feature_count(self, model: Any, layer_name: str) -> int:
+        """Return the synthetic layer width.
+
+        Inputs:
+            model: Any placeholder model, accepted but not used.
+            layer_name: str selected layer name, accepted but not used.
+
+        Outputs:
+            int 3, the number of synthetic feature columns.
+        """
+
+        del model, layer_name
+        return 3
+
+    def batching(
+        self,
+        model_context: dict[str, Any],
+        batch_start: int,
+        batch_end: int,
+        stim_dataset: Any,
+        subj_image_ids: np.ndarray,
+        layer_name: str,
+        batch_size_dataloader: int,
+    ) -> np.ndarray:
+        """Return one batch of model-scaled synthetic features.
+
+        Inputs:
+            model_context: dict[str, Any] created by prepare_model_context.
+            batch_start: int first image row of the batch.
+            batch_end: int end image row of the batch (exclusive).
+            stim_dataset: Any synthetic stimuli placeholder.
+            subj_image_ids: np.ndarray ordered image ids.
+            layer_name: str selected layer name.
+            batch_size_dataloader: int DataLoader batch size.
+
+        Outputs:
+            np.ndarray with shape (batch_end - batch_start, 3).
+        """
+
+        model_name = str(model_context["model_name"])
+        assert layer_name == f"layer-{self.model_names.index(model_name)}"
+        assert stim_dataset == "synthetic-stimuli"
+        assert subj_image_ids.shape == (6,)
+        assert batch_size_dataloader == 2
+        self.counts[f"batch:{model_name}"] += 1
+        batch_features = self.model_values[model_name] * _REPRESENTATION_BASE[
+            batch_start:batch_end
+        ]
+        # (6, 3) -> (batch_end - batch_start, 3)
+        return batch_features
+
+    def pid_calculation(
+        self,
+        target: np.ndarray,
+        source_1: np.ndarray,
+        source_2: np.ndarray,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Record ordered PID inputs and return a fixed result schema.
+
+        Inputs:
+            target: np.ndarray held-out target projection.
+            source_1: np.ndarray held-out X1 projection.
+            source_2: np.ndarray held-out X2 projection.
+            **kwargs: Any configured PID options, accepted for compatibility.
+
+        Outputs:
+            dict[str, Any] containing standard PID and MI component mappings.
+        """
+
+        assert kwargs["rng_seed"] == 11
+        self.counts["pid"] += 1
+        self.pid_inputs.append(
+            (
+                np.asarray(target).copy(),
+                np.asarray(source_1).copy(),
+                np.asarray(source_2).copy(),
+            )
+        )
+        return {
+            "pid": {"red": 0.1, "unq1": 0.2, "unq2": 0.3, "syn": 0.4},
+            "mi": {"bi_mi_1": 0.3, "bi_mi_2": 0.4, "tri_mi": 1.0},
+            "method": "synthetic-method",
+        }
+
+    def run(self, csv_path: str | Path) -> Path:
+        """Invoke the real pairwise runner on every synthetic model pair.
+
+        Inputs:
+            csv_path: str or Path used for checkpoint output.
+
+        Outputs:
+            Exact Path returned by ``run_pairwise_pid_pipeline``.
+        """
+
+        return ridge_pair_wise_comp.run_pairwise_pid_pipeline(
+            model_1_names=list(self.model_names),
+            model_2_names=list(self.model_names),
+            otc_config=self.config,
+            csv_path=csv_path,
+        )
+
+
+def test_pairwise_runner_representation_mode_fits_pca_on_unique_images(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Check representation mode projects target and sources with unique-image PCA.
+
+    Inputs:
+        tmp_path: Path provided by pytest for the layer CSV and checkpoint.
+        monkeypatch: pytest.MonkeyPatch installing deterministic fakes.
+
+    Outputs:
+        None. Assertions cover once-only model work, HDF cleanup, CSV rows and
+        metadata, and that PID receives shared-image projections whose PCA
+        was fitted without the shared images.
+    """
+
+    models = ["model-a", "model-b", "model-c"]
+    harness = _RepresentationHarness(monkeypatch, tmp_path, models)
+    csv_path = tmp_path / "representation.csv"
+
+    returned_path = harness.run(csv_path)
+
+    assert returned_path == csv_path
+    harness.hdf_file.close.assert_called_once_with()
+    assert harness.counts["target_extraction"] == 1
+    assert harness.counts["pid"] == 3
+    for model_name in models:
+        assert harness.counts[f"layer:{model_name}"] == 1
+        assert harness.counts[f"load:{model_name}"] == 1
+        assert harness.counts[f"batch:{model_name}"] == 2
+
+    results = pd.read_csv(csv_path)
+    assert list(results.columns) == ridge_pairwise_utils.PAIRWISE_RESULT_COLUMNS
+    assert list(zip(results["model_1"], results["model_2"], strict=True)) == [
+        ("model-a", "model-b"),
+        ("model-a", "model-c"),
+        ("model-b", "model-c"),
+    ]
+    assert (results["subj_id"] == "synthetic-subject").all()
+    assert (results["n_samples"] == 2).all()
+    for column in (
+        "n_components_source_1",
+        "n_components_source_2",
+        "n_components_target",
+    ):
+        assert (results[column] == 2).all()
+
+    for (model_1, model_2), (target, source_1, source_2) in zip(
+        zip(results["model_1"], results["model_2"], strict=True),
+        harness.pid_inputs,
+        strict=True,
+    ):
+        np.testing.assert_allclose(
+            np.abs(target), _REPRESENTATION_EXPECTED_ABS, atol=1e-8
+        )
+        np.testing.assert_allclose(
+            np.abs(source_1),
+            harness.model_values[model_1] * _REPRESENTATION_EXPECTED_ABS,
+            atol=1e-8,
+        )
+        np.testing.assert_allclose(
+            np.abs(source_2),
+            harness.model_values[model_2] * _REPRESENTATION_EXPECTED_ABS,
+            atol=1e-8,
+        )
+
+
+def test_pairwise_runner_representation_mode_rejects_unequal_source_pcs_before_loading(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Check unequal source PCA sizes fail before the target is loaded.
+
+    Inputs:
+        tmp_path: Path provided by pytest for the layer CSV and checkpoint.
+        monkeypatch: pytest.MonkeyPatch installing deterministic fakes.
+
+    Outputs:
+        None. Assertions require a ValueError and no target or model loading.
+    """
+
+    harness = _RepresentationHarness(
+        monkeypatch,
+        tmp_path,
+        ["model-a", "model-b"],
+        n_source_2_components=1,
+    )
+
+    with pytest.raises(ValueError, match="equal PCA dimensions"):
+        harness.run(tmp_path / "representation.csv")
+
+    assert harness.counts["target_extraction"] == 0
+    assert harness.counts["load:model-a"] == 0

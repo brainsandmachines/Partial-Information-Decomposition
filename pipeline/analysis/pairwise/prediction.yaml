@@ -1,3 +1,8 @@
+# Prediction-level pairwise PID: X1 and X2 are held-out ridge predictions of
+# the saved target PCs. Run:
+#   python pipeline/analysis/pairwise/pairwise.py --config pipeline/analysis/pairwise/prediction.yaml
+source_mode: prediction
+
 functions:
   target_extraction: prepare_target
   sources_extraction: nsd_sources
@@ -34,7 +39,7 @@ metadata:
 
 execution:
   # While PID evaluates the current pair, extract and ridge the next model.
-  prefetch_ridge_predictions: true
+  prefetch_next_model: true
 
 target_kwargs:
   hdf_path: /groups/golan_neurogroup/bml_group/datasets/nsddata/nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5

@@ -32,4 +32,4 @@ echo "Python path: $(which python)"
 echo "Conda environment: $CONDA_DEFAULT_ENV"
 echo "CUDA devices: ${CUDA_VISIBLE_DEVICES:-not set}"
 
-python -u pipeline/analysis/pairwise/prediction.py
+python -u pipeline/analysis/pairwise/pairwise.py --config pipeline/analysis/pairwise/prediction.yaml

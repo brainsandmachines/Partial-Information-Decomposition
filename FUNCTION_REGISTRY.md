@@ -18,7 +18,7 @@ Generated from the current AST after the repository reorganization. Paths, signa
 - `pid/`: 5 Python files.
 - `pipeline/`: 3 Python files.
 - `pipeline/analysis/`: 1 Python file.
-- `pipeline/analysis/pairwise/`: 3 Python files.
+- `pipeline/analysis/pairwise/`: 2 Python files.
 - `pipeline/analysis/pca/`: 4 Python files.
 - `pipeline/analysis/predictivity/`: 2 Python files.
 - `pipeline/examples/`: 2 Python files.
@@ -101,44 +101,46 @@ File description: No module docstring; inspect before reuse.
 | `residual_rvs (line 1238)` | rv_list: list, predictor_index=0 | Unannotated | Given a list of random variables (Torch.Tensors), | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
 | `save_sample_simulation_results_table (line 1263)` | results: dict, config: dict, save_path: str \\| pathlib.Path, decimals: int=4, title: str='PID Method Comparison', dpi: int=200 | pathlib.Path | Save sample-simulation PID/MI summaries as a styled table image. | Scope: reusable/public. Related: PCA–Ridge simulation reporting. Conventions: verify PID definition, source/target order, and bit units. |
 
-## `pipeline/analysis/pairwise/prediction.py`
+## `pipeline/analysis/pairwise/pairwise.py`
 
-File description: Run resumable prediction-level ridge PID across unordered model pairs.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `run_pairwise_pid_pipeline (line 24)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \\| Path | Path | Run prediction-level PID once per unfinished unordered model pair. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify scaling, alpha, and train/test conventions. |
-| `main (line 199)` |  | None | Run the YAML-configured ridge analysis and plot its exact written CSV. | Scope: entry point. Conventions: verify scaling, alpha, and train/test conventions. |
-
-## `pipeline/analysis/pairwise/prediction_utils.py`
-
-File description: Task-specific artifact, checkpoint, and prefetch helpers for ridge pairwise PID.
+File description: Run resumable pairwise PID across unordered model pairs; `source_mode` in the YAML selects prediction-level (`prediction.yaml`) or representation-level (`representation.yaml`) sources.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `RidgeModelArtifacts (line 54)` | See class definition | RidgeModelArtifacts instance | Store one model's validated layer and ridge-alpha artifact. | Scope: class. Conventions: verify scaling, alpha, and train/test conventions. |
-| `safe_model_name (line 72)` | model_name: str | str | Replace path separators in a model identifier for artifact filenames. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-| `_resolve_project_path (line 85)` | path_value: str \\| Path | Path | Resolve a configured path relative to the repository when necessary. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_load_or_create_checkpoint (line 101)` | output_path: Path | pd.DataFrame | Load a compatible pairwise CSV or create an empty checkpoint. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_unfinished_unordered_pairs (line 132)` | source_1_names: list[str], source_2_names: list[str], existing_results: pd.DataFrame | list[tuple[str, str]] | Choose the first requested orientation of every unfinished pair. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_required_models (line 168)` | pairs: list[tuple[str, str]] | list[str] | Return each model needed by pending pairs once in first-use order. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_model_artifact_path (line 188)` | artifact_config: Mapping[str, Any], model_name: str, artifact_label: str | Path | Resolve and require one model-specific configured artifact path. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_validate_model_artifacts (line 238)` | model_names: list[str], config: Mapping[str, Any], expected_target_dim: int | dict[str, RidgeModelArtifacts] | Resolve and validate every required model artifact before extraction. | Scope: private helper. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `_load_model_context (line 313)` | model_name: str | tuple[dict[str, Any], float] | Load one DeepDive model context and measure its loading duration. | Scope: private helper. Conventions: verify covariance order, whitening state, dtype, and device. |
-| `_release_model_context (line 341)` | model_context: dict[str, Any] \\| None | None | Clear one model context and release unused CPU and CUDA memory. | Scope: private helper. Conventions: inspect implementation assumptions before reuse. |
-| `_prepare_ridge_prediction (line 358)` | model_name: str, artifacts: RidgeModelArtifacts, target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], *, seed: int | tuple[np.ndarray, int] | Create one model's held-out ridge prediction and release intermediates. | Scope: private helper. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `_iter_ridge_prediction_pairs (line 435)` | pairs: list[tuple[str, str]], artifacts_by_model: Mapping[str, RidgeModelArtifacts], target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], *, seed: int, prefetch_ridge_predictions: bool | Iterator[tuple[str, str, np.ndarray, int, np.ndarray, int]] | Yield PID-ready pairs while preprocessing the next model in one worker. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
+| `run_pairwise_pid_pipeline (line 47)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \| Path | Path | Run PID once per unfinished unordered model pair in either source mode and append each row to a resumable CSV. | Scope: reusable/public. Conventions: `source_mode` defaults to "prediction"; PID input order (target, X1, X2); held-out shared images only; outputs bits; config checks run before the NSD target load. |
+| `_representation_inputs (line 147)` | raw_target: np.ndarray, target_context: dict[str, Any], config: dict[str, Any], layer_results_path: Path, n_source_components: int, seed: int | tuple[np.ndarray, SourcePreparer] | Fit target PCA on unique images, project shared images, and bind the PCA source preparer. | Scope: private helper. Related: `_fit_unique_project_shared`, `_prepare_representation_projection`. |
+| `main (line 181)` | config_path: str \| Path=DEFAULT_CONFIG_PATH | None | Run the YAML-configured pairwise analysis and plot the exact CSV it wrote. | Scope: entry point. Conventions: relative config paths resolve from the repository root; default config is `prediction.yaml`. |
+| `parse_args (line 215)` |  | argparse.Namespace | Parse the `--config` command-line option. | Scope: entry point. |
 
-## `pipeline/analysis/pairwise/representation.py`
+## `pipeline/analysis/pairwise/pairwise_utils.py`
 
-File description: Run deterministic OTC PID comparisons across unordered model pairs.
+File description: Shared helpers for pairwise PID and cumulative target-PC analyses, including target preparation, model loading, checkpointing, and reusable source preparation.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `target_pca (line 85)` | target_context: np.ndarray, n_components: int, random_state: int | np.ndarray | PCA target, train target on unique images and return projected target for shared images. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `pca_model (line 107)` | features: np.ndarray, shared_mask: np.ndarray, n_components: int, random_state: int | np.ndarray | Fit source PCA on unique images and project shared images. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `extract_model_projection (line 144)` | model_name: str, target_context: dict[str, Any], choose_layer_kwargs: dict[str, Any], feature_extraction_kwargs: dict[str, Any], n_components: int, random_state: int | tuple[np.ndarray, int] | Extract one selected model layer and return its memory-safe PCA projection. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `run_pairwise_pid_pipeline (line 253)` | model_1_names: list[str], model_2_names: list[str], otc_config: dict[str, Any], csv_path: str \\| Path | Path | Run OTC PID once per unordered model pair and checkpoint results to CSV. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
+| `safe_model_name (line 58)` | model_name: str | str | Replace path separators in a model identifier for artifact filenames. | Scope: reusable/public. |
+| `pop_raw_target (line 71)` | target_context: dict[str, Any] | np.ndarray | Remove and return the full neural target, dropping the large arrays from the context. | Scope: reusable/public. Conventions: returns (n_images, n_voxels). |
+| `_resolve_project_path (line 93)` | path_value: str \| Path | Path | Resolve a configured path relative to the repository when necessary. | Scope: private helper. |
+| `_load_or_create_checkpoint (line 109)` | output_path: Path | pd.DataFrame | Load a compatible pairwise CSV or create an empty checkpoint. | Scope: private helper. Conventions: schema is `PAIRWISE_RESULT_COLUMNS`. |
+| `_unfinished_unordered_pairs (line 138)` | source_1_names: list[str], source_2_names: list[str], existing_results: pd.DataFrame | list[tuple[str, str]] | Choose the first requested orientation of every unfinished pair. | Scope: private helper. Conventions: skips self pairs and pairs completed in either orientation. |
+| `required_models (line 167)` | pairs: list[tuple[str, str]] | list[str] | Return each model needed by pending pairs once in first-use order. | Scope: reusable/public. |
+| `_result_row (line 187)` | model_1: str, model_2: str, layer_1: int, layer_2: int, target: np.ndarray, source_1: np.ndarray, source_2: np.ndarray, pid_results: Mapping[str, Any], config: Mapping[str, Any] | dict[str, Any] | Build one CSV row for a finished pair. | Scope: private helper. Conventions: `subj_id` from `metadata.subj_id`; unq1 belongs to X1 = model_1. |
+| `_layer_results_path (line 237)` | config: Mapping[str, Any] | Path | Resolve and require the best-layer results CSV. | Scope: private helper. |
+| `_check_prediction_config (line 261)` | config: dict[str, Any], registry: dict[str, Any] | tuple[Callable[..., Any], Path] | Resolve feature extraction and require the saved target-PCA artifact before loading data. | Scope: private helper. Conventions: prediction mode only. |
+| `_check_representation_config (line 291)` | config: dict[str, Any] | int | Require equal source PCA sizes before loading data. | Scope: private helper. Conventions: representation mode only. |
+| `_best_layer_index (line 318)` | model_name: str, layer_results_path: Path | int | Look up one model's overall best layer index. | Scope: private helper. Related: `overall_best_layer`. |
+| `_check_layer_index (line 343)` | model_context: Mapping[str, Any], model_name: str, layer_index: int | None | Require the selected layer to exist in a loaded model. | Scope: private helper. |
+| `_load_model_context (line 364)` | model_name: str | tuple[dict[str, Any], float] | Load one DeepDive model context and measure its loading duration. | Scope: private helper. Conventions: applies `to_deepdive_model_name`. |
+| `_release_model_context (line 390)` | model_context: dict[str, Any] \| None | None | Clear one model context and release unused CPU and CUDA memory. | Scope: private helper. |
+| `RidgeModelArtifacts (line 413)` | See class definition | RidgeModelArtifacts instance | Store one model's validated layer and ridge-alpha artifact. | Scope: class. Conventions: prediction mode. |
+| `_model_artifact_path (line 432)` | artifact_config: Mapping[str, Any], model_name: str, artifact_label: str | Path | Resolve and require one model-specific configured artifact path. | Scope: private helper. |
+| `_validate_model_artifacts (line 468)` | model_names: list[str], config: Mapping[str, Any], layer_results_path: Path, expected_target_dim: int | dict[str, RidgeModelArtifacts] | Resolve and validate every required layer and per-PC alpha artifact before extraction. | Scope: private helper. Conventions: prediction mode; alphas must match the target PC count and layer. |
+| `_prepare_ridge_prediction (line 508)` | model_name: str, *, artifacts_by_model: Mapping[str, RidgeModelArtifacts], target_context: dict[str, Any], train_target: np.ndarray, shared_mask: np.ndarray, feature_extraction: Callable[..., Any], feature_extraction_kwargs: Mapping[str, Any], seed: int | tuple[np.ndarray, int] | Prediction-mode source preparer: extract raw best-layer features, fit ridge on training rows, predict shared rows. | Scope: private helper. Related: `ridge_predict_shared`. Conventions: returns (n_shared, n_target_pcs); no feature standardization. |
+| `prepare_prediction_inputs (line 569)` | raw_target: np.ndarray, target_context: dict[str, Any], config: Mapping[str, Any], required_models: list[str], layer_results_path: Path, feature_extraction: Callable[..., Any], pc_target_path: Path, seed: int, *, target_preparation: Callable[..., tuple[np.ndarray, np.ndarray, np.ndarray]] | tuple[np.ndarray, SourcePreparer] | Project and split the neural target, validate saved per-PC ridge artifacts, and bind a reusable held-out prediction preparer. | Scope: reusable/public. Related: `prepare_ridge_target`, `_prepare_ridge_prediction`. Conventions: target PCA is fitted outside held-out shared images; returns target and predictions in the same PC space. |
+| `_fit_unique_project_shared (line 626)` | data: np.ndarray, shared_mask: np.ndarray, n_components: int, random_state: int | np.ndarray | Fit randomized PCA on unique-image rows and project shared-image rows. | Scope: private helper. Conventions: used for both target and sources in representation mode; returns float64 (n_shared, n_components). |
+| `_extract_layer_features (line 660)` | model_context: dict[str, Any], layer_name: str, target_context: Mapping[str, Any], feature_extraction_kwargs: Mapping[str, Any] | np.ndarray | Extract one layer's features for every image in batches, with optional sparse random projection. | Scope: private helper. Conventions: returns float64 (n_images, n_features). |
+| `_prepare_representation_projection (line 727)` | model_name: str, *, target_context: dict[str, Any], layer_results_path: Path, feature_extraction_kwargs: Mapping[str, Any], n_components: int, random_state: int, expected_shape: tuple[int, int] | tuple[np.ndarray, int] | Representation-mode source preparer: extract best-layer features and project them with unique-image PCA. | Scope: private helper. Conventions: projection must match the target shape. |
+| `iter_prepared_pairs (line 788)` | pairs: list[tuple[str, str]], prepare_source: SourcePreparer, *, prefetch_next_model: bool | Iterator[tuple[str, str, np.ndarray, int, np.ndarray, int]] | Yield PID-ready pairs, preparing each model once and optionally the next model in one background thread. | Scope: reusable/public. Conventions: works with prediction and representation source preparers. |
 
 ## `pipeline/analysis/pca/pc_function.py`
 
@@ -147,8 +149,8 @@ File description: Calculate PID and mutual information as target PCs are accumul
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
 | `_save_pair_results (line 32)` | pair_results: dict[int, dict[str, Any]], model_1: str, model_2: str, results_dir: str \\| Path | Path | Save the PC-dependent PID and MI results for one model pair. | Scope: private helper. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention. |
-| `pc_function_analysis (line 60)` | config: dict[str, Any], functions: PIDPipelineFunctions, model1_name: list[str], model2_name: list[str], pc_path: str \\| Path, hdf_path: str \\| Path, pkl_info_path: str \\| Path, neural_data_path: str \\| Path, results_dir: str \\| Path \\| None=None, plot_dir: str \\| Path \\| None=None | dict[str, dict[str, dict[int, dict[str, Any]]]] | Calculate PID and MI for each model pair and cumulative target-PC count. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units; verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
-| `main (line 204)` |  | None | Load the PC-function YAML, run all model pairs, and save their plots. | Scope: entry point. Conventions: verify PCA fitting split and component convention. |
+| `pc_function_analysis (line 60)` | config: dict[str, Any], functions: PIDPipelineFunctions, model1_name: list[str], model2_name: list[str], pc_path: str \\| Path, hdf_path: str \\| Path, pkl_info_path: str \\| Path, neural_data_path: str \\| Path, results_dir: str \\| Path \\| None=None, plot_dir: str \\| Path \\| None=None | dict[str, dict[str, dict[int, dict[str, Any]]]] | Calculate PID and MI for each model pair and cumulative target-PC count from full held-out predictions prepared once per model. | Scope: reusable/public. Related: `prepare_prediction_inputs`, `iter_prepared_pairs`. Conventions: PID input order (target, X1, X2); saved PCA and per-PC alphas must match; each PC step slices the same full predictions. |
+| `main (line 197)` |  | None | Load the PC-function YAML, run all model pairs, and save their plots. | Scope: entry point. Conventions: verify PCA fitting split and component convention. |
 
 ## `pipeline/analysis/pca/pca_as_function.py`
 
@@ -591,9 +593,10 @@ File description: Gaussian suppression generators selectable by name.
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `full_suppression (line 8)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate the full-suppression example. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: X2 is a pure suppressor; returns samples ordered [X1, X2, T]. |
-| `unq12_zero (line 37)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a suppression example with zero unique information in both sources. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
-| `unq2_zero (line 67)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a suppression example with zero source-2 unique information. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `full_suppression (line 29)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate the full-suppression example. | Scope: reusable/public. Related: `commonality_analysis`. Conventions: X2 is a pure suppressor; returns samples ordered [X1, X2, T]. |
+| `unq12_zero (line 58)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a suppression example with zero unique information in both sources. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `unq2_zero (line 88)` | rng: np.random.Generator, n: int, p: int, noise_std: float | tuple[np.ndarray, np.ndarray, np.ndarray] | Generate a suppression example with zero source-2 unique information. | Scope: reusable/public. Conventions: returns samples ordered [X1, X2, T]. |
+| `run_suppression_example (line 126)` | example: str, *, n_samples: int, p: int, noise_std: float, seed: int, bias_correction: bool=False, commonality_method: str='standard', commonality_alphas=None, n_resamples: int=20, n_shuffles: int=20 | dict | Run Eigen-PID and commonality on the same suppression samples. | Scope: reusable/public. Related: `pid_calc`, `commonality_analysis`. Conventions: PID values are Gaussian BROJA bits; commonality is variance partitioning calculated from the identical X1, X2, T samples. |
 
 ## `simulations/utils.py`
 

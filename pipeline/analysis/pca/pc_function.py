@@ -15,8 +15,8 @@ repo_root = Path(__file__).resolve().parents[3]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-from pipeline.pid_pipeline import PIDPipeline, PIDPipelineFunctions
-from pipeline.analysis.utils import _prepare_source_for_pid
+from pipeline.pid_pipeline import PIDPipelineFunctions
+from pipeline.analysis.pairwise import pairwise_utils
 from pipeline.analysis.pca.plot_pc_results import (
     plot_pid_mi_as_function_of_pcs,
 )
@@ -72,9 +72,10 @@ def pc_function_analysis(
     """Calculate PID and MI for each model pair and cumulative target-PC count.
 
     Inputs:
-        config: dict containing layer, feature-extraction, ridge, and PID kwargs.
-        functions: PIDPipelineFunctions containing the configured layer,
-            feature-extraction, source-extraction, and PID callables.
+        config: dict containing layer, saved-alpha, feature-extraction,
+            execution, and PID settings.
+        functions: PIDPipelineFunctions containing the configured feature
+            extraction and PID callables.
         model1_name: list[str] containing the first-source model names.
         model2_name: list[str] containing the second-source model names.
         pc_path: str or Path pointing to the fitted target PCA model.
@@ -92,111 +93,103 @@ def pc_function_analysis(
         ``mi`` dictionaries.
     """
     print(f"\nBias correction is set to: {config['pid_kwargs']['config']['bias_correction']}")
-    print(f"Ridge is set to: {config['feature_manipulation_kwargs']['ridge']}")
+    print("Ridge predictions use the configured saved per-PC alphas.")
     print(f"Results will be saved to: {results_dir}")
     print(f"Plots will be saved to: {plot_dir}")
     print(f"Target PCA model will be loaded from: {pc_path}\n")
 
+    feature_extraction = functions.feature_extraction
+    pid_calculation = functions.pid_calculation
+    if not callable(feature_extraction) or not callable(pid_calculation):
+        raise ValueError("Feature extraction and PID calculation must be callable.")
 
-
-    target_context = prepare_target(
-        Path(hdf_path),
-        Path(pkl_info_path),
-        Path(neural_data_path),
+    pairs = [(model_1, model_2) for model_1 in model1_name for model_2 in model2_name]
+    required_models = pairwise_utils.required_models(pairs)
+    layer_results_path = Path(config["choose_layer_kwargs"]["path_to_results"])
+    seed = int(config["pid_kwargs"].get("rng_seed", 56))
+    prefetch_next_model = bool(
+        (config.get("execution") or {}).get("prefetch_next_model", True)
     )
-    train_target, shared_target, shared_mask = prepare_ridge_target(
-        target_context["target"],
-        target_context,
-        pc_path,
-    )
-    pipeline = PIDPipeline(functions)
-    ridge = config["feature_manipulation_kwargs"]["ridge"]
-    feature_kwargs = config.get("feature_extraction_kwargs", {})
     results: dict[str, dict[str, dict[int, dict[str, Any]]]] = {}
 
-    for model_1 in model1_name:
-        print(f"\nRunning target-PC analysis with Source 1: {model_1} 😀")
-        results[model_1] = {}
-        source_1_raw = None
+    target_context = prepare_target(
+        Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
+    hdf_file = target_context.get("hdf_file")
+    try:
+        raw_target = pairwise_utils.pop_raw_target(target_context)
+        shared_target, prepare_source = pairwise_utils.prepare_prediction_inputs(
+            raw_target,
+            target_context,
+            config,
+            required_models,
+            layer_results_path,
+            feature_extraction,
+            Path(pc_path),
+            seed,
+            target_preparation=prepare_ridge_target,
+        )
+        del raw_target
 
-        for model_2 in model2_name:
-            sources = pipeline.functions.sources_extraction(
-                model_name_1=model_1,
-                model_name_2=model_2,
-            )
-            selected_layers = pipeline.functions.choose_layer(
-                sources,
-                **(config.get("choose_layer_kwargs") or {}),
-            )
-
-            if source_1_raw is None:
-                source_1_raw = pipeline.functions.feature_extraction(
-                    sources["X1"],
-                    selected_layers["X1"],
-                    target_context,
-                    **feature_kwargs,
-                )
-
-            source_2_raw = pipeline.functions.feature_extraction(
-                sources["X2"],
-                selected_layers["X2"],
-                target_context,
-                **feature_kwargs,
-            )
-            pair_results: dict[int, dict[str, Any]] = {}
-
-            print(
-                f"\nRunning target-PC analysis with Source 1: {model_1} and "
-                f"Source 2: {model_2} 😀")
-
-            for number_of_pcs in range(1, shared_target.shape[1] + 1):
-                selected_train_target = train_target[:, :number_of_pcs]
-                selected_shared_target = shared_target[:, :number_of_pcs]
+        source_pairs = pairwise_utils.iter_prepared_pairs(
+            pairs,
+            prepare_source,
+            prefetch_next_model=prefetch_next_model,
+        )
+        try:
+            for model_1, model_2, source_1, _, source_2, _ in source_pairs:
+                results.setdefault(model_1, {})
                 print(
-                    f"Selecting the first {number_of_pcs} target PCs "
-                    f"and running PID for {model_1} and {model_2} 😀"
+                    f"\nRunning target-PC analysis with Source 1: {model_1} and "
+                    f"Source 2: {model_2} 😀"
                 )
-                source_1_for_pid = _prepare_source_for_pid(
-                    source_1_raw,
-                    selected_train_target,
-                    shared_mask,
-                    ridge,
-                )
-                source_2_for_pid = _prepare_source_for_pid(
-                    source_2_raw,
-                    selected_train_target,
-                    shared_mask,
-                    ridge,
-                )
-                print(f"Source 1 shape: {source_1_for_pid.shape}, Source 2 shape: {source_2_for_pid.shape}")
-                print(f"Shared target shape: {selected_shared_target.shape}")
-                pid_results = pipeline.functions.pid_calculation(
-                    selected_shared_target,
-                    source_1_for_pid,
-                    source_2_for_pid,
-                    **(config.get("pid_kwargs") or {}),
-                )
+                pair_results: dict[int, dict[str, Any]] = {}
 
-                pair_results[number_of_pcs] = pid_results
+                for number_of_pcs in range(1, shared_target.shape[1] + 1):
+                    selected_shared_target = shared_target[:, :number_of_pcs]
+                    source_1_for_pid = source_1[:, :number_of_pcs]
+                    source_2_for_pid = source_2[:, :number_of_pcs]
+                    # Three (n_shared, n_target_pcs) arrays -> three
+                    # (n_shared, number_of_pcs) arrays.
+                    print(
+                        f"Selecting the first {number_of_pcs} target PCs "
+                        f"and running PID for {model_1} and {model_2} 😀"
+                    )
+                    print(
+                        f"Source 1 shape: {source_1_for_pid.shape}, "
+                        f"Source 2 shape: {source_2_for_pid.shape}"
+                    )
+                    print(f"Shared target shape: {selected_shared_target.shape}")
+                    pid_results = pid_calculation(
+                        selected_shared_target,
+                        source_1_for_pid,
+                        source_2_for_pid,
+                        **(config.get("pid_kwargs") or {}),
+                    )
 
-                print(
-                    f"\nResults after selecting the first {number_of_pcs} "
-                    "target PCs:"
-                )
-                print_pid_mi(pid_results["pid"], pid_results["mi"])
+                    pair_results[number_of_pcs] = pid_results
+                    print(
+                        f"\nResults after selecting the first {number_of_pcs} "
+                        "target PCs:"
+                    )
+                    print_pid_mi(pid_results["pid"], pid_results["mi"])
 
-            results[model_1][model_2] = pair_results
-            if results_dir is not None:
-                _save_pair_results(pair_results, model_1, model_2, results_dir)
-            if plot_dir is not None:
-                absolute_path, normalized_path = plot_pid_mi_as_function_of_pcs(
-                    pair_results=pair_results,
-                    model_1_name=model_1,
-                    model_2_name=model_2,
-                    output_dir=plot_dir,
-                )
-                print(f"Saved absolute plot: {absolute_path}")
-                print(f"Saved normalized plot: {normalized_path}")
+                results[model_1][model_2] = pair_results
+                if results_dir is not None:
+                    _save_pair_results(pair_results, model_1, model_2, results_dir)
+                if plot_dir is not None:
+                    absolute_path, normalized_path = plot_pid_mi_as_function_of_pcs(
+                        pair_results=pair_results,
+                        model_1_name=model_1,
+                        model_2_name=model_2,
+                        output_dir=plot_dir,
+                    )
+                    print(f"Saved absolute plot: {absolute_path}")
+                    print(f"Saved normalized plot: {normalized_path}")
+        finally:
+            source_pairs.close()
+    finally:
+        if hdf_file is not None:
+            hdf_file.close()
 
     return results
 
@@ -261,7 +254,7 @@ def main() -> None:
             configured_paths["results_dir"] = Path(config["results_dir"]) / f"NR_NB_eigen_pid_{config['model1_name']}_{config['model2_name']}"
             configured_paths["plot_dir"] = Path(config["plot_dir"]) / f"NR_NB_eigen_pid_{config['model1_name']}_{config['model2_name']}"
 
-        
+
     pc_function_analysis(
         config=config,
         functions=functions,

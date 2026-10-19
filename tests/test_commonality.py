@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from simulations.commonality import commonality_analysis
-from simulations.suppression_examples import full_suppression
+from simulations.suppression_examples import run_suppression_example
 
 
 def make_toy(n=50, p=20, t=3, seed=0):
@@ -43,10 +43,15 @@ def test_commonality_analysis_invalid_method_raises():
 
 def test_commonality_mislabels_suppressor_as_unique() -> None:
     """Show that variance partitioning assigns uniqueness to a pure suppressor."""
-    rng = np.random.default_rng(12)
-    x1, x2, target = full_suppression(rng, n=5000, p=1, noise_std=1.0)
-    # Four latent (5000, 1) arrays -> X1, X2, T arrays with shape (5000, 1).
-    result = commonality_analysis(x1, x2, target, method="standard")
-    assert result["R²_X2"] < 0.01
-    assert result["unique_X2"] > 0.1
-    assert result["common"] < -0.1
+    result = run_suppression_example(
+        "full_suppression",
+        n_samples=5000,
+        p=1,
+        noise_std=1.0,
+        seed=12,
+    )
+    commonality = result["commonality"]
+    assert commonality["R²_X2"] < 0.01
+    assert commonality["unique_X2"] > 0.1
+    assert commonality["common"] < -0.1
+    assert result["pid"]["unq2"] < 0.01
