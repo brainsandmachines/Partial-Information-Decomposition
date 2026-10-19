@@ -286,12 +286,14 @@ def main(
         hdf_path: str or Path, NSD stimulus HDF5 file.
         pkl_info_path: str or Path, NSD stimulus-information pickle.
         neural_data_path: str or Path, subject neural-data path.
-        alphas_csv_path: str or Path, destination CSV file.
+        alphas_csv_path: str or Path, destination alpha CSV file. A diagnostics
+            CSV is written alongside it without changing the alpha CSV schema.
 
     Outputs:
         tuple[np.ndarray, Pipeline] containing the per-PC alpha vector and the
         fitted raw-input RidgeCV model. Per-PC CV MSE, target variance, CV R²,
-        and alpha-grid boundary warnings are printed before returning.
+        and alpha-grid boundary warnings are printed before returning. The CV
+        diagnostics are also appended to ``<alphas_csv_stem>_diagnostics.csv``.
     """
 
     target = prepare_target(hdf_path, pkl_info_path, neural_data_path)
@@ -338,8 +340,20 @@ def main(
 
     output_path = Path(alphas_csv_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    diagnostics_path = output_path.with_name(
+        f"{output_path.stem}_diagnostics{output_path.suffix}"
+    )
 
     csv_header = ["model_name", "layer_index", "pc_index", "alpha"]
+    diagnostics_header = [
+        "model_name",
+        "layer_index",
+        "pc_index",
+        "alpha",
+        "cv_mse",
+        "target_variance",
+        "cv_r2",
+    ]
     csv_has_content = output_path.is_file() and output_path.stat().st_size > 0
     if csv_has_content:
         with output_path.open("r", newline="", encoding="utf-8") as csv_file:
@@ -348,6 +362,20 @@ def main(
             raise ValueError(
                 f"Existing alpha CSV has an incompatible header: {existing_header}. "
                 f"Expected: {csv_header}."
+            )
+
+    diagnostics_has_content = (
+        diagnostics_path.is_file() and diagnostics_path.stat().st_size > 0
+    )
+    if diagnostics_has_content:
+        with diagnostics_path.open(
+            "r", newline="", encoding="utf-8"
+        ) as diagnostics_file:
+            existing_diagnostics_header = next(csv.reader(diagnostics_file), None)
+        if existing_diagnostics_header != diagnostics_header:
+            raise ValueError(
+                "Existing diagnostics CSV has an incompatible header: "
+                f"{existing_diagnostics_header}. Expected: {diagnostics_header}."
             )
 
     write_mode = "a" if csv_has_content else "w"
@@ -373,8 +401,11 @@ def main(
         dtype=np.float64,
     )
 
+    # (n_samples, n_pcs) -> (n_pcs,)
     target_variance_per_pc = np.var(pca_target, axis=0)
+    # (n_pcs,) -> (n_pcs,)
     cv_mse_per_pc = -scores_per_pc
+    # (n_pcs,) -> (n_pcs,)
     cv_r2_per_pc = np.full_like(cv_mse_per_pc, np.nan)
     nonzero_variance = target_variance_per_pc > 0
     cv_r2_per_pc[nonzero_variance] = (
@@ -382,6 +413,35 @@ def main(
         - cv_mse_per_pc[nonzero_variance]
         / target_variance_per_pc[nonzero_variance]
     )
+
+    diagnostics_write_mode = "a" if diagnostics_has_content else "w"
+    with diagnostics_path.open(
+        diagnostics_write_mode, newline="", encoding="utf-8"
+    ) as diagnostics_file:
+        writer = csv.writer(diagnostics_file)
+        if not diagnostics_has_content:
+            writer.writerow(diagnostics_header)
+        writer.writerows(
+            (
+                source_name,
+                int(layer_index),
+                pc_index,
+                float(alpha),
+                float(cv_mse),
+                float(target_variance),
+                float(cv_r2),
+            )
+            for pc_index, (alpha, cv_mse, target_variance, cv_r2) in enumerate(
+                zip(
+                    alphas_per_pc,
+                    cv_mse_per_pc,
+                    target_variance_per_pc,
+                    cv_r2_per_pc,
+                ),
+                start=1,
+            )
+        )
+    print(f"Saved cross-validation diagnostics to: {diagnostics_path}")
 
     alpha_grid = np.asarray(ridge_model.alphas, dtype=np.float64)
     lower_alpha = float(np.min(alpha_grid))
