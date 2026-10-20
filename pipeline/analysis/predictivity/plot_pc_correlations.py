@@ -173,13 +173,13 @@ def plot_pc_correlations(
         csv_paths: sequence of str or Path objects naming CSV files produced by
             ``pcIndex_predictions.py``.
         model_names: sequence of str model names to draw on the shared axes.
-        output_path: str or Path for the saved figure. The file extension
-            selects the Matplotlib output format.
+        output_path: str or Path for the saved figure. Its suffix is replaced
+            with ``.pdf``.
         title: str displayed as the figure title.
         dpi: int resolution used when saving the figure.
 
     Outputs:
-        Path to the saved plot. Each curve is annotated with its layer index,
+        Path to the saved PDF plot. Each curve is annotated with its layer index,
         and the legend follows the supplied model order.
 
     Raises:
@@ -253,7 +253,7 @@ def plot_pc_correlations(
         )
         figure.tight_layout()
 
-        figure_path = Path(output_path)
+        figure_path = Path(output_path).with_suffix(".pdf")
         figure_path.parent.mkdir(parents=True, exist_ok=True)
         figure.savefig(figure_path, dpi=dpi, bbox_inches="tight")
     finally:
@@ -281,7 +281,7 @@ def main() -> Path:
         "hardcorenas_f_classification",
         "eca_nfnet_l0_classification",
     ]
-    output_path = ridge_analysis_dir / "alpha(1,50,100)_GPU_200_pcs_correlations_by_model.csv.png"
+    output_path = ridge_analysis_dir / "alpha(1,50,100)_GPU_200_pcs_correlations_by_model.pdf"
 
     figure_path = plot_pc_correlations(
         csv_paths=csv_paths,

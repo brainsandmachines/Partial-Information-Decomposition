@@ -295,7 +295,7 @@ def plot_cov_blocks(cov_dict, x0_dim, x1_dim, x2_dim,
         plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
     plt.tight_layout()
-    plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pid/random_plots/{title.replace(' ', '_')}.png", dpi=300)
+    plt.savefig(f"/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pid/random_plots/{title.replace(' ', '_')}.pdf", dpi=300)
 def standardize(X: torch.Tensor, eps: float = 1e-12) -> torch.Tensor:
     """
     Standardize columns of X to zero mean and unit variance.
@@ -575,7 +575,7 @@ def pid_comparison_table(results: dict, decimals: int = 4, print_table: bool = T
 
 
 def save_pid_comparison_table(results: dict, save_path: str, decimals: int = 4, title: str = "PID Method Comparison", config: dict = None):
-    """Save the PID comparison table as a clean matplotlib image."""
+    """Save the PID comparison table as a clean Matplotlib PDF."""
     rows = pid_comparison_table(results, decimals=decimals, print_table=False)
     columns = ["method", "Red", "Unq1", "Unq2", "Syn", "I(X1;T)", "I(X2;T)", "I(X1,X2;T)"]
     cfg = config.get("parameters", config) if config else {}
@@ -613,9 +613,9 @@ def save_pid_comparison_table(results: dict, save_path: str, decimals: int = 4, 
         else:
             cell.set_facecolor("#f9fafb" if row % 2 else "white")
 
-    fig.savefig(save_path, bbox_inches="tight", dpi=200)
+    fig.savefig(pathlib.Path(save_path).with_suffix(".pdf"), bbox_inches="tight", dpi=200)
     plt.close(fig)
-    return save_path
+    return str(pathlib.Path(save_path).with_suffix(".pdf"))
 
 
 def commonality_comparison_table(
@@ -703,17 +703,17 @@ def save_commonality_comparison_table(
     title: str = "Commonality Analysis Comparison",
     config: dict | None = None,
 ) -> str:
-    """Save normalized commonality results as a Matplotlib table image.
+    """Save normalized commonality results as a Matplotlib PDF table.
 
     Inputs:
         results: dict containing one or more commonality payloads.
-        save_path: str, destination image path.
+        save_path: str, destination path; its suffix is replaced with ``.pdf``.
         decimals: int, number of decimal places shown in table cells.
         title: str, figure title.
         config: dict | None, optional run configuration shown above the table.
 
     Outputs:
-        str, the destination image path after the figure is saved.
+        str, the destination PDF path after the figure is saved.
     """
     rows = commonality_comparison_table(
         results,
@@ -788,9 +788,9 @@ def save_commonality_comparison_table(
         else:
             cell.set_facecolor("#f9fafb" if row % 2 else "white")
 
-    fig.savefig(save_path, bbox_inches="tight", dpi=200)
+    fig.savefig(pathlib.Path(save_path).with_suffix(".pdf"), bbox_inches="tight", dpi=200)
     plt.close(fig)
-    return save_path
+    return str(pathlib.Path(save_path).with_suffix(".pdf"))
 
 
 def commanility_analysis(
@@ -930,7 +930,7 @@ def plot_mi_heatmap(
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(f'{save_path}/{title}.png', dpi=300, bbox_inches="tight")
+        plt.savefig(f'{save_path}/{title}.pdf', dpi=300, bbox_inches="tight")
 
     plt.show()
 
@@ -1095,7 +1095,7 @@ def plot_all_mi_heatmaps(
 
     if save_path is not None:
         os.makedirs(save_path, exist_ok=True)
-        filename = f"{title}.png"
+        filename = f"{title}.pdf"
         full_path = os.path.join(save_path, filename)
         plt.savefig(full_path, dpi=300, bbox_inches="tight")
 
@@ -1158,7 +1158,7 @@ def plot_block_heatmap(csv_path, save_path=None):
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300)
+        plt.savefig(pathlib.Path(save_path).with_suffix(".pdf"), dpi=300)
 
     plt.show()
 
@@ -1268,7 +1268,7 @@ def save_sample_simulation_results_table(
     title: str = "PID Method Comparison",
     dpi: int = 200,
 ) -> pathlib.Path:
-    """Save sample-simulation PID/MI summaries as a styled table image.
+    """Save sample-simulation PID/MI summaries as a styled PDF table.
 
     Inputs:
         results: dict, output from simulation. Expected shape is
@@ -1280,13 +1280,13 @@ def save_sample_simulation_results_table(
             strings add the two CMI validation columns.
         config: dict, simulation configuration with n/n_samples, dimensions,
             p_scale, q_scale, r_scale, seed, bias_correction, and n_trials.
-        save_path: str or pathlib.Path, target image file path.
+        save_path: str or pathlib.Path, target path; its suffix becomes ``.pdf``.
         decimals: int, number of decimal places to show in numeric cells.
         title: str, title shown above the image table.
         dpi: int, output image resolution.
 
     Outputs:
-        pathlib.Path, the saved image path.
+        pathlib.Path, the saved PDF path.
     """
     cfg = config.get("parameters", config)
     save_path = pathlib.Path(save_path)
@@ -1456,6 +1456,6 @@ def save_sample_simulation_results_table(
                 cell.set_facecolor("#f9fafb" if table_row % 2 else "white")
 
     plt.tight_layout(rect=[0, 0, 1, 0.93 if legend else 0.95])
-    fig.savefig(save_path, bbox_inches="tight", dpi=dpi)
+    fig.savefig(pathlib.Path(save_path).with_suffix(".pdf"), bbox_inches="tight", dpi=dpi)
     plt.close(fig)
-    return save_path
+    return pathlib.Path(save_path).with_suffix(".pdf")

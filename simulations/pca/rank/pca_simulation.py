@@ -160,7 +160,7 @@ def run_rank_simulation(
         for y, x in product(range(heat.shape[0]), range(heat.shape[1])):
             axis.text(x, y, f"{heat.iloc[y, x]:.2f}", ha="center", va="center", color="white")
     figure.colorbar(image, ax=axes.tolist(), label="success_rate")
-    figure.savefig(output_dir / "estim_ncpPCA_EM_success_heatmap.png",
+    figure.savefig(output_dir / "estim_ncpPCA_EM_success_heatmap.pdf",
                    dpi=200, bbox_inches="tight")
     plt.close(figure)
     return raw, summary

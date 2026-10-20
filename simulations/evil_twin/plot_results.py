@@ -38,11 +38,12 @@ def plot_pid_atoms(
 
     Inputs:
         results_csv: Path or str, CSV produced by the evil-twin runner.
-        output_path: optional Path or str for the PNG. By default, the image is
+        output_path: optional Path or str for the PDF; its suffix is replaced.
+            By default, the figure is
             saved beside the CSV with ``_pid_atoms`` appended to its stem.
 
     Outputs:
-        Path, the saved grouped-bar-chart image.
+        Path, the saved grouped-bar-chart PDF.
     """
     results_path = Path(results_csv)
     if not results_path.is_file():
@@ -127,8 +128,8 @@ def plot_pid_atoms(
     image_path = (
         Path(output_path)
         if output_path is not None
-        else results_path.with_name(f"{results_path.stem}_pid_atoms.png")
-    )
+        else results_path.with_name(f"{results_path.stem}_pid_atoms.pdf")
+    ).with_suffix(".pdf")
     image_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(image_path, dpi=200, bbox_inches="tight")
     plt.close(figure)

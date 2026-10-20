@@ -414,7 +414,7 @@ def run_pid_feature_comparison(
         pid_method: str configured covariance method: Eigen PID.
         bias_correction: bool passed unchanged to sampled PID calls.
         experiment_name: str label printed for each route.
-        plot_path: str | Path output image path.
+        plot_path: str | Path output path; the table is saved as PDF.
         plot_title: str title rendered above the result table.
         metadata: optional dict added to the plot legend configuration.
 
@@ -552,6 +552,6 @@ if __name__ == "__main__":
         pid_method=pid_method,
         bias_correction=bias_correction,
         experiment_name="SONIC",
-        plot_path=PROJECT_ROOT / "simulations/pca/ridge/results" / f"sonic_pid_feature_comparison_{n_trials}_trials.png",
+        plot_path=PROJECT_ROOT / "simulations/pca/ridge/results" / f"sonic_pid_feature_comparison_{n_trials}_trials.pdf",
         plot_title="Sonic PID: RAW vs PCA vs Ridge CV",
     )

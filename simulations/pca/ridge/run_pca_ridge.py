@@ -98,7 +98,7 @@ def run_scenario(
         metadata["block_p"] = p
 
     output_path = Path(output_dir) / (
-        f"{scenario.plot_slug}_pid_feature_comparison_{n_trials}_trials.png"
+        f"{scenario.plot_slug}_pid_feature_comparison_{n_trials}_trials.pdf"
     )
     return run_pid_feature_comparison(
         lambda seed: scenario.generator(

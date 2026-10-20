@@ -23,13 +23,13 @@ def plot_pairwise_pid_matrices(
 
     Inputs:
         csv_path: str or Path, CSV created by run_pairwise_pid_pipeline.
-        output_dir: str or Path, directory for the matrix CSVs and PNG figures.
+        output_dir: str or Path, directory for the matrix CSVs and PDF figures.
         model_order: list[str] or None, optional model order and subset. When
             None, use the sorted union of model_1 and model_2 names.
         value_format: str, format specification used for cell annotations.
         cmap: str, matplotlib colormap name.
         figsize: tuple[float, float] or None, optional figure size in inches.
-        dpi: int, resolution used when saving each PNG figure.
+        dpi: int, resolution used when saving each PDF figure.
 
     Output:
         figure_paths: dict[str, Path], paths keyed by "unique_information",
@@ -217,7 +217,7 @@ def plot_pairwise_pid_matrices(
 
         colorbar = figure.colorbar(image, ax=axis, fraction=0.046, pad=0.04)
         colorbar.set_label(colorbar_label)
-        figure_path = output_path / f"{name}_matrix.png"
+        figure_path = output_path / f"{name}_matrix.pdf"
         figure.savefig(figure_path, dpi=dpi, bbox_inches="tight")
         plt.close(figure)
         figure_paths[name] = figure_path
@@ -237,7 +237,7 @@ if __name__ == "__main__":
 
 
     csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pairwise/results/70PCs_pairwise_pid_results.csv"
-    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pairwise/results/70PCs_eigen_pid_PCAonly.png"
+    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pairwise/results/70PCs_eigen_pid_PCAonly"
 
     plot_pairwise_pid_matrices(
         csv_path=csv_path,

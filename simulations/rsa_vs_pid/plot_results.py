@@ -153,7 +153,7 @@ def plot_rsa_comparison(trials_csv: str | Path, summary_csv: str | Path, output_
     Inputs:
         trials_csv: str or Path, trial-level CSV.
         summary_csv: str or Path, summary CSV with trial quartiles.
-        output_path: str or Path, PNG output path.
+        output_path: str or Path, PDF output path; any suffix is replaced.
 
     Outputs:
         Path to the saved 2 x n_dimensions figure. Top row: per-trial RSA
@@ -220,7 +220,7 @@ def plot_rsa_comparison(trials_csv: str | Path, summary_csv: str | Path, output_
     )
     fig.suptitle("Pearson-RDM RSA does not separate X from Y", color=INK_PRIMARY, fontsize=11)
     fig.tight_layout(rect=(0, 0.05, 1, 1))
-    saved_path = Path(output_path)
+    saved_path = Path(output_path).with_suffix(".pdf")
     fig.savefig(saved_path, dpi=200)
     plt.close(fig)
     return saved_path
@@ -232,7 +232,7 @@ def plot_pid_decomposition(trials_csv: str | Path, summary_csv: str | Path, outp
     Inputs:
         trials_csv: str or Path, trial-level CSV.
         summary_csv: str or Path, summary CSV with medians of the raw atoms.
-        output_path: str or Path, PNG output path.
+        output_path: str or Path, PDF output path; any suffix is replaced.
 
     Outputs:
         Path to the saved 4 x n_dimensions figure. Box plots show the
@@ -289,7 +289,7 @@ def plot_pid_decomposition(trials_csv: str | Path, summary_csv: str | Path, outp
     fig.legend(handles=legend_handles, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
     fig.suptitle("Gaussian BROJA PID of T from sources X and Y", color=INK_PRIMARY, fontsize=11)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
-    saved_path = Path(output_path)
+    saved_path = Path(output_path).with_suffix(".pdf")
     fig.savefig(saved_path, dpi=200)
     plt.close(fig)
     return saved_path
@@ -301,7 +301,7 @@ def plot_rsa_vs_unique(trials_csv: str | Path, summary_csv: str | Path, output_p
     Inputs:
         trials_csv: str or Path, trial-level CSV.
         summary_csv: str or Path, summary CSV with trial quartiles.
-        output_path: str or Path, PNG output path.
+        output_path: str or Path, PDF output path; any suffix is replaced.
 
     Outputs:
         Path to the saved 1 x n_dimensions figure. Each point is one trial:
@@ -354,7 +354,7 @@ def plot_rsa_vs_unique(trials_csv: str | Path, summary_csv: str | Path, output_p
         color=INK_PRIMARY, fontsize=11,
     )
     fig.tight_layout(rect=(0, 0.07, 1, 1))
-    saved_path = Path(output_path)
+    saved_path = Path(output_path).with_suffix(".pdf")
     fig.savefig(saved_path, dpi=200)
     plt.close(fig)
     return saved_path
@@ -366,7 +366,7 @@ def plot_all(trials_csv: str | Path, summary_csv: str | Path, output_dir: str | 
     Inputs:
         trials_csv: str or Path, trial-level CSV.
         summary_csv: str or Path, summary CSV.
-        output_dir: str or Path, directory for the PNG files.
+        output_dir: str or Path, directory for the PDF files.
 
     Outputs:
         dict mapping figure keys to saved Paths.
@@ -374,11 +374,11 @@ def plot_all(trials_csv: str | Path, summary_csv: str | Path, output_dir: str | 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     return {
-        "fig1_rsa_comparison": plot_rsa_comparison(trials_csv, summary_csv, output_dir / "fig1_rsa_comparison.png"),
+        "fig1_rsa_comparison": plot_rsa_comparison(trials_csv, summary_csv, output_dir / "fig1_rsa_comparison.pdf"),
         "fig2_pid_decomposition": plot_pid_decomposition(
-            trials_csv, summary_csv, output_dir / "fig2_pid_decomposition.png"
+            trials_csv, summary_csv, output_dir / "fig2_pid_decomposition.pdf"
         ),
-        "fig3_rsa_vs_unique": plot_rsa_vs_unique(trials_csv, summary_csv, output_dir / "fig3_rsa_vs_unique.png"),
+        "fig3_rsa_vs_unique": plot_rsa_vs_unique(trials_csv, summary_csv, output_dir / "fig3_rsa_vs_unique.pdf"),
     }
 
 

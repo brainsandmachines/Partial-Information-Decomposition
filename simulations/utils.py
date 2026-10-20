@@ -347,7 +347,7 @@ def save_seed_summary_table_image(
     if table.empty:
         return None
 
-    image_path = Path(image_path)
+    image_path = Path(image_path).with_suffix(".pdf")
     image_path.parent.mkdir(parents=True, exist_ok=True)
 
     n_rows = len(table)
@@ -627,7 +627,7 @@ def create_distribution_plot_with_colors(
     bar_alpha: float = 0.65,
     xlim: tuple[float, float] | None = None,
 ) -> None:
-    save_path = Path(save_path)
+    save_path = Path(save_path).with_suffix(".pdf")
     save_path.parent.mkdir(parents=True, exist_ok=True)
     numeric_data = np.asarray(data, dtype=float)
     numeric_data = numeric_data[np.isfinite(numeric_data)]
@@ -701,7 +701,7 @@ def load_hist_kde_and_change_colors(
     bar_alpha: float = 0.65,
 ) -> Path | None:
     csv_path = Path(csv_path)
-    output_path = Path(output_path)
+    output_path = Path(output_path).with_suffix(".pdf")
     if not csv_path.exists():
         return None
 
@@ -809,7 +809,7 @@ def create_test_histograms_with_kde(
 
         series = numeric_series_by_col[col]
 
-        plot_path = output_dir / f"hist_kde_{col}.png"
+        plot_path = output_dir / f"hist_kde_{col}.pdf"
         create_distribution_plot_with_colors(
             data=series.tolist(),
             title=f"{col} distribution",

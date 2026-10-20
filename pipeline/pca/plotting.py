@@ -25,14 +25,14 @@ def plot_cumulative_unique_information(
         csv_path: str or Path, path to a pairwise PID results CSV. Each row
             must associate ``unique_1_column`` with ``model_1_column`` and
             ``unique_2_column`` with ``model_2_column``.
-        output_path: str, Path, or None, destination image path. When None,
-            save beside the CSV with a ``_cumulative_unique_information.png``
+        output_path: str, Path, or None, destination path. Its suffix is replaced
+            with ``.pdf``. When None, save beside the CSV with a ``.pdf``
             suffix.
         model_1_column: str, column containing the source-1 model names.
         model_2_column: str, column containing the source-2 model names.
         unique_1_column: str, column containing source-1 unique information.
         unique_2_column: str, column containing source-2 unique information.
-        dpi: int, resolution of the saved image.
+        dpi: int, resolution of the saved PDF.
 
     Output:
         figure_path: Path, location of the saved bar graph. Bars contain the
@@ -115,9 +115,9 @@ def plot_cumulative_unique_information(
         Path(output_path)
         if output_path is not None
         else pairwise_csv_path.with_name(
-            f"{pairwise_csv_path.stem}_cumulative_unique_information.png"
+            f"{pairwise_csv_path.stem}_cumulative_unique_information.pdf"
         )
-    )
+    ).with_suffix(".pdf")
     figure_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(figure_path, dpi=dpi, bbox_inches="tight")
     plt.close(figure)
@@ -140,7 +140,7 @@ def plot_heldout_variance_explained(
     Inputs:
         variance_csv_path: str or Path, CSV produced by
             ``subj_pc_analysis.main``.
-        output_path: str, Path, or None, destination PNG path. When None, save
+        output_path: str, Path, or None, destination PDF path. When None, save
             beside the CSV using the same filename stem.
         show_cumulative: bool, whether to overlay cumulative explained variance.
         show_training: bool, whether to overlay the per-PC training explained
@@ -152,7 +152,7 @@ def plot_heldout_variance_explained(
             both datasets regardless of ``show_training`` and cannot be
             combined with ``plot_training_minus_heldout``.
         number_of_pcs: int or None, number of PCs to include in the plot.
-        dpi: int, resolution of the saved PNG.
+        dpi: int, resolution of the saved PDF.
 
     Output:
         figure_path: Path, location of the saved variance-explained figure.
@@ -349,8 +349,8 @@ def plot_heldout_variance_explained(
     figure_path = (
         Path(output_path)
         if output_path is not None
-        else csv_path.with_suffix(".png")
-    )
+        else csv_path.with_suffix(".pdf")
+    ).with_suffix(".pdf")
     figure_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(figure_path, dpi=dpi, bbox_inches="tight")
     plt.close(figure)
@@ -361,7 +361,7 @@ def plot_heldout_variance_explained(
 
 if __name__ == "__main__":
     csv_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pairwise/pair_wise_ridge/pairwise_pid_results_ridge_pca.csv"
-    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pairwise/ridge_pca_cumulative_unique_information.png"
+    out_path = "/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pairwise/ridge_pca_cumulative_unique_information.pdf"
     
     # plot_heldout_variance_explained(
     #     variance_csv_path=csv_path,

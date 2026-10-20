@@ -198,7 +198,7 @@ def run_from_config(config: dict) -> dict:
     bias_correction = config["bias_correction"]
     bias_label = "bias_corrected" if bias_correction else "uncorrected"
     results_path = output_dir / f"{config['csv_prefix']}_{bias_label}.csv"
-    plot_path = results_path.with_name(f"{results_path.stem}_pid_atoms.png")
+    plot_path = results_path.with_name(f"{results_path.stem}_pid_atoms.pdf")
 
     if not config["overwrite_outputs"]:
         existing_paths = [str(path) for path in (results_path, plot_path) if path.exists()]

@@ -1,6 +1,7 @@
 from typing import Any
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import sys
 from pathlib import Path
@@ -61,9 +62,7 @@ def pca_as_function(pipeline_config: str | Path, pca_config: str | Path) -> dict
 
 def plot_(results_dict: dict[str, Any], pca_config: str,pipeline_config: str ) -> None:
     """Plot the results of the PID computation as a function of the number of PCA components."""
-    import matplotlib.pyplot as plt
-
-    save_fig_path = Path(pca_config["save_path"])
+    save_fig_path = Path(pca_config["save_path"]).with_suffix(".pdf")
     target_components = pipeline_config["feature_manipulation_kwargs"]["n_components_target"]
     model_name_1 = pipeline_config["sources_kwargs"]["model_name_1"]
     model_name_2 = pipeline_config["sources_kwargs"]["model_name_2"]

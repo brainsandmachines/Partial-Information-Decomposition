@@ -172,7 +172,7 @@ def plot_pid_mi_as_function_of_pcs(
         suffix = "normalized_by_tri_mi" if normalized else "absolute"
         filename_prefix = f"{safe_name}_" if safe_name else ""
         figure_path = output_path / (
-            f"{filename_prefix}{safe_model_1}__{safe_model_2}_pid_mi_{suffix}.png"
+            f"{filename_prefix}{safe_model_1}__{safe_model_2}_pid_mi_{suffix}.pdf"
         )
         figure.savefig(figure_path, dpi=300, bbox_inches="tight")
         plt.close(figure)
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     model2_name = "ResNet50-SimCLR_selfsupervised"
     model_pair_name = f"{model1_name}__{model2_name}"
     pickle_path = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca/results/NORIDGE_RN50_clip_ResNet50-SimCLR_selfsupervised/RN50_clip__ResNet50-SimCLR_selfsupervised_pc_results.pkl")
-    output_dir = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca/plots/RN50_clip_ResNet50-SimCLR_selfsupervised/no_ridge_RN50_clip_ResNet50-SimCLR_selfsupervised.png")
+    output_dir = Path("/home/ohadshee/Desktop/Thesis_Ohad_Sheelo/pipeline/analysis/pca/plots/RN50_clip_ResNet50-SimCLR_selfsupervised/no_ridge_RN50_clip_ResNet50-SimCLR_selfsupervised")
     plot_pc_results_from_pickle(
         pkl_path=pickle_path,
         model_name=model_pair_name,
