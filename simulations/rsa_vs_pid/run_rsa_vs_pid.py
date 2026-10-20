@@ -32,9 +32,9 @@ from simulations.rsa_vs_pid.plot_results import plot_all
 
 
 CONFIG = {
-    "dimensions": [50,100,500],
-    "sample_sizes": [2000,10000,50000],
-    "n_trials": 100,
+    "dimensions": [10,50,100],
+    "sample_sizes": [1000,5000],
+    "n_trials": 30,
     "base_seed": 56,
     "noise_variance": 0.1,
     "n_shuffles": 20,
