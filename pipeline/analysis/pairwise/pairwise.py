@@ -23,7 +23,7 @@ import argparse
 import sys
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
@@ -74,8 +74,6 @@ def run_pairwise_pid_pipeline(model_1_names: list[str], model_2_names: list[str]
 
     config = otc_config
     source_mode = config.get("source_mode", "prediction")
-    if source_mode not in SOURCE_MODES:
-        raise ValueError(f"source_mode must be one of {SOURCE_MODES}, got {source_mode!r}.")
     registry = otc_experiment.PIPELINE_STEP_FUNCTIONS
     target_extraction = resolve_pipeline_function(config["functions"], registry,
                                                   "target_extraction", required=True)
@@ -86,19 +84,15 @@ def run_pairwise_pid_pipeline(model_1_names: list[str], model_2_names: list[str]
     if target_extraction is None or pid_calculation is None:
         raise RuntimeError("Required configured pipeline functions did not resolve.")
 
-    # Cheap configuration checks run before the slow NSD target load.
     layer_results_path = pairwise_utils._layer_results_path(config)
-    if source_mode == "prediction":
-        feature_extraction, pc_target_path = pairwise_utils._check_prediction_config(config,
-                                                                                     registry)
-    else:
-        n_source_components = pairwise_utils._check_representation_config(config)
-
     required_models = pairwise_utils.required_models(unfinished_pairs)
     pid_kwargs = dict(config.get("pid_kwargs", {}))
     seed = int(pid_kwargs.get("rng_seed", 56))
     report_kwargs = dict(config.get("report_kwargs", {}))
     prefetch_next_model = bool((config.get("execution") or {}).get("prefetch_next_model", True))
+    # Validate the mode and bind its configuration before the expensive target load.
+    prepare_mode_inputs = _build_mode_input_preparer(
+        source_mode, config, registry, required_models, layer_results_path, seed)
     print(f"Source mode: {source_mode}; pending unordered pairs: {len(unfinished_pairs)}; "
           f"required models: {len(required_models)}; next-model prefetch: {prefetch_next_model}.")
 
@@ -106,15 +100,7 @@ def run_pairwise_pid_pipeline(model_1_names: list[str], model_2_names: list[str]
     hdf_file = target_context.get("hdf_file")
     try:
         raw_target = pairwise_utils.pop_raw_target(target_context)
-        if source_mode == "prediction":
-            test_target, prepare_source = pairwise_utils.prepare_prediction_inputs(
-                raw_target, target_context, config, required_models, layer_results_path,
-                feature_extraction, pc_target_path, seed,
-                target_preparation=prepare_ridge_target)
-        else:
-            test_target, prepare_source = _representation_inputs(raw_target, target_context,
-                                                                 config, layer_results_path,
-                                                                 n_source_components, seed)
+        test_target, prepare_source = prepare_mode_inputs(raw_target, target_context)
         # Free the full-voxel target before the long pair loop.
         del raw_target
 
@@ -142,6 +128,54 @@ def run_pairwise_pid_pipeline(model_1_names: list[str], model_2_names: list[str]
             hdf_file.close()
 
     return output_path
+
+
+def _build_mode_input_preparer(
+    source_mode: str,
+    config: dict[str, Any],
+    registry: dict[str, Any],
+    required_models: list[str],
+    layer_results_path: Path,
+    seed: int,
+) -> Callable[[np.ndarray, dict[str, Any]], tuple[np.ndarray, pairwise_utils.SourcePreparer]]:
+    """Validate a source mode and bind its pairwise input-preparation inputs.
+
+    Inputs:
+        source_mode: str selecting prediction or representation sources.
+        config: dict[str, Any] containing the selected mode's configuration.
+        registry: dict[str, Any] mapping configured function names to callables.
+        required_models: list[str] containing every model needed by pending pairs.
+        layer_results_path: Path to the existing best-layer CSV.
+        seed: int random seed used by ridge or PCA preparation.
+
+    Outputs:
+        Callable accepting the raw target and target context and returning the
+        held-out target plus a reusable source preparer.
+    """
+
+    if source_mode == "prediction":
+        feature_extraction, pc_target_path = pairwise_utils._check_prediction_config(
+            config, registry)
+        return partial(
+            pairwise_utils.prepare_prediction_inputs,
+            config=config,
+            required_models=required_models,
+            layer_results_path=layer_results_path,
+            feature_extraction=feature_extraction,
+            pc_target_path=pc_target_path,
+            seed=seed,
+            target_preparation=prepare_ridge_target,
+        )
+    if source_mode == "representation":
+        n_source_components = pairwise_utils._check_representation_config(config)
+        return partial(
+            _representation_inputs,
+            config=config,
+            layer_results_path=layer_results_path,
+            n_source_components=n_source_components,
+            seed=seed,
+        )
+    raise ValueError(f"source_mode must be one of {SOURCE_MODES}, got {source_mode!r}.")
 
 
 def _representation_inputs(raw_target: np.ndarray, target_context: dict[str, Any],
