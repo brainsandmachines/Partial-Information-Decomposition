@@ -1,0 +1,33 @@
+
+
+
+paths:
+  NSD_ROOT: "/groups/golan_neurogroup/bml_group/datasets/nsddata"
+  HDF_PATH: "nsddata_stimuli/stimuli/nsd/nsd_stimuli.hdf5"
+  PKL_INFO_PATH: "nsddata/experiments/nsd/nsd_stim_info_merged.pkl"
+  NEURAL_DATA_PATH: "/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim"
+  per_voxel_results_dir: "results/encoding/per_voxel_results"
+
+
+sources: 
+  source1_name: "alexnet_random"
+  source2_name: "resnet18_random"
+  DEBUG_LAYER_1: None
+  DEBUG_LAYER_2: None
+
+
+target:
+  target_name: "subj01"
+  betas_roi: "OTC"
+
+
+images:
+  N_DEBUG_IMAGES: 50
+  BATCH_SIZE_PROCESS: 4
+  BATCH_SIZE_DATALOADER: 4
+
+functions:
+  layer_func_name: "random_layer_selection"
+  manipulation_func_name: "pca_projection"
+
+

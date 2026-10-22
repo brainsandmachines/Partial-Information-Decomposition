@@ -1,0 +1,4 @@
+#'ViT-B_32_clip','ViT-L_14_clip' - weigh too much
+# dino_resnet50_selfsupervised -   File "/tmp/torch/hub/facebookresearch_dino_main/vision_transformer.py", line 24, in <module>
+    from utils import trunc_normal_
+ImportError: cannot import name 'trunc_normal_' from 'utils' (unknown location)
