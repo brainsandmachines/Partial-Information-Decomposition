@@ -40,7 +40,7 @@ from pipeline.plotting import plot_pairwise_pid_matrices
 from pipeline.utils import resolve_pipeline_function
 
 
-DEFAULT_CONFIG_PATH = Path(__file__).with_name("prediction.yaml")
+DEFAULT_CONFIG_PATH = Path(__file__).with_name("representation.yaml")
 SOURCE_MODES = ("prediction", "representation")
 
 
@@ -265,4 +265,8 @@ def parse_args() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
+    import time
+    start_time = time.time()
     main(parse_args().config)
+    elapsed_time = time.time() - start_time
+    print(f"Pairwise PID pipeline completed in {elapsed_time:.2f} seconds.")

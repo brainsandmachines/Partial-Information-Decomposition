@@ -16,7 +16,10 @@ functions:
 
 # Symmetric candidate list: every unfinished unordered pair is processed once.
 models:
-  - levit_128_classification
+  - levit_128_classification #Top 4 are the fastest models in terms of runtime, so they are processed first to get a quick sense of the results.
+  - mobilenetv3_large_100_classification
+  - ghostnet_100_classification
+  - pit_ti_224_classification
   - coat_lite_tiny_classification
   - visformer_small_classification
   - convit_base_classification
@@ -34,14 +37,11 @@ models:
   - resnet50_classification
   - semnasnet_100_classification
   - cspresnet50_classification
-  - mobilenetv3_large_100_classification
-  - ghostnet_100_classification
   - convnext_base_classification
   - xcit_nano_12_p8_224_classification
   - xcit_nano_12_p16_224_classification
   - swin_large_patch4_window7_224_classification
   - jx_nest_tiny_classification
-  - pit_ti_224_classification
   - vit_base_patch32_224_classification
   - vit_base_patch16_224_classification
   - tnt_s_patch16_224_classification
