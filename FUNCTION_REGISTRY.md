@@ -25,6 +25,7 @@ Generated from the current AST after the repository reorganization. Paths, signa
 - `pipeline/experiments/`: 4 Python files.
 - `pipeline/pca/`: 5 Python files.
 - `pipeline/phases/`: 4 Python files.
+- `pipeline/testing/gsn/`: 2 Python files.
 - `simulations/`: 4 Python files.
 - `simulations/evil_twin/`: 4 Python files.
 - `simulations/pca/rank/`: 5 Python files.
@@ -383,6 +384,24 @@ File description: No module docstring; inspect before reuse.
 | `make_nsd_dataloader (line 241)` | model_context: dict, stim_dataset, image_ids: np.ndarray, batch_size: int | DataLoader | Create a DataLoader for an ordered subset of NSD images. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `batching (line 264)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | np.ndarray | Batch process a range of images for feature extraction. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `feature_extraction (line 295)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | np.ndarray | Extract features from the models and the neural data. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
+
+## `pipeline/testing/gsn/gsn_pca.py`
+
+File description: Estimate GSN covariances and eigendecompose them for PCA diagnostics.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `estimate_gsn_covariances (line 17)` | responses: np.ndarray | dict[str, Any] | Estimate optimized signal and noise covariances with official GSN. | Scope: task-specific/public. Related: `pca_signal_noise_covariances`. Conventions: input order `(image, voxel, repeat)`; GSN receives `(voxel, image, repeat)`; returns optimized raw covariances `cSb` and `cNb`; no scaling or DNN/PID dependency. |
+| `pca_signal_noise_covariances (line 50)` | signal_covariance: np.ndarray, noise_covariance: np.ndarray | dict[str, np.ndarray] | Eigendecompose optimized GSN signal and noise covariance matrices. | Scope: task-specific/public. Related: `estimate_gsn_covariances`. Conventions: inputs are raw covariance matrices, not samples or correlation matrices; eigenvectors are columns and eigenvalues are descending. |
+| `select_gsn_pca_components (line 113)` | responses: np.ndarray, max_components: int \| None=None, n_folds: int=5, seed: int=0 | dict[str, Any] | Select the smallest GSN signal-PC count within one standard error of the best independent-repeat reconstruction error. | Scope: task-specific/public. Related: `estimate_gsn_covariances`, `pca_signal_noise_covariances`. Conventions: GSN is fit on training-image folds; validation compares disjoint balanced repeat averages; errors are normalized to the training-mean reconstruction; no DNN/PID dependency. |
+
+## `pipeline/testing/gsn/gsn_pca_smoke.py`
+
+File description: Debuggable smoke example for GSN PCA with known signal rank.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `run_gsn_pca_smoke (line 20)` | n_images: int=500, n_voxels: int=50, true_rank: int=5, n_repeats: int=4, seed: int=0 | dict[str, Any] | Run GSN PCA on repeated responses with known low-rank signal. | Scope: smoke/debug entry point. Related: `estimate_gsn_covariances`, `pca_signal_noise_covariances`, `select_gsn_pca_components`. Conventions: responses are `(image, voxel, repeat)`; prints only the cross-validated number of retained signal eigenvalues; reports selected count, error-minimizing count, eigengap after the true rank, and subspace overlap; no PID, DNN, or real-data dependency. |
 
 ## `pipeline/pid_pipeline.py`
 

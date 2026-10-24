@@ -18,7 +18,7 @@ from pipeline.testing.gsn.gsn_pca import (
 
 
 def run_gsn_pca_smoke(
-    n_images: int = 500,
+    n_images: int = 200,
     n_voxels: int = 50,
     true_rank: int = 5,
     n_repeats: int = 4,
