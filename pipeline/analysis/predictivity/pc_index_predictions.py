@@ -22,8 +22,8 @@ from pipeline.analysis.utils import (
     to_deepdive_model_name,
 )
 from pipeline.phases.choosing_layer import overall_best_layer
-from pipeline.phases.feature_manipulations import prepare_ridge_target
-from pipeline.phases.sources_target_features import prepare_target
+from pipeline.phases.feature_manipulations import prepare_target as project_target
+from pipeline.phases.sources_target_features import prepare_target as load_target
 from pipeline.utils import nsd_feature_extraction
 
 
@@ -57,8 +57,8 @@ def each_pc_index_pred(
         the selected model-layer index.
     """
 
-    target_context = prepare_target(Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
-    train_target, shared_target, shared_mask = prepare_ridge_target(
+    target_context = load_target(Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
+    train_target, shared_target, shared_mask = project_target(
         target_context["target"], target_context, pc_path
     )
     if any(pc_index < 0 or pc_index >= train_target.shape[1] for pc_index in n_pcs):

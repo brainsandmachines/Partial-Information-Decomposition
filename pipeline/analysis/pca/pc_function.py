@@ -21,8 +21,8 @@ from pipeline.analysis.pca.plot_pc_results import (
     plot_pid_mi_as_function_of_pcs,
 )
 from pipeline.experiments.otc import PIPELINE_STEP_FUNCTIONS
-from pipeline.phases.feature_manipulations import prepare_ridge_target
-from pipeline.phases.sources_target_features import prepare_target
+from pipeline.phases.feature_manipulations import prepare_target as project_target
+from pipeline.phases.sources_target_features import prepare_target as load_target
 from pipeline.utils import pipeline_functions_from_config, print_pid_mi
 
 
@@ -112,7 +112,7 @@ def pc_function_analysis(
     )
     results: dict[str, dict[str, dict[int, dict[str, Any]]]] = {}
 
-    target_context = prepare_target(
+    target_context = load_target(
         Path(hdf_path), Path(pkl_info_path), Path(neural_data_path))
     hdf_file = target_context.get("hdf_file")
     try:
@@ -126,7 +126,7 @@ def pc_function_analysis(
             feature_extraction,
             Path(pc_path),
             seed,
-            target_preparation=prepare_ridge_target,
+            target_preparation=project_target,
         )
         del raw_target
 

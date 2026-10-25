@@ -35,7 +35,7 @@ if str(repo_root) not in sys.path:
 
 from pipeline.analysis.pairwise import pairwise_utils
 from pipeline.experiments import otc as otc_experiment
-from pipeline.phases.feature_manipulations import prepare_ridge_target
+from pipeline.phases.feature_manipulations import prepare_target
 from pipeline.plotting import plot_pairwise_pid_matrices
 from pipeline.utils import resolve_pipeline_function
 
@@ -164,7 +164,7 @@ def _build_mode_input_preparer(
             feature_extraction=feature_extraction,
             pc_target_path=pc_target_path,
             seed=seed,
-            target_preparation=prepare_ridge_target,
+            target_preparation=prepare_target,
         )
     if source_mode == "representation":
         n_source_components = pairwise_utils._check_representation_config(config)

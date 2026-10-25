@@ -103,7 +103,7 @@ def cca_projection(features1, features2, n_components):
 
 
 
-def prepare_ridge_target(
+def prepare_target(
     target: np.ndarray,
     target_context: Mapping[str, Any],
     pc_target_path: str | Path,
@@ -463,7 +463,7 @@ def feature_manipulation_ridge(
             array contains only shared held-out rows, and all three use the
             saved target-PCA component space.
     """
-    train_target, test_target, shared_mask = prepare_ridge_target(
+    train_target, test_target, shared_mask = prepare_target(
         target,
         target_context,
         pc_target_path,

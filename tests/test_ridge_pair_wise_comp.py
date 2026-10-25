@@ -168,7 +168,7 @@ def test_alpha_search_and_saved_pca_use_raw_unstandardized_arrays(
     np.testing.assert_allclose(transformed, target_pca.transform(target))
 
 
-def test_prepare_ridge_target_projects_once_and_preserves_held_out_order(
+def test_prepare_target_projects_once_and_preserves_held_out_order(
     tmp_path: Path,
 ) -> None:
     """Check saved target PCA projection and exact Boolean-mask splitting.
@@ -196,7 +196,7 @@ def test_prepare_ridge_target_projects_once_and_preserves_held_out_order(
     joblib.dump(pca, pca_path)
     target_context = {"shared1000_subj": mask.copy()}
 
-    train_target, test_target, returned_mask = feature_manipulations.prepare_ridge_target(
+    train_target, test_target, returned_mask = feature_manipulations.prepare_target(
         target,
         target_context,
         pca_path,
@@ -210,7 +210,7 @@ def test_prepare_ridge_target_projects_once_and_preserves_held_out_order(
     np.testing.assert_array_equal(returned_mask, mask)
 
 
-def test_prepare_ridge_target_rejects_invalid_target_mask_and_artifact(
+def test_prepare_target_rejects_invalid_target_mask_and_artifact(
     tmp_path: Path,
 ) -> None:
     """Check target, held-out-mask, and PCA artifact validation.
@@ -228,7 +228,7 @@ def test_prepare_ridge_target_rejects_invalid_target_mask_and_artifact(
     joblib.dump(PCA(n_components=2).fit(target), pca_path)
 
     with pytest.raises(ValueError, match="two-dimensional"):
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             target[:, 0],
             {"shared1000_subj": mask},
             pca_path,
@@ -236,35 +236,35 @@ def test_prepare_ridge_target_rejects_invalid_target_mask_and_artifact(
     with pytest.raises(ValueError, match="NaN or infinite"):
         invalid_target = target.copy()
         invalid_target[0, 0] = np.nan
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             invalid_target,
             {"shared1000_subj": mask},
             pca_path,
         )
     with pytest.raises(TypeError, match="must be a mapping"):
-        feature_manipulations.prepare_ridge_target(target, None, pca_path)  # type: ignore[arg-type]
+        feature_manipulations.prepare_target(target, None, pca_path)  # type: ignore[arg-type]
     with pytest.raises(KeyError, match="shared1000_subj"):
-        feature_manipulations.prepare_ridge_target(target, {}, pca_path)
+        feature_manipulations.prepare_target(target, {}, pca_path)
     with pytest.raises(ValueError, match="one-dimensional Boolean"):
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             target,
             {"shared1000_subj": mask.astype(np.int64)},
             pca_path,
         )
     with pytest.raises(ValueError, match="one entry for each target sample"):
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             target,
             {"shared1000_subj": mask[:-1]},
             pca_path,
         )
     with pytest.raises(ValueError, match="at least one held-out"):
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             target,
             {"shared1000_subj": np.zeros(target.shape[0], dtype=bool)},
             pca_path,
         )
     with pytest.raises(ValueError, match="at least one training"):
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             target,
             {"shared1000_subj": np.ones(target.shape[0], dtype=bool)},
             pca_path,
@@ -273,7 +273,7 @@ def test_prepare_ridge_target_rejects_invalid_target_mask_and_artifact(
     invalid_pca_path = tmp_path / "invalid_pca.pkl"
     joblib.dump({"transform": None}, invalid_pca_path)
     with pytest.raises(TypeError, match="provide a transform method"):
-        feature_manipulations.prepare_ridge_target(
+        feature_manipulations.prepare_target(
             target,
             {"shared1000_subj": mask},
             invalid_pca_path,
@@ -690,7 +690,7 @@ def test_grouped_feature_manipulation_matches_composed_single_array_helpers(
         layer_index=9,
     )
 
-    train_target, expected_target, direct_mask = feature_manipulations.prepare_ridge_target(
+    train_target, expected_target, direct_mask = feature_manipulations.prepare_target(
         target,
         target_context,
         pca_path,
@@ -720,10 +720,10 @@ def test_grouped_feature_manipulation_matches_composed_single_array_helpers(
         seed=23,
     )
 
-    prepare_spy = Mock(wraps=feature_manipulations.prepare_ridge_target)
+    prepare_spy = Mock(wraps=feature_manipulations.prepare_target)
     load_spy = Mock(wraps=feature_manipulations.load_ridge_alphas)
     predict_spy = Mock(wraps=feature_manipulations.ridge_predict_shared)
-    monkeypatch.setattr(feature_manipulations, "prepare_ridge_target", prepare_spy)
+    monkeypatch.setattr(feature_manipulations, "prepare_target", prepare_spy)
     monkeypatch.setattr(feature_manipulations, "load_ridge_alphas", load_spy)
     monkeypatch.setattr(feature_manipulations, "ridge_predict_shared", predict_spy)
 
@@ -915,8 +915,8 @@ class _RunnerHarness:
         )
         monkeypatch.setattr(
             ridge_pair_wise_comp,
-            "prepare_ridge_target",
-            self.prepare_ridge_target,
+            "prepare_target",
+            self.prepare_target,
         )
         monkeypatch.setattr(
             ridge_pairwise_utils,
@@ -1048,7 +1048,7 @@ class _RunnerHarness:
         self.counts[f"alphas:{model_name}"] += 1
         return np.full(expected_target_dim, self.model_values[model_name])
 
-    def prepare_ridge_target(
+    def prepare_target(
         self,
         target: np.ndarray,
         target_context: dict[str, Any],
