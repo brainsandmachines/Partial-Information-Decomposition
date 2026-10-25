@@ -275,7 +275,8 @@ def choose_minimal_pcs(
             ``*_betas_img_vox_rep.zarr`` stores.
         pkl_info_path: str or Path, NSD stimulus-information pickle.
         output_dir: str, Path, or None, directory for the CSV of selection
-            outputs. When None, nothing is written.
+            outputs. When None, nothing is written. If selection_kwargs contains
+            ``seed``, the CSV filename includes that seed.
         nonfinite_report_dir: str or Path, directory for the report written
             when non-finite responses are found.
 
@@ -303,7 +304,11 @@ def choose_minimal_pcs(
     if output_dir is not None:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
-        csv_path = output_path / f"{subj_id}_{image_set}_{selection_function.__name__}.csv"
+        seed = selection_kwargs.get("seed")
+        seed_suffix = "" if seed is None else f"_seed{seed}"
+        csv_path = output_path / (
+            f"{subj_id}_{image_set}_{selection_function.__name__}{seed_suffix}.csv"
+        )
         table.to_csv(csv_path, index=False)
         print(f"Saved selection outputs to {csv_path}.")
 

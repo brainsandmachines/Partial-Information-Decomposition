@@ -18,6 +18,7 @@ pipeline/trash/
 subj01_results/
 pipeline/pca/saved_pcs/
 pipeline/pca/results/
+pipeline/pca/choosing_minimal_best_pca/results/
 pca_by_variance=8000/
 MultivariateStatistics/
 # Cluster scripts and instructions

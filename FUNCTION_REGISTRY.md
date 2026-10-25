@@ -309,6 +309,17 @@ File description: Minimal in-process Python wrapper for R's ``missMDA::estim_ncp
 |---|---|---|---|---|
 | `estimate_ncp_pca (line 22)` | data, ncp_min=0, ncp_max=5, method='Regularized', scale=True, method_cv='gcv', nbsim=100, p_na=0.05, threshold=0.0001, seed=None, rscript=RSCRIPT, verbose=False | Unannotated | Call ``missMDA::estim_ncpPCA`` on a Python sample table. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention. |
 
+## `pipeline/pca/choosing_minimal_best_pca/choosing_minimal_best_pca.py`
+
+File description: Load repeated NSD OTC responses and run a configurable target-PC count selector.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `raise_on_nonfinite_images (line 47)` | responses: np.ndarray, image_ids: np.ndarray, repeat_ids: np.ndarray, subj_id: str, image_set: str, report_dir: str \| Path=DEFAULT_NONFINITE_DIR | None | Report every image/repeat pair containing a non-finite response and stop the run. | Scope: task-specific/public. Conventions: responses use `(image, voxel, repeat)` order; writes a diagnostic CSV only on failure. |
+| `load_repeat_responses (line 108)` | subj_id: str, image_set: str='unique', pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, nonfinite_report_dir: str \| Path=DEFAULT_NONFINITE_DIR | dict[str, Any] | Load finite repeated OTC responses and optionally exclude shared1000 images. | Scope: task-specific/public. Conventions: output responses use `(image, voxel, repeat)` order; `unique` excludes shared1000. |
+| `selection_results_to_table (line 195)` | results: dict[str, Any], subj_id: str | pd.DataFrame | Convert scalar, per-candidate, and per-fold selection outputs into a candidate-level table. | Scope: task-specific/public. Conventions: requires `selected_n_components` and one-dimensional `candidate_n_components`; unsupported result shapes raise. |
+| `choose_minimal_pcs (line 249)` | subj_id: str, selection_function: Callable[..., dict[str, Any]], image_set: str='unique', selection_kwargs: dict[str, Any] \| None=None, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH, output_dir: str \| Path \| None=DEFAULT_OUTPUT_DIR, nonfinite_report_dir: str \| Path=DEFAULT_NONFINITE_DIR | dict[str, Any] | Load repeated responses, run a component selector, tabulate its outputs, and optionally save them. | Scope: task-specific/public. Conventions: passes responses unchanged in `(image, voxel, repeat)` order; when `selection_kwargs` contains `seed`, the output filename ends in `_seed{seed}.csv`. |
+
 ## `pipeline/pca/plotting.py`
 
 File description: Plot subject-level PCA variance and pairwise unique information.
