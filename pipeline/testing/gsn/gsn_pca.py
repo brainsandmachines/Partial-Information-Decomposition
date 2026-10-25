@@ -115,13 +115,15 @@ def select_gsn_pca_components(
     max_components: int | None = None,
     n_folds: int = 5,
     seed: int = 0,
+    repeat_split_weighting: str = "input_repeat_count",
 ) -> dict[str, Any]:
     """Select GSN signal PCs by independent-repeat reconstruction.
 
-    Repeat-split errors are weighted in proportion to the number of input
-    repeats. With three repeats, the three two-repeat-input directions receive
-    total weight 2/3 and the three one-repeat-input directions receive total
-    weight 1/3. The target side necessarily has the complementary repeat count.
+    Repeat-split errors can be weighted in proportion to the number of input
+    repeats. With three repeats, this gives the three two-repeat-input
+    directions total weight 2/3 and the three one-repeat-input directions total
+    weight 1/3. Equal weighting remains available for comparison. The target
+    side necessarily has the complementary repeat count.
 
     Inputs:
         responses: np.ndarray with shape (n_images, n_voxels, n_repeats).
@@ -129,6 +131,9 @@ def select_gsn_pca_components(
             voxel dimension.
         n_folds: int, number of held-out image folds used for validation.
         seed: int, random seed used to assign images to folds.
+        repeat_split_weighting: str, ``"input_repeat_count"`` weights each
+            split by its number of input repeats, while ``"equal"`` gives
+            every directed repeat split equal weight.
 
     Output:
         results: dict[str, Any] containing candidate component counts, fold
@@ -136,9 +141,9 @@ def select_gsn_pca_components(
             the error-minimizing count, the one-standard-error threshold, and
             the smallest count within that threshold. Each validation score
             compares a projected repeat average with an independent repeat
-            average; no DNN representations are used. It also reports that
+            average; no DNN representations are used. It also reports whether
             input-repeat weighting was used and the maximum-to-minimum
-            per-split input-repeat weight ratio.
+            per-split weight ratio.
     """
 
     response_array = np.asarray(responses, dtype=float)
@@ -157,6 +162,10 @@ def select_gsn_pca_components(
         raise TypeError("n_folds must be an integer.")
     if not 2 <= n_folds <= n_images:
         raise ValueError("n_folds must be between 2 and n_images.")
+    if repeat_split_weighting not in ("equal", "input_repeat_count"):
+        raise ValueError(
+            "repeat_split_weighting must be 'equal' or 'input_repeat_count'."
+        )
     if max_components is None:
         max_components = n_voxels
     if not isinstance(max_components, (int, np.integer)):
@@ -179,8 +188,13 @@ def select_gsn_pca_components(
         [len(input_repeats) for input_repeats, _ in repeat_splits],
         dtype=float,
     )
+    if repeat_split_weighting == "input_repeat_count":
+        unnormalized_weights = input_repeat_counts
+    else:
+        # (n_repeat_splits,) -> (n_repeat_splits,)
+        unnormalized_weights = np.ones_like(input_repeat_counts)
     # (n_repeat_splits,) -> (n_repeat_splits,)
-    repeat_split_weights = input_repeat_counts / input_repeat_counts.sum()
+    repeat_split_weights = unnormalized_weights / unnormalized_weights.sum()
 
     fold_errors = np.empty((n_folds, max_components))
     for fold_index, validation_indices in enumerate(validation_folds):
@@ -254,8 +268,10 @@ def select_gsn_pca_components(
         "mean_normalized_reconstruction_errors": mean_errors,
         "reconstruction_error_standard_errors": standard_errors,
         "one_standard_error_threshold": threshold,
-        "repeat_splits_weighted_by_input_count": True,
+        "repeat_splits_weighted_by_input_count": (
+            repeat_split_weighting == "input_repeat_count"
+        ),
         "repeat_split_input_weight_ratio": float(
-            input_repeat_counts.max() / input_repeat_counts.min()
+            repeat_split_weights.max() / repeat_split_weights.min()
         ),
     }

@@ -23,3 +23,6 @@ selection_kwargs:
   max_components: 1000  # Same cap as subject_pca.max_features; null tests every voxel (slow).
   n_folds: 5
   seed: 0
+  # "input_repeat_count": 2/3 total weight for two-repeat inputs and 1/3
+  # for one-repeat inputs when three repeats are available; "equal": 1/2 each.
+  repeat_split_weighting: input_repeat_count

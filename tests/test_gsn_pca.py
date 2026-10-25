@@ -135,6 +135,7 @@ def test_component_selection_weights_splits_by_input_repeat_count(
         max_components=1,
         n_folds=2,
         seed=7,
+        repeat_split_weighting="input_repeat_count",
     )
 
     # Two fold errors with shape (2, 1) -> (2,).
@@ -144,6 +145,21 @@ def test_component_selection_weights_splits_by_input_repeat_count(
     )
     assert selection["repeat_splits_weighted_by_input_count"] is True
     assert selection["repeat_split_input_weight_ratio"] == 2.0
+
+    equal_selection = select_gsn_pca_components(
+        responses,
+        max_components=1,
+        n_folds=2,
+        seed=7,
+        repeat_split_weighting="equal",
+    )
+    # Two fold errors with shape (2, 1) -> (2,).
+    np.testing.assert_allclose(
+        equal_selection["fold_normalized_reconstruction_errors"][:, 0],
+        [5.625, 5.625],
+    )
+    assert equal_selection["repeat_splits_weighted_by_input_count"] is False
+    assert equal_selection["repeat_split_input_weight_ratio"] == 1.0
 
 
 @pytest.mark.skipif(GSN_IMPORT_ERROR is not None, reason="official GSN is unavailable")
