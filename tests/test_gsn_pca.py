@@ -104,6 +104,48 @@ def test_pca_signal_noise_covariances_known_spectra() -> None:
         pca_signal_noise_covariances(np.array([[1.0, 1.0], [0.0, 1.0]]), np.eye(2))
 
 
+def test_component_selection_weights_splits_by_input_repeat_count(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Give two-repeat inputs total weight 2/3 and one-repeat inputs 1/3."""
+
+    def fake_estimate_gsn_covariances(responses: np.ndarray) -> dict:
+        """Return a one-dimensional GSN covariance pair with a fixed basis."""
+
+        return {"cSb": np.ones((1, 1)), "cNb": np.ones((1, 1))}
+
+    monkeypatch.setattr(
+        gsn_pca,
+        "estimate_gsn_covariances",
+        fake_estimate_gsn_covariances,
+    )
+    responses = np.array(
+        [
+            [[0.0, 0.0, 10.0]],
+            [[1.0, 1.0, 8.0]],
+            [[2.0, 2.0, 6.0]],
+            [[3.0, 3.0, 4.0]],
+            [[4.0, 4.0, 2.0]],
+            [[5.0, 5.0, 0.0]],
+        ]
+    )
+
+    selection = select_gsn_pca_components(
+        responses,
+        max_components=1,
+        n_folds=2,
+        seed=7,
+    )
+
+    # Two fold errors with shape (2, 1) -> (2,).
+    np.testing.assert_allclose(
+        selection["fold_normalized_reconstruction_errors"][:, 0],
+        [4.5, 4.5],
+    )
+    assert selection["repeat_splits_weighted_by_input_count"] is True
+    assert selection["repeat_split_input_weight_ratio"] == 2.0
+
+
 @pytest.mark.skipif(GSN_IMPORT_ERROR is not None, reason="official GSN is unavailable")
 def test_gsn_recovers_stable_low_rank_signal_subspace() -> None:
     """Recover a known low-rank signal subspace in two stimulus halves."""

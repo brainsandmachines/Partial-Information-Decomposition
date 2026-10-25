@@ -118,6 +118,11 @@ def select_gsn_pca_components(
 ) -> dict[str, Any]:
     """Select GSN signal PCs by independent-repeat reconstruction.
 
+    Repeat-split errors are weighted in proportion to the number of input
+    repeats. With three repeats, the three two-repeat-input directions receive
+    total weight 2/3 and the three one-repeat-input directions receive total
+    weight 1/3. The target side necessarily has the complementary repeat count.
+
     Inputs:
         responses: np.ndarray with shape (n_images, n_voxels, n_repeats).
         max_components: int or None, largest candidate count; None tests every
@@ -131,7 +136,9 @@ def select_gsn_pca_components(
             the error-minimizing count, the one-standard-error threshold, and
             the smallest count within that threshold. Each validation score
             compares a projected repeat average with an independent repeat
-            average; no DNN representations are used.
+            average; no DNN representations are used. It also reports that
+            input-repeat weighting was used and the maximum-to-minimum
+            per-split input-repeat weight ratio.
     """
 
     response_array = np.asarray(responses, dtype=float)
@@ -167,6 +174,13 @@ def select_gsn_pca_components(
         if len(group_a) == len(group_b) and tuple(group_a) > group_b:
             continue
         repeat_splits.extend(((group_a, group_b), (group_b, group_a)))
+    # n_repeat_splits tuples -> (n_repeat_splits,)
+    input_repeat_counts = np.asarray(
+        [len(input_repeats) for input_repeats, _ in repeat_splits],
+        dtype=float,
+    )
+    # (n_repeat_splits,) -> (n_repeat_splits,)
+    repeat_split_weights = input_repeat_counts / input_repeat_counts.sum()
 
     fold_errors = np.empty((n_folds, max_components))
     for fold_index, validation_indices in enumerate(validation_folds):
@@ -217,7 +231,11 @@ def select_gsn_pca_components(
                 )
 
         # (n_repeat_splits, max_components) -> (max_components,)
-        fold_errors[fold_index] = split_errors.mean(axis=0)
+        fold_errors[fold_index] = np.average(
+            split_errors,
+            axis=0,
+            weights=repeat_split_weights,
+        )
 
     # (n_folds, max_components) -> (max_components,)
     mean_errors = fold_errors.mean(axis=0)
@@ -236,4 +254,8 @@ def select_gsn_pca_components(
         "mean_normalized_reconstruction_errors": mean_errors,
         "reconstruction_error_standard_errors": standard_errors,
         "one_standard_error_threshold": threshold,
+        "repeat_splits_weighted_by_input_count": True,
+        "repeat_split_input_weight_ratio": float(
+            input_repeat_counts.max() / input_repeat_counts.min()
+        ),
     }
