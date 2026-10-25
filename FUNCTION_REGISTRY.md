@@ -320,6 +320,15 @@ File description: Load repeated NSD OTC responses and run a configurable target-
 | `selection_results_to_table (line 195)` | results: dict[str, Any], subj_id: str | pd.DataFrame | Convert scalar, per-candidate, and per-fold selection outputs into a candidate-level table. | Scope: task-specific/public. Conventions: requires `selected_n_components` and one-dimensional `candidate_n_components`; unsupported result shapes raise. |
 | `choose_minimal_pcs (line 249)` | subj_id: str, selection_function: Callable[..., dict[str, Any]], image_set: str='unique', selection_kwargs: dict[str, Any] \| None=None, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH, output_dir: str \| Path \| None=DEFAULT_OUTPUT_DIR, nonfinite_report_dir: str \| Path=DEFAULT_NONFINITE_DIR | dict[str, Any] | Load repeated responses, run a component selector, tabulate its outputs, and optionally save them. | Scope: task-specific/public. Conventions: passes responses unchanged in `(image, voxel, repeat)` order; when `selection_kwargs` contains `seed`, the output filename ends in `_seed{seed}.csv`. |
 
+## `pipeline/pca/choosing_minimal_best_pca/save_gsn_pca_transform.py`
+
+File description: Fit GSN on the selection CSV's image set and save only a pipeline-compatible signal-PCA transform.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `selection_from_csv (line 43)` | selection_csv_path: str \| Path, subj_id: str | tuple[int, str] | Read and validate one subject's error-minimizing component count and image set from a selection CSV. | Scope: task-specific/public. Conventions: reads `best_n_components`, not the one-standard-error `selected_n_components`; requires one supported `image_set`. |
+| `save_gsn_pca_transform (line 102)` | subj_id: str, selection_csv_path: str \| Path, output_dir: str \| Path, n_components: int \| None=None, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH | Path | Fit GSN on the CSV's image set and save a centered transform using the leading signal-covariance eigenvectors. | Scope: task-specific/public. Conventions: `n_components` overrides the CSV count; artifact records `image_set_` and `selection_csv_path_`; no responses, covariances, or projected observations are saved. |
+
 ## `pipeline/pca/plotting.py`
 
 File description: Plot subject-level PCA variance and pairwise unique information.
