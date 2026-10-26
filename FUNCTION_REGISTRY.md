@@ -457,8 +457,8 @@ File description: Orchestrate the configured data adapter, rank calculations, an
 
 | Callable | Inputs | Outputs | Purpose | Scope / conventions |
 |---|---|---|---|---|
-| `run_cross_decomposition_criteria (line 27)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run source loading and the configured rank calculations, then assemble source-appropriate validation and summaries. | Scope: task-specific experiment runner. |
-| `main (line 109)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run, save, and print the configured experiment. | Scope: CLI entry point. |
+| `run_cross_decomposition_criteria (line 32)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run source loading and the configured rank calculations, then assemble source-appropriate validation and summaries. | Scope: task-specific experiment runner. |
+| `main (line 114)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run, save, and print the configured experiment. | Scope: CLI entry point. |
 
 ## `pipeline/testing/cross_decomposition/cross_decomposition_outputs.py`
 

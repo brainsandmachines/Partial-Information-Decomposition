@@ -7,3 +7,6 @@
 [submodule "external/DeepDive"]
 	path = external/DeepDive
 	url = https://github.com/ColinConwell/DeepDive.git
+[submodule "external/scale-free-visual-cortex"]
+	path = external/scale-free-visual-cortex
+	url = https://github.com/BonnerLab/scale-free-visual-cortex.git
