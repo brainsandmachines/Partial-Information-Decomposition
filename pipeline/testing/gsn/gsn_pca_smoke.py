@@ -15,6 +15,9 @@ from pipeline.testing.gsn.gsn_pca import (
     pca_signal_noise_covariances,
     select_gsn_pca_components,
 )
+from pipeline.testing.synthetic_repeated_responses import (
+    generate_low_rank_repeated_responses,
+)
 
 
 def run_gsn_pca_smoke(
@@ -41,41 +44,20 @@ def run_gsn_pca_smoke(
             validation metrics.
     """
 
-    if not 1 <= true_rank < n_voxels:
-        raise ValueError("true_rank must be between 1 and n_voxels - 1.")
-    if n_images <= true_rank:
-        raise ValueError("n_images must be greater than true_rank.")
+    synthetic_data = generate_low_rank_repeated_responses(
+        n_images=n_images,
+        n_voxels=n_voxels,
+        true_rank=true_rank,
+        n_repeats=n_repeats,
+        seed=seed,
+        noise_scale=0.3,
+    )
     if n_repeats < 2:
         raise ValueError("n_repeats must be at least 2 for GSN.")
 
-    rng = np.random.default_rng(seed)
-    signal_eigenvalues = np.geomspace(9.0, 1.0, true_rank)
-    noise_eigenvalues = np.linspace(2.0, 0.2, n_voxels)
-
-    # (n_voxels, true_rank) -> (n_voxels, true_rank)
-    signal_basis, _ = np.linalg.qr(rng.normal(size=(n_voxels, true_rank)))
-    latent = rng.normal(size=(n_images, true_rank))
-    latent -= latent.mean(axis=0, keepdims=True)
-    # (n_images, true_rank) -> (n_images, true_rank)
-    latent_basis, _ = np.linalg.qr(latent)
-    scores = latent_basis * np.sqrt((n_images - 1) * signal_eigenvalues)
-    # (n_images, true_rank) @ (true_rank, n_voxels) -> (n_images, n_voxels)
-    signal = scores @ signal_basis.T
-    # (n_voxels, true_rank) @ (true_rank, n_voxels) -> (n_voxels, n_voxels)
-    true_signal_covariance = (
-        signal_basis * signal_eigenvalues
-    ) @ signal_basis.T
-
-    # (n_voxels, n_voxels) -> (n_voxels, n_voxels)
-    noise_basis, _ = np.linalg.qr(rng.normal(size=(n_voxels, n_voxels)))
-    # (n_voxels, n_voxels) @ (n_voxels, n_voxels) -> (n_voxels, n_voxels)
-    true_noise_covariance = (noise_basis * noise_eigenvalues) @ noise_basis.T
-    noise_cholesky = np.linalg.cholesky(true_noise_covariance)
-    standard_noise = rng.normal(size=(n_images, n_repeats, n_voxels))
-    # (n_images, n_repeats, n_voxels) -> (n_images, n_voxels, n_repeats)
-    noise = (standard_noise @ noise_cholesky.T).transpose(0, 2, 1)
-    # (n_images, n_voxels) -> (n_images, n_voxels, n_repeats)
-    responses = signal[:, :, None] + noise
+    responses = synthetic_data["responses"]
+    signal_basis = synthetic_data["true_signal_basis"]
+    signal_eigenvalues = synthetic_data["true_signal_eigenvalues"]
 
     gsn_results = estimate_gsn_covariances(responses)
     pca_results = pca_signal_noise_covariances(
@@ -128,15 +110,7 @@ def run_gsn_pca_smoke(
     )
 
     return {
-        "responses": responses,
-        "signal": signal,
-        "noise": noise,
-        "true_signal_basis": signal_basis,
-        "true_noise_basis": noise_basis,
-        "true_signal_eigenvalues": signal_eigenvalues,
-        "true_noise_eigenvalues": noise_eigenvalues,
-        "true_signal_covariance": true_signal_covariance,
-        "true_noise_covariance": true_noise_covariance,
+        **synthetic_data,
         "gsn_results": gsn_results,
         "pca_results": pca_results,
         "selection_results": selection_results,

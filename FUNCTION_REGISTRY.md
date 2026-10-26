@@ -428,6 +428,49 @@ File description: No module docstring; inspect before reuse.
 | `batching (line 264)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | np.ndarray | Batch process a range of images for feature extraction. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `feature_extraction (line 295)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | np.ndarray | Extract features from the models and the neural data. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 
+## `pipeline/testing/cross_decomposition/cross_decomposition_inputs.py`
+
+File description: Load synthetic or repeated OTC responses and adapt them to the external authors' input interface without calculating rank.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `skip_font_installation (line 30)` | None | None | Replace Bonner's unrelated import-time font installer with a no-op. | Scope: task-specific/private import shim; no analytical effect. |
+| `load_config (line 59)` | config_path: str \| Path | dict[str, Any] | Load the synthetic/OTC experiment configuration. | Scope: task-specific/public; relative paths resolve from the repository root. |
+| `assert_caching_disabled (line 77)` | None | None | Require Bonner's cache wrapper to run in ignore mode. | Scope: task-specific guard; prevents stale fold/data fits. |
+| `build_repetition_dataarrays (line 95)` | responses: np.ndarray, image_ids: np.ndarray, dataset_name: str, n_repetitions: int=2 | tuple[xr.DataArray, xr.DataArray] | Adapt `(image, voxel, repeat)` responses to the authors' repetition-0/repetition-1 arrays. | Scope: input wrapper only; calls authors' `split_by_repetition`; no averaging, scaling, centering, fitting, or decomposition. |
+| `load_cross_decomposition_inputs (line 157)` | config: dict[str, Any] | dict[str, Any] | Load the selected source and return authors-compatible arrays plus metadata. | Scope: input wrapper; OTC reuses `load_repeat_responses`, and `image_set=unique` preserves shared1000. |
+
+## `pipeline/testing/cross_decomposition/cross_decomposition_criteria.py`
+
+File description: Calculate cross-decomposition rank criteria; data loading, orchestration, and output handling are kept in separate modules.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `verify_ground_truth (line 18)` | synthetic_data: dict[str, Any], true_rank: int | dict[str, Any] | Independently verify the synthetic covariance rank and construction. | Scope: synthetic rank validation only; never called for OTC. |
+| `significance_table (line 52)` | spectra: xr.Dataset, dimension: str, null_quantile: float | pd.DataFrame | Calculate the observed-versus-permuted rank-significance rule used by the authors' plotter. | Scope: supports individual-component and logarithmic-rank coordinates. |
+| `calculate_authors_spectra (line 91)` | x: xr.DataArray, y: xr.DataArray, cross_decomposition_config: dict[str, Any], permutation_config: dict[str, Any], n_permutations: int | dict[str, Any] | Run the external authors' CV spectrum, permutation, and rank-binning functions. | Scope: shared synthetic/OTC rank calculation; decomposition and resampling algorithms remain external. |
+| `calculate_reconstruction_criterion (line 173)` | x: xr.DataArray, y: xr.DataArray, folds: np.ndarray, randomized: bool, seed: int | dict[str, Any] | Calculate the separate symmetric normalized-MSE retained-rank criterion using authors' fit/transform/inverse-transform operations. | Scope: local synthetic rank diagnostic; not part of the authors' algorithm and disabled for OTC. |
+
+## `pipeline/testing/cross_decomposition/cross_decomposition_runner.py`
+
+File description: Orchestrate the configured data adapter, rank calculations, and output writer.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `run_cross_decomposition_criteria (line 27)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run source loading and the configured rank calculations, then assemble source-appropriate validation and summaries. | Scope: task-specific experiment runner. |
+| `main (line 109)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run, save, and print the configured experiment. | Scope: CLI entry point. |
+
+## `pipeline/testing/cross_decomposition/cross_decomposition_outputs.py`
+
+File description: Save source-appropriate cross-decomposition tables and figures without assuming a known rank for OTC.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `summarize_criteria (line 39)` | bin_table: pd.DataFrame, rank_table: pd.DataFrame, true_rank: int \| None, k_reconstruction: int \| None | pd.DataFrame | Summarize significance and any available synthetic validation quantities. | Scope: reporting only; omits ground truth and reconstruction rows for OTC. |
+| `plot_permutation_significance (line 98)` | results: dict[str, Any], output_stem: Path | None | Plot authors' binned/unbinned spectra and permutation significance. | Scope: reporting; true-rank reference appears only for synthetic data. |
+| `plot_reconstruction (line 186)` | results: dict[str, Any], output_stem: Path | None | Plot the optional synthetic reconstruction-error curve. | Scope: synthetic-only output. |
+| `save_outputs (line 229)` | results: dict[str, Any], smoke: bool | Path | Save tables, metadata, image/fold alignment, and available figures to a fresh content-addressed directory. | Scope: task-specific output; OTC directory names record subject, image set, image count, and voxel count. |
+
 ## `pipeline/testing/gsn/gsn_pca.py`
 
 File description: Estimate GSN covariances and eigendecompose them for PCA diagnostics.
