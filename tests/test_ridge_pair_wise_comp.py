@@ -22,11 +22,11 @@ from pipeline.analysis.pairwise import pairwise_utils as ridge_pairwise_utils
 from pipeline.pca import find_alpha
 from pipeline.phases import feature_manipulations
 
-_missmda_stub = ModuleType("pipeline.pca.missmda_ncp")
+_missmda_stub = ModuleType("pipeline.rank_selection.archive.missmda_ncp")
 _missmda_stub.estimate_ncp_pca = Mock(  # type: ignore[attr-defined]
     side_effect=RuntimeError("missMDA must be mocked in unit tests.")
 )
-sys.modules.setdefault("pipeline.pca.missmda_ncp", _missmda_stub)
+sys.modules.setdefault("pipeline.rank_selection.archive.missmda_ncp", _missmda_stub)
 
 from pipeline.pca import subject_pca as subj_pc_analysis
 

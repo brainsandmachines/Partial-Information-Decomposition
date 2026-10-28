@@ -13,16 +13,18 @@ repo_root = Path(__file__).resolve().parents[3]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-from pipeline.pca.choosing_minimal_best_pca.choosing_minimal_best_pca import (
-    DEFAULT_NEURAL_DATA_DIR,
+from pipeline.rank_selection.data import (
     DEFAULT_PKL_INFO_PATH,
     IMAGE_SETS,
-    load_repeat_responses,
+    STORE_DIRS,
+    load_otc_responses,
 )
-from pipeline.testing.gsn.gsn_pca import (
+from pipeline.rank_selection.methods.gsn import (
     estimate_gsn_covariances,
     pca_signal_noise_covariances,
 )
+
+DEFAULT_NEURAL_DATA_DIR = STORE_DIRS["repeat"]
 
 
 # Edit these values before running this file. Set N_COMPONENTS to None to use
@@ -143,11 +145,12 @@ def save_gsn_pca_transform(
         raise TypeError("n_components must be an integer or None.")
     chosen_n_components = int(chosen_n_components)
 
-    data = load_repeat_responses(
+    data = load_otc_responses(
         subj_id,
         image_set=image_set,
-        pkl_info_path=pkl_info_path,
+        store="repeat",
         neural_data_dir=neural_data_dir,
+        pkl_info_path=pkl_info_path,
     )
     responses = np.asarray(data["responses"], dtype=float)
     if responses.ndim != 3:

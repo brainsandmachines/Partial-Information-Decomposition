@@ -66,7 +66,7 @@ def test_save_gsn_pca_transform_uses_csv_count_and_supports_override(
 
     monkeypatch.setattr(
         save_gsn_pca_transform,
-        "load_repeat_responses",
+        "load_otc_responses",
         fake_load_repeat_responses,
     )
     monkeypatch.setattr(

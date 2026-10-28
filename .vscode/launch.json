@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "rank_selection: toy_grid",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pipeline.rank_selection.run",
+      "args": ["--config", "pipeline/rank_selection/configs/toy_grid.yaml"],
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false
+    }
+  ]
+}

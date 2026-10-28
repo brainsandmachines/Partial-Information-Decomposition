@@ -1,0 +1,32 @@
+# Controlled comparison: the factors that separated the methods on OTC.
+# Each grid combination is one toy dataset (make_toy parameters); every method
+# runs on every dataset. true_rank is the shared signal rank; with
+# private_rank > 0 each subject also has its own signal (single-subject truth =
+# true_rank + private_rank, pair truth = true_rank).
+experiment_name: toy_grid
+
+data:
+  source: toy
+  fixed:
+    n_images: 1000
+    n_voxels: 105
+    n_repeats: 3
+    noise_std: 1.0
+    noise_rank: 20
+    noise_corr_strength: 0.5
+    n_subjects: 2
+  grid:
+    noise_type: [isotropic, unequal_variance, correlated]
+    true_rank: [5, 20]
+    private_rank: [0, 5]
+    seed: [0, 1, 2]
+
+methods:
+  variance_threshold: {variance_threshold: 0.9, folds: 8}
+  eigenvector: {basis: [pca, gsn], folds: 8, max_components: 100}
+  repeat_reconstruction: {basis: [gsn, pca], folds: 8, max_components: 100}
+  mle: {}
+  cross_decomposition: {n_permutations: 5000, folds: 8, randomized: true, bin_stop: 200}
+  pls: {max_rank: 100, folds: 8}
+
+seeds: [0]

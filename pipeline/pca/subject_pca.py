@@ -18,8 +18,8 @@ if str(repo_root) not in sys.path:
 from pipeline.phases.sources_target_features import prepare_target
 
 
-from simulations.pca.rank.eigenvector_pca import eigenvector_pca_cv
-from pipeline.pca.missmda_ncp import estimate_ncp_pca
+from pipeline.rank_selection.methods.eigenvector import eigenvector_pca_cv
+from pipeline.rank_selection.archive.missmda_ncp import estimate_ncp_pca
 
 
 max_features = 1000  # Maximum number of features to use for PCA

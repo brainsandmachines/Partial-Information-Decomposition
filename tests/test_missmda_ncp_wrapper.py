@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from pipeline.pca.missmda_ncp import estimate_ncp_pca
+from pipeline.rank_selection.archive.missmda_ncp import estimate_ncp_pca
 
 
 def test_estimate_ncp_pca() -> None:

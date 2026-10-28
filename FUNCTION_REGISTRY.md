@@ -21,16 +21,17 @@ Generated from the current AST after the repository reorganization. Paths, signa
 - `pipeline/analysis/pairwise/`: 2 Python files.
 - `pipeline/analysis/pca/`: 4 Python files.
 - `pipeline/analysis/predictivity/`: 2 Python files.
-- `pipeline/examples/`: 3 Python files.
+- `pipeline/examples/`: 2 Python files.
 - `pipeline/experiments/`: 4 Python files.
-- `pipeline/pca/`: 5 Python files.
-- `pipeline/pca/cross_decomposition/`: 2 Python files.
-- `pipeline/pca/cross_subject_pls/`: 1 Python file.
+- `pipeline/pca/`: 4 Python files.
+- `pipeline/pca/choosing_minimal_best_pca/`: 1 Python file.
 - `pipeline/phases/`: 4 Python files.
-- `pipeline/testing/gsn/`: 2 Python files.
+- `pipeline/rank_selection/`: 6 Python files.
+- `pipeline/rank_selection/archive/`: 2 Python files.
+- `pipeline/rank_selection/methods/`: 8 Python files.
+- `pipeline/testing/disagreement_project/`: 1 Python file.
 - `simulations/`: 4 Python files.
 - `simulations/evil_twin/`: 4 Python files.
-- `simulations/pca/rank/`: 5 Python files.
 - `simulations/pca/ridge/`: 3 Python files.
 - `simulations/rsa_vs_pid/`: 3 Python files.
 
@@ -229,15 +230,6 @@ File description: Tiny no-data-loading example for debugging the strict PID pipe
 | `toy_pid_report (line 177)` | pid_results: dict[str, Any], context: dict[str, Any] | str | Print a compact toy pipeline report. | Scope: reusable/public. Conventions: verify PID definition, source/target order, and bit units. |
 | `main (line 198)` |  | dict[str, Any] | Run the tiny toy PID pipeline. | Scope: entry point. Conventions: verify PID definition, source/target order, and bit units. |
 
-## `pipeline/examples/cross_subject_pls_toy_example.py`
-
-File description: Tiny no-data example for debugging cross-subject PLS rank selection.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `make_toy_subjects (line 49)` | seed: int=SEED | dict[str, np.ndarray] | Create two fake subjects' responses to the same images. | Scope: task-specific/public. Conventions: shared signal of rank TRUE_SHARED_RANK plus per-subject private signal and independent noise; rows are images. |
-| `check_truncated_ranks (line 81)` | source: np.ndarray, target: np.ndarray, max_rank: int=10 | float | Check that the first k components of one PLS fit equal a separate k-component fit. | Scope: task-specific/public. Related: `pls_rank_curve`. |
-
 ## `pipeline/examples/voxel_experiment_smoke_example.py`
 
 File description: No-data smoke example for the config-driven voxel experiment runner.
@@ -312,66 +304,6 @@ File description: No module docstring; inspect before reuse.
 | `split_alphas_csv_by_model (line 148)` | alphas_csv_path: str \\| Path, output_dir: str \\| Path \\| None=None | list[Path] | Split an aggregate per-PC alpha CSV into one NumPy file per model. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
 | `main (line 270)` | source_name: str, path_to_results: str \\| Path, pc_path: str \\| Path, hdf_path: str \\| Path, pkl_info_path: str \\| Path, neural_data_path: str \\| Path, alphas_csv_path: str \\| Path, n_pcs: int \\| None=None | tuple[np.ndarray, Pipeline] | Find raw-feature ridge alphas, save the unchanged alpha CSV plus a separate per-PC CV-diagnostics CSV, and print CV MSE/R² and alpha-boundary warnings. | Scope: entry point. The sidecar path is `<alphas_csv_stem>_diagnostics.csv`; CV R² is normalized by each training target PC's variance, and the aggregate is variance-weighted. Conventions: verify PCA fitting split and component convention; verify scaling, alpha, and train/test conventions. |
 
-## `pipeline/pca/missmda_ncp.py`
-
-File description: Minimal in-process Python wrapper for R's ``missMDA::estim_ncpPCA``.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `estimate_ncp_pca (line 22)` | data, ncp_min=0, ncp_max=5, method='Regularized', scale=True, method_cv='gcv', nbsim=100, p_na=0.05, threshold=0.0001, seed=None, rscript=RSCRIPT, verbose=False | Unannotated | Call ``missMDA::estim_ncpPCA`` on a Python sample table. | Scope: reusable/public. Conventions: verify covariance order, whitening state, dtype, and device; verify PCA fitting split and component convention. |
-
-## `pipeline/pca/choosing_minimal_best_pca/choosing_minimal_best_pca.py`
-
-File description: Load repeated NSD OTC responses and run a configurable target-PC count selector.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `raise_on_nonfinite_images (line 47)` | responses: np.ndarray, image_ids: np.ndarray, repeat_ids: np.ndarray, subj_id: str, image_set: str, report_dir: str \| Path=DEFAULT_NONFINITE_DIR | None | Report every image/repeat pair containing a non-finite response and stop the run. | Scope: task-specific/public. Conventions: responses use `(image, voxel, repeat)` order; writes a diagnostic CSV only on failure. |
-| `load_repeat_responses (line 108)` | subj_id: str, image_set: str='unique', pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, nonfinite_report_dir: str \| Path=DEFAULT_NONFINITE_DIR | dict[str, Any] | Load finite repeated OTC responses and optionally exclude shared1000 images. | Scope: task-specific/public. Conventions: output responses use `(image, voxel, repeat)` order; `unique` excludes shared1000. |
-| `selection_results_to_table (line 195)` | results: dict[str, Any], subj_id: str | pd.DataFrame | Convert scalar, per-candidate, and per-fold selection outputs into a candidate-level table. | Scope: task-specific/public. Conventions: requires `selected_n_components` and one-dimensional `candidate_n_components`; unsupported result shapes raise. |
-| `choose_minimal_pcs (line 249)` | subj_id: str, selection_function: Callable[..., dict[str, Any]], image_set: str='unique', selection_kwargs: dict[str, Any] \| None=None, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH, output_dir: str \| Path \| None=DEFAULT_OUTPUT_DIR, nonfinite_report_dir: str \| Path=DEFAULT_NONFINITE_DIR | dict[str, Any] | Load repeated responses, run a component selector, tabulate its outputs, and optionally save them. | Scope: task-specific/public. Conventions: passes responses unchanged in `(image, voxel, repeat)` order; when `selection_kwargs` contains `seed`, the output filename ends in `_seed{seed}.csv`. |
-
-## `pipeline/pca/choosing_minimal_best_pca/save_gsn_pca_transform.py`
-
-File description: Fit GSN on the selection CSV's image set and save only a pipeline-compatible signal-PCA transform.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `selection_from_csv (line 43)` | selection_csv_path: str \| Path, subj_id: str | tuple[int, str] | Read and validate one subject's error-minimizing component count and image set from a selection CSV. | Scope: task-specific/public. Conventions: reads `best_n_components`, not the one-standard-error `selected_n_components`; requires one supported `image_set`. |
-| `save_gsn_pca_transform (line 102)` | subj_id: str, selection_csv_path: str \| Path, output_dir: str \| Path, n_components: int \| None=None, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH | Path | Fit GSN on the CSV's image set and save a centered transform using the leading signal-covariance eigenvectors. | Scope: task-specific/public. Conventions: `n_components` overrides the CSV count; artifact records `image_set_` and `selection_csv_path_`; no responses, covariances, or projected observations are saved. |
-
-## `pipeline/pca/cross_decomposition/cross_decomposition.py`
-
-File description: Reusable training-only cross-covariance SVD and independent-repeat reconstruction selection with the existing GSN evaluation conventions.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `fit_cross_decomposition (line 15)` | first: np.ndarray, second: np.ndarray, n_components: int, seed: int=0, solver: str='auto' | dict[str, Any] | Fit descending left/right singular directions and training means. | Scope: reusable/public. Arrays `(n_train,d)`; separate group means; raw units, no scaling; C=A.T B/n_train. Matrix-free iterative or reduced-QR exact SVD; K cannot exceed min(d,n_train-1). Related: `select_cross_decomposition_components`. |
-| `fit_cross_decomposition.multiply (line 61)` | v: np.ndarray | np.ndarray | Apply cross-covariance without constructing it. | Scope: nested operator helper. `(d,)` or `(d,q)` input/output; training data only. |
-| `fit_cross_decomposition.transpose_multiply (line 66)` | v: np.ndarray | np.ndarray | Apply transposed cross-covariance without constructing it. | Scope: nested operator helper. `(d,)` or `(d,q)` input/output. |
-| `normalized_reconstruction_curve (line 102)` | observed: np.ndarray, target: np.ndarray, mean: np.ndarray, basis: np.ndarray | np.ndarray | Compute normalized independent-repeat MSE for K=0..basis width via orthogonal SSE identity. | Scope: reusable/public. Inputs `(n,d)`, `(n,d)`, `(d,)`, orthonormal `(d,K)`; output `(K+1,)`; denominator is target error about supplied training mean. |
-| `validation_design (line 134)` | n_images: int, n_repeats: int, n_folds: int, seed: int, repeat_split_weighting: str | tuple[list[np.ndarray], list[tuple[tuple, tuple]], np.ndarray] | Mirror seeded GSN image folds and adjacent forward/reverse repetition groups. | Scope: task-specific/public. Related: `select_gsn_pca_components`; weighting equal or proportional to input repeat count; >=2 training images per fold. |
-| `select_cross_decomposition_components (line 171)` | responses: np.ndarray, max_components: int \| None=None, n_folds: int=5, seed: int=0, repeat_split_weighting: str='input_repeat_count', solver: str='auto' | dict[str, Any] | Select dimensions using independent-repeat validation errors, returning both argmin and one-SE choices. | Scope: reusable/public. Input `(images,voxels,repeats)`; U/V per training repeat partition; pooled training reconstruction mean matches GSN. Candidate grid 1..K; rejects unsupported fold rank. Fold errors `(folds,K)` and directed errors `(folds*directions,K)` in fold-major order. Selection CV only, no final-test claim. |
-
-## `pipeline/pca/cross_decomposition/compare_reconstruction.py`
-
-File description: Standalone YAML-configured paired OTC reconstruction comparison without modifying the original GSN selector.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `save_comparison (line 31)` | results: dict[str, dict[str, Any]], output_dir: Path, subj_id: str, image_set: str | pd.DataFrame | Save method curves, fold variability, summary, paired cross-minus-GSN differences and PDF. | Scope: task-specific/public. Requires matched candidate/fold arrays; reuses `selection_results_to_table`; descriptive fold SE, not final-test uncertainty. |
-| `run_comparison (line 115)` | config_path: str \| Path=DEFAULT_CONFIG_PATH | list[Path] | Load the source GSN YAML and OTC data, run both methods on identical inputs, save fresh timestamped outputs. | Scope: entry point. Reuses `load_repeat_responses`, `select_gsn_pca_components`; saves image folds, repeat groups and resolved settings; fixed seeds; no argparse; no projected responses or overwrite of prior GSN files. |
-
-## `pipeline/pca/cross_subject_pls/cross_subject_pls.py`
-
-File description: Choose a cross-subject PLS rank from shared-image OTC responses.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `load_shared_pair (line 26)` | source_subject: str, target_subject: str, hdf_path: str \| Path, pkl_info_path: str \| Path, neural_data_dir: str \| Path | dict[str, Any] | Load two subjects' responses to their common shared images, aligned by image ID. | Scope: task-specific/public. Related: `split_unique_shared`. Conventions: repeat-averaged `*_OTC_betas_per_stimulus.zarr`; uses only shared1000 images, i.e. the PID evaluation stimuli. |
-| `pls_rank_curve (line 85)` | source: np.ndarray, target: np.ndarray, max_rank: int, n_folds: int=5, seed: int=0 | dict[str, Any] | Cross-validate the PLS rank for predicting target responses from source responses. | Scope: task-specific/public. Conventions: image folds; centering with training means, no scaling (`PLSRegression(scale=False)`); every rank from one fit via the first k x-rotations and y-loadings; MSE normalized so rank 0 = 1; returns k* (`best_rank`) and the 1-SE rank. PLS k* can exceed the shared rank when the source has private signal (suppression). |
-| `save_rank_curve (line 184)` | results: dict[str, Any], source_subject: str, target_subject: str, output_dir: str \| Path | dict[str, Path] | Save the rank curve as a CSV and a PDF plot. | Scope: task-specific/public. |
-
 ## `pipeline/pca/plotting.py`
 
 File description: Plot subject-level PCA variance and pairwise unique information.
@@ -392,6 +324,199 @@ File description: Fit subject-level PCA models and evaluate them on shared held-
 | `heldout_pca (line 128)` | pca_model: PCA, heldout_data: np.ndarray | np.ndarray | Project raw held-out responses with a fitted centered PCA model. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
 | `pca_func (line 154)` | data: np.ndarray, mode: str='eigenvector_CV', max_features: int \\| None=None, device: str \\| None=None | dict[str, Any] | Select a component count and fit centered, unstandardized PCA. | Scope: reusable/public. Conventions: device is passed to eigenvector_pca_cv in eigenvector_CV mode; checkpoint path is a hard-coded cluster path. |
 | `main (line 226)` | subj_id: str, hdf_path: str \\| Path, pkl_info_path: str \\| Path, neural_data_path: str \\| Path, variance_threshold: float=0.99, save_models_path: str \\| Path \\| None=None, max_features: int \\| None=None, pca_mode: str='missmda_CV', device: str \\| None=None | dict[str, Any] | Fit centered unstandardized PCA and evaluate shared held-out data. | Scope: entry point. Conventions: verify PCA fitting split and component convention. |
+
+## `pipeline/rank_selection/archive/missmda_ncp.py`
+
+File description: Minimal in-process Python wrapper for R's ``missMDA::estim_ncpPCA``.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `estimate_ncp_pca (line 22)` | data, ncp_min=0, ncp_max=5, method='Regularized', scale=True, method_cv='gcv', nbsim=100, p_na=0.05, threshold=0.0001, seed=None, rscript=RSCRIPT, verbose=False |  | Call ``missMDA::estim_ncpPCA`` on a Python sample table. | Scope: reusable/public. Conventions: see docstring |
+
+## `pipeline/rank_selection/archive/rowwise_pca.py`
+
+File description: No module docstring; inspect before reuse.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `RowwiseLOOVariancePCAResult (line 10)` | See class definition | RowwiseLOOVariancePCAResult instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: see docstring |
+| `rowwise_loo_pca_variance_threshold (line 23)` | X: np.ndarray, variance_threshold: float=0.99 | RowwiseLOOVariancePCAResult | Row-wise leave-one-out PCA where the number of PCs is chosen by | Scope: reusable/public. Conventions: see docstring |
+
+## `pipeline/rank_selection/data.py`
+
+File description: Shared inputs for every rank-selection method: OTC loaders and one toy generator.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `RankData (line 45)` | See class definition | RankData instance | Responses of one subject, optionally paired with a second subject. | Scope: class. Conventions: Responses are (images, voxels, repeats); optional second subject in target_responses; toy truth in true_rank/info. |
+| `raise_on_nonfinite_images (line 91)` | responses: np.ndarray, image_ids: np.ndarray, repeat_ids: np.ndarray, subj_id: str, image_set: str, report_dir: str \| Path=DEFAULT_NONFINITE_DIR | None | Report images with non-finite responses and stop with an error. | Scope: reusable/public. Conventions: see docstring |
+| `load_otc_responses (line 150)` | subj_id: str, image_set: str='unique', store: str='repeat', neural_data_dir: str \| Path \| None=None, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH, nonfinite_report_dir: str \| Path=DEFAULT_NONFINITE_DIR | dict[str, Any] | Load one subject's OTC responses for an image set from a named store. | Scope: reusable/public. Conventions: store must be explicit ('repeat' or 'per_stimulus'; they disagree); shared1000[image_id] convention; non-finite values stop the run. |
+| `load_otc (line 242)` | subject: str, image_set: str='unique', store: str='repeat', neural_data_dir: str \| Path \| None=None, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH | RankData | Load one subject's OTC responses as RankData. | Scope: reusable/public. Conventions: see docstring |
+| `load_otc_pair (line 266)` | source_subject: str, target_subject: str, image_set: str='shared', store: str='repeat', neural_data_dir: str \| Path \| None=None, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH | RankData | Load two subjects' responses to their common images, aligned by image ID. | Scope: reusable/public. Conventions: Keeps images common to both subjects (use image_set='shared'); rows aligned by image ID. |
+| `_orthonormal_loadings (line 306)` | rng: np.random.Generator, n_voxels: int, rank: int, loading_corr: float | np.ndarray | Draw unit-norm voxel loadings with a fixed equicorrelation between columns. | Scope: private helper. Conventions: see docstring |
+| `_orthogonal_scores (line 333)` | rng: np.random.Generator, n_images: int, variances: np.ndarray | np.ndarray | Draw centered latent scores whose sample covariance is exactly diagonal. | Scope: private helper. Conventions: see docstring |
+| `_subject_noise (line 355)` | rng: np.random.Generator, n_images: int, n_voxels: int, n_repeats: int, noise_std: float, noise_type: str, noise_rank: int, noise_corr_strength: float | tuple[np.ndarray, np.ndarray] | Draw measurement noise, independent across images and repeats. | Scope: private helper. Conventions: see docstring |
+| `make_toy (line 392)` | n_images: int=500, n_voxels: int=60, true_rank: int=5, n_repeats: int=3, noise_std: float=1.0, noise_type: str='isotropic', noise_rank: int=10, noise_corr_strength: float=0.5, private_rank: int=0, n_subjects: int=1, n_target_voxels: int \| None=None, loading_corr: float=0.0, signal_max_variance: float=9.0, signal_min_variance: float=1.0, seed: int=0 | RankData | Generate repeated toy responses with a known stimulus-driven signal rank. | Scope: reusable/public. Conventions: Exact signal covariance; true_rank = shared rank (pair) or shared + private (single subject); noise independent across repeats. |
+
+## `pipeline/rank_selection/methods/cross_decomposition.py`
+
+File description: Cross-decomposition spectrum with the authors' implementation (Gauthaman et al., 2025).
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `skip_font_installation (line 35)` |  | None | Disable Bonner's unrelated import-time font installation. | Scope: reusable/public. Conventions: see docstring |
+| `assert_caching_disabled (line 59)` |  | None | Require the authors' cache wrapper to recompute every result. | Scope: reusable/public. Conventions: see docstring |
+| `build_repetition_dataarrays (line 77)` | responses: np.ndarray, image_ids: np.ndarray, dataset_name: str, n_repetitions: int=2 | tuple[xr.DataArray, xr.DataArray] | Adapt repeated responses to the authors' two-repetition interface. | Scope: reusable/public. Conventions: see docstring |
+| `significance_table (line 140)` | spectra: xr.Dataset, dimension: str, null_quantile: float | pd.DataFrame | Apply the authors' plotting significance rule to a rank spectrum. | Scope: reusable/public. Conventions: see docstring |
+| `calculate_authors_spectra (line 179)` | x: xr.DataArray, y: xr.DataArray, cross_decomposition_config: dict[str, Any], permutation_config: dict[str, Any], n_permutations: int | dict[str, Any] | Run the authors' complete spectrum, permutation, and binning algorithm. | Scope: reusable/public. Conventions: Authors' code unchanged; exact SVD fails on CPU (use randomized=True there). |
+| `leading_significant_count (line 262)` | significant: np.ndarray | int | Count the leading consecutive significant components. | Scope: reusable/public. Conventions: Counts components before the first non-significant one. |
+| `run (line 273)` | data: RankData, n_permutations: int=5000, folds: int=8, seed: int=0, randomized: bool=False, batch_size: int=10, null_quantile: float=0.999, bin_density: int=3, bin_stop: int=10000 | RankResult | Run the authors' cross-decomposition spectrum on a dataset. | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/eigenvector.py`
+
+File description: Eigenvector cross-validation: predict each voxel of a held-out image from its others.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `EigenvectorPCACVResult (line 45)` | See class definition | EigenvectorPCACVResult instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: see docstring |
+| `fit_pca_loadings_svd (line 55)` | X_train: np.ndarray, n_components: int | np.ndarray | Fit PCA loadings with SVD. | Scope: reusable/public. Conventions: see docstring |
+| `fit_pca_loadings_sklearn (line 79)` | X_train: np.ndarray, n_components: int | np.ndarray | Fit PCA loadings with sklearn. | Scope: reusable/public. Conventions: see docstring |
+| `_check_loadings (line 99)` | P: 'np.ndarray \| torch.Tensor', n_features: int, n_components: int | None | Check the type and shape of a loading matrix returned by pca_fit_fn. | Scope: private helper. Conventions: see docstring |
+| `_eigenvector_pca_cv_sample_press (line 120)` | X: 'np.ndarray \| torch.Tensor', sample_index: int, max_components: int, pca_fit_fn: PCAFitFunction, center: bool, scale: bool, include_zero_components: bool, method_pca: str \| None, eps: float | np.ndarray | Calculate one held-out sample's PRESS contribution. | Scope: private helper. Conventions: see docstring |
+| `eigenvector_pca_cv (line 212)` | X: np.ndarray, max_components: int \| None=None, pca_fit_fn: PCAFitFunction \| None=None, center: bool=True, scale: bool=False, include_zero_components: bool=True, method_pca: str \| None=None, eps: float=1e-12, checkpoint_csv_path: str \| Path \| None=None, device: str \| None=None | EigenvectorPCACVResult | Run eigenvector cross-validation for PCA component selection. | Scope: reusable/public. Conventions: Leave-one-image-out on 2D (samples, features); device runs float64 torch; device not in checkpoint metadata. |
+| `eigenvector_kfold_curve (line 347)` | responses: np.ndarray, basis: str='pca', max_components: int \| None=None, n_folds: int=5, seed: int=0 | dict | Eigenvector cross-validation over K held-out image folds. | Scope: reusable/public. Conventions: Held-out images averaged over repeats, centered with the training mean; selects the MSEP minimum including 0. |
+| `run (line 480)` | data: RankData, basis: str='pca', folds: int \| str=5, max_components: int \| None=None, seed: int=0, device: str \| None=None, checkpoint_path: str \| Path \| None=None | RankResult | Run eigenvector cross-validation on a dataset. | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/eigenvector_checkpoint.py`
+
+File description: Row-level checkpoint persistence for leave-one-image-out eigenvector CV.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `_checkpoint_fields (line 40)` | max_components: int | tuple[list[str], list[str]] | Build the checkpoint CSV columns. | Scope: private helper. Conventions: see docstring |
+| `build_checkpoint_metadata (line 54)` | X: np.ndarray, max_components: int, pca_fit_fn: PCAFitFunction, center: bool, scale: bool, include_zero_components: bool, method_pca: str \| None, eps: float | dict[str, str] | Build strict metadata used to validate a resumable checkpoint. | Scope: reusable/public. Conventions: see docstring |
+| `load_eigenvector_pca_checkpoint (line 108)` | checkpoint_csv_path: str \| Path, metadata: dict[str, str], max_components: int | dict[int, np.ndarray] | Load a compatible eigenvector PCA checkpoint. | Scope: reusable/public. Conventions: Accepts LEGACY_FIT_FUNCTION_NAMES (pre-move module paths) as equivalent. |
+| `write_eigenvector_pca_checkpoint (line 173)` | checkpoint_csv_path: str \| Path, metadata: dict[str, str], completed_press: dict[int, np.ndarray], max_components: int | None | Atomically write completed eigenvector PCA checkpoint rows. | Scope: reusable/public. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/gsn.py`
+
+File description: Estimate GSN signal and noise covariances and eigendecompose them.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `estimate_gsn_covariances (line 16)` | responses: np.ndarray | dict[str, Any] | Estimate optimized signal and noise covariances with official GSN. | Scope: reusable/public. Conventions: see docstring |
+| `pca_signal_noise_covariances (line 49)` | signal_covariance: np.ndarray, noise_covariance: np.ndarray | dict[str, np.ndarray] | Eigendecompose optimized GSN signal and noise covariance matrices. | Scope: reusable/public. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/mle.py`
+
+File description: Minka's MLE of the PCA dimension, via sklearn's PCA(n_components="mle").
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `pca_mle (line 15)` | responses: np.ndarray | dict[str, Any] | Select the PC count with Minka's MLE, as ``PCA(n_components='mle')``. | Scope: reusable/public. Conventions: Isotropic-noise assumption; requires n_images >= n_voxels; hours for ~8000 voxels. |
+| `run (line 64)` | data: RankData | RankResult | Run Minka's MLE on a dataset (deterministic; no folds or seed). | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/pls.py`
+
+File description: Cross-subject PLS: how many PLS ranks predict a second subject's responses.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `pls_rank_curve (line 17)` | source: np.ndarray, target: np.ndarray, max_rank: int, n_folds: int=5, seed: int=0 | dict[str, Any] | Cross-validate the PLS rank for predicting target responses from source responses. | Scope: reusable/public. Conventions: Centering only (scale=False); every rank from one fit; k* can exceed the shared rank with source-private signal. |
+| `run (line 116)` | data: RankData, max_rank: int=300, folds: int=5, seed: int=0 | RankResult | Run cross-subject PLS on a paired dataset. | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/repeat_reconstruction.py`
+
+File description: Independent-repeat reconstruction: choose PCs that reconstruct a new repeat.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `repeat_reconstruction_curve (line 20)` | responses: np.ndarray, basis: str='gsn', max_components: int \| None=None, n_folds: int=5, seed: int=0, repeat_split_weighting: str='input_repeat_count' | dict[str, Any] | Select PCs by independent-repeat reconstruction of held-out images. | Scope: reusable/public. Conventions: Candidates 1..max; selected = one-SE count (original GSN rule); best = minimum. |
+| `run (line 207)` | data: RankData, basis: str='gsn', max_components: int \| None=None, folds: int=5, seed: int=0, repeat_split_weighting: str='input_repeat_count' | RankResult | Run independent-repeat reconstruction on a dataset. | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/rank_selection/methods/variance.py`
+
+File description: Naive PCA baselines: a training-variance threshold and plain held-out projection.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `variance_threshold_curve (line 20)` | averaged: np.ndarray, variance_threshold: float=0.99, n_folds: int=5, seed: int=0 | dict[str, Any] | Choose PCs by a variance threshold and compute the naive held-out curve. | Scope: reusable/public. Conventions: Selection as subject_pca.pca_by_variance; held-out curve is reported, never used to select. |
+| `run (line 90)` | data: RankData, variance_threshold: float=0.99, folds: int=5, seed: int=0 | RankResult | Run the variance-threshold baseline on a dataset. | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/rank_selection/plotting.py`
+
+File description: Plots of rank curves: one result, overlays per dataset, and toy rank recovery.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `method_family (line 35)` | method: str | str | Return the method name without its options. | Scope: reusable/public. Conventions: see docstring |
+| `_style_axis (line 45)` | axis: plt.Axes | None | Make grid and spines recessive. | Scope: private helper. Conventions: see docstring |
+| `plot_result (line 60)` | result: RankResult, path: str \| Path | Path | Plot one method's curve with its selected, 1-SE, and true ranks. | Scope: reusable/public. Conventions: see docstring |
+| `plot_dataset_overlay (line 115)` | results: list[RankResult], path: str \| Path | Path | Overlay every method's curve for one dataset, one panel per score type. | Scope: reusable/public. Conventions: see docstring |
+| `plot_rank_recovery (line 162)` | summary: pd.DataFrame, path: str \| Path | Path \| None | Plot selected minus true rank for every method across toy datasets. | Scope: reusable/public. Conventions: see docstring |
+
+## `pipeline/rank_selection/press.py`
+
+File description: Shared leave-one-voxel-out PRESS kernel for eigenvector cross-validation.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `to_numpy (line 23)` | array: Any | np.ndarray | Copy a NumPy array or torch tensor to a NumPy array on the CPU. | Scope: reusable/public. Conventions: see docstring |
+| `is_orthonormal (line 34)` | P: Any, tolerance: float | bool | Check whether the columns of a loading matrix are orthonormal. | Scope: reusable/public. Conventions: see docstring |
+| `eigenvector_press (line 48)` | heldout: Any, basis: Any, tolerance: float=1e-08 | tuple[np.ndarray, np.ndarray] | Leave-one-voxel-out PRESS for every component count 1..n_components. | Scope: reusable/public. Conventions: Basis must have orthonormal columns and be fitted without the held-out rows; NumPy or torch. |
+| `direct_press (line 87)` | x_test: np.ndarray, P: np.ndarray, eps: float | float | PRESS of one held-out row by predicting each voxel from the others directly. | Scope: reusable/public. Conventions: Explicit leave-one-voxel-out reference (np.delete + pinv); slow. |
+
+## `pipeline/rank_selection/registry.py`
+
+File description: Names, entry points, and data requirements of every rank-selection method.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `MethodSpec (line 17)` | See class definition | MethodSpec instance | What a method needs from the data and from its environment. | Scope: class. Conventions: see docstring |
+| `_spec (line 72)` | name: str, module: Any | MethodSpec | Build a MethodSpec from an imported (or missing) module. | Scope: private helper. Conventions: see docstring |
+| `get_run_function (line 99)` | name: str | Callable[..., Any] | Return a method's ``run`` function or explain why it is unavailable. | Scope: reusable/public. Conventions: see docstring |
+| `option_names (line 117)` | name: str | list[str] | List the options a method accepts, without ``data`` and ``seed``. | Scope: reusable/public. Conventions: see docstring |
+| `uses_seed (line 127)` | name: str, options: dict[str, Any] | bool | Whether a method's result depends on the seed. | Scope: reusable/public. Conventions: see docstring |
+| `unmet_requirement (line 140)` | name: str, options: dict[str, Any], data: RankData | str \| None | Explain why a method cannot run on a dataset, if it cannot. | Scope: reusable/public. Conventions: see docstring |
+
+## `pipeline/rank_selection/result.py`
+
+File description: One output format for every rank-selection method.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `RankResult (line 11)` | See class definition | RankResult instance | A method's rank curve and its selected rank. | Scope: class. Conventions: One format for every method; selected_rank follows the method's own rule (selection_rule). |
+| `one_standard_error_rank (line 96)` | rank: np.ndarray, mean_score: np.ndarray, standard_error: np.ndarray, minimize: bool=True | int | Return the smallest rank whose score is within one SE of the optimum. | Scope: reusable/public. Conventions: NaN-aware; minimize=True for errors. |
+
+## `pipeline/rank_selection/run.py`
+
+File description: Run rank-selection methods on toy or OTC datasets from one YAML config.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `Task (line 55)` | See class definition | Task instance | One method variant on one dataset with one seed. | Scope: class. Conventions: see docstring |
+| `_expand_options (line 78)` | options: dict[str, Any] | list[dict[str, Any]] | Expand list-valued options into every combination. | Scope: private helper. Conventions: see docstring |
+| `_format_value (line 89)` | value: Any | str | Format an option or parameter value for labels. | Scope: private helper. Conventions: see docstring |
+| `expand_methods (line 98)` | config: dict[str, Any] | list[tuple[str, dict, str]] | List the method variants requested by the config. | Scope: reusable/public. Conventions: see docstring |
+| `expand_datasets (line 130)` | config: dict[str, Any] | list[dict[str, Any]] | List the datasets requested by the config. | Scope: reusable/public. Conventions: see docstring |
+| `build_tasks (line 168)` | config: dict[str, Any] | list[Task] | Combine datasets, method variants, and seeds into an ordered task list. | Scope: reusable/public. Conventions: Pair methods only on pair datasets (or two-subject toys); seed-free methods once. |
+| `load_dataset (line 187)` | spec: dict[str, Any] | RankData | Load or generate one dataset from its spec. | Scope: reusable/public. Conventions: see docstring |
+| `_git_state (line 203)` |  | dict[str, Any] | Return the repository commit and whether the working tree is dirty. | Scope: private helper. Conventions: see docstring |
+| `_environment_info (line 219)` |  | dict[str, Any] | Collect where and with what this process runs. | Scope: private helper. Conventions: see docstring |
+| `prepare_experiment_dir (line 244)` | config: dict[str, Any], config_path: Path | Path | Create the experiment folder with an exact copy of the config. | Scope: reusable/public. Conventions: Refuses a folder whose config.yaml differs; copies the config byte for byte. |
+| `_json_ready (line 275)` | value: Any | Any | Convert NumPy scalars for JSON. | Scope: private helper. Conventions: see docstring |
+| `run_task (line 286)` | task: Task, experiment_dir: Path, cache: dict[str, RankData] | dict[str, Any] | Run one task unless its result exists; write its CSV, JSON, and PDF. | Scope: reusable/public. Conventions: see docstring |
+| `summarize (line 343)` | experiment_dir: Path | pd.DataFrame | Collect every finished result into summary.csv and overview plots. | Scope: reusable/public. Conventions: see docstring |
+| `main (line 377)` | argv: list[str] \| None=None | None | Command-line entry point. | Scope: entry point. Conventions: see docstring |
+
+## `pipeline/pca/choosing_minimal_best_pca/save_gsn_pca_transform.py`
+
+File description: Fit and save a selected-image-set GSN PCA transform without projections.
+
+| Callable | Inputs | Outputs | Purpose | Scope / conventions |
+|---|---|---|---|---|
+| `selection_from_csv (line 45)` | selection_csv_path: str \| Path, subj_id: str | tuple[int, str] | Read one subject's component count and image set from a result CSV. | Scope: reusable/public. Conventions: see docstring |
+| `save_gsn_pca_transform (line 104)` | subj_id: str, selection_csv_path: str \| Path, output_dir: str \| Path, n_components: int \| None=None, neural_data_dir: str \| Path=DEFAULT_NEURAL_DATA_DIR, pkl_info_path: str \| Path=DEFAULT_PKL_INFO_PATH | Path | Fit GSN on the CSV's image set and save only its PCA transform. | Scope: reusable/public. Conventions: see docstring |
 
 ## `pipeline/phases/choosing_layer.py`
 
@@ -448,70 +573,6 @@ File description: No module docstring; inspect before reuse.
 | `batching (line 264)` | model_context: dict, batch_start: int, batch_end: int, stim_dataset, subj_image_ids: np.ndarray, layer_name: str, batch_size_dataloader: int | np.ndarray | Batch process a range of images for feature extraction. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `feature_extraction (line 295)` | layer_index: int, model_context: dict, subj_image_ids: np.ndarray, stim_dataset, batch_size_process: int, batch_size_dataloader: int=128 | np.ndarray | Extract features from the models and the neural data. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 
-## `pipeline/testing/cross_decomposition/cross_decomposition_inputs.py`
-
-File description: Load synthetic or repeated OTC responses and adapt them to the external authors' input interface without calculating rank.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `skip_font_installation (line 30)` | None | None | Replace Bonner's unrelated import-time font installer with a no-op. | Scope: task-specific/private import shim; no analytical effect. |
-| `load_config (line 59)` | config_path: str \| Path | dict[str, Any] | Load the synthetic/OTC experiment configuration. | Scope: task-specific/public; relative paths resolve from the repository root. |
-| `assert_caching_disabled (line 77)` | None | None | Require Bonner's cache wrapper to run in ignore mode. | Scope: task-specific guard; prevents stale fold/data fits. |
-| `build_repetition_dataarrays (line 95)` | responses: np.ndarray, image_ids: np.ndarray, dataset_name: str, n_repetitions: int=2 | tuple[xr.DataArray, xr.DataArray] | Adapt `(image, voxel, repeat)` responses to the authors' repetition-0/repetition-1 arrays. | Scope: input wrapper only; calls authors' `split_by_repetition`; no averaging, scaling, centering, fitting, or decomposition. |
-| `load_cross_decomposition_inputs (line 157)` | config: dict[str, Any] | dict[str, Any] | Load the selected source and return authors-compatible arrays plus metadata. | Scope: input wrapper; OTC reuses `load_repeat_responses`, and `image_set=unique` preserves shared1000. |
-
-## `pipeline/testing/cross_decomposition/cross_decomposition_criteria.py`
-
-File description: Calculate cross-decomposition rank criteria; data loading, orchestration, and output handling are kept in separate modules.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `verify_ground_truth (line 18)` | synthetic_data: dict[str, Any], true_rank: int | dict[str, Any] | Independently verify the synthetic covariance rank and construction. | Scope: synthetic rank validation only; never called for OTC. |
-| `significance_table (line 52)` | spectra: xr.Dataset, dimension: str, null_quantile: float | pd.DataFrame | Calculate the observed-versus-permuted rank-significance rule used by the authors' plotter. | Scope: supports individual-component and logarithmic-rank coordinates. |
-| `calculate_authors_spectra (line 91)` | x: xr.DataArray, y: xr.DataArray, cross_decomposition_config: dict[str, Any], permutation_config: dict[str, Any], n_permutations: int | dict[str, Any] | Run the external authors' CV spectrum, permutation, and rank-binning functions. | Scope: shared synthetic/OTC rank calculation; decomposition and resampling algorithms remain external. |
-| `calculate_reconstruction_criterion (line 173)` | x: xr.DataArray, y: xr.DataArray, folds: np.ndarray, randomized: bool, seed: int, run_reconstruction: bool | dict[str, Any] \| None | Calculate the separate symmetric normalized-MSE retained-rank criterion using authors' fit/transform/inverse-transform operations. | Scope: local rank diagnostic for synthetic or OTC data; not part of the authors' algorithm. Returns None when run_reconstruction is False. |
-
-## `pipeline/testing/cross_decomposition/cross_decomposition_runner.py`
-
-File description: Orchestrate the configured data adapter, rank calculations, and output writer.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `run_cross_decomposition_criteria (line 32)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run source loading and the configured rank calculations, then assemble source-appropriate validation and summaries. | Scope: task-specific experiment runner. |
-| `main (line 114)` | config_path: str \| Path=DEFAULT_CONFIG_PATH, smoke: bool=False | dict[str, Any] | Run, save, and print the configured experiment. | Scope: CLI entry point. |
-
-## `pipeline/testing/cross_decomposition/cross_decomposition_outputs.py`
-
-File description: Save source-appropriate cross-decomposition tables and figures without assuming a known rank for OTC.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `summarize_criteria (line 39)` | bin_table: pd.DataFrame, rank_table: pd.DataFrame, true_rank: int \| None, k_reconstruction: int \| None | pd.DataFrame | Summarize significance and any available synthetic validation quantities. | Scope: reporting only; omits ground truth and reconstruction rows for OTC. |
-| `plot_permutation_significance (line 98)` | results: dict[str, Any], output_stem: Path | None | Plot authors' binned/unbinned spectra and permutation significance. | Scope: reporting; true-rank reference appears only for synthetic data. |
-| `plot_reconstruction (line 186)` | results: dict[str, Any], output_stem: Path | None | Plot the optional synthetic reconstruction-error curve. | Scope: synthetic-only output. |
-| `save_outputs (line 229)` | results: dict[str, Any], smoke: bool | Path | Save tables, metadata, image/fold alignment, and available figures to a fresh content-addressed directory. | Scope: task-specific output; OTC directory names record subject, image set, image count, and voxel count. |
-
-## `pipeline/testing/gsn/gsn_pca.py`
-
-File description: Estimate GSN covariances and eigendecompose them for PCA diagnostics.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `estimate_gsn_covariances (line 17)` | responses: np.ndarray | dict[str, Any] | Estimate optimized signal and noise covariances with official GSN. | Scope: task-specific/public. Related: `pca_signal_noise_covariances`. Conventions: input order `(image, voxel, repeat)`; GSN receives `(voxel, image, repeat)`; returns optimized raw covariances `cSb` and `cNb`; no scaling or DNN/PID dependency. |
-| `pca_signal_noise_covariances (line 50)` | signal_covariance: np.ndarray, noise_covariance: np.ndarray | dict[str, np.ndarray] | Eigendecompose optimized GSN signal and noise covariance matrices. | Scope: task-specific/public. Related: `estimate_gsn_covariances`. Conventions: inputs are raw covariance matrices, not samples or correlation matrices; eigenvectors are columns and eigenvalues are descending. |
-| `select_gsn_pca_components (line 113)` | responses: np.ndarray, max_components: int \| None=None, n_folds: int=5, seed: int=0, repeat_split_weighting: str='input_repeat_count' | dict[str, Any] | Select the smallest GSN signal-PC count within one standard error of the best independent-repeat reconstruction error. | Scope: task-specific/public. Related: `estimate_gsn_covariances`, `pca_signal_noise_covariances`. Conventions: GSN is fit on training-image folds; `repeat_split_weighting='input_repeat_count'` gives two-repeat inputs total weight 2/3 and one-repeat inputs 1/3 when three repeats are available; `'equal'` gives directed splits equal weight; no DNN/PID dependency. |
-| `gsn_eigenvector (line 280)` | responses: np.ndarray, max_components: int \| None=None, n_folds: int=5, seed: int=0 | dict[str, Any] | Select GSN signal PCs by eigenvector cross-validation on held-out images. | Scope: task-specific/public. Related: `select_gsn_pca_components`, `eigenvector_pca_cv`. Conventions: GSN signal-covariance eigenvectors fit per training-image fold (same folds as `select_gsn_pca_components` for a seed); held-out images average all repeats; leave-one-voxel-out PRESS r_j / (1 - h_j); selects the MSEP minimum including rank 0; registered as `gsn_eigenvector` in `choosing_minimal_best_pca.SELECTION_FUNCTIONS`. |
-| `pca_eigenvector (line 419)` | responses: np.ndarray, max_components: int \| None=None, n_folds: int=5, seed: int=0 | dict[str, Any] | Select ordinary PCs by eigenvector cross-validation on held-out images. | Scope: task-specific/public. Related: `gsn_eigenvector`, `eigenvector_pca_cv`. Conventions: identical to `gsn_eigenvector` except the basis is the SVD of the training images' repeat-averaged, centered responses; same folds, held-out repeat averaging, PRESS, and selection; registered as `pca_eigenvector` in `choosing_minimal_best_pca.SELECTION_FUNCTIONS`. |
-| `pca_mle (line 552)` | responses: np.ndarray | dict[str, Any] | Select the PC count with Minka's MLE, as ``PCA(n_components='mle')``. | Scope: task-specific/public. Conventions: averages repeats, fits `PCA(n_components='mle', svd_solver='full')` on all images (no held-out set); requires n_images >= n_voxels; assumes isotropic noise, so unequal or correlated voxel noise inflates the count; hours for ~8000 voxels; registered as `pca_mle` in `choosing_minimal_best_pca.SELECTION_FUNCTIONS`. |
-
-## `pipeline/testing/gsn/gsn_pca_smoke.py`
-
-File description: Debuggable smoke example for GSN PCA with known signal rank.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `run_gsn_pca_smoke (line 20)` | n_images: int=500, n_voxels: int=50, true_rank: int=5, n_repeats: int=4, seed: int=0 | dict[str, Any] | Run GSN PCA on repeated responses with known low-rank signal. | Scope: smoke/debug entry point. Related: `estimate_gsn_covariances`, `pca_signal_noise_covariances`, `select_gsn_pca_components`. Conventions: responses are `(image, voxel, repeat)`; prints only the cross-validated number of retained signal eigenvalues; reports selected count, error-minimizing count, eigengap after the true rank, and subspace overlap; no PID, DNN, or real-data dependency. |
-
 ## `pipeline/pid_pipeline.py`
 
 File description: Strict, readable orchestration class for one PID pipeline run.
@@ -562,61 +623,6 @@ File description: Utility helpers used by the PID pipeline orchestrator.
 | `source_context (line 520)` | sources: Any, source_name: str | Any | Read one source context from the sources object. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `choose_one_layer (line 536)` | layer_func: Callable[..., Any], source_context_value: Any, layer_kwargs: dict[str, Any] | Any | Choose one layer by adapting to the common layer-selection helper signatures. | Scope: reusable/public. Conventions: inspect implementation assumptions before reuse. |
 | `ridge_preprocessing (line 565)` | source_1: Any, source_2: Any, target: Any, rng, test_size, **preprocess_kwargs: Any | tuple[Any, Any, Any] | Apply ridge regression preprocessing to sources and target. | Scope: reusable/public. Conventions: verify scaling, alpha, and train/test conventions. |
-
-## `simulations/pca/rank/eigenvector_pca.py`
-
-File description: Numerical eigenvector PCA cross-validation and loading estimators.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `EigenvectorPCACVResult (line 49)` | See class definition | EigenvectorPCACVResult instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: verify PCA fitting split and component convention. |
-| `fit_pca_loadings_svd (line 59)` | X_train: np.ndarray, n_components: int | np.ndarray | Fit PCA loadings with SVD. | Scope: reusable/public. Conventions: also accepts a torch tensor and returns a tensor; on CUDA uses the exact `gesvd` driver. |
-| `_to_numpy (line 83)` | array: 'np.ndarray \\| torch.Tensor' | np.ndarray | Copy a NumPy array or torch tensor to a NumPy array on the CPU. | Scope: private helper. |
-| `_check_loadings (line 94)` | P: 'np.ndarray \\| torch.Tensor', n_features: int, n_components: int | None | Check the type and shape of a loading matrix returned by pca_fit_fn. | Scope: private helper. |
-| `_is_orthonormal (line 115)` | P: 'np.ndarray \\| torch.Tensor', tolerance: float | bool | Check whether the columns of a loading matrix are orthonormal. | Scope: private helper. |
-| `_direct_loo_press (line 129)` | x_test: np.ndarray, P: np.ndarray, eps: float | float | Calculate one held-out sample's PRESS by predicting each feature directly. | Scope: private helper. Conventions: explicit leave-one-feature-out least squares (np.delete + pinv); slow fallback and reference for the leverage formula. |
-| `_eigenvector_pca_cv_sample_press (line 150)` | X: 'np.ndarray \\| torch.Tensor', sample_index: int, max_components: int, pca_fit_fn: PCAFitFunction, center: bool, scale: bool, include_zero_components: bool, method_pca: str \\| None, eps: float | np.ndarray | Calculate one held-out sample's PRESS contribution. | Scope: private helper. Conventions: with method_pca="SVD" and orthonormal loadings, one SVD gives every component count through running residuals and leverages, r_j / (1 - h_j). |
-| `eigenvector_pca_cv (line 256)` | X: np.ndarray, max_components: int \\| None=None, pca_fit_fn: PCAFitFunction \\| None=None, center: bool=True, scale: bool=False, include_zero_components: bool=True, method_pca: str \\| None=None, eps: float=1e-12, checkpoint_csv_path: str \\| Path \\| None=None, device: str \\| None=None | EigenvectorPCACVResult | Run eigenvector cross-validation for PCA component selection. | Scope: reusable/public. Conventions: leave-one-sample-out; device (e.g. "cuda") runs float64 torch and requires method_pca="SVD" with fit_pca_loadings_svd; device is not in the checkpoint metadata. |
-| `fit_pca_loadings_sklearn (line 391)` | X_train: np.ndarray, n_components: int | np.ndarray | Fit PCA loadings with sklearn. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `regular_PCA (line 411)` | X: np.ndarray, variance_threshold: float | np.ndarray | Fit sklearn PCA using a variance threshold. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-
-## `simulations/pca/rank/eigenvector_pca_wrapper.py`
-
-File description: Checkpoint persistence helpers for eigenvector PCA cross-validation.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `_checkpoint_fields (line 31)` | max_components: int | tuple[list[str], list[str]] | Build the checkpoint CSV columns. | Scope: private helper. Conventions: verify PCA fitting split and component convention. |
-| `build_checkpoint_metadata (line 45)` | X: np.ndarray, max_components: int, pca_fit_fn: PCAFitFunction, center: bool, scale: bool, include_zero_components: bool, method_pca: str \\| None, eps: float | dict[str, str] | Build strict metadata used to validate a resumable checkpoint. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `load_eigenvector_pca_checkpoint (line 99)` | checkpoint_csv_path: str \\| Path, metadata: dict[str, str], max_components: int | dict[int, np.ndarray] | Load a compatible eigenvector PCA checkpoint. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `write_eigenvector_pca_checkpoint (line 161)` | checkpoint_csv_path: str \\| Path, metadata: dict[str, str], completed_press: dict[int, np.ndarray], max_components: int | None | Atomically write completed eigenvector PCA checkpoint rows. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-
-## `simulations/pca/rank/pca_simulation.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `create_T_and_P (line 30)` | n_samples: int, n_features: int, rank: int, loading_corr: float=0.0, component_strengths: np.ndarray \\| list[float] \\| None=None, random_state: int \\| None=None | tuple[np.ndarray, np.ndarray] | Create scores and correlated loadings. Inputs define sizes, rank, correlation, strengths, and seed; outputs are T and P arrays. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `generate_rank_simulation_data (line 69)` | n_samples: int, n_features: int, rank: int, loading_corr: float, noise_std: float, random_state: int, component_strengths: list[float] \\| np.ndarray \\| None=None, center_columns: bool=True | dict | Generate noisy known-rank data. Inputs define the condition; output contains X, T, P, normalized signal, and metadata. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-| `run_rank_simulation (line 95)` | grid: dict[str, list], output_dir: str \\| Path=OUTPUT_DIR, nbsim: int=NBSIM | tuple[pd.DataFrame, pd.DataFrame] | Run EM/K-fold rank selection and save raw/summary CSVs plus a PDF heatmap. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-
-## `simulations/pca/rank/rowwise_pca.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `RowwiseLOOVariancePCAResult (line 10)` | See class definition | RowwiseLOOVariancePCAResult instance | No docstring; inspect implementation before reuse. | Scope: class. Conventions: verify PCA fitting split and component convention. |
-| `rowwise_loo_pca_variance_threshold (line 23)` | X: np.ndarray, variance_threshold: float=0.99 | RowwiseLOOVariancePCAResult | Row-wise leave-one-out PCA where the number of PCs is chosen by | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
-
-## `simulations/pca/rank/run_simulation.py`
-
-File description: No module docstring; inspect before reuse.
-
-| Callable | Inputs | Outputs | Purpose | Scope / conventions |
-|---|---|---|---|---|
-| `run_simulation (line 13)` | n_samples: int, n_features: int, rank: int, loading_corr: float, noise_std: float, random_state: int | dict | Run PCA simulations with eigenvector and row-wise LOOCV methods. | Scope: reusable/public. Conventions: verify PCA fitting split and component convention. |
 
 ## `simulations/pca/ridge/pid_feature_middleware.py`
 
