@@ -1,0 +1,6 @@
+Betas without mean over repetitions: 
+/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_img_vox_rep
+
+
+Betas with mean over repetitions:
+/groups/golan_neurogroup/bml_group/datasets/nsddata/otc_betas/otc_betas_per_stim

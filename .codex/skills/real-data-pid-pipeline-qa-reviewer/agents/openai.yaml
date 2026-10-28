@@ -1,0 +1,4 @@
+interface:
+  display_name: "Real Data PID QA Reviewer"
+  short_description: "Review real-data PID pipeline code safely"
+  default_prompt: "Use $real-data-pid-pipeline-qa-reviewer to QA-check the real-data PID pipeline against the plan."

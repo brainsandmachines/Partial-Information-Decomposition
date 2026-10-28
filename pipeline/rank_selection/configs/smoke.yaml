@@ -1,0 +1,28 @@
+# Seconds-long check that every method runs on one small toy dataset.
+# cross_decomposition needs the cross_decomposition conda environment; in
+# pid_env it is reported as unavailable and the other methods still run.
+experiment_name: smoke
+
+data:
+  source: toy
+  fixed:
+    n_images: 300
+    n_voxels: 30
+    true_rank: 4
+    n_repeats: 3
+    noise_std: 1.0
+    noise_type: isotropic
+    n_subjects: 2        # a second subject so PLS can run
+    seed: 0
+
+methods:
+  variance_threshold: {variance_threshold: 0.9, folds: 5}
+  eigenvector:
+    - {basis: [pca, gsn], folds: 5, max_components: 15}
+    - {basis: pca, folds: loo, max_components: 15}
+  repeat_reconstruction: {basis: [gsn, pca], folds: 5, max_components: 15}
+  mle: {}
+  cross_decomposition: {n_permutations: 50, folds: 5, randomized: true, bin_stop: 100}
+  pls: {max_rank: 15, folds: 5}
+
+seeds: [0]

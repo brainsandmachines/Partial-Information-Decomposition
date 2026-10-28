@@ -1,0 +1,25 @@
+# Real data: choose the subjects below. Single-subject methods run once per
+# subject on image_set; pair methods (PLS) run on every ordered pair of the
+# chosen subjects on pair_image_set (only the shared images are seen by both).
+experiment_name: otc
+
+data:
+  source: otc
+  subjects: [subj01, subj02]
+  image_set: unique          # unique | shared | all
+  store: repeat              # repeat | per_stimulus (they disagree; see data.py)
+  pairs: all_ordered         # or an explicit list, e.g. [[subj01, subj02]]
+  pair_image_set: shared
+
+methods:
+  variance_threshold: {variance_threshold: 0.99, folds: 5}
+  eigenvector:
+    - {basis: [pca, gsn], folds: 5, max_components: 1000}
+    # Leave-one-image-out (about 3 days per subject on a GPU); uncomment to run:
+    # - {basis: pca, folds: loo, max_components: 1000, device: cuda}
+  repeat_reconstruction: {basis: [gsn, pca], folds: 5, max_components: 1000}
+  mle: {}                    # about 6 hours per subject (sklearn scores ranks in Python)
+  cross_decomposition: {n_permutations: 5000, folds: 8, randomized: false}   # exact SVD: run on a GPU
+  pls: {max_rank: 300, folds: 5}
+
+seeds: [0]

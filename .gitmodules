@@ -1,0 +1,12 @@
+[submodule "external/PID"]
+	path = external/PID
+	url = https://github.com/JWKay/PID.git
+[submodule "external/mayas_project"]
+	path = external/mayas_project
+	url = https://github.com/brainsandmachines/Mayas-Project.git
+[submodule "external/DeepDive"]
+	path = external/DeepDive
+	url = https://github.com/ColinConwell/DeepDive.git
+[submodule "external/scale-free-visual-cortex"]
+	path = external/scale-free-visual-cortex
+	url = https://github.com/BonnerLab/scale-free-visual-cortex.git
