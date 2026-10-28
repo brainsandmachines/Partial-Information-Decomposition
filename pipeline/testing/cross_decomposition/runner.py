@@ -9,7 +9,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from pipeline.testing.cross_decomposition.cross_decomposition_inputs import (
+from pipeline.testing.cross_decomposition.inputs import (
     DEFAULT_CONFIG_PATH,
     assert_caching_disabled,
     load_config,
@@ -18,12 +18,12 @@ from pipeline.testing.cross_decomposition.cross_decomposition_inputs import (
 
 from lib.spectra._computation import _get_folds
 
-from pipeline.testing.cross_decomposition.cross_decomposition_criteria import (
+from pipeline.testing.cross_decomposition.criteria import (
     calculate_authors_spectra,
     calculate_reconstruction_criterion,
     verify_ground_truth,
 )
-from pipeline.testing.cross_decomposition.cross_decomposition_outputs import (
+from pipeline.testing.cross_decomposition.outputs import (
     save_outputs,
     summarize_criteria,
 )
@@ -78,18 +78,14 @@ def run_cross_decomposition_criteria(
         n_folds=cross_decomposition_config["n_folds"],
         seed=cross_decomposition_config["seed"],
     )
-    reconstruction = None
-    if (
-        inputs["data_metadata"]["source"] == "synthetic"
-        and config["reconstruction"]["enabled_for_synthetic"]
-    ):
-        reconstruction = calculate_reconstruction_criterion(
-            x,
-            y,
-            folds,
-            randomized=cross_decomposition_config["randomized"],
-            seed=cross_decomposition_config["seed"],
-        )
+    reconstruction = calculate_reconstruction_criterion(
+        x,
+        y,
+        folds,
+        randomized=cross_decomposition_config["randomized"],
+        seed=cross_decomposition_config["seed"],
+        run_reconstruction=config["reconstruction"]["enabled"],
+    )
     summary = summarize_criteria(
         spectra_results["bin_table"],
         spectra_results["rank_table"],

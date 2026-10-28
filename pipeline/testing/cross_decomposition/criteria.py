@@ -8,7 +8,7 @@ import torch
 import xarray as xr
 
 # Configure Bonner before importing the authors' spectrum implementation.
-from pipeline.testing.cross_decomposition import cross_decomposition_inputs as _inputs
+from pipeline.testing.cross_decomposition import inputs as _inputs
 
 from lib.spectra import CrossDecomposition, compute_spectra_with_n_fold_cross_validation
 from lib.spectra._computation import filter_datasets
@@ -176,12 +176,14 @@ def calculate_reconstruction_criterion(
     folds: np.ndarray,
     randomized: bool,
     seed: int,
-) -> dict[str, Any]:
+    run_reconstruction: bool,
+) -> dict[str, Any] | None:
     """Calculate the reconstruction-based retained-rank criterion.
 
     This criterion uses only the authors' fitted transforms, but is separate
     from ``calculate_authors_spectra`` because the authors do not provide a
-    reconstruction-error rank-selection criterion.
+    reconstruction-error rank-selection criterion. It applies to synthetic
+    and OTC data alike.
 
     Inputs:
         x: xr.DataArray shaped (presentation, neuroid), repetition 0.
@@ -189,12 +191,17 @@ def calculate_reconstruction_criterion(
         folds: np.ndarray shaped (presentation,) from the authors' ``_get_folds``.
         randomized: bool passed unchanged to the authors' ``CrossDecomposition``.
         seed: int Torch seed for reproducible randomized decompositions.
+        run_reconstruction: bool; False skips the criterion entirely.
 
     Output:
         reconstruction: dict[str, Any] containing k=0..K, fold-normalized
             symmetric reconstruction errors, means, standard errors, and the
-            error-minimizing rank. All transforms use the authors' classes.
+            error-minimizing rank, or None when ``run_reconstruction`` is
+            False. All transforms use the authors' classes.
     """
+
+    if not run_reconstruction:
+        return None
 
     n_folds = int(np.unique(folds).size)
     max_k = min(

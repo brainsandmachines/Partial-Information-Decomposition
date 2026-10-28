@@ -15,7 +15,7 @@ import xarray as xr
 import yaml
 
 # Configure Bonner before importing the authors' plotting implementation.
-from pipeline.testing.cross_decomposition import cross_decomposition_inputs as _inputs
+from pipeline.testing.cross_decomposition import inputs as _inputs
 
 from lib.spectra import plot_spectrum
 
@@ -159,7 +159,7 @@ def plot_permutation_significance(
             axis.set_xlim(0.8, 1.4 * results["rank_table"]["component"].max())
             axis.set_xlabel("cross-decomposition rank")
             axis.set_title(title, loc="left")
-        axes[0].set_ylabel("held-out covariance / sqrt(d_x d_y)")
+        axes[0].set_ylabel("covariance")
         legend_handles = [
             Line2D([], [], ls="None", marker="s", color=OBSERVED_COLOR,
                    label="significant"),

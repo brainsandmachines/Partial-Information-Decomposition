@@ -35,10 +35,11 @@ cross_decomposition:
   # authors' exact setting. Randomization does not cap the OTC voxel dimensions.
   randomized: true
 
-# Reconstruction-error selection is not implemented by the authors. It remains
-# a separate synthetic diagnostic and is never run on OTC data.
+# Reconstruction-error selection is not implemented by the authors. It is a
+# separate diagnostic for synthetic or OTC data; false skips it entirely.
+# On OTC the current per-k loop is slow (thousands of candidate ranks).
 reconstruction:
-  enabled_for_synthetic: true
+  enabled: true
 
 # Figure 3 settings: 5,000 permutations, p < 0.001, 3 bins per decade over
 # ranks 1-10,000.
