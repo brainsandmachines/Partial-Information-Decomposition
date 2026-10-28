@@ -20,6 +20,7 @@ from external.mayas_project.features_and_encoding.feat_ext_and_encoding import g
 from pipeline.testing.gsn.gsn_pca import (
     gsn_eigenvector,
     pca_eigenvector,
+    pca_mle,
     select_gsn_pca_components,
 )
 from pipeline.utils import resolve_pipeline_function
@@ -44,6 +45,7 @@ SELECTION_FUNCTIONS = {
     "gsn_independent_repeat": select_gsn_pca_components,
     "gsn_eigenvector": gsn_eigenvector,
     "pca_eigenvector": pca_eigenvector,
+    "pca_mle": pca_mle,
 }
 # "unique": every image except shared1000 (default); "all": every OTC image.
 # Shared images are used only when "all" is requested explicitly.
