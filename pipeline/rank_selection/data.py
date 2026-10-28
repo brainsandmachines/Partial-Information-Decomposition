@@ -381,6 +381,7 @@ def _subject_noise(
         return noise, np.diag((noise_std * voxel_scale) ** 2)
     if noise_type == "correlated":
         mixing = noise_corr_strength * rng.normal(size=(noise_rank, n_voxels))  # (noise_rank, n_voxels)
+        #Mixing determines how strongly each latent noise source contributes to the noise of each voxel.
         shared = rng.normal(size=(n_images, noise_rank, n_repeats))
         # (n_images, noise_rank, n_repeats) x (noise_rank, n_voxels) -> (n_images, n_voxels, n_repeats)
         correlated_part = np.einsum("nkr,kv->nvr", shared, mixing)

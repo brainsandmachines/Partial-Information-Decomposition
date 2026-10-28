@@ -67,6 +67,11 @@ try:
 except Exception as error:
     pls = None
     _IMPORT_ERRORS["pls"] = error
+try:
+    from pipeline.rank_selection.methods import missmda
+except Exception as error:
+    missmda = None
+    _IMPORT_ERRORS["missmda"] = error
 
 
 def _spec(name: str, module: Any, **requirements: Any) -> MethodSpec:
@@ -93,6 +98,7 @@ METHODS: dict[str, MethodSpec] = {
         environment="cross_decomposition",
     ),
     "pls": _spec("pls", pls, needs_pair=True),
+    "missmda": _spec("missmda", missmda),
 }
 
 
@@ -128,9 +134,12 @@ def uses_seed(name: str, options: dict[str, Any]) -> bool:
     """Whether a method's result depends on the seed.
 
     Inputs: name, str; options, dict of the method's options.
-    Output: bool. False for ``mle`` and leave-one-image-out eigenvector CV.
+    Output: bool. False for ``mle``, leave-one-image-out eigenvector CV, and
+        missMDA GCV.
     """
     if name == "mle":
+        return False
+    if name == "missmda" and options.get("method_cv", "gcv") == "gcv":
         return False
     if name == "eigenvector" and options.get("folds") == "loo":
         return False

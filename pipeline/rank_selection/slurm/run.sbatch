@@ -14,6 +14,7 @@
 #   CONFIG     path of the YAML config (required)
 #   ENV        conda environment (default pid_env; cross_decomposition for the authors' method)
 #   ONLY       optional space-separated method names (same as run --only)
+#   CHUNK      tasks per array element (default 1); arrays are limited to 1001 elements
 #   SUMMARIZE  1 to rebuild summary.csv and the overview plots instead of running a task
 
 set -euo pipefail
@@ -38,5 +39,5 @@ echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || ec
 if [ "${SUMMARIZE:-0}" = "1" ]; then
     python -u -m pipeline.rank_selection.run --config "$CONFIG" --summarize
 else
-    python -u -m pipeline.rank_selection.run --config "$CONFIG" --task-index "$SLURM_ARRAY_TASK_ID" ${ONLY:+--only $ONLY}
+    python -u -m pipeline.rank_selection.run --config "$CONFIG" --task-index "$SLURM_ARRAY_TASK_ID" --chunk-size "${CHUNK:-1}" ${ONLY:+--only $ONLY}
 fi

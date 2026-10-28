@@ -3,6 +3,7 @@
     python -m pipeline.rank_selection.run --config pipeline/rank_selection/configs/smoke.yaml
     python -m pipeline.rank_selection.run --config ... --list
     python -m pipeline.rank_selection.run --config ... --task-index 3   # one SLURM array task
+    python -m pipeline.rank_selection.run --config ... --task-index 3 --chunk-size 7   # tasks 21-27
     python -m pipeline.rank_selection.run --config ... --summarize
     python -m pipeline.rank_selection.run --config ... --only cross_decomposition --list
 
@@ -439,6 +440,8 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--list", action="store_true", help="print the task list and exit")
     parser.add_argument("--task-index", type=int, help="run only this task (SLURM array index)")
+    parser.add_argument("--chunk-size", type=int, default=1,
+                        help="with --task-index i, run tasks i*size .. (i+1)*size - 1 (for arrays larger than SLURM allows)")
     parser.add_argument("--summarize", action="store_true", help="only rebuild summary.csv and plots")
     parser.add_argument("--only", nargs="+", metavar="METHOD",
                         help="keep only these methods (task indices refer to the filtered list)")
@@ -460,7 +463,13 @@ def main(argv: list[str] | None = None) -> None:
     experiment_dir = prepare_experiment_dir(config, config_path)
     if not args.summarize:
         cache: dict[str, RankData] = {}
-        selected = tasks if args.task_index is None else [tasks[args.task_index]]
+        if args.task_index is None:
+            selected = tasks
+        else:
+            first = args.task_index * args.chunk_size
+            selected = tasks[first:first + args.chunk_size]
+            if not selected:
+                raise IndexError(f"Chunk {args.task_index} is beyond the {len(tasks)} tasks.")
         unavailable = []
         for task in selected:
             try:
