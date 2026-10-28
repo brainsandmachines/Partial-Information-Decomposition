@@ -155,6 +155,7 @@ def pca_func(
     data: np.ndarray,
     mode: str = "eigenvector_CV",
     max_features: int | None = None,
+    device: str | None = None,
 ) -> dict[str, Any]:
     """Select a component count and fit centered, unstandardized PCA.
 
@@ -163,6 +164,8 @@ def pca_func(
         mode: str selecting ``pca_by_variance``, ``eigenvector_CV``, or
             ``missmda_CV``.
         max_features: int or None limiting candidate PCA components.
+        device: str or None, torch device (e.g. ``"cuda"``) for
+            ``eigenvector_CV``; None runs it in NumPy on the CPU.
         variance_threshold: float training-variance fraction used by
             ``pca_by_variance``.
 
@@ -191,6 +194,7 @@ def pca_func(
             max_components=max_features,
             method_pca="SVD",
             checkpoint_csv_path=csv_path,
+            device=device,
         )
         selected_n_components = int(output.selected_n_components)
     elif mode == "missmda_CV":
@@ -228,6 +232,7 @@ def main(
     save_models_path: str | Path | None = None,
     max_features: int | None = None,
     pca_mode: str = "missmda_CV",
+    device: str | None = None,
 ) -> dict[str, Any]:
     """Fit centered unstandardized PCA and evaluate shared held-out data.
 
@@ -242,6 +247,8 @@ def main(
             model and held-out variance CSV. When None, nothing is written.
         max_features: int or None, maximum number of features to use for PCA.
         pca_mode: str component-selection method passed to ``pca_func``.
+        device: str or None, torch device passed to ``pca_func`` for
+            ``eigenvector_CV``.
 
     Output:
         results: dict[str, Any], containing the fitted models, unique and
@@ -268,6 +275,7 @@ def main(
         mode=pca_mode,
         data=data_split["unique_neural_data"],
         max_features=max_features,
+        device=device,
     )
 
     heldout_scores = heldout_pca(

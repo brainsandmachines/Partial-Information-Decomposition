@@ -275,3 +275,142 @@ def select_gsn_pca_components(
             repeat_split_weights.max() / repeat_split_weights.min()
         ),
     }
+
+
+def gsn_eigenvector(
+    responses: np.ndarray,
+    max_components: int | None = None,
+    n_folds: int = 5,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """Select GSN signal PCs by eigenvector cross-validation on held-out images.
+
+    For each image fold, GSN is fit on the training images and the
+    eigenvectors of its signal covariance ``cSb`` form the PCA basis. Each
+    held-out image is averaged over all of its repeats and centered with the
+    training mean. Every voxel is then predicted from the image's other voxels
+    through the first f basis vectors (eigenvector / leave-one-voxel-out
+    PRESS), so no repeat split is used. The count with the lowest MSEP is
+    selected, as in ``eigenvector_pca_cv``. Image folds are assigned exactly
+    as in ``select_gsn_pca_components`` for the same seed.
+
+    Inputs:
+        responses: np.ndarray with shape (n_images, n_voxels, n_repeats).
+        max_components: int or None, largest candidate count; None tests
+            n_voxels - 1 components (f = n_voxels leaves no voxel to predict
+            from).
+        n_folds: int, number of held-out image folds.
+        seed: int, random seed used to assign images to folds.
+
+    Output:
+        results: dict[str, Any] with ``candidate_n_components`` of shape
+            (max_components + 1,) starting at 0, ``press`` (summed over all
+            images) and ``msep`` of that shape, ``fold_msep`` of shape
+            (n_folds, max_components + 1), ``msep_standard_errors`` across
+            folds, ``unstable_components`` (bool, True where some voxel had
+            leverage within 1e-8 of 1; those counts are excluded from the
+            selection), ``best_n_components`` and ``selected_n_components``
+            (both the MSEP-minimizing count).
+    """
+
+    response_array = np.asarray(responses, dtype=float)
+    if response_array.ndim != 3:
+        raise ValueError(
+            "responses must have shape (n_images, n_voxels, n_repeats)."
+        )
+    if not np.all(np.isfinite(response_array)):
+        raise ValueError("responses must be finite.")
+    n_images, n_voxels, n_repeats = response_array.shape
+    if n_images < 3:
+        raise ValueError("Component selection requires at least three images.")
+    if n_repeats < 2:
+        raise ValueError("GSN requires at least two repeats per image.")
+    if not isinstance(n_folds, (int, np.integer)):
+        raise TypeError("n_folds must be an integer.")
+    if not 2 <= n_folds <= n_images:
+        raise ValueError("n_folds must be between 2 and n_images.")
+    if max_components is None:
+        max_components = n_voxels - 1
+    if not isinstance(max_components, (int, np.integer)):
+        raise TypeError("max_components must be an integer or None.")
+    if not 1 <= max_components <= n_voxels - 1:
+        raise ValueError("max_components must be between 1 and n_voxels - 1.")
+
+    tolerance = 1e-8
+    rng = np.random.default_rng(seed)
+    # (n_images,) -> n_folds arrays with shape (n_validation_images,)
+    validation_folds = np.array_split(rng.permutation(n_images), n_folds)
+
+    fold_press = np.zeros((n_folds, max_components + 1))
+    fold_sizes = np.empty(n_folds)
+    unstable_components = np.zeros(max_components + 1, dtype=bool)
+    for fold_index, validation_indices in enumerate(validation_folds):
+        print(f"GSN eigenvector CV: fold {fold_index + 1} of {n_folds}...")
+        training_mask = np.ones(n_images, dtype=bool)
+        training_mask[validation_indices] = False
+        training_responses = response_array[training_mask]
+
+        # 1. GSN signal covariance on the training images -> PCA basis.
+        gsn_results = estimate_gsn_covariances(training_responses)
+        pca_results = pca_signal_noise_covariances(
+            gsn_results["cSb"],
+            gsn_results["cNb"],
+        )
+        # (n_voxels, n_voxels) -> (n_voxels, max_components)
+        basis = pca_results["signal_eigenvectors"][:, :max_components]
+
+        # 2. Held-out images: average all repeats, center with training mean.
+        # (n_training_images, n_voxels, n_repeats) -> (n_voxels,)
+        training_mean = training_responses.mean(axis=(0, 2))
+        # (n_validation_images, n_voxels, n_repeats) -> (n_validation_images, n_voxels)
+        heldout = response_array[validation_indices].mean(axis=2) - training_mean
+        fold_sizes[fold_index] = heldout.shape[0]
+        fold_press[fold_index, 0] = np.sum(heldout ** 2)
+
+        # 3. Eigenvector PRESS. With orthonormal basis vectors, the error of
+        #    predicting voxel j from the other voxels is r_j / (1 - h_j),
+        #    where r is the reconstruction residual and h the leverage.
+        # (n_validation_images, n_voxels) @ (n_voxels, max_components) ->
+        # (n_validation_images, max_components)
+        scores = heldout @ basis
+        residual = heldout.copy()  # (n_validation_images, n_voxels)
+        leverage = np.zeros(n_voxels)  # (n_voxels,)
+        for component_index in range(max_components):
+            # (n_validation_images, 1) * (1, n_voxels) ->
+            # (n_validation_images, n_voxels)
+            residual -= (
+                scores[:, component_index, None]
+                * basis[None, :, component_index]
+            )
+            leverage += basis[:, component_index] ** 2
+            denominator = 1.0 - leverage  # (n_voxels,)
+            if np.any(np.abs(denominator) <= tolerance):
+                unstable_components[component_index + 1] = True
+                continue
+            fold_press[fold_index, component_index + 1] = np.sum(
+                (residual / denominator[None, :]) ** 2
+            )
+
+    # (n_folds, max_components + 1) -> (max_components + 1,)
+    press = fold_press.sum(axis=0)
+    msep = press / (n_images * n_voxels)
+    # (n_folds, max_components + 1) / (n_folds, 1) -> (n_folds, max_components + 1)
+    fold_msep = fold_press / (fold_sizes[:, None] * n_voxels)
+    # (n_folds, max_components + 1) -> (max_components + 1,)
+    msep_standard_errors = fold_msep.std(axis=0, ddof=1) / np.sqrt(n_folds)
+    press[unstable_components] = np.nan
+    msep[unstable_components] = np.nan
+    fold_msep[:, unstable_components] = np.nan
+    msep_standard_errors[unstable_components] = np.nan
+    best_n_components = int(np.nanargmin(msep))
+
+    return {
+        "selected_n_components": best_n_components,
+        "best_n_components": best_n_components,
+        "candidate_n_components": np.arange(max_components + 1),
+        "press": press,
+        "msep": msep,
+        "fold_msep": fold_msep,
+        "msep_standard_errors": msep_standard_errors,
+        "unstable_components": unstable_components,
+    }
