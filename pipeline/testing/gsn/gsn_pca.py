@@ -414,3 +414,135 @@ def gsn_eigenvector(
         "msep_standard_errors": msep_standard_errors,
         "unstable_components": unstable_components,
     }
+
+
+def pca_eigenvector(
+    responses: np.ndarray,
+    max_components: int | None = None,
+    n_folds: int = 5,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """Select ordinary PCs by eigenvector cross-validation on held-out images.
+
+    Identical to ``gsn_eigenvector`` except for the basis: in each image fold
+    the basis is the PCA (right singular vectors) of the training images'
+    repeat-averaged, training-mean-centered responses instead of GSN's signal
+    covariance. Folds, held-out averaging over all repeats, centering, the
+    leave-one-voxel-out PRESS, and the MSEP-minimum selection are the same, so
+    the two curves differ only in the basis.
+
+    Inputs:
+        responses: np.ndarray with shape (n_images, n_voxels, n_repeats).
+        max_components: int or None, largest candidate count; None tests
+            min(n_voxels - 1, n_training_images - 1) components.
+        n_folds: int, number of held-out image folds.
+        seed: int, random seed used to assign images to folds (same folds as
+            ``gsn_eigenvector`` and ``select_gsn_pca_components``).
+
+    Output:
+        results: dict[str, Any] with the same keys and shapes as
+            ``gsn_eigenvector``: ``candidate_n_components`` (from 0),
+            ``press``, ``msep``, ``fold_msep``, ``msep_standard_errors``,
+            ``unstable_components``, ``best_n_components`` and
+            ``selected_n_components``.
+    """
+
+    response_array = np.asarray(responses, dtype=float)
+    if response_array.ndim != 3:
+        raise ValueError(
+            "responses must have shape (n_images, n_voxels, n_repeats)."
+        )
+    if not np.all(np.isfinite(response_array)):
+        raise ValueError("responses must be finite.")
+    n_images, n_voxels, _ = response_array.shape
+    if n_images < 3:
+        raise ValueError("Component selection requires at least three images.")
+    if not isinstance(n_folds, (int, np.integer)):
+        raise TypeError("n_folds must be an integer.")
+    if not 2 <= n_folds <= n_images:
+        raise ValueError("n_folds must be between 2 and n_images.")
+    min_training = n_images - int(np.ceil(n_images / n_folds))
+    largest = min(n_voxels - 1, min_training - 1)
+    if max_components is None:
+        max_components = largest
+    if not isinstance(max_components, (int, np.integer)):
+        raise TypeError("max_components must be an integer or None.")
+    if not 1 <= max_components <= largest:
+        raise ValueError(f"max_components must be between 1 and {largest}.")
+
+    tolerance = 1e-8
+    rng = np.random.default_rng(seed)
+    # (n_images,) -> n_folds arrays with shape (n_validation_images,)
+    validation_folds = np.array_split(rng.permutation(n_images), n_folds)
+
+    fold_press = np.zeros((n_folds, max_components + 1))
+    fold_sizes = np.empty(n_folds)
+    unstable_components = np.zeros(max_components + 1, dtype=bool)
+    for fold_index, validation_indices in enumerate(validation_folds):
+        print(f"PCA eigenvector CV: fold {fold_index + 1} of {n_folds}...")
+        training_mask = np.ones(n_images, dtype=bool)
+        training_mask[validation_indices] = False
+        training_responses = response_array[training_mask]
+
+        # 1. PCA of the training images' repeat-averaged responses -> basis.
+        # (n_training_images, n_voxels, n_repeats) -> (n_voxels,)
+        training_mean = training_responses.mean(axis=(0, 2))
+        # (n_training_images, n_voxels, n_repeats) -> (n_training_images, n_voxels)
+        training_average = training_responses.mean(axis=2) - training_mean
+        # (n_training_images, n_voxels) -> Vt: (min(n_training_images, n_voxels), n_voxels)
+        _, _, Vt = np.linalg.svd(training_average, full_matrices=False)
+        # (min(n_training_images, n_voxels), n_voxels) -> (n_voxels, max_components)
+        basis = Vt[:max_components].T
+
+        # 2. Held-out images: average all repeats, center with training mean.
+        # (n_validation_images, n_voxels, n_repeats) -> (n_validation_images, n_voxels)
+        heldout = response_array[validation_indices].mean(axis=2) - training_mean
+        fold_sizes[fold_index] = heldout.shape[0]
+        fold_press[fold_index, 0] = np.sum(heldout ** 2)
+
+        # 3. Eigenvector PRESS, as in gsn_eigenvector: the error of predicting
+        #    voxel j from the other voxels is r_j / (1 - h_j).
+        # (n_validation_images, n_voxels) @ (n_voxels, max_components) ->
+        # (n_validation_images, max_components)
+        scores = heldout @ basis
+        residual = heldout.copy()  # (n_validation_images, n_voxels)
+        leverage = np.zeros(n_voxels)  # (n_voxels,)
+        for component_index in range(max_components):
+            # (n_validation_images, 1) * (1, n_voxels) ->
+            # (n_validation_images, n_voxels)
+            residual -= (
+                scores[:, component_index, None]
+                * basis[None, :, component_index]
+            )
+            leverage += basis[:, component_index] ** 2
+            denominator = 1.0 - leverage  # (n_voxels,)
+            if np.any(np.abs(denominator) <= tolerance):
+                unstable_components[component_index + 1] = True
+                continue
+            fold_press[fold_index, component_index + 1] = np.sum(
+                (residual / denominator[None, :]) ** 2
+            )
+
+    # (n_folds, max_components + 1) -> (max_components + 1,)
+    press = fold_press.sum(axis=0)
+    msep = press / (n_images * n_voxels)
+    # (n_folds, max_components + 1) / (n_folds, 1) -> (n_folds, max_components + 1)
+    fold_msep = fold_press / (fold_sizes[:, None] * n_voxels)
+    # (n_folds, max_components + 1) -> (max_components + 1,)
+    msep_standard_errors = fold_msep.std(axis=0, ddof=1) / np.sqrt(n_folds)
+    press[unstable_components] = np.nan
+    msep[unstable_components] = np.nan
+    fold_msep[:, unstable_components] = np.nan
+    msep_standard_errors[unstable_components] = np.nan
+    best_n_components = int(np.nanargmin(msep))
+
+    return {
+        "selected_n_components": best_n_components,
+        "best_n_components": best_n_components,
+        "candidate_n_components": np.arange(max_components + 1),
+        "press": press,
+        "msep": msep,
+        "fold_msep": fold_msep,
+        "msep_standard_errors": msep_standard_errors,
+        "unstable_components": unstable_components,
+    }

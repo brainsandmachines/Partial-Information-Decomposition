@@ -17,7 +17,11 @@ for path in (repo_root, external_root):
         sys.path.insert(0, path_str)
 
 from external.mayas_project.features_and_encoding.feat_ext_and_encoding import get_stim_info
-from pipeline.testing.gsn.gsn_pca import gsn_eigenvector, select_gsn_pca_components
+from pipeline.testing.gsn.gsn_pca import (
+    gsn_eigenvector,
+    pca_eigenvector,
+    select_gsn_pca_components,
+)
 from pipeline.utils import resolve_pipeline_function
 
 
@@ -39,6 +43,7 @@ MAX_LISTED_NONFINITE_IMAGES = 20
 SELECTION_FUNCTIONS = {
     "gsn_independent_repeat": select_gsn_pca_components,
     "gsn_eigenvector": gsn_eigenvector,
+    "pca_eigenvector": pca_eigenvector,
 }
 # "unique": every image except shared1000 (default); "all": every OTC image.
 # Shared images are used only when "all" is requested explicitly.
